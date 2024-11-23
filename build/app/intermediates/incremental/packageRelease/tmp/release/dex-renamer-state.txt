@@ -1,4 +1,0 @@
-#Sat Nov 23 12:59:49 CET 2024
-base.0=/home/mathis/tek3/all_area/B-DEV-500-PAR-5-2-area-yanis.harkouk/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-renamed.0=classes.dex
-path.0=classes.dex
