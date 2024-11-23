@@ -20,6 +20,10 @@ type User struct {
 	createdAt string
 }
 
+type Database struct {
+	db *sql.DB
+}
+
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
 	port, err := strconv.Atoi(os.Getenv("PGPORT"))
 	if err != nil {
@@ -140,8 +144,40 @@ func randomNumber(context *gin.Context) {
 	})
 }
 
+func (databaseContext *Database) loginAuthentification(context *gin.Context) {
+	email := context.Param("email")
+	hashedPass := context.Param("password")
+
+	foundUser, err := findUserByEmail(databaseContext.db, email)
+
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find requested user",
+		})
+		return
+	}
+
+	//
+	fmt.Println("foundUserPass: " + foundUser.password)
+	fmt.Println("Hashed In DB: " + hashedPass)
+	//
+
+	if foundUser.password == hashedPass {
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"success": "Connection successfull",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusBadRequest, gin.H{
+		"error": "Wrong password",
+	})
+}
+
 func main() {
-	db, err := connectToDatabase()
+	var databaseContext Database
+	var err error
+
+	databaseContext.db, err = connectToDatabase()
 	if err != nil {
 		panic(err)
 	}
@@ -149,6 +185,7 @@ func main() {
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/hi", helloServer)
 	router.GET("/random/:maxRand", randomNumber)
+	router.GET("/login/:email/:password", databaseContext.loginAuthentification)
 	router.Run(":8080")
-	defer db.Close()
+	defer databaseContext.db.Close()
 }
