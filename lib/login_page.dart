@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
               ),
 
               Padding(padding: EdgeInsets.only(top: 15)),
-              OrDivider(
+              MyDivider(
                 text: AutoSizeText("or", style: TextStyle(fontSize: 16, color: Colors.grey), maxLines: 1,),
                 textPadding: EdgeInsets.symmetric(horizontal: 8.0),
               ),

@@ -105,8 +105,8 @@ class CustomPasswdForm extends StatelessWidget {
   }
 }
 
-class OrDivider extends StatelessWidget {
-  const OrDivider({
+class MyDivider extends StatelessWidget {
+  const MyDivider({
     super.key,
     this.text = const AutoSizeText(''),
     this.textPadding = const EdgeInsets.symmetric(),
