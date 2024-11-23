@@ -13,6 +13,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type User struct {
+	id        string
+	email     string
+	password  string
+	createdAt string
+}
+
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
 	port, err := strconv.Atoi(os.Getenv("PGPORT"))
 	if err != nil {
@@ -47,15 +54,39 @@ func connectToDatabase() (*sql.DB, error) {
 	return db, err
 }
 
-func createUser(db *sql.DB, username string, email string, password string) {
+func createUser(db *sql.DB, email string, password string) {
 	sqlStatement := `
-    INSERT INTO users (username, email, password)
+    INSERT INTO users (email, password)
     VALUES ($1, $2, $3);
     `
-	_, err := db.Exec(sqlStatement, username, email, password)
+	_, err := db.Exec(sqlStatement, email, password)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func findUserByEmail(db *sql.DB, email string) (User, error) {
+	var retrievedUser User
+	sqlStatement := `SELECT * FROM users where email = ($1)`
+	rows, err := db.Query(sqlStatement, email)
+
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&retrievedUser.id, &retrievedUser.email,
+			&retrievedUser.password, &retrievedUser.createdAt)
+		if err != nil {
+			panic(err)
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+	return retrievedUser, err
 }
 
 func createService(db *sql.DB, name string) {
