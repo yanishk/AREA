@@ -3,8 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
+	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -26,17 +30,17 @@ func connectToDatabase() (*sql.DB, error) {
 	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-	  "password=%s dbname=%s sslmode=require",
-	  host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=require",
+		host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-	  panic(err)
+		panic(err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-	  panic(err)
+		panic(err)
 	}
 
 	fmt.Println("Successfully connected!")
@@ -48,10 +52,10 @@ func createUser(db *sql.DB, username string, email string, password string) {
     INSERT INTO users (username, email, password)
     VALUES ($1, $2, $3);
     `
-    _, err := db.Exec(sqlStatement, username, email, password)
-    if err != nil {
-      panic(err)
-    }
+	_, err := db.Exec(sqlStatement, username, email, password)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func createService(db *sql.DB, name string) {
@@ -59,28 +63,11 @@ func createService(db *sql.DB, name string) {
     INSERT INTO services (name)
     VALUES ($1);
     `
-    _, err := db.Exec(sqlStatement, name)
-    if err != nil {
-      panic(err)
-    }
-}
-
-func main() {
-	db, err := connectToDatabase()
+	_, err := db.Exec(sqlStatement, name)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 }
-package main
-
-import (
-	"math/rand"
-	"net/http"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
-)
 
 func sumNumbers(context *gin.Context) {
 	firstNbr, err1 := strconv.Atoi(context.Param("numberFrst"))
@@ -123,9 +110,14 @@ func randomNumber(context *gin.Context) {
 }
 
 func main() {
+	db, err := connectToDatabase()
+	if err != nil {
+		panic(err)
+	}
 	var router *gin.Engine = gin.Default()
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/hi", helloServer)
 	router.GET("/random/:maxRand", randomNumber)
 	router.Run(":8080")
+	defer db.Close()
 }
