@@ -1,0 +1,1 @@
+ /home/mathis/tek3/all_area/B-DEV-500-PAR-5-2-area-yanis.harkouk/.dart_tool/flutter_build/30afde2c8413f160148e0329e0f7141d/native_assets.yaml: 
