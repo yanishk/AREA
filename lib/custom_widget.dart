@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -13,7 +14,7 @@ class CustomButton extends StatelessWidget {
   });
 
   final Color backgroundColor;
-  final Text text;
+  final AutoSizeText text;
   final VoidCallback? onPressed;
   final Size size;
   final EdgeInsets padding;
@@ -107,13 +108,13 @@ class CustomPasswdForm extends StatelessWidget {
 class OrDivider extends StatelessWidget {
   const OrDivider({
     super.key,
-    this.text = const Text(''),
+    this.text = const AutoSizeText(''),
     this.textPadding = const EdgeInsets.symmetric(),
     this.color = Colors.grey,
     this.thickness = 1,
   });
 
-  final Text text;
+  final AutoSizeText text;
   final EdgeInsets textPadding;
   final Color color;
   final double thickness;

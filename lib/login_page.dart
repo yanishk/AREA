@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import "custom_widget.dart";
+import "sign_up.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -24,7 +26,7 @@ class LoginPage extends StatelessWidget {
 
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 34, 34, 34),
-                text: Text("Log in", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+                text: AutoSizeText("Log in", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -32,14 +34,14 @@ class LoginPage extends StatelessWidget {
 
               Padding(padding: EdgeInsets.only(top: 15)),
               OrDivider(
-                text: Text("or", style: TextStyle(fontSize: 16, color: Colors.grey),),
+                text: AutoSizeText("or", style: TextStyle(fontSize: 16, color: Colors.grey), maxLines: 1,),
                 textPadding: EdgeInsets.symmetric(horizontal: 8.0),
               ),
               Padding(padding: EdgeInsets.only(top: 15)),
 
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 232, 74, 74),
-                text: Text("Continue with google", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),),
+                text: AutoSizeText("Continue with google", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -50,7 +52,7 @@ class LoginPage extends StatelessWidget {
               Padding(padding: EdgeInsets.only(top: 10)),
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 59, 87, 157),
-                text: Text("Continue with Facebook", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),),
+                text: AutoSizeText("Continue with Facebook", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -61,7 +63,7 @@ class LoginPage extends StatelessWidget {
               Padding(padding: EdgeInsets.only(top: 10)),
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 169, 169, 169),
-                text: Text("Continue with X", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),),
+                text: AutoSizeText("Continue with X", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -72,7 +74,7 @@ class LoginPage extends StatelessWidget {
               Padding(padding: EdgeInsets.only(top: 10)),
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 34, 34, 34),
-                text: Text("Continue with Apple", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),),
+                text: AutoSizeText("Continue with Apple", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
@@ -81,7 +83,16 @@ class LoginPage extends StatelessWidget {
               ),
 
               Padding(padding: EdgeInsets.only(top: 30)),
-              Text("New to AREA? Sign up here. ", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+
+              ElevatedButton(
+                child: const Text("New to AREA? Sign up here. ", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUp()),
+                  );
+                },
+              ),
 
             ],
           ),
