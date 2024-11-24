@@ -80,8 +80,8 @@ func findUserByEmail(db *sql.DB, email string) (User, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&retrievedUser.id, &retrievedUser.email,
-			&retrievedUser.password, &retrievedUser.createdAt)
+		err := rows.Scan(&retrievedUser.email,
+			&retrievedUser.password, &retrievedUser.id, &retrievedUser.createdAt)
 		if err != nil {
 			panic(err)
 		}
@@ -150,17 +150,12 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 
 	foundUser, err := findUserByEmail(databaseContext.db, email)
 
-	if err != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
+	if err != nil || len(foundUser.email) <= 0 {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Could not find requested user",
 		})
 		return
 	}
-
-	//
-	fmt.Println("foundUserPass: " + foundUser.password)
-	fmt.Println("Hashed In DB: " + hashedPass)
-	//
 
 	if foundUser.password == hashedPass {
 		context.IndentedJSON(http.StatusOK, gin.H{
@@ -168,7 +163,7 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		})
 		return
 	}
-	context.IndentedJSON(http.StatusBadRequest, gin.H{
+	context.IndentedJSON(http.StatusUnauthorized, gin.H{
 		"error": "Wrong password",
 	})
 }
