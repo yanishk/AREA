@@ -151,7 +151,8 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		Password string `json:"password"`
 	}
 
-	if err := context.ShouldBindJSON(&loginData); err != nil {
+	err := context.ShouldBindJSON(&loginData)
+	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
 		})
