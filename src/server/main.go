@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 type User struct {
@@ -145,10 +146,19 @@ func randomNumber(context *gin.Context) {
 }
 
 func (databaseContext *Database) loginAuthentification(context *gin.Context) {
-	email := context.Param("email")
-	hashedPass := context.Param("password")
+	var loginData struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
-	foundUser, err := findUserByEmail(databaseContext.db, email)
+	if err := context.ShouldBindJSON(&loginData); err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	foundUser, err := findUserByEmail(databaseContext.db, loginData.Email)
 
 	if err != nil || len(foundUser.email) <= 0 {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -157,7 +167,7 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		return
 	}
 
-	if foundUser.password == hashedPass {
+	if foundUser.password == loginData.Password {
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"success": "Connection successfull",
 		})
@@ -176,11 +186,26 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	corsAllow := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:8081"},
+		AllowedMethods: []string{"GET", "POST"},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+
 	var router *gin.Engine = gin.Default()
+
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/hi", helloServer)
 	router.GET("/random/:maxRand", randomNumber)
-	router.GET("/login/:email/:password", databaseContext.loginAuthentification)
-	router.Run(":8080")
+	router.POST("/login/", databaseContext.loginAuthentification)
+
+	handler := corsAllow.Handler(router)
+
+	err = http.ListenAndServe(":8080", handler)
+	if err != nil {
+		panic(err)
+	}
+
 	defer databaseContext.db.Close()
 }
