@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -96,7 +97,7 @@ func createUser(db *sql.DB, email string, password string) error {
 
 	_, err := findUserByEmail(db, email)
 	if err == nil {
-	    return fmt.Errorf("User already exist")
+		return fmt.Errorf("User already exist")
 	}
 
 	_, err = db.Exec(sqlStatement, email, password)
@@ -305,6 +306,41 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 	})
 }
 
+func (databaseContext *Database) createNewUser(context *gin.Context) {
+	var newUser struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := context.ShouldBindJSON(&newUser)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error",
+		})
+		return
+	}
+
+	errorUser := createUser(databaseContext.db, newUser.Email, string(hash))
+	if errorUser != nil {
+		context.IndentedJSON(http.StatusConflict, gin.H{
+			"error": "Email address already used",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "New user created",
+	})
+}
+
 func main() {
 	var databaseContext Database
 	var err error
@@ -325,7 +361,8 @@ func main() {
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/hi", helloServer)
 	router.GET("/random/:maxRand", randomNumber)
-	router.POST("/login/", databaseContext.loginAuthentification)
+	router.POST("/login", databaseContext.loginAuthentification)
+	router.POST("/register", databaseContext.createNewUser)
 
 	handler := corsAllow.Handler(router)
 
