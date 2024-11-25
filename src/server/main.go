@@ -93,7 +93,13 @@ func createUser(db *sql.DB, email string, password string) error {
     INSERT INTO users (email, password)
     VALUES ($1, $2);
     `
-	_, err := db.Exec(sqlStatement, email, password)
+
+	_, err := findUserByEmail(db, email)
+	if err == nil {
+	    return fmt.Errorf("User already exist")
+	}
+
+	_, err = db.Exec(sqlStatement, email, password)
 	if err != nil {
 		return err
 	}
