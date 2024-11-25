@@ -295,7 +295,9 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		return
 	}
 
-	if foundUser.password == loginData.Password {
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.password), []byte(loginData.Password))
+
+	if resBcrypt == nil {
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"success": "Connection successfull",
 		})
