@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import "explore.dart";
-
+import "login_page.dart";
 void main() {
   runApp(MyApp());
 }
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'AREA',
-      home: ExplorePage(),
+      home: LoginPage(),
     );
   }
 }

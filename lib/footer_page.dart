@@ -26,19 +26,21 @@ class FooterNavigationBar extends StatelessWidget {
       showUnselectedLabels: true,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
-      selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-      unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
       onTap: (int index) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => _pages[index]),
-        );
+        if (index != currentIndex) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => _pages[index]),
+          );
+        }
       },
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.call_to_action_outlined),
-          label: 'My Applets',
+          label: 'My Workflow',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.search),
