@@ -89,14 +89,11 @@ func connectToDatabase() (*sql.DB, error) {
 }
 
 func createUser(db *sql.DB, email string, password string) error {
-	sqlStatement := `
-    INSERT INTO users (email, password)
-    VALUES ($1, $2);
-    `
+	sqlStatement := `INSERT INTO users (email, password) VALUES ($1, $2);`
 
 	_, err := findUserByEmail(db, email)
 	if err == nil {
-	    return fmt.Errorf("User already exist")
+		return fmt.Errorf("User already exist")
 	}
 
 	_, err = db.Exec(sqlStatement, email, password)
@@ -107,14 +104,11 @@ func createUser(db *sql.DB, email string, password string) error {
 }
 
 func createService(db *sql.DB, name string) error {
-	sqlStatement := `
-    INSERT INTO services (name)
-    VALUES ($1);
-    `
+	sqlStatement := `INSERT INTO services (name) VALUES ($1);`
 
 	_, err := findServiceByName(db, name)
 	if err == nil {
-	    return fmt.Errorf("Service already exist")
+		return fmt.Errorf("Service already exist")
 	}
 
 	_, err = db.Exec(sqlStatement, name)
@@ -125,12 +119,18 @@ func createService(db *sql.DB, name string) error {
 }
 
 func createTrigger(db *sql.DB, name string, description string, serviceName string) error {
+	sqlStatement := `INSERT INTO triggers (name, description, serviceid) VALUES ($1, $2, $3);`
+
+	_, err := findTriggerByName(db, name)
+	if (err == nil) {
+		return fmt.Errorf("Trigger already exist")
+	}
+
 	retrievedService, err := findServiceByName(db, serviceName)
 	if err != nil {
 		return err
 	}
 
-	sqlStatement := `INSERT INTO triggers (name, description, serviceid) VALUES ($1, $2, $3);`
 	_, err = db.Exec(sqlStatement, name, description, retrievedService.id)
 	if err != nil {
 		return err
@@ -139,12 +139,18 @@ func createTrigger(db *sql.DB, name string, description string, serviceName stri
 }
 
 func createAction(db *sql.DB, name string, description string, serviceName string) error {
+	sqlStatement := `INSERT INTO actions (name, description, serviceid) VALUES ($1, $2, $3);`
+
+	_, err := findActionByName(db, name)
+	if (err == nil) {
+		return fmt.Errorf("Action already exist")
+	}
+
 	retrievedService, err := findServiceByName(db, serviceName)
 	if err != nil {
 		return err
 	}
 
-	sqlStatement := `INSERT INTO actions (name, description, serviceid) VALUES ($1, $2, $3);`
 	_, err = db.Exec(sqlStatement, name, description, retrievedService.id)
 	if err != nil {
 		return err
@@ -153,6 +159,8 @@ func createAction(db *sql.DB, name string, description string, serviceName strin
 }
 
 func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName string, actionName string) error {
+	sqlStatement := `INSERT INTO workflows (name, ownerid, triggerid, actionid, isactivated) VALUES ($1, $2, $3, $4, $5);`
+
 	retrievedUser, err := findUserByEmail(db, ownerEmail)
 	if err != nil {
 		return err
@@ -168,7 +176,6 @@ func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName stri
 		return err
 	}
 
-	sqlStatement := `INSERT INTO workflows (name, ownerid, triggerid, actionid, isactivated) VALUES ($1, $2, $3, $4, $5);`
 	_, err = db.Exec(sqlStatement, name, retrievedUser.id, retrievedTrigger.id, retrievedAction.id, true)
 	if err != nil {
 		return err
@@ -177,8 +184,8 @@ func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName stri
 }
 
 func findUserByEmail(db *sql.DB, email string) (User, error) {
-	var retrievedUser User
 	sqlStatement := `SELECT * FROM users where email = ($1)`
+	var retrievedUser User
 
 	row := db.QueryRow(sqlStatement, email)
 	err := row.Scan(&retrievedUser.email, &retrievedUser.password, &retrievedUser.id, &retrievedUser.createdAt)
@@ -189,8 +196,8 @@ func findUserByEmail(db *sql.DB, email string) (User, error) {
 }
 
 func findServiceByName(db *sql.DB, name string) (Service, error) {
-	var retrievedService Service
 	sqlStatement := `SELECT * FROM services where name = ($1)`
+	var retrievedService Service
 
 	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedService.id, &retrievedService.name)
@@ -201,8 +208,8 @@ func findServiceByName(db *sql.DB, name string) (Service, error) {
 }
 
 func findTriggerByName(db *sql.DB, name string) (Trigger, error) {
-	var retrievedTrigger Trigger
 	sqlStatement := `SELECT * FROM triggers where name = ($1)`
+	var retrievedTrigger Trigger
 
 	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedTrigger.id, &retrievedTrigger.serviceId, &retrievedTrigger.name, &retrievedTrigger.description)
@@ -213,8 +220,8 @@ func findTriggerByName(db *sql.DB, name string) (Trigger, error) {
 }
 
 func findActionByName(db *sql.DB, name string) (Action, error) {
-	var retrievedAction Action
 	sqlStatement := `SELECT * FROM actions where name = ($1)`
+	var retrievedAction Action
 
 	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedAction.id, &retrievedAction.serviceId, &retrievedAction.name, &retrievedAction.description)
@@ -225,8 +232,8 @@ func findActionByName(db *sql.DB, name string) (Action, error) {
 }
 
 func findWorkflowByName(db *sql.DB, name string) (Workflow, error) {
-	var retrievedWorkflow Workflow
 	sqlStatement := `SELECT * FROM workflows where name = ($1)`
+	var retrievedWorkflow Workflow
 
 	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedWorkflow.id, &retrievedWorkflow.name, &retrievedWorkflow.ownerId, &retrievedWorkflow.actionId,
