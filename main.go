@@ -1,11 +1,16 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func sumNumbers(context *gin.Context) {
@@ -48,58 +53,40 @@ func randomNumber(context *gin.Context) {
 	})
 }
 
-func main() {
-	var router *gin.Engine = gin.Default()
-	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
-	router.GET("/hi", helloServer)
-	router.GET("/random/:maxRand", randomNumber)
-	router.Run(":8080")
-}
-package main
-
-import (
-	"database/sql"
-	"fmt"
-	"os"
-	"strconv"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
-)
-
 type User struct {
-	id string
-	email string
-	password string
+	id        string
+	email     string
+	password  string
 	createdAt string
 }
 
 type Service struct {
-	id string
+	id   string
 	name string
 }
 
 type Trigger struct {
-	id string
-	serviceId string
-	name string
+	id          string
+	serviceId   string
+	name        string
 	description string
 }
 
 type Action struct {
-	id string
-	serviceId string
-	name string
+	id          string
+	serviceId   string
+	name        string
 	description string
 }
 
 type Workflow struct {
-	id string
-	name string
-	ownerId string
-	actionId string
-	triggerId string
+	id          string
+	name        string
+	ownerId     string
+	actionId    string
+	triggerId   string
 	isActivated bool
-	createdAt string
+	createdAt   string
 }
 
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
@@ -119,17 +106,17 @@ func connectToDatabase() (*sql.DB, error) {
 	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-	  "password=%s dbname=%s sslmode=require",
-	  host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=require",
+		host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-	  panic(err)
+		panic(err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-	  panic(err)
+		panic(err)
 	}
 
 	fmt.Println("Successfully connected!")
@@ -141,10 +128,10 @@ func createUser(db *sql.DB, email string, password string) error {
     INSERT INTO users (email, password)
     VALUES ($1, $2);
     `
-    _, err := db.Exec(sqlStatement, email, password)
-    if err != nil {
-      return err
-    }
+	_, err := db.Exec(sqlStatement, email, password)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -153,10 +140,10 @@ func createService(db *sql.DB, name string) error {
     INSERT INTO services (name)
     VALUES ($1);
     `
-    _, err := db.Exec(sqlStatement, name)
-    if err != nil {
+	_, err := db.Exec(sqlStatement, name)
+	if err != nil {
 		return err
-    }
+	}
 	return nil
 }
 
@@ -167,10 +154,10 @@ func createTrigger(db *sql.DB, name string, description string, serviceName stri
 	}
 
 	sqlStatement := `INSERT INTO triggers (name, description, serviceid) VALUES ($1, $2, $3);`
-    _, err = db.Exec(sqlStatement, name, description, retrievedService.id)
-    if err != nil {
-    	return err
-    }
+	_, err = db.Exec(sqlStatement, name, description, retrievedService.id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -181,10 +168,10 @@ func createAction(db *sql.DB, name string, description string, serviceName strin
 	}
 
 	sqlStatement := `INSERT INTO actions (name, description, serviceid) VALUES ($1, $2, $3);`
-    _, err = db.Exec(sqlStatement, name, description, retrievedService.id)
-    if err != nil {
-    	return err
-    }
+	_, err = db.Exec(sqlStatement, name, description, retrievedService.id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -205,10 +192,10 @@ func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName stri
 	}
 
 	sqlStatement := `INSERT INTO workflows (name, ownerid, triggerid, actionid, isactivated) VALUES ($1, $2, $3, $4, $5);`
-    _, err = db.Exec(sqlStatement, name, retrievedUser.id, retrievedTrigger.id, retrievedAction.id, true)
-    if err != nil {
-    	return err
-    }
+	_, err = db.Exec(sqlStatement, name, retrievedUser.id, retrievedTrigger.id, retrievedAction.id, true)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -216,7 +203,7 @@ func findUserByEmail(db *sql.DB, email string) (User, error) {
 	var retrievedUser User
 	sqlStatement := `SELECT * FROM users where email = ($1)`
 
-    row := db.QueryRow(sqlStatement, email)
+	row := db.QueryRow(sqlStatement, email)
 	err := row.Scan(&retrievedUser.email, &retrievedUser.password, &retrievedUser.id, &retrievedUser.createdAt)
 	if err != nil {
 		return retrievedUser, err
@@ -228,7 +215,7 @@ func findServiceByName(db *sql.DB, name string) (Service, error) {
 	var retrievedService Service
 	sqlStatement := `SELECT * FROM services where name = ($1)`
 
-    row := db.QueryRow(sqlStatement, name)
+	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedService.id, &retrievedService.name)
 	if err != nil {
 		return retrievedService, err
@@ -240,7 +227,7 @@ func findTriggerByName(db *sql.DB, name string) (Trigger, error) {
 	var retrievedTrigger Trigger
 	sqlStatement := `SELECT * FROM triggers where name = ($1)`
 
-    row := db.QueryRow(sqlStatement, name)
+	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedTrigger.id, &retrievedTrigger.serviceId, &retrievedTrigger.name, &retrievedTrigger.description)
 	if err != nil {
 		return retrievedTrigger, err
@@ -252,7 +239,7 @@ func findActionByName(db *sql.DB, name string) (Action, error) {
 	var retrievedAction Action
 	sqlStatement := `SELECT * FROM actions where name = ($1)`
 
-    row := db.QueryRow(sqlStatement, name)
+	row := db.QueryRow(sqlStatement, name)
 	err := row.Scan(&retrievedAction.id, &retrievedAction.serviceId, &retrievedAction.name, &retrievedAction.description)
 	if err != nil {
 		return retrievedAction, err
@@ -265,5 +252,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	var router *gin.Engine = gin.Default()
+	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
+	router.GET("/hi", helloServer)
+	router.GET("/random/:maxRand", randomNumber)
+	router.Run(":8080")
 	defer db.Close()
 }
