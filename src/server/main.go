@@ -161,6 +161,11 @@ func createAction(db *sql.DB, name string, description string, serviceName strin
 func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName string, actionName string) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, triggerid, actionid, isactivated) VALUES ($1, $2, $3, $4, $5);`
 
+	_, err := findWorkflowByName(db, name)
+	if (err == nil) {
+		return fmt.Errorf("Workflow already exist")
+	}
+
 	retrievedUser, err := findUserByEmail(db, ownerEmail)
 	if err != nil {
 		return err
