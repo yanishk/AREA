@@ -111,7 +111,13 @@ func createService(db *sql.DB, name string) error {
     INSERT INTO services (name)
     VALUES ($1);
     `
-	_, err := db.Exec(sqlStatement, name)
+
+	_, err := findServiceByName(db, name)
+	if err == nil {
+	    return fmt.Errorf("Service already exist")
+	}
+
+	_, err = db.Exec(sqlStatement, name)
 	if err != nil {
 		return err
 	}
