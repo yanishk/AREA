@@ -250,6 +250,36 @@ func findWorkflowByName(db *sql.DB, name string) (Workflow, error) {
 	return retrievedWorkflow, nil
 }
 
+func updateUser(db *sql.DB, email string, password string) error {
+	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2);`
+
+	_, err := findUserByEmail(db, email)
+	if err != nil {
+		return fmt.Errorf("User doesn't exist")
+	}
+
+	_, err = db.Exec(sqlStatement, password, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func deleteUser(db *sql.DB, email string) error {
+	sqlStatement := `DELETE FROM users WHERE email = ($1)`
+
+	_, err := findUserByEmail(db, email)
+	if err != nil {
+		return fmt.Errorf("User doesn't exist")
+	}
+
+	_, err = db.Exec(sqlStatement, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func sumNumbers(context *gin.Context) {
 	firstNbr, err1 := strconv.Atoi(context.Param("numberFrst"))
 	sndNbr, err2 := strconv.Atoi(context.Param("numberSnd"))
