@@ -94,29 +94,6 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
-  /delete-account:
-    delete:
-      consumes:
-      - application/json
-      description: Delete the user account
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entities.DeleteAccountSuccessResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/entities.DeleteAccountFailureUnauthorizedResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse'
-      summary: Delete Account
-      tags:
-      - Users
   /login:
     post:
       consumes:
@@ -151,40 +128,6 @@ paths:
       summary: Login
       tags:
       - Users
-  /modify-password:
-    put:
-      consumes:
-      - application/json
-      description: Modify the user password
-      parameters:
-      - description: New password of the user
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/entities.ModifyPasswordData'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entities.ModifyPasswordSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse'
-      summary: Modify Password
-      tags:
-      - Users
   /register:
     post:
       consumes:
@@ -217,6 +160,63 @@ paths:
           schema:
             $ref: '#/definitions/entities.FailureInternalServerErrorResponse'
       summary: Register
+      tags:
+      - Users
+  /user/delete-account:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the user account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.DeleteAccountSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/entities.DeleteAccountFailureUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse'
+      summary: Delete Account
+      tags:
+      - Users
+  /user/modify-password:
+    put:
+      consumes:
+      - application/json
+      description: Modify the user password
+      parameters:
+      - description: New password of the user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ModifyPasswordData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.ModifyPasswordSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse'
+      summary: Modify Password
       tags:
       - Users
 swagger: "2.0"

@@ -15,41 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/delete-account": {
-            "delete": {
-                "description": "Delete the user account",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete Account",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountFailureUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -102,58 +67,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/modify-password": {
-            "put": {
-                "description": "Modify the user password",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Modify Password",
-                "parameters": [
-                    {
-                        "description": "New password of the user",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/register": {
             "post": {
                 "description": "Create user account",
@@ -201,6 +114,93 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/entities.FailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/delete-account": {
+            "delete": {
+                "description": "Delete the user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete Account",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.DeleteAccountSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/entities.DeleteAccountFailureUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/modify-password": {
+            "put": {
+                "description": "Modify the user password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Modify Password",
+                "parameters": [
+                    {
+                        "description": "New password of the user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.ModifyPasswordData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.ModifyPasswordSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse"
                         }
                     }
                 }

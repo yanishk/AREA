@@ -68,7 +68,7 @@ type ModifyPasswordFailureInternalServerErrorResponse struct {
 //	@Failure		400		{object}	FailureInvalidBodyResponse
 //	@Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
 //	@Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
-//	@Router			/modify-password [put]
+//	@Router			/user/modify-password [put]
 func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -140,7 +140,7 @@ type DeleteAccountFailureInternalServerErrorResponse struct {
 //	@Success		200		{object}	DeleteAccountSuccessResponse
 //	@Failure		401		{object}	DeleteAccountFailureUnauthorizedResponse
 //	@Failure		500		{object}	DeleteAccountFailureInternalServerErrorResponse
-//	@Router			/delete-account [delete]
+//	@Router			/user/delete-account [delete]
 func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	email, err := context.Get("email")
 
