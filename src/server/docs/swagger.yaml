@@ -36,6 +36,29 @@ definitions:
         example: Connection successfull
         type: string
     type: object
+  main.ModifyPasswordData:
+    properties:
+      password:
+        type: string
+    type: object
+  main.ModifyPasswordFailureEmailNotValidResponse:
+    properties:
+      errorr:
+        example: Email is not a valid string
+        type: string
+    type: object
+  main.ModifyPasswordFailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to hash password-Could not modify the password
+        type: string
+    type: object
+  main.ModifyPasswordSuccessResponse:
+    properties:
+      success:
+        example: Password modified
+        type: string
+    type: object
   main.RegisterFailureEmailAlreadyUsedResponse:
     properties:
       error:
@@ -85,6 +108,36 @@ paths:
           schema:
             $ref: '#/definitions/main.LoginFailureTokenErrorResponse'
       summary: Login
+      tags:
+      - Users
+  /modify-password:
+    post:
+      consumes:
+      - application/json
+      description: Modify the user password
+      parameters:
+      - description: New password of the user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.ModifyPasswordData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ModifyPasswordSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ModifyPasswordFailureEmailNotValidResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ModifyPasswordFailureInternalServerErrorResponse'
+      summary: Modify Password
       tags:
       - Users
   /register:

@@ -67,6 +67,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/modify-password": {
+            "post": {
+                "description": "Modify the user password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Modify Password",
+                "parameters": [
+                    {
+                        "description": "New password of the user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ModifyPasswordData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ModifyPasswordSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ModifyPasswordFailureEmailNotValidResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ModifyPasswordFailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "description": "Create user account",
@@ -174,6 +220,41 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "Connection successfull"
+                }
+            }
+        },
+        "main.ModifyPasswordData": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.ModifyPasswordFailureEmailNotValidResponse": {
+            "type": "object",
+            "properties": {
+                "errorr": {
+                    "type": "string",
+                    "example": "Email is not a valid string"
+                }
+            }
+        },
+        "main.ModifyPasswordFailureInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to hash password-Could not modify the password"
+                }
+            }
+        },
+        "main.ModifyPasswordSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Password modified"
                 }
             }
         },

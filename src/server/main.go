@@ -469,6 +469,32 @@ func createToken(email string, context *gin.Context) error {
 	return nil
 }
 
+type ModifyPasswordData struct {
+	Password string `json:"password"`
+}
+
+type ModifyPasswordSuccessResponse struct {
+	Msg string `json:"success"example:"Password modified"`
+}
+
+type ModifyPasswordFailureEmailNotValidResponse struct {
+	Msg string `json:"errorr"example:"Email is not a valid string"`
+}
+
+type ModifyPasswordFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
+}
+
+// @Summary Modify Password
+// @Description Modify the user password
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body ModifyPasswordData true "New password of the user"
+// @Success 200 {object} ModifyPasswordSuccessResponse
+// @Failure 400 {object} ModifyPasswordFailureEmailNotValidResponse
+// @Failure 500 {object} ModifyPasswordFailureInternalServerErrorResponse
+// @Router /modify-password [post]
 func (databaseContext *Database) modifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
