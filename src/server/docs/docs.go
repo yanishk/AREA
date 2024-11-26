@@ -15,6 +15,41 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/delete-account": {
+            "delete": {
+                "description": "Delete the user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete Account",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DeleteAccountSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.DeleteAccountFailureUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.DeleteAccountFailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -101,6 +136,12 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
+                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
                             "$ref": "#/definitions/main.ModifyPasswordFailureEmailNotValidResponse"
                         }
                     },
@@ -167,6 +208,33 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.DeleteAccountFailureInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not delete account"
+                }
+            }
+        },
+        "main.DeleteAccountFailureUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "main.DeleteAccountSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Account deleted"
+                }
+            }
+        },
         "main.FailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {

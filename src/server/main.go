@@ -492,7 +492,8 @@ type ModifyPasswordFailureInternalServerErrorResponse struct {
 //	@Produce		json
 //	@Param			user	body		ModifyPasswordData	true	"New password of the user"
 //	@Success		200		{object}	ModifyPasswordSuccessResponse
-//	@Failure		400		{object}	ModifyPasswordFailureEmailNotValidResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
 //	@Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
 //	@Router			/modify-password [put]
 func (databaseContext *Database) modifyPassword(context *gin.Context) {
@@ -546,6 +547,57 @@ func (databaseContext *Database) modifyPassword(context *gin.Context) {
 	})
 }
 
+type DeleteAccountSuccessResponse struct {
+	Msg string `json:"success"example:"Account deleted"`
+}
+
+type DeleteAccountFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}
+
+type DeleteAccountFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not delete account"`
+}
+
+//	@Summary		Delete Account
+//	@Description	Delete the user account
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	DeleteAccountSuccessResponse
+//	@Failure		401		{object}	DeleteAccountFailureUnauthorizedResponse
+//	@Failure		500		{object}	DeleteAccountFailureInternalServerErrorResponse
+//	@Router			/delete-account [delete]
+func (databaseContext *Database) deleteAccount(context *gin.Context) {
+	email, err := context.Get("email")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email not found in token",
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email is not a valid string",
+		})
+		return
+	}
+
+	errDelete := deleteUser(databaseContext.db, emailStr)
+	if errDelete != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not delete account",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Account deleted",
+	})
+}
+
 //	@title	Documentation for AREA Rest API
 //	@host	localhost:8080
 func main() {
@@ -575,6 +627,8 @@ func main() {
 	router.POST("/register", databaseContext.createNewUser)
 
 	router.PUT("/modify-password", middleware.VerifyJWTCookie, databaseContext.modifyPassword)
+
+	router.DELETE("/delete-account", middleware.VerifyJWTCookie, databaseContext.deleteAccount)
 
 	handler := corsAllow.Handler(router)
 

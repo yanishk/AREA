@@ -1,4 +1,22 @@
 definitions:
+  main.DeleteAccountFailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not delete account
+        type: string
+    type: object
+  main.DeleteAccountFailureUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  main.DeleteAccountSuccessResponse:
+    properties:
+      success:
+        example: Account deleted
+        type: string
+    type: object
   main.FailureInternalServerErrorResponse:
     properties:
       error:
@@ -76,6 +94,29 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
+  /delete-account:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the user account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DeleteAccountSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.DeleteAccountFailureUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.DeleteAccountFailureInternalServerErrorResponse'
+      summary: Delete Account
+      tags:
+      - Users
   /login:
     post:
       consumes:
@@ -131,6 +172,10 @@ paths:
             $ref: '#/definitions/main.ModifyPasswordSuccessResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/main.FailureInvalidBodyResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/main.ModifyPasswordFailureEmailNotValidResponse'
         "500":
