@@ -23,19 +23,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountSuccessResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountSuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -61,7 +61,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.LoginData"
+                            "$ref": "#/definitions/entities.LoginData"
                         }
                     }
                 ],
@@ -69,25 +69,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginSuccessResponse"
+                            "$ref": "#/definitions/entities.LoginSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/entities.LoginFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginFailureTokenErrorResponse"
+                            "$ref": "#/definitions/entities.LoginFailureTokenErrorResponse"
                         }
                     }
                 }
@@ -113,7 +113,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordData"
+                            "$ref": "#/definitions/entities.ModifyPasswordData"
                         }
                     }
                 ],
@@ -121,25 +121,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordSuccessResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -165,7 +165,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.LoginData"
+                            "$ref": "#/definitions/entities.LoginData"
                         }
                     }
                 ],
@@ -173,25 +173,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.RegisterSuccessResponse"
+                            "$ref": "#/definitions/entities.RegisterSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/main.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/entities.RegisterFailureEmailAlreadyUsedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.FailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -199,7 +199,7 @@
         }
     },
     "definitions": {
-        "main.DeleteAccountFailureInternalServerErrorResponse": {
+        "entities.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -208,7 +208,7 @@
                 }
             }
         },
-        "main.DeleteAccountFailureUnauthorizedResponse": {
+        "entities.DeleteAccountFailureUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -217,7 +217,7 @@
                 }
             }
         },
-        "main.DeleteAccountSuccessResponse": {
+        "entities.DeleteAccountSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -226,7 +226,7 @@
                 }
             }
         },
-        "main.FailureInternalServerErrorResponse": {
+        "entities.FailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -235,7 +235,7 @@
                 }
             }
         },
-        "main.FailureInvalidBodyResponse": {
+        "entities.FailureInvalidBodyResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -244,7 +244,7 @@
                 }
             }
         },
-        "main.LoginData": {
+        "entities.LoginData": {
             "type": "object",
             "properties": {
                 "email": {
@@ -255,7 +255,7 @@
                 }
             }
         },
-        "main.LoginFailureTokenErrorResponse": {
+        "entities.LoginFailureTokenErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -264,7 +264,7 @@
                 }
             }
         },
-        "main.LoginFailureUnauthorizedResponse": {
+        "entities.LoginFailureUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -273,7 +273,7 @@
                 }
             }
         },
-        "main.LoginSuccessResponse": {
+        "entities.LoginSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -282,7 +282,7 @@
                 }
             }
         },
-        "main.ModifyPasswordData": {
+        "entities.ModifyPasswordData": {
             "type": "object",
             "properties": {
                 "password": {
@@ -290,7 +290,7 @@
                 }
             }
         },
-        "main.ModifyPasswordFailureEmailNotValidResponse": {
+        "entities.ModifyPasswordFailureEmailNotValidResponse": {
             "type": "object",
             "properties": {
                 "errorr": {
@@ -299,7 +299,7 @@
                 }
             }
         },
-        "main.ModifyPasswordFailureInternalServerErrorResponse": {
+        "entities.ModifyPasswordFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -308,7 +308,7 @@
                 }
             }
         },
-        "main.ModifyPasswordSuccessResponse": {
+        "entities.ModifyPasswordSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -317,7 +317,7 @@
                 }
             }
         },
-        "main.RegisterFailureEmailAlreadyUsedResponse": {
+        "entities.RegisterFailureEmailAlreadyUsedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -326,7 +326,7 @@
                 }
             }
         },
-        "main.RegisterSuccessResponse": {
+        "entities.RegisterSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {

@@ -32,19 +32,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountSuccessResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountSuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.DeleteAccountFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -70,7 +70,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.LoginData"
+                            "$ref": "#/definitions/entities.LoginData"
                         }
                     }
                 ],
@@ -78,25 +78,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginSuccessResponse"
+                            "$ref": "#/definitions/entities.LoginSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/entities.LoginFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.LoginFailureTokenErrorResponse"
+                            "$ref": "#/definitions/entities.LoginFailureTokenErrorResponse"
                         }
                     }
                 }
@@ -122,7 +122,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordData"
+                            "$ref": "#/definitions/entities.ModifyPasswordData"
                         }
                     }
                 ],
@@ -130,25 +130,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordSuccessResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.ModifyPasswordFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -174,7 +174,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.LoginData"
+                            "$ref": "#/definitions/entities.LoginData"
                         }
                     }
                 ],
@@ -182,25 +182,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.RegisterSuccessResponse"
+                            "$ref": "#/definitions/entities.RegisterSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/main.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/entities.RegisterFailureEmailAlreadyUsedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/main.FailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/entities.FailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -208,7 +208,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.DeleteAccountFailureInternalServerErrorResponse": {
+        "entities.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -217,7 +217,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.DeleteAccountFailureUnauthorizedResponse": {
+        "entities.DeleteAccountFailureUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -226,7 +226,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.DeleteAccountSuccessResponse": {
+        "entities.DeleteAccountSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -235,7 +235,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.FailureInternalServerErrorResponse": {
+        "entities.FailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -244,7 +244,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.FailureInvalidBodyResponse": {
+        "entities.FailureInvalidBodyResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -253,7 +253,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.LoginData": {
+        "entities.LoginData": {
             "type": "object",
             "properties": {
                 "email": {
@@ -264,7 +264,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.LoginFailureTokenErrorResponse": {
+        "entities.LoginFailureTokenErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -273,7 +273,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.LoginFailureUnauthorizedResponse": {
+        "entities.LoginFailureUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -282,7 +282,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.LoginSuccessResponse": {
+        "entities.LoginSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -291,7 +291,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ModifyPasswordData": {
+        "entities.ModifyPasswordData": {
             "type": "object",
             "properties": {
                 "password": {
@@ -299,7 +299,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ModifyPasswordFailureEmailNotValidResponse": {
+        "entities.ModifyPasswordFailureEmailNotValidResponse": {
             "type": "object",
             "properties": {
                 "errorr": {
@@ -308,7 +308,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ModifyPasswordFailureInternalServerErrorResponse": {
+        "entities.ModifyPasswordFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -317,7 +317,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.ModifyPasswordSuccessResponse": {
+        "entities.ModifyPasswordSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -326,7 +326,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.RegisterFailureEmailAlreadyUsedResponse": {
+        "entities.RegisterFailureEmailAlreadyUsedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -335,7 +335,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.RegisterSuccessResponse": {
+        "entities.RegisterSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {

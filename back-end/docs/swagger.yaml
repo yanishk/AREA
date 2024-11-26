@@ -1,89 +1,89 @@
 definitions:
-  main.DeleteAccountFailureInternalServerErrorResponse:
+  entities.DeleteAccountFailureInternalServerErrorResponse:
     properties:
       error:
         example: Could not delete account
         type: string
     type: object
-  main.DeleteAccountFailureUnauthorizedResponse:
+  entities.DeleteAccountFailureUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
         type: string
     type: object
-  main.DeleteAccountSuccessResponse:
+  entities.DeleteAccountSuccessResponse:
     properties:
       success:
         example: Account deleted
         type: string
     type: object
-  main.FailureInternalServerErrorResponse:
+  entities.FailureInternalServerErrorResponse:
     properties:
       error:
         example: Internal server error
         type: string
     type: object
-  main.FailureInvalidBodyResponse:
+  entities.FailureInvalidBodyResponse:
     properties:
       error:
         example: Invalid request body
         type: string
     type: object
-  main.LoginData:
+  entities.LoginData:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  main.LoginFailureTokenErrorResponse:
+  entities.LoginFailureTokenErrorResponse:
     properties:
       error:
         example: Error creating token
         type: string
     type: object
-  main.LoginFailureUnauthorizedResponse:
+  entities.LoginFailureUnauthorizedResponse:
     properties:
       error:
         example: Could not find requested user-Wrong password
         type: string
     type: object
-  main.LoginSuccessResponse:
+  entities.LoginSuccessResponse:
     properties:
       success:
         example: Connection successfull
         type: string
     type: object
-  main.ModifyPasswordData:
+  entities.ModifyPasswordData:
     properties:
       password:
         type: string
     type: object
-  main.ModifyPasswordFailureEmailNotValidResponse:
+  entities.ModifyPasswordFailureEmailNotValidResponse:
     properties:
       errorr:
         example: Email is not a valid string
         type: string
     type: object
-  main.ModifyPasswordFailureInternalServerErrorResponse:
+  entities.ModifyPasswordFailureInternalServerErrorResponse:
     properties:
       error:
         example: Failed to hash password-Could not modify the password
         type: string
     type: object
-  main.ModifyPasswordSuccessResponse:
+  entities.ModifyPasswordSuccessResponse:
     properties:
       success:
         example: Password modified
         type: string
     type: object
-  main.RegisterFailureEmailAlreadyUsedResponse:
+  entities.RegisterFailureEmailAlreadyUsedResponse:
     properties:
       error:
         example: Email address already used
         type: string
     type: object
-  main.RegisterSuccessResponse:
+  entities.RegisterSuccessResponse:
     properties:
       success:
         example: New user created
@@ -105,15 +105,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.DeleteAccountSuccessResponse'
+            $ref: '#/definitions/entities.DeleteAccountSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/main.DeleteAccountFailureUnauthorizedResponse'
+            $ref: '#/definitions/entities.DeleteAccountFailureUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.DeleteAccountFailureInternalServerErrorResponse'
+            $ref: '#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse'
       summary: Delete Account
       tags:
       - Users
@@ -128,26 +128,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/main.LoginData'
+          $ref: '#/definitions/entities.LoginData'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.LoginSuccessResponse'
+            $ref: '#/definitions/entities.LoginSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.FailureInvalidBodyResponse'
+            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/main.LoginFailureUnauthorizedResponse'
+            $ref: '#/definitions/entities.LoginFailureUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.LoginFailureTokenErrorResponse'
+            $ref: '#/definitions/entities.LoginFailureTokenErrorResponse'
       summary: Login
       tags:
       - Users
@@ -162,26 +162,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/main.ModifyPasswordData'
+          $ref: '#/definitions/entities.ModifyPasswordData'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.ModifyPasswordSuccessResponse'
+            $ref: '#/definitions/entities.ModifyPasswordSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.FailureInvalidBodyResponse'
+            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/main.ModifyPasswordFailureEmailNotValidResponse'
+            $ref: '#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.ModifyPasswordFailureInternalServerErrorResponse'
+            $ref: '#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse'
       summary: Modify Password
       tags:
       - Users
@@ -196,26 +196,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/main.LoginData'
+          $ref: '#/definitions/entities.LoginData'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.RegisterSuccessResponse'
+            $ref: '#/definitions/entities.RegisterSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.FailureInvalidBodyResponse'
+            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/main.RegisterFailureEmailAlreadyUsedResponse'
+            $ref: '#/definitions/entities.RegisterFailureEmailAlreadyUsedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/main.FailureInternalServerErrorResponse'
+            $ref: '#/definitions/entities.FailureInternalServerErrorResponse'
       summary: Register
       tags:
       - Users
