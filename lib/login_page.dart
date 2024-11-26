@@ -39,8 +39,9 @@ class _APICallState extends State<APICall> {
   Future<void> _postData() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
+      developer.log('SERVER_LINK + redirection : ${apiUrl}login');
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('${apiUrl}login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
