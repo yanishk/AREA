@@ -3,6 +3,8 @@ import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-br
 import { useState } from "react";
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const LoginForm = () => {
 
     const [email, setEmail] = useState("");
@@ -11,29 +13,29 @@ const LoginForm = () => {
 
     const sendFormOnClick = async () => {
         if (!email || !password) {
-          setEmail("");
-          setPassword("");
-          setError("Please fill email and password");
-          return;
+            setEmail("");
+            setPassword("");
+            setError("Please fill email and password");
+            return;
         }
 
         try {
-          const result = await axios.post('http://localhost:8080/login', {
-            email, password
-          });
+            const result = await axios.post(`${apiUrl}login`, {
+                email, password
+            });
 
-          if (result.data.success) {
-            alert("Successful login");
-          } else {
+            if (result.data.success) {
+                alert("Successful login");
+            } else {
+                setEmail("");
+                setPassword("");
+                setError("The email and password don't match");
+            }
+        } catch (error) {
+            console.log(error)
             setEmail("");
             setPassword("");
             setError("The email and password don't match");
-          }
-        } catch (error) {
-          console.log(error)
-          setEmail("");
-          setPassword("");
-          setError("The email and password don't match");
         }
       }
 
