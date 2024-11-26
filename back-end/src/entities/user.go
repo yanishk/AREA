@@ -17,12 +17,64 @@ type LoginData struct {
 	Password string `json:"password"`
 }
 
+type ModifyPasswordData struct {
+	Password string `json:"password"`
+}
+
+// General Responses
 type FailureInvalidBodyResponse struct {
 	Msg string `json:"error"example:"Invalid request body"`
 }
 
 type FailureInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Internal server error"`
+}
+
+// Modify Data Responses
+type ModifyPasswordSuccessResponse struct {
+	Msg string `json:"success"example:"Password modified"`
+}
+
+type ModifyPasswordFailureEmailNotValidResponse struct {
+	Msg string `json:"errorr"example:"Email is not a valid string"`
+}
+
+type ModifyPasswordFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
+}
+
+// Delete Account Responses
+type DeleteAccountSuccessResponse struct {
+	Msg string `json:"success"example:"Account deleted"`
+}
+
+type DeleteAccountFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}
+
+type DeleteAccountFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not delete account"`
+}
+
+// Login Responses
+type LoginSuccessResponse struct {
+	Msg string `json:"success"example:"Connection successfull"`
+}
+
+type LoginFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Could not find requested user-Wrong password"`
+}
+type LoginFailureTokenErrorResponse struct {
+	Msg string `json:"error"example:"Error creating token"`
+}
+
+// Register Responses
+type RegisterSuccessResponse struct {
+	Msg string `json:"success"example:"New user created"`
+}
+
+type RegisterFailureEmailAlreadyUsedResponse struct {
+	Msg string `json:"error"example:"Email address already used"`
 }
 
 func createToken(email string, context *gin.Context) error {
@@ -40,22 +92,6 @@ func createToken(email string, context *gin.Context) error {
 	context.SetSameSite(http.SameSiteLaxMode)
 	context.SetCookie("JWToken", tokenString, 3600, "", "", false, true)
 	return nil
-}
-
-type ModifyPasswordData struct {
-	Password string `json:"password"`
-}
-
-type ModifyPasswordSuccessResponse struct {
-	Msg string `json:"success"example:"Password modified"`
-}
-
-type ModifyPasswordFailureEmailNotValidResponse struct {
-	Msg string `json:"errorr"example:"Email is not a valid string"`
-}
-
-type ModifyPasswordFailureInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
 }
 
 //	@Summary		Modify Password
@@ -87,9 +123,7 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	var newPassword struct {
-		Password string `json:"password"`
-	}
+	var newPassword ModifyPasswordData
 
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
@@ -118,18 +152,6 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Password modified",
 	})
-}
-
-type DeleteAccountSuccessResponse struct {
-	Msg string `json:"success"example:"Account deleted"`
-}
-
-type DeleteAccountFailureUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
-}
-
-type DeleteAccountFailureInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not delete account"`
 }
 
 //	@Summary		Delete Account
@@ -169,17 +191,6 @@ func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Account deleted",
 	})
-}
-
-type LoginSuccessResponse struct {
-	Msg string `json:"success"example:"Connection successfull"`
-}
-
-type LoginFailureUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Could not find requested user-Wrong password"`
-}
-type LoginFailureTokenErrorResponse struct {
-	Msg string `json:"error"example:"Error creating token"`
 }
 
 //	@Summary		Login
@@ -230,14 +241,6 @@ func (databaseContext *Database) LoginAuthentication(context *gin.Context) {
 	context.IndentedJSON(http.StatusUnauthorized, gin.H{
 		"error": "Wrong password",
 	})
-}
-
-type RegisterSuccessResponse struct {
-	Msg string `json:"success"example:"New user created"`
-}
-
-type RegisterFailureEmailAlreadyUsedResponse struct {
-	Msg string `json:"error"example:"Email address already used"`
 }
 
 //	@Summary		Register
