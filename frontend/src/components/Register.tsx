@@ -30,7 +30,6 @@ const RegisterForm = () => {
                 setError("The email and password don't match");
             }
         } catch (error) {
-            console.log(error)
             setEmail("");
             setPassword("");
             setError("The email and password don't match");
