@@ -8,7 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"poc-goland.com/poc/back-end/database"
+
+	"poc-goland.com/poc/src/database"
 )
 
 func createToken(email string, context *gin.Context) error {

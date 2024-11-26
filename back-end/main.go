@@ -7,9 +7,9 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 
-	"poc-goland.com/poc/back-end/database"
-	"poc-goland.com/poc/back-end/entities"
-	"poc-goland.com/poc/back-end/routes"
+	"poc-goland.com/poc/src/database"
+	"poc-goland.com/poc/src/entities"
+	"poc-goland.com/poc/src/routes"
 )
 
 func main() {

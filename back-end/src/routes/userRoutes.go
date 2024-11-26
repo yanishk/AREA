@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/exp/rand"
-	"poc-goland.com/poc/back-end/entities"
-	"poc-goland.com/poc/back-end/middleware"
+	"poc-goland.com/poc/src/entities"
+	"poc-goland.com/poc/src/middleware"
 )
 
 func sumNumbers(context *gin.Context) {
