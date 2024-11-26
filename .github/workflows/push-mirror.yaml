@@ -52,4 +52,4 @@ jobs:
           echo "mail: "
           git config --get user.email
 
-          git push origin-test HEAD:refs/heads/$BRANCH_NAME
+          git push origin-mirror HEAD:refs/heads/$BRANCH_NAME
