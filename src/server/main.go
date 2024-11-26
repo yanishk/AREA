@@ -61,6 +61,20 @@ type Database struct {
 	db *sql.DB
 }
 
+type LoginData struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
+type FailureInvalidBodyResponse struct {
+	Msg string `json:"error"example:"Invalid request body"`
+}
+
+type FailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Internal server error"`
+}
+
+
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
 	port, err := strconv.Atoi(os.Getenv("PGPORT"))
 	if err != nil {
@@ -326,17 +340,8 @@ func randomNumber(context *gin.Context) {
 	})
 }
 
-type LoginData struct {
-	Email string `json:"email"`
-	Password string `json:"password"`
-}
-
 type LoginSuccessResponse struct {
 	Msg string `json:"success"example:"Connection successfull"`
-}
-
-type LoginFailureInvalidBodyResponse struct {
-	Msg string `json:"error"example:"Invalid request body"`
 }
 
 type LoginFailureUnauthorizedResponse struct {
@@ -353,17 +358,13 @@ type LoginFailureTokenErrorResponse struct {
 // @Produce  json
 // @Param user body LoginData true "User credentials"
 // @Success 200 {object} LoginSuccessResponse
-// @Failure 400 {object} LoginFailureInvalidBodyResponse
+// @Failure 400 {object} FailureInvalidBodyResponse
 // @Failure 401 {object} LoginFailureUnauthorizedResponse
 // @Failure 500 {object} LoginFailureTokenErrorResponse
 // @Router /login [post]
-func (databaseContext *Database) loginAuthentification(context *gin.Context) {
-	var loginData struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	err := context.ShouldBindJSON(&loginData)
+func (databaseContext *Database) loginAuthentication(context *gin.Context) {
+	var user LoginData
+	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
@@ -371,7 +372,7 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		return
 	}
 
-	foundUser, err := findUserByEmail(databaseContext.db, loginData.Email)
+	foundUser, err := findUserByEmail(databaseContext.db, user.Email)
 
 	if err != nil || len(foundUser.email) <= 0 {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -380,7 +381,7 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 		return
 	}
 
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.password), []byte(loginData.Password))
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.password), []byte(user.Password))
 
 	if resBcrypt == nil {
 		errToken := createToken(foundUser.email, context)
@@ -400,11 +401,27 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 	})
 }
 
+type RegisterSuccessResponse struct {
+	Msg string `json:"success"example:"New user created"`
+}
+
+type RegisterFailureEmailAlreadyUsedResponse struct {
+	Msg string `json:"error"example:"Email address already used"`
+}
+
+// @Summary Register
+// @Description Create user account
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body LoginData true "User credentials"
+// @Success 200 {object} RegisterSuccessResponse
+// @Failure 400 {object} FailureInvalidBodyResponse
+// @Failure 409 {object} RegisterFailureEmailAlreadyUsedResponse
+// @Failure 500 {object} FailureInternalServerErrorResponse
+// @Router /register [post]
 func (databaseContext *Database) createNewUser(context *gin.Context) {
-	var newUser struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var newUser LoginData
 
 	err := context.ShouldBindJSON(&newUser)
 	if err != nil {
@@ -505,7 +522,6 @@ func (databaseContext *Database) modifyPassword(context *gin.Context) {
 
 // @title Documentation for AREA Rest API
 // @host localhost:8080
-
 func main() {
 	var databaseContext Database
 	var err error
@@ -529,7 +545,7 @@ func main() {
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/random/:maxRand", randomNumber)
 
-	router.POST("/login", databaseContext.loginAuthentification)
+	router.POST("/login", databaseContext.loginAuthentication)
 	router.POST("/register", databaseContext.createNewUser)
 
 	router.PUT("/modify-password", middleware.VerifyJWTCookie, databaseContext.modifyPassword)

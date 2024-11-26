@@ -1,15 +1,21 @@
 definitions:
+  main.FailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  main.FailureInvalidBodyResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
   main.LoginData:
     properties:
       email:
         type: string
       password:
-        type: string
-    type: object
-  main.LoginFailureInvalidBodyResponse:
-    properties:
-      error:
-        example: Invalid request body
         type: string
     type: object
   main.LoginFailureTokenErrorResponse:
@@ -28,6 +34,18 @@ definitions:
     properties:
       success:
         example: Connection successfull
+        type: string
+    type: object
+  main.RegisterFailureEmailAlreadyUsedResponse:
+    properties:
+      error:
+        example: Email address already used
+        type: string
+    type: object
+  main.RegisterSuccessResponse:
+    properties:
+      success:
+        example: New user created
         type: string
     type: object
 host: localhost:8080
@@ -57,7 +75,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/main.LoginFailureInvalidBodyResponse'
+            $ref: '#/definitions/main.FailureInvalidBodyResponse'
         "401":
           description: Unauthorized
           schema:
@@ -67,6 +85,40 @@ paths:
           schema:
             $ref: '#/definitions/main.LoginFailureTokenErrorResponse'
       summary: Login
+      tags:
+      - Users
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create user account
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.RegisterSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.FailureInvalidBodyResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/main.RegisterFailureEmailAlreadyUsedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.FailureInternalServerErrorResponse'
+      summary: Register
       tags:
       - Users
 swagger: "2.0"
