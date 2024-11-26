@@ -287,7 +287,7 @@ const docTemplate = `{
             "properties": {
                 "success": {
                     "type": "string",
-                    "example": "Connection successfull"
+                    "example": "Connection successful"
                 }
             }
         },

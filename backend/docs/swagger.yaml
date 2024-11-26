@@ -51,7 +51,7 @@ definitions:
   entities.LoginSuccessResponse:
     properties:
       success:
-        example: Connection successfull
+        example: Connection successful
         type: string
     type: object
   entities.ModifyPasswordData:

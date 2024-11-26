@@ -58,7 +58,7 @@ type DeleteAccountFailureInternalServerErrorResponse struct {
 
 // Login Responses
 type LoginSuccessResponse struct {
-	Msg string `json:"success"example:"Connection successfull"`
+	Msg string `json:"success"example:"Connection successful"`
 }
 
 type LoginFailureUnauthorizedResponse struct {
@@ -234,7 +234,7 @@ func (databaseContext *Database) LoginAuthentication(context *gin.Context) {
 			return
 		}
 		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "Connection successfull",
+			"success": "Connection successful",
 		})
 		return
 	}
