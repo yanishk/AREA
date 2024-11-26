@@ -7,12 +7,15 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 	"golang.org/x/crypto/bcrypt"
+	"poc-goland.com/poc/src/server/middleware"
 )
 
 type User struct {
@@ -123,7 +126,7 @@ func createTrigger(db *sql.DB, name string, description string, serviceName stri
 	sqlStatement := `INSERT INTO triggers (name, description, serviceid) VALUES ($1, $2, $3);`
 
 	_, err := findTriggerByName(db, name)
-	if (err == nil) {
+	if err == nil {
 		return fmt.Errorf("Trigger already exist")
 	}
 
@@ -143,7 +146,7 @@ func createAction(db *sql.DB, name string, description string, serviceName strin
 	sqlStatement := `INSERT INTO actions (name, description, serviceid) VALUES ($1, $2, $3);`
 
 	_, err := findActionByName(db, name)
-	if (err == nil) {
+	if err == nil {
 		return fmt.Errorf("Action already exist")
 	}
 
@@ -163,7 +166,7 @@ func createWorkflow(db *sql.DB, name string, ownerEmail string, triggerName stri
 	sqlStatement := `INSERT INTO workflows (name, ownerid, triggerid, actionid, isactivated) VALUES ($1, $2, $3, $4, $5);`
 
 	_, err := findWorkflowByName(db, name)
-	if (err == nil) {
+	if err == nil {
 		return fmt.Errorf("Workflow already exist")
 	}
 
@@ -346,6 +349,13 @@ func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.password), []byte(loginData.Password))
 
 	if resBcrypt == nil {
+		errToken := createToken(foundUser.email, context)
+		if errToken != nil {
+			context.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"error": "Error creating token",
+			})
+			return
+		}
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"success": "Connection successfull",
 		})
@@ -391,6 +401,23 @@ func (databaseContext *Database) createNewUser(context *gin.Context) {
 	})
 }
 
+func createToken(email string, context *gin.Context) error {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"email": email,
+			"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
+	if err != nil {
+		return err
+	}
+
+	context.SetSameSite(http.SameSiteLaxMode)
+	context.SetCookie("JWToken", tokenString, 3600, "", "", false, true)
+	return nil
+}
+
 func main() {
 	var databaseContext Database
 	var err error
@@ -408,8 +435,8 @@ func main() {
 
 	var router *gin.Engine = gin.Default()
 
+	router.GET("/hi", middleware.VerifyJWTCookie, helloServer)
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
-	router.GET("/hi", helloServer)
 	router.GET("/random/:maxRand", randomNumber)
 	router.POST("/login", databaseContext.loginAuthentification)
 	router.POST("/register", databaseContext.createNewUser)
