@@ -13,7 +13,7 @@ class ExplorePage extends StatelessWidget {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            TopBar(),
+            ExploreTopBar(),
             MyDivider(),
             SearchBar(),
             MyCard(),
@@ -136,8 +136,8 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-class TopBar extends StatelessWidget {
-  const TopBar({
+class ExploreTopBar extends StatelessWidget {
+  const ExploreTopBar({
     super.key,
   });
 
