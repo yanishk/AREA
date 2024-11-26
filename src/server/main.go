@@ -469,6 +469,36 @@ func (databaseContext *Database) modifyPassword(context *gin.Context) {
 	})
 }
 
+func (databaseContext *Database) deleteAccount(context *gin.Context) {
+	email, err := context.Get("email")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email not found in token",
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email is not a valid string",
+		})
+		return
+	}
+
+	errDelete := deleteUser(databaseContext.db, emailStr)
+	if errDelete != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not delete account",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Account deleted",
+	})
+}
+
 func main() {
 	var databaseContext Database
 	var err error
@@ -494,6 +524,8 @@ func main() {
 	router.POST("/register", databaseContext.createNewUser)
 
 	router.PUT("/modify-password", middleware.VerifyJWTCookie, databaseContext.modifyPassword)
+
+	router.DELETE("/delete-account", middleware.VerifyJWTCookie, databaseContext.deleteAccount)
 
 	handler := corsAllow.Handler(router)
 
