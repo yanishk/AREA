@@ -12,6 +12,71 @@ import (
 	"poc-goland.com/poc/src/database"
 )
 
+type LoginData struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
+type ModifyPasswordData struct {
+	Password string `json:"password"`
+}
+
+// General Responses
+type FailureInvalidBodyResponse struct {
+	Msg string `json:"error"example:"Invalid request body"`
+}
+
+type FailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Internal server error"`
+}
+
+// Modify Data Responses
+type ModifyPasswordSuccessResponse struct {
+	Msg string `json:"success"example:"Password modified"`
+}
+
+type ModifyPasswordFailureEmailNotValidResponse struct {
+	Msg string `json:"errorr"example:"Email is not a valid string"`
+}
+
+type ModifyPasswordFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
+}
+
+// Delete Account Responses
+type DeleteAccountSuccessResponse struct {
+	Msg string `json:"success"example:"Account deleted"`
+}
+
+type DeleteAccountFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}
+
+type DeleteAccountFailureInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not delete account"`
+}
+
+// Login Responses
+type LoginSuccessResponse struct {
+	Msg string `json:"success"example:"Connection successful"`
+}
+
+type LoginFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Could not find requested user-Wrong password"`
+}
+type LoginFailureTokenErrorResponse struct {
+	Msg string `json:"error"example:"Error creating token"`
+}
+
+// Register Responses
+type RegisterSuccessResponse struct {
+	Msg string `json:"success"example:"New user created"`
+}
+
+type RegisterFailureEmailAlreadyUsedResponse struct {
+	Msg string `json:"error"example:"Email address already used"`
+}
+
 func createToken(email string, context *gin.Context) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
@@ -29,6 +94,17 @@ func createToken(email string, context *gin.Context) error {
 	return nil
 }
 
+//	@Summary		Modify Password
+//	@Description	Modify the user password
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		ModifyPasswordData	true	"New password of the user"
+//	@Success		200		{object}	ModifyPasswordSuccessResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
+//	@Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
+//	@Router			/user/modify-password [put]
 func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -47,9 +123,7 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	var newPassword struct {
-		Password string `json:"password"`
-	}
+	var newPassword ModifyPasswordData
 
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
@@ -80,6 +154,15 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	})
 }
 
+//	@Summary		Delete Account
+//	@Description	Delete the user account
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200		{object}	DeleteAccountSuccessResponse
+//	@Failure		401		{object}	DeleteAccountFailureUnauthorizedResponse
+//	@Failure		500		{object}	DeleteAccountFailureInternalServerErrorResponse
+//	@Router			/user/delete-account [delete]
 func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -110,13 +193,20 @@ func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	})
 }
 
-func (databaseContext *Database) LoginAuthentification(context *gin.Context) {
-	var loginData struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	err := context.ShouldBindJSON(&loginData)
+//	@Summary		Login
+//	@Description	User Authentication
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		LoginData	true	"User credentials"
+//	@Success		200		{object}	LoginSuccessResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		401		{object}	LoginFailureUnauthorizedResponse
+//	@Failure		500		{object}	LoginFailureTokenErrorResponse
+//	@Router			/login [post]
+func (databaseContext *Database) LoginAuthentication(context *gin.Context) {
+	var user LoginData
+	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body",
@@ -124,7 +214,7 @@ func (databaseContext *Database) LoginAuthentification(context *gin.Context) {
 		return
 	}
 
-	foundUser, err := database.FindUserByEmail(databaseContext.Db, loginData.Email)
+	foundUser, err := database.FindUserByEmail(databaseContext.Db, user.Email)
 
 	if err != nil || len(foundUser.Email) <= 0 {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -133,7 +223,7 @@ func (databaseContext *Database) LoginAuthentification(context *gin.Context) {
 		return
 	}
 
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginData.Password))
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(user.Password))
 
 	if resBcrypt == nil {
 		errToken := createToken(foundUser.Email, context)
@@ -144,7 +234,7 @@ func (databaseContext *Database) LoginAuthentification(context *gin.Context) {
 			return
 		}
 		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "Connection successfull",
+			"success": "Connection successful",
 		})
 		return
 	}
@@ -153,11 +243,19 @@ func (databaseContext *Database) LoginAuthentification(context *gin.Context) {
 	})
 }
 
+//	@Summary		Register
+//	@Description	Create user account
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		LoginData	true	"User credentials"
+//	@Success		200		{object}	RegisterSuccessResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		409		{object}	RegisterFailureEmailAlreadyUsedResponse
+//	@Failure		500		{object}	FailureInternalServerErrorResponse
+//	@Router			/register [post]
 func (databaseContext *Database) CreateNewUser(context *gin.Context) {
-	var newUser struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var newUser LoginData
 
 	err := context.ShouldBindJSON(&newUser)
 	if err != nil {

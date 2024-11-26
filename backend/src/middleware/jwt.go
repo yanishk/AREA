@@ -14,7 +14,7 @@ func VerifyJWTCookie(context *gin.Context) {
 
 	if err != nil {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "No Authentification Token",
+			"error": "No Authentication Token",
 		})
 		context.Abort()
 		return

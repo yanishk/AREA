@@ -8,6 +8,9 @@ import (
 	"golang.org/x/exp/rand"
 	"poc-goland.com/poc/src/entities"
 	"poc-goland.com/poc/src/middleware"
+
+	ginSwagger "github.com/swaggo/gin-swagger"
+    swaggerFiles "github.com/swaggo/files"
 )
 
 func sumNumbers(context *gin.Context) {
@@ -51,11 +54,11 @@ func randomNumber(context *gin.Context) {
 }
 
 func PublicRoutes(router *gin.Engine, databaseContext entities.Database) {
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/random/:maxRand", randomNumber)
-	router.POST("/login", databaseContext.LoginAuthentification)
+	router.POST("/login", databaseContext.LoginAuthentication)
 	router.POST("/register", databaseContext.CreateNewUser)
-
 }
 
 func PrivateRoutes(router *gin.Engine, databaseContext entities.Database) {
