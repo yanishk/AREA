@@ -1,0 +1,55 @@
+name: push to origin repo
+run-name: Push ${{ github.actor }}'s PR -> ${{ github.event.pull_request.title }} 🚀
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  push-after-pr-merged:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: add ssh key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: set remote repo
+        run: |
+          git remote add origin-mirror git@github.com:EpitechPromo2027/B-DEV-500-PAR-5-2-area-yanis.harkouk.git
+          git remote -v
+
+          BRANCH_NAME=${{ github.event.pull_request.base.ref }}
+          USER_NAME=${{ github.event.pull_request.user.login }}
+
+          git config --global user.name "$USER_NAME"
+
+          if [ "$USER_NAME" = "Chaegnal" ]; then
+            git config --global user.email "eva.legrand@epitech.eu"
+          fi
+          if [ "$USER_NAME" = "mathisbdkr" ]; then
+            git config --global user.email "mathis.brehm@epitech.eu"
+          fi
+          if [ "$USER_NAME" = "yanishk" ]; then
+            git config --global user.email "yanis.harkouk@epitech.eu"
+          fi
+          if [ "$USER_NAME" = "Wilson-Epitech" ]; then
+            git config --global user.email "wilson.bordichon@epitech.eu"
+          fi
+
+          echo "mail: "
+          git config --get user.email
+
+          git push origin-test HEAD:refs/heads/$BRANCH_NAME
