@@ -16,6 +16,9 @@ import (
 	"github.com/rs/cors"
 	"golang.org/x/crypto/bcrypt"
 	"poc-goland.com/poc/src/server/middleware"
+	ginSwagger "github.com/swaggo/gin-swagger"
+    swaggerFiles "github.com/swaggo/files"
+	_ "poc-goland.com/poc/src/server/docs"
 )
 
 type User struct {
@@ -485,6 +488,8 @@ func main() {
 	})
 
 	var router *gin.Engine = gin.Default()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/hi", middleware.VerifyJWTCookie, helloServer)
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
