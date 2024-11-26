@@ -3,8 +3,6 @@ import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-br
 import { useState } from "react";
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
 const LoginForm = () => {
 
     const [email, setEmail] = useState("");
@@ -20,7 +18,7 @@ const LoginForm = () => {
         }
 
         try {
-            const result = await axios.post(`${apiUrl}login`, {
+            const result = await axios.post(`${import.meta.env.VITE_API_URL}login`, {
                 email, password
             });
 
