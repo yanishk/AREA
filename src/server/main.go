@@ -418,6 +418,57 @@ func createToken(email string, context *gin.Context) error {
 	return nil
 }
 
+func (databaseContext *Database) modifyPassword(context *gin.Context) {
+	email, err := context.Get("email")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email not found in token",
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email is not a valid string",
+		})
+		return
+	}
+
+	var newPassword struct {
+		Password string `json:"password"`
+	}
+
+	errorBody := context.ShouldBindJSON(&newPassword)
+	if errorBody != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
+
+	hash, errHash := bcrypt.GenerateFromPassword([]byte(newPassword.Password), bcrypt.DefaultCost)
+
+	if errHash != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to hash password",
+		})
+		return
+	}
+
+	errUpdate := updateUser(databaseContext.db, emailStr, string(hash))
+	if errUpdate != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not modify the password",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Password modified",
+	})
+}
+
 func main() {
 	var databaseContext Database
 	var err error
@@ -438,8 +489,11 @@ func main() {
 	router.GET("/hi", middleware.VerifyJWTCookie, helloServer)
 	router.GET("/sum/:numberFrst/:numberSnd", sumNumbers)
 	router.GET("/random/:maxRand", randomNumber)
+
 	router.POST("/login", databaseContext.loginAuthentification)
 	router.POST("/register", databaseContext.createNewUser)
+
+	router.PUT("/modify-password", middleware.VerifyJWTCookie, databaseContext.modifyPassword)
 
 	handler := corsAllow.Handler(router)
 
