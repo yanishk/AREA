@@ -326,6 +326,37 @@ func randomNumber(context *gin.Context) {
 	})
 }
 
+type LoginData struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginSuccessResponse struct {
+	Msg string `json:"success"example:"Connection successfull"`
+}
+
+type LoginFailureInvalidBodyResponse struct {
+	Msg string `json:"error"example:"Invalid request body"`
+}
+
+type LoginFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Could not find requested user-Wrong password"`
+}
+type LoginFailureTokenErrorResponse struct {
+	Msg string `json:"error"example:"Error creating token"`
+}
+
+// @Summary Login
+// @Description User Authentication
+// @Tags Users
+// @Accept  json
+// @Produce  json
+// @Param user body LoginData true "User credentials"
+// @Success 200 {object} LoginSuccessResponse
+// @Failure 400 {object} LoginFailureInvalidBodyResponse
+// @Failure 401 {object} LoginFailureUnauthorizedResponse
+// @Failure 500 {object} LoginFailureTokenErrorResponse
+// @Router /login [post]
 func (databaseContext *Database) loginAuthentification(context *gin.Context) {
 	var loginData struct {
 		Email    string `json:"email"`
@@ -471,6 +502,9 @@ func (databaseContext *Database) modifyPassword(context *gin.Context) {
 		"success": "Password modified",
 	})
 }
+
+// @title Documentation for AREA Rest API
+// @host localhost:8080
 
 func main() {
 	var databaseContext Database
