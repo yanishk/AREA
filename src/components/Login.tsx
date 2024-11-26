@@ -1,7 +1,42 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { useState } from "react";
+import axios from "axios";
 
 const LoginForm = () => {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    const sendFormOnClick = async () => {
+        if (!email || !password) {
+          setEmail("");
+          setPassword("");
+          setError("Please fill email and password");
+          return;
+        }
+
+        try {
+          const result = await axios.post('http://localhost:8080/login', {
+            email, password
+          });
+
+          if (result.data.success) {
+            alert("Successful login");
+          } else {
+            setEmail("");
+            setPassword("");
+            setError("The email and password don't match");
+          }
+        } catch (error) {
+          console.log(error)
+          setEmail("");
+          setPassword("");
+          setError("The email and password don't match");
+        }
+      }
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
             <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
@@ -17,13 +52,27 @@ const LoginForm = () => {
                 <input
                     type="email"
                     placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 h-[4.8rem] mb-3 border-[7px] rounded-[15px] border-[#EEEEEE] focus:outline-none focus:border-black placeholder-[#C8C8C8] font-[900] text-[25px] leading-7"
                 />
                 <input
                     type="password"
                     placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full px-4 h-[4.8rem] mt-2.5 border-[7px] rounded-[15px] border-[#EEEEEE] focus:outline-none focus:border-black placeholder-[#C8C8C8] font-[900] text-[25px] leading-7"
                 />
+
+                {error && (
+                    <div
+                        className="flex justify-center mt-6">
+                        <p
+                            className="text-red-600 text-lg mt-2">
+                                {error}
+                        </p>
+                    </div>
+                )}
 
                 <div
                     className="flex justify-center mt-3">
@@ -35,6 +84,7 @@ const LoginForm = () => {
                 </div>
 
                 <button
+                    onClick={sendFormOnClick}
                     className="w-full h-28 bg-[#222222] text-white text-[2.2rem] rounded-full hover:bg-[#333333] mt-8 font-[900]">
                     Log in
                 </button>
