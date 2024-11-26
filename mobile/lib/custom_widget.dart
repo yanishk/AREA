@@ -58,10 +58,12 @@ class CustomClassicForm extends StatelessWidget {
     super.key,
     required this.hint,
     this.controller,
+    this.obscureText = false,
   });
 
   final String hint;
   final TextEditingController? controller;
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -70,42 +72,32 @@ class CustomClassicForm extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: hint,
+          child:
+          Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 238, 238, 238),
+              borderRadius:  BorderRadius.circular(5),
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CustomPasswdForm extends StatelessWidget {
-  const CustomPasswdForm({
-    super.key,
-    required this.hint,
-    this.controller,
-  });
-
-  final String hint;
-  final TextEditingController? controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          child: TextField(
-            obscureText: true,
-            controller: controller,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: hint,
+            child: TextField(
+              controller: controller,
+              obscureText: obscureText,
+              decoration: InputDecoration(
+                hintStyle: TextStyle(
+                  fontSize: 20,
+                  color: const Color.fromARGB(255, 156, 156, 156),
+                  fontWeight: FontWeight.bold,
+                ),
+                hintText: hint,
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: Colors.black,
+                    width: 4,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

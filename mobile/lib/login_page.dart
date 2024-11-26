@@ -28,6 +28,7 @@ class _APICallState extends State<APICall> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String result = '';
+  String apiRoute = 'login';
 
   @override
   void dispose() {
@@ -39,9 +40,9 @@ class _APICallState extends State<APICall> {
   Future<void> _postData() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl}login');
+      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
       final response = await http.post(
-        Uri.parse('${apiUrl}login'),
+        Uri.parse('${apiUrl + apiRoute}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -93,7 +94,7 @@ class _APICallState extends State<APICall> {
 
               Text(result, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),),
               CustomClassicForm(hint:'Email', controller: emailController,),
-              CustomPasswdForm(hint:'Password', controller: passwordController,),
+              CustomClassicForm(hint:'Password', controller: passwordController, obscureText: true),
 
               Text("Forgot your password?", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
 
