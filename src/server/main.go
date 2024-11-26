@@ -351,17 +351,17 @@ type LoginFailureTokenErrorResponse struct {
 	Msg string `json:"error"example:"Error creating token"`
 }
 
-// @Summary Login
-// @Description User Authentication
-// @Tags Users
-// @Accept  json
-// @Produce  json
-// @Param user body LoginData true "User credentials"
-// @Success 200 {object} LoginSuccessResponse
-// @Failure 400 {object} FailureInvalidBodyResponse
-// @Failure 401 {object} LoginFailureUnauthorizedResponse
-// @Failure 500 {object} LoginFailureTokenErrorResponse
-// @Router /login [post]
+//	@Summary		Login
+//	@Description	User Authentication
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		LoginData	true	"User credentials"
+//	@Success		200		{object}	LoginSuccessResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		401		{object}	LoginFailureUnauthorizedResponse
+//	@Failure		500		{object}	LoginFailureTokenErrorResponse
+//	@Router			/login [post]
 func (databaseContext *Database) loginAuthentication(context *gin.Context) {
 	var user LoginData
 	err := context.ShouldBindJSON(&user)
@@ -409,17 +409,17 @@ type RegisterFailureEmailAlreadyUsedResponse struct {
 	Msg string `json:"error"example:"Email address already used"`
 }
 
-// @Summary Register
-// @Description Create user account
-// @Tags Users
-// @Accept  json
-// @Produce  json
-// @Param user body LoginData true "User credentials"
-// @Success 200 {object} RegisterSuccessResponse
-// @Failure 400 {object} FailureInvalidBodyResponse
-// @Failure 409 {object} RegisterFailureEmailAlreadyUsedResponse
-// @Failure 500 {object} FailureInternalServerErrorResponse
-// @Router /register [post]
+//	@Summary		Register
+//	@Description	Create user account
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		LoginData	true	"User credentials"
+//	@Success		200		{object}	RegisterSuccessResponse
+//	@Failure		400		{object}	FailureInvalidBodyResponse
+//	@Failure		409		{object}	RegisterFailureEmailAlreadyUsedResponse
+//	@Failure		500		{object}	FailureInternalServerErrorResponse
+//	@Router			/register [post]
 func (databaseContext *Database) createNewUser(context *gin.Context) {
 	var newUser LoginData
 
@@ -485,16 +485,16 @@ type ModifyPasswordFailureInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
 }
 
-// @Summary Modify Password
-// @Description Modify the user password
-// @Tags Users
-// @Accept  json
-// @Produce  json
-// @Param user body ModifyPasswordData true "New password of the user"
-// @Success 200 {object} ModifyPasswordSuccessResponse
-// @Failure 400 {object} ModifyPasswordFailureEmailNotValidResponse
-// @Failure 500 {object} ModifyPasswordFailureInternalServerErrorResponse
-// @Router /modify-password [post]
+//	@Summary		Modify Password
+//	@Description	Modify the user password
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		ModifyPasswordData	true	"New password of the user"
+//	@Success		200		{object}	ModifyPasswordSuccessResponse
+//	@Failure		400		{object}	ModifyPasswordFailureEmailNotValidResponse
+//	@Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
+//	@Router			/modify-password [put]
 func (databaseContext *Database) modifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -546,8 +546,8 @@ func (databaseContext *Database) modifyPassword(context *gin.Context) {
 	})
 }
 
-// @title Documentation for AREA Rest API
-// @host localhost:8080
+//	@title	Documentation for AREA Rest API
+//	@host	localhost:8080
 func main() {
 	var databaseContext Database
 	var err error

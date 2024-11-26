@@ -68,7 +68,7 @@ const docTemplate = `{
             }
         },
         "/modify-password": {
-            "post": {
+            "put": {
                 "description": "Modify the user password",
                 "consumes": [
                     "application/json"
