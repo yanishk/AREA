@@ -10,8 +10,12 @@ import (
 	"poc-goland.com/poc/src/database"
 	"poc-goland.com/poc/src/entities"
 	"poc-goland.com/poc/src/routes"
+
+	_ "poc-goland.com/poc/docs"
 )
 
+//	@title	Documentation for AREA Rest API
+//	@host	localhost:8080
 func main() {
 	var databaseContext entities.Database
 	var err error
