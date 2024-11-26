@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:developer' as developer;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "sign_up.dart";
@@ -22,7 +24,7 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final String apiUrl = 'http://mathisbrehm.fr:8080/login/';
+  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String result = '';
@@ -35,6 +37,7 @@ class _APICallState extends State<APICall> {
   }
 
   Future<void> _postData() async {
+    developer.log('SERVER_LINK : $apiUrl');
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -49,7 +52,6 @@ class _APICallState extends State<APICall> {
 
       if (response.statusCode == 200) {
         setState(() {
-          debugPrint('_postData response.statusCode == 200');
           result = "";
 
           Navigator.pop(context);
@@ -67,6 +69,11 @@ class _APICallState extends State<APICall> {
     } catch (e) {
       setState(() {
         result = '$e';
+        if (result.split(' ').contains("SocketException:") == true ||
+           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+          debugPrint(result);
+          result = "Could not find the server\nPlease try again later";
+        }
       });
     }
   }
