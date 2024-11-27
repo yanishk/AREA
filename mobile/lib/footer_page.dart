@@ -26,6 +26,7 @@ class FooterNavigationBar extends StatelessWidget {
       showUnselectedLabels: true,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
+      backgroundColor: Colors.white,
       selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
