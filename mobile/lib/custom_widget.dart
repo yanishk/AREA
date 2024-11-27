@@ -59,11 +59,13 @@ class CustomClassicForm extends StatelessWidget {
     required this.hint,
     this.controller,
     this.obscureText = false,
+    this.padding = const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
   });
 
   final String hint;
   final TextEditingController? controller;
   final bool obscureText;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class CustomClassicForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: padding,
           child:
           Container(
             decoration: BoxDecoration(
