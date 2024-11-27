@@ -9,8 +9,8 @@ import (
 	"poc-goland.com/poc/src/entities"
 	"poc-goland.com/poc/src/middleware"
 
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-    swaggerFiles "github.com/swaggo/files"
 )
 
 func sumNumbers(context *gin.Context) {
@@ -63,6 +63,6 @@ func PublicRoutes(router *gin.Engine, databaseContext entities.Database) {
 
 func PrivateRoutes(router *gin.Engine, databaseContext entities.Database) {
 	router.GET("/hi", middleware.VerifyJWTCookie, helloServer)
-	router.PUT("user/modify-password", middleware.VerifyJWTCookie, databaseContext.ModifyPassword)
-	router.DELETE("user/delete-account", middleware.VerifyJWTCookie, databaseContext.DeleteAccount)
+	router.PUT("/user/modify-password", middleware.VerifyJWTCookie, databaseContext.ModifyPassword)
+	router.DELETE("/user/delete-account", middleware.VerifyJWTCookie, databaseContext.DeleteAccount)
 }

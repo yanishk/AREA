@@ -13,12 +13,13 @@ import (
 )
 
 type LoginData struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type ModifyPasswordData struct {
-	Password string `json:"password"`
+	OldPassword string `json:"oldpassword"`
+	Password    string `json:"password"`
 }
 
 // General Responses
@@ -39,8 +40,16 @@ type ModifyPasswordFailureEmailNotValidResponse struct {
 	Msg string `json:"errorr"example:"Email is not a valid string"`
 }
 
+type ModifyPasswordFailureOldPasswordNotValidResponse struct {
+	Msg string `json:"errorr"example:"Old password is incorrect"`
+}
+
 type ModifyPasswordFailureInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
+}
+
+type ModifyPasswordBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Could not find requested user"`
 }
 
 // Delete Account Responses
@@ -94,17 +103,18 @@ func createToken(email string, context *gin.Context) error {
 	return nil
 }
 
-//	@Summary		Modify Password
-//	@Description	Modify the user password
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Param			user	body		ModifyPasswordData	true	"New password of the user"
-//	@Success		200		{object}	ModifyPasswordSuccessResponse
-//	@Failure		400		{object}	FailureInvalidBodyResponse
-//	@Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
-//	@Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
-//	@Router			/user/modify-password [put]
+// @Summary		Modify Password
+// @Description	Modify the user password
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Param			user	body		ModifyPasswordData	true	"New password of the user"
+// @Success		200		{object}	ModifyPasswordSuccessResponse
+// @Failure		400		{object}	ModifyPasswordBadRequestResponse
+// @Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
+// @Failure		403		{object}	ModifyPasswordFailureOldPasswordNotValidResponse
+// @Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
+// @Router			/user/modify-password [put]
 func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -133,6 +143,23 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 		return
 	}
 
+	foundUser, errSeekMail := database.FindUserByEmail(databaseContext.Db, emailStr)
+
+	if errSeekMail != nil || len(foundUser.Email) <= 0 {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find requested user",
+		})
+		return
+	}
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(newPassword.OldPassword), []byte(foundUser.Password))
+
+	if resBcrypt == nil {
+		context.IndentedJSON(http.StatusForbidden, gin.H{
+			"error": "Old password is incorrect",
+		})
+		return
+	}
+
 	hash, errHash := bcrypt.GenerateFromPassword([]byte(newPassword.Password), bcrypt.DefaultCost)
 
 	if errHash != nil {
@@ -154,15 +181,15 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 	})
 }
 
-//	@Summary		Delete Account
-//	@Description	Delete the user account
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Success		200		{object}	DeleteAccountSuccessResponse
-//	@Failure		401		{object}	DeleteAccountFailureUnauthorizedResponse
-//	@Failure		500		{object}	DeleteAccountFailureInternalServerErrorResponse
-//	@Router			/user/delete-account [delete]
+// @Summary		Delete Account
+// @Description	Delete the user account
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Success		200		{object}	DeleteAccountSuccessResponse
+// @Failure		401		{object}	DeleteAccountFailureUnauthorizedResponse
+// @Failure		500		{object}	DeleteAccountFailureInternalServerErrorResponse
+// @Router			/user/delete-account [delete]
 func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	email, err := context.Get("email")
 
@@ -193,17 +220,17 @@ func (databaseContext *Database) DeleteAccount(context *gin.Context) {
 	})
 }
 
-//	@Summary		Login
-//	@Description	User Authentication
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Param			user	body		LoginData	true	"User credentials"
-//	@Success		200		{object}	LoginSuccessResponse
-//	@Failure		400		{object}	FailureInvalidBodyResponse
-//	@Failure		401		{object}	LoginFailureUnauthorizedResponse
-//	@Failure		500		{object}	LoginFailureTokenErrorResponse
-//	@Router			/login [post]
+// @Summary		Login
+// @Description	User Authentication
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Param			user	body		LoginData	true	"User credentials"
+// @Success		200		{object}	LoginSuccessResponse
+// @Failure		400		{object}	FailureInvalidBodyResponse
+// @Failure		401		{object}	LoginFailureUnauthorizedResponse
+// @Failure		500		{object}	LoginFailureTokenErrorResponse
+// @Router			/login [post]
 func (databaseContext *Database) LoginAuthentication(context *gin.Context) {
 	var user LoginData
 	err := context.ShouldBindJSON(&user)
@@ -243,17 +270,17 @@ func (databaseContext *Database) LoginAuthentication(context *gin.Context) {
 	})
 }
 
-//	@Summary		Register
-//	@Description	Create user account
-//	@Tags			Users
-//	@Accept			json
-//	@Produce		json
-//	@Param			user	body		LoginData	true	"User credentials"
-//	@Success		200		{object}	RegisterSuccessResponse
-//	@Failure		400		{object}	FailureInvalidBodyResponse
-//	@Failure		409		{object}	RegisterFailureEmailAlreadyUsedResponse
-//	@Failure		500		{object}	FailureInternalServerErrorResponse
-//	@Router			/register [post]
+// @Summary		Register
+// @Description	Create user account
+// @Tags			Users
+// @Accept			json
+// @Produce		json
+// @Param			user	body		LoginData	true	"User credentials"
+// @Success		200		{object}	RegisterSuccessResponse
+// @Failure		400		{object}	FailureInvalidBodyResponse
+// @Failure		409		{object}	RegisterFailureEmailAlreadyUsedResponse
+// @Failure		500		{object}	FailureInternalServerErrorResponse
+// @Router			/register [post]
 func (databaseContext *Database) CreateNewUser(context *gin.Context) {
 	var newUser LoginData
 
