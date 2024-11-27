@@ -48,6 +48,10 @@ type ModifyPasswordFailureInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
 }
 
+type ModifyPasswordBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Could not find requested user"`
+}
+
 // Delete Account Responses
 type DeleteAccountSuccessResponse struct {
 	Msg string `json:"success"example:"Account deleted"`
@@ -106,7 +110,7 @@ func createToken(email string, context *gin.Context) error {
 // @Produce		json
 // @Param			user	body		ModifyPasswordData	true	"New password of the user"
 // @Success		200		{object}	ModifyPasswordSuccessResponse
-// @Failure		400		{object}	FailureInvalidBodyResponse
+// @Failure		400		{object}	ModifyPasswordBadRequestResponse
 // @Failure		401		{object}	ModifyPasswordFailureEmailNotValidResponse
 // @Failure		403		{object}	ModifyPasswordFailureOldPasswordNotValidResponse
 // @Failure		500		{object}	ModifyPasswordFailureInternalServerErrorResponse
