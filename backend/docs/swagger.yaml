@@ -54,8 +54,16 @@ definitions:
         example: Connection successful
         type: string
     type: object
+  entities.ModifyPasswordBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Could not find requested user
+        type: string
+    type: object
   entities.ModifyPasswordData:
     properties:
+      oldpassword:
+        type: string
       password:
         type: string
     type: object
@@ -69,6 +77,12 @@ definitions:
     properties:
       error:
         example: Failed to hash password-Could not modify the password
+        type: string
+    type: object
+  entities.ModifyPasswordFailureOldPasswordNotValidResponse:
+    properties:
+      errorr:
+        example: Old password is incorrect
         type: string
     type: object
   entities.ModifyPasswordSuccessResponse:
@@ -207,11 +221,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
+            $ref: '#/definitions/entities.ModifyPasswordBadRequestResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/entities.ModifyPasswordFailureOldPasswordNotValidResponse'
         "500":
           description: Internal Server Error
           schema:
