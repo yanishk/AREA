@@ -188,13 +188,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/entities.ModifyPasswordBadRequestResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/entities.ModifyPasswordFailureOldPasswordNotValidResponse"
                         }
                     },
                     "500": {
@@ -291,9 +297,21 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.ModifyPasswordBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Could not find requested user"
+                }
+            }
+        },
         "entities.ModifyPasswordData": {
             "type": "object",
             "properties": {
+                "oldpassword": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 }
@@ -314,6 +332,15 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Failed to hash password-Could not modify the password"
+                }
+            }
+        },
+        "entities.ModifyPasswordFailureOldPasswordNotValidResponse": {
+            "type": "object",
+            "properties": {
+                "errorr": {
+                    "type": "string",
+                    "example": "Old password is incorrect"
                 }
             }
         },
