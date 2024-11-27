@@ -1,6 +1,9 @@
 package entities
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -36,4 +39,44 @@ func SpotifyCallBack(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"access_token": tokenSpotify,
 	})
+}
+
+func getAccesTokenFromCode(codeSpotify string) (string, error) {
+	tokenUrl := "https://accounts.spotify.com/api/token"
+	var result struct {
+		AccessToken string `json:"access_token"`
+		TokenType   string `json:"token_type"`
+		ExpiresIn   int    `json:"expires_in"`
+	}
+	jsonBody := fmt.Sprintf(
+		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		codeSpotify,
+		os.Getenv("CALLBACK_SPOTIFY"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return "", errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("SPOTIFY_ID_CLIENT"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return "", err
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&result)
+	if errDecoder != nil {
+		return "", errDecoder
+	}
+
+	return result.AccessToken, nil
 }
