@@ -151,34 +151,36 @@ func (databaseContext *Database) ModifyPassword(context *gin.Context) {
 		})
 		return
 	}
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(newPassword.OldPassword), []byte(foundUser.Password))
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(newPassword.OldPassword))
 
 	if resBcrypt == nil {
-		context.IndentedJSON(http.StatusForbidden, gin.H{
-			"error": "Old password is incorrect",
+
+		hash, errHash := bcrypt.GenerateFromPassword([]byte(newPassword.Password), bcrypt.DefaultCost)
+
+		if errHash != nil {
+			context.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to hash password",
+			})
+			return
+		}
+
+		errUpdate := database.UpdateUser(databaseContext.Db, emailStr, string(hash))
+		if errUpdate != nil {
+			context.IndentedJSON(http.StatusInternalServerError, gin.H{
+				"error": "Could not modify the password",
+			})
+			return
+		}
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"success": "Password modified",
 		})
 		return
 	}
 
-	hash, errHash := bcrypt.GenerateFromPassword([]byte(newPassword.Password), bcrypt.DefaultCost)
-
-	if errHash != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to hash password",
-		})
-		return
-	}
-
-	errUpdate := database.UpdateUser(databaseContext.Db, emailStr, string(hash))
-	if errUpdate != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not modify the password",
-		})
-		return
-	}
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": "Password modified",
+	context.IndentedJSON(http.StatusForbidden, gin.H{
+		"error": "Old password is incorrect",
 	})
+
 }
 
 // @Summary		Delete Account
