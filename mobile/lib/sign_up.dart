@@ -7,11 +7,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "login_page.dart";
+import "explore.dart";
 
 class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: new ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: APICall(),
     );
   }
@@ -101,8 +103,8 @@ class _APICallState extends State<APICall> {
                 backgroundColor:Color.fromARGB(255, 34, 34, 34),
                 text: AutoSizeText("Get started", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
                 onPressed: _postData,
-                size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                size: Size(double.infinity, 70),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
               ),
 
               Padding(padding: EdgeInsets.only(top: 15)),
@@ -117,7 +119,7 @@ class _APICallState extends State<APICall> {
                 text: AutoSizeText("Continue with google", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
                 image: Image.asset('assets/icon/google_logo.webp', width: 24, height: 24),
               ),
@@ -128,7 +130,7 @@ class _APICallState extends State<APICall> {
                 text: AutoSizeText("Continue with Facebook", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
                 image: Image.asset('assets/icon/facebook_icon.png', width: 24, height: 24),
               ),
@@ -139,7 +141,7 @@ class _APICallState extends State<APICall> {
                 text: AutoSizeText("Continue with X", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {},
                 size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
                 image: Image.asset('assets/icon/X-Logo.png', width: 40, height: 40),
               ),
@@ -148,9 +150,14 @@ class _APICallState extends State<APICall> {
               CustomButton(
                 backgroundColor:Color.fromARGB(255, 34, 34, 34),
                 text: AutoSizeText("Continue with Apple", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ExplorePage()),
+                  );
+                },
                 size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
                 image: Image.asset('assets/icon/apple_logo.png', width: 29, height: 29),
               ),
@@ -158,6 +165,10 @@ class _APICallState extends State<APICall> {
               Padding(padding: EdgeInsets.only(top: 30)),
               ElevatedButton(
                 child: const Text("Already on AREA? Log in here", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  overlayColor: const Color.fromARGB(255, 204, 204, 204),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,

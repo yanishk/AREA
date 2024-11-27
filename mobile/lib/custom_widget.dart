@@ -71,30 +71,37 @@ class CustomClassicForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child:
           Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 238, 238, 238),
-              borderRadius:  BorderRadius.circular(5),
+              borderRadius:  BorderRadius.circular(10),
             ),
             child: TextField(
+              style: TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,
               decoration: InputDecoration(
+                labelStyle:TextStyle(fontSize:40),
                 hintStyle: TextStyle(
                   fontSize: 20,
-                  color: const Color.fromARGB(255, 156, 156, 156),
+                  color: const Color.fromARGB(255, 150, 150, 150),
                   fontWeight: FontWeight.bold,
                 ),
                 hintText: hint,
-                border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                    width: 5,
+                  ),
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: Colors.black,
-                    width: 4,
+                    width: 5,
                   ),
                 ),
               ),

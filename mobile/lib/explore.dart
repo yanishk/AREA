@@ -8,6 +8,16 @@ import "footer_page.dart";
 class ExplorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: new ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      home: ExplorePageMain(),
+    );
+  }
+}
+
+class ExplorePageMain extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView (
         child: Column(
@@ -101,7 +111,6 @@ class SearchBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 238, 238, 238),
           borderRadius:  BorderRadius.circular(5),
         ),
         child: TextField(
@@ -120,8 +129,14 @@ class SearchBar extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
             hintText: 'Search',
-            border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: const Color.fromARGB(255, 238, 238, 238),
+                width: 5,
+              ),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
