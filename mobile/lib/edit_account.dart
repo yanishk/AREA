@@ -8,6 +8,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "custom_widget.dart";
 import "explore.dart";
 import "footer_page.dart";
+import "editPassword.dart";
 
 class EditAccount extends StatelessWidget {
   @override
@@ -86,17 +87,7 @@ class _APICallState extends State<APICall> {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            Center(
-              child: AutoSizeText(
-                "Account",
-                style: TextStyle (
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                maxLines: 1,
-              ),
-            ),
+            AutoSizeText("Account", style: TextStyle (fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
             SizedBox(width: 16),
             MyDivider(),
             Padding(padding: EdgeInsets.only(top: 30)),
@@ -110,7 +101,7 @@ class _APICallState extends State<APICall> {
             LeftWidget(
               child: IntrinsicWidth(
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPassword()),);},
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                   ),
@@ -124,7 +115,15 @@ class _APICallState extends State<APICall> {
                   ),
                 ),
               ),
-            )
+            ),
+            Padding(padding: EdgeInsets.only(top: 20)),
+            CustomButton(
+              backgroundColor:Color.fromARGB(255, 34, 34, 34),
+              text: AutoSizeText("Save", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: () {},
+              size: Size(double.infinity, 55),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+            ),
           ],
         ),
       ),
