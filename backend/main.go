@@ -36,7 +36,7 @@ func main() {
 	routes.PublicRoutes(router, databaseContext)
 	routes.PrivateRoutes(router, databaseContext)
 
-	routes.PrivateServicesRoutes(router)
+	routes.PrivateServicesRoutes(router, databaseContext)
 
 	handler := corsAllow.Handler(router)
 
