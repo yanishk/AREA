@@ -91,3 +91,39 @@ func getAccesTokenFromCode(codeSpotify string) (ResultToken, error) {
 
 	return tokensRes, nil
 }
+
+func (databaseContext *Database) refreshToken(refreshToken string) (ResultToken, error) {
+	tokenUrl := "https://accounts.spotify.com/api/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=refresh_token&refresh_token=%s",
+		refreshToken,
+	)
+	var tokensRefreshRes ResultToken
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return tokensRefreshRes, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("SPOTIFY_ID_CLIENT"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return tokensRefreshRes, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return tokensRefreshRes, err
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&tokensRefreshRes)
+	if errDecoder != nil {
+		return tokensRefreshRes, errDecoder
+	}
+
+	database.UpdateService(databaseContext.Db, "spotify", tokensRefreshRes.AccessToken, tokensRefreshRes.RefreshToken)
+	return tokensRefreshRes, err
+}
