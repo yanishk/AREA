@@ -8,7 +8,15 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"poc-goland.com/poc/src/database"
 )
+
+type ResultToken struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+}
 
 func Auth02Spotify(context *gin.Context) {
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
@@ -17,7 +25,7 @@ func Auth02Spotify(context *gin.Context) {
 	context.Redirect(http.StatusTemporaryRedirect, spotifyAuthUrl)
 }
 
-func SpotifyCallBack(context *gin.Context) {
+func (databaseContext *Database) SpotifyCallBack(context *gin.Context) {
 	codeSpotify := context.Query("code")
 
 	if codeSpotify == "" {
@@ -36,27 +44,30 @@ func SpotifyCallBack(context *gin.Context) {
 		return
 	}
 
+	_, errFindingService := database.FindServiceByName(databaseContext.Db, "spotify")
+	if errFindingService == nil {
+		database.UpdateService(databaseContext.Db, "spotify", tokenSpotify.AccessToken, tokenSpotify.RefreshToken)
+	} else {
+		database.CreateService(databaseContext.Db, "spotify", tokenSpotify.AccessToken, tokenSpotify.RefreshToken)
+	}
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"access_token": tokenSpotify,
 	})
 }
 
-func getAccesTokenFromCode(codeSpotify string) (string, error) {
+func getAccesTokenFromCode(codeSpotify string) (ResultToken, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
-	var result struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
 	jsonBody := fmt.Sprintf(
 		"grant_type=authorization_code&code=%s&redirect_uri=%s",
 		codeSpotify,
 		os.Getenv("CALLBACK_SPOTIFY"),
 	)
+	var tokensRes ResultToken
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
-		return "", errRequest
+		return tokensRes, errRequest
 	}
 
 	request.SetBasicAuth(os.Getenv("SPOTIFY_ID_CLIENT"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
@@ -65,18 +76,18 @@ func getAccesTokenFromCode(codeSpotify string) (string, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return tokensRes, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return "", err
+		return tokensRes, err
 	}
 
-	errDecoder := json.NewDecoder(res.Body).Decode(&result)
+	errDecoder := json.NewDecoder(res.Body).Decode(&tokensRes)
 	if errDecoder != nil {
-		return "", errDecoder
+		return tokensRes, errDecoder
 	}
 
-	return result.AccessToken, nil
+	return tokensRes, nil
 }
