@@ -38,3 +38,18 @@ func FindServiceByName(db *sql.DB, name string) (Service, error) {
 	}
 	return retrievedService, nil
 }
+
+func UpdateService(db *sql.DB, name string, accessToken string, refreshToken string) error {
+	sqlStatement := `UPDATE services SET accessToken = ($1), refreshToken = ($2) WHERE name = ($3);`
+
+	_, err := FindServiceByName(db, name)
+	if err != nil {
+		return fmt.Errorf("Service doesn't exist")
+	}
+
+	_, err = db.Exec(sqlStatement, accessToken, refreshToken, name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
