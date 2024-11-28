@@ -20,7 +20,7 @@ func createAction(db *sql.DB, name string, description string, serviceName strin
 		return fmt.Errorf("Action already exist")
 	}
 
-	retrievedService, err := findServiceByName(db, serviceName)
+	retrievedService, err := FindServiceByName(db, serviceName)
 	if err != nil {
 		return err
 	}
