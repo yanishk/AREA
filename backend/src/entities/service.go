@@ -92,6 +92,32 @@ func getAccesTokenFromCode(codeSpotify string) (ResultToken, error) {
 	return tokensRes, nil
 }
 
+func (databaseContext *Database) SpotifyCallApi(context *gin.Context) {
+	foundService, errServiceFound := database.FindServiceByName(databaseContext.Db, "spotify")
+	if errServiceFound != nil {
+		fmt.Println(errServiceFound)
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "User is not connected to the service",
+		})
+		return
+	}
+
+	refreshedToken, errRefresh := databaseContext.refreshToken(foundService.RefreshToken)
+	if errRefresh != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not refresh token",
+		})
+		return
+	}
+
+	//call API instead of this stooooopid print
+	fmt.Println(refreshedToken)
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"Success": "API successfully called",
+	})
+}
+
 func (databaseContext *Database) refreshToken(refreshToken string) (ResultToken, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
