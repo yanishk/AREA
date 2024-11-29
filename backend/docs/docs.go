@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.LoginData"
+                            "$ref": "#/definitions/entities.UserCredentials"
                         }
                     }
                 ],
@@ -43,25 +43,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entities.LoginSuccessResponse"
+                            "$ref": "#/definitions/docs_user.LoginSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/entities.LoginFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/docs_user.LoginFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/entities.LoginFailureTokenErrorResponse"
+                            "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
                         }
                     }
                 }
@@ -87,7 +87,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.LoginData"
+                            "$ref": "#/definitions/entities.UserCredentials"
                         }
                     }
                 ],
@@ -95,25 +95,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entities.RegisterSuccessResponse"
+                            "$ref": "#/definitions/docs_user.RegisterSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/entities.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/entities.FailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.FailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -136,19 +136,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountSuccessResponse"
+                            "$ref": "#/definitions/docs_user.DeleteAccountSuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/docs_user.DeleteAccountFailureUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.DeleteAccountFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -174,7 +174,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordData"
+                            "$ref": "#/definitions/entities.UserModifyPassword"
                         }
                     }
                 ],
@@ -182,25 +182,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordSuccessResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/entities.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordBadRequestResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureOldPasswordNotValidResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureInternalServerErrorResponse"
                         }
                     }
                 }
@@ -208,7 +214,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entities.DeleteAccountFailureInternalServerErrorResponse": {
+        "docs_user.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -217,7 +223,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.DeleteAccountFailureUnauthorizedResponse": {
+        "docs_user.DeleteAccountFailureUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -226,7 +232,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.DeleteAccountSuccessResponse": {
+        "docs_user.DeleteAccountSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -235,7 +241,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.FailureInternalServerErrorResponse": {
+        "docs_user.FailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -244,7 +250,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.FailureInvalidBodyResponse": {
+        "docs_user.FailureInvalidBodyResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -253,7 +259,97 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.LoginData": {
+        "docs_user.LoginFailureTokenErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Error creating token"
+                }
+            }
+        },
+        "docs_user.LoginFailureUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested user-Wrong password"
+                }
+            }
+        },
+        "docs_user.LoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Connection successful"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Could not find requested user"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordFailureEmailNotValidResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email is not a valid string"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordFailureInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to hash password-Could not modify the password"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordFailureOldPasswordNotValidResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Old password is incorrect"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Password modified"
+                }
+            }
+        },
+        "docs_user.RegisterFailureEmailAlreadyUsedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email address already used"
+                }
+            }
+        },
+        "docs_user.RegisterSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "New user created"
+                }
+            }
+        },
+        "entities.UserCredentials": {
             "type": "object",
             "properties": {
                 "email": {
@@ -264,83 +360,14 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.LoginFailureTokenErrorResponse": {
+        "entities.UserModifyPassword": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Error creating token"
-                }
-            }
-        },
-        "entities.LoginFailureUnauthorizedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not find requested user-Wrong password"
-                }
-            }
-        },
-        "entities.LoginSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Connection successful"
-                }
-            }
-        },
-        "entities.ModifyPasswordData": {
-            "type": "object",
-            "properties": {
+                "oldpassword": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
-                }
-            }
-        },
-        "entities.ModifyPasswordFailureEmailNotValidResponse": {
-            "type": "object",
-            "properties": {
-                "errorr": {
-                    "type": "string",
-                    "example": "Email is not a valid string"
-                }
-            }
-        },
-        "entities.ModifyPasswordFailureInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Failed to hash password-Could not modify the password"
-                }
-            }
-        },
-        "entities.ModifyPasswordSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Password modified"
-                }
-            }
-        },
-        "entities.RegisterFailureEmailAlreadyUsedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email address already used"
-                }
-            }
-        },
-        "entities.RegisterSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "New user created"
                 }
             }
         }
@@ -350,10 +377,10 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Documentation for AREA Rest API",
+	Title:            "",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

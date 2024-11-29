@@ -1,12 +1,15 @@
-package database
+package postgres
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
-
+	"database/sql"
 	"github.com/joho/godotenv"
+
+	"backend/src/storage"
+	"backend/src/storage/postgres/user"
+	"backend/src/storage/postgres/action"
 )
 
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
@@ -17,7 +20,7 @@ func retrieveDatabaseInfos() (string, int, string, string, string, error) {
 	return os.Getenv("PGHOST"), port, os.Getenv("PGUSER"), os.Getenv("PGPASSWORD"), os.Getenv("PGDATABASE"), err
 }
 
-func ConnectToDatabase() (*sql.DB, error) {
+func New() *storage.Repository {
 	godotenv.Load()
 
 	host, port, user, password, dbname, err := retrieveDatabaseInfos()
@@ -38,7 +41,10 @@ func ConnectToDatabase() (*sql.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println("Successfully connected!")
-	return db, err
+
+	return &storage.Repository{
+		UserRepository: user_repository.NewUserRepository(db),
+		ActionRepository: action_repository.NewActionRepository(db),
+	}
 }
