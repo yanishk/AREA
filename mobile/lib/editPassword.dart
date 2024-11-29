@@ -6,8 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import "custom_widget.dart";
-import "explore.dart";
 import "edit_account.dart";
+import "globalData.dart";
 
 class EditPassword extends StatelessWidget {
   @override
@@ -27,55 +27,74 @@ class APICall extends StatefulWidget {
 
 class _APICallState extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController oldPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController repeatNewPasswordController = TextEditingController();
   String result = '';
-  String apiRoute = 'modify-password';
+  String notSamePasswd = "";
+  String apiRoute = 'user/modify-password';
 
   @override
   void dispose() {
-    passwordController.dispose();
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _postData() async {
+  Future<void> putData() async {
     developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.post(
-        Uri.parse(apiUrl + apiRoute),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'password': passwordController.text,
-        }),
-      );
+    if (repeatNewPasswordController.text != newPasswordController.text) {
+      setState(() {
+        notSamePasswd = "Password don't match";
+      });
+      developer.log('USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
+    } else {
+      setState(() {
+        notSamePasswd = "";
+      });
+      try {
+        developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
+        final response = await http.put(
+          Uri.parse(apiUrl + apiRoute),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Cookie': Globaldata.JWToken,
+          },
+          body: jsonEncode(<String, dynamic>{
+            'oldpassword' : oldPasswordController.text,
+            'password': newPasswordController.text,
+          }),
+        );
 
-      if (response.statusCode == 200) {
-        setState(() {
-          result = "";
+        if (response.statusCode == 200) {
+          setState(() {
+            result = "";
+            developer.log("Password putData succes");
 
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ExplorePage()),
-          );
-        });
-      } else {
-        final responseData = jsonDecode(response.body);
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditAccount()),
+            );
+          });
+        } else {
+          final responseData = jsonDecode(response.body);
+          developer.log("Password putData FAILE ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          setState(() {
+            result = '${responseData['error']}';
+          });
+        }
+      } catch (e) {
+        developer.log("Password putData ERROR: $e", level: 1);
         setState(() {
-          result = '${responseData['error']}';
+          result = '$e';
+          if (result.split(' ').contains("SocketException:") == true ||
+             (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+            debugPrint(result);
+            result = "Could not find the server\nPlease try again later";
+          }
         });
       }
-    } catch (e) {
-      setState(() {
-        result = '$e';
-        if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
-          debugPrint(result);
-          result = "Could not find the server\nPlease try again later";
-        }
-      });
     }
   }
 
@@ -90,21 +109,25 @@ class _APICallState extends State<APICall> {
 
             SizedBox(width: 16),
             MyDivider(),
+            Text(result, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),),
+
+            LeftWidget(child: AutoSizeText("Current password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
+            CustomClassicForm(hint: 'Password', controller: oldPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
             Padding(padding: EdgeInsets.only(top: 30)),
 
-            LeftText(str: "Current password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,)),
-            CustomClassicForm(hint:'Password', padding: EdgeInsets.symmetric(horizontal: 15),),
-            Padding(padding: EdgeInsets.only(top: 30)),
-            LeftText(str: "New password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,)),
-            CustomClassicForm(hint:'Password', padding: EdgeInsets.symmetric(horizontal: 15),),
+            LeftWidget(child: AutoSizeText("New password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
+            CustomClassicForm(hint: 'Password', controller: newPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
             Padding (padding: EdgeInsets.only(top: 20)),
-            LeftText (str: "Confirm new password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,)),
-            CustomClassicForm(hint: 'Password', controller: passwordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
-            Padding(padding: EdgeInsets.only(top: 30)),
+
+            LeftWidget(child: AutoSizeText("Confirm new password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
+            CustomClassicForm(hint: 'Password', controller: repeatNewPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
+            LeftWidget(child: AutoSizeText(notSamePasswd, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 0, 0),), maxLines: 1,),),
+            Padding(padding: EdgeInsets.only(top: 10)),
+
             CustomButton(
               backgroundColor:Color.fromARGB(255, 34, 34, 34),
               text: AutoSizeText("Save", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              onPressed: () {},
+              onPressed: putData,
               size: Size(double.infinity, 55),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
@@ -136,49 +159,6 @@ class EditPasswordTopBar extends StatelessWidget {
           child: AutoSizeText("Account", style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
         ),
       ],
-    );
-  }
-}
-
-class LeftWidget extends StatelessWidget {
-  const LeftWidget({
-    super.key,
-    required this.child,
-  });
-
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class LeftText extends StatelessWidget {
-  const LeftText({
-    super.key,
-    required this.str,
-    this.style,
-  });
-
-  final String str;
-  final TextStyle? style;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          AutoSizeText(str, style: style, maxLines: 1,),
-        ],
-      ),
     );
   }
 }

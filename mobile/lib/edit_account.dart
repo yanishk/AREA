@@ -92,11 +92,11 @@ class _APICallState extends State<APICall> {
             MyDivider(),
             Padding(padding: EdgeInsets.only(top: 30)),
 
-            LeftText(str: "Email", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,)),
+            LeftWidget(child: AutoSizeText("Email", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
 
             CustomClassicForm(hint:'Email', padding: EdgeInsets.symmetric(horizontal: 15),),
             Padding (padding: EdgeInsets.only(top: 20)),
-            LeftText (str: "Password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,)),
+            LeftWidget(child: AutoSizeText("Password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
             CustomClassicForm(hint: 'Password', controller: passwordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
             LeftWidget(
               child: IntrinsicWidth(
@@ -128,49 +128,6 @@ class _APICallState extends State<APICall> {
         ),
       ),
       bottomNavigationBar: FooterNavigationBar(currentIndex: 4),
-    );
-  }
-}
-
-class LeftWidget extends StatelessWidget {
-  const LeftWidget({
-    super.key,
-    required this.child,
-  });
-
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class LeftText extends StatelessWidget {
-  const LeftText({
-    super.key,
-    required this.str,
-    this.style,
-  });
-
-  final String str;
-  final TextStyle? style;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          AutoSizeText(str, style: style, maxLines: 1,),
-        ],
-      ),
     );
   }
 }

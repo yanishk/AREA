@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import "custom_widget.dart";
 import "sign_up.dart";
 import "explore.dart";
+import "globalData.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -54,15 +55,29 @@ class _APICallState extends State<APICall> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          result = "";
+        String? cookiesBrute = response.headers["set-cookie"];
+        String cookie = "";
+        String JWToken = "";
+        if (cookiesBrute != null) {
+          cookie = cookiesBrute;
+          JWToken = cookie.split(';').first;
+          setState(() {
+            result = "";
+            developer.log("HEADER : ${response.headers}");
+            developer.log("JWToken : {${JWToken}}");
+            Globaldata.JWToken = JWToken;
 
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ExplorePage()),
-          );
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ExplorePage()),
+            );
+          });
+        } else {
+          setState(() {
+          result = 'Failed to get the token';
         });
+        }
       } else {
         final responseData = jsonDecode(response.body);
         setState(() {

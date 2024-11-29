@@ -140,3 +140,23 @@ class MyDivider extends StatelessWidget {
     );
   }
 }
+
+class LeftWidget extends StatelessWidget {
+  const LeftWidget({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          child,
+        ],
+      ),
+    );
+  }
+}
