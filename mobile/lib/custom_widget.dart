@@ -60,12 +60,16 @@ class CustomClassicForm extends StatelessWidget {
     this.controller,
     this.obscureText = false,
     this.padding = const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    this.enabled = true,
+    this.fillCollor = Colors.white,
   });
 
   final String hint;
   final TextEditingController? controller;
   final bool obscureText;
   final EdgeInsetsGeometry padding;
+  final bool enabled;
+  final Color fillCollor;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +87,10 @@ class CustomClassicForm extends StatelessWidget {
               style: TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,
+              cursorColor: Colors.black,
               decoration: InputDecoration(
+                filled: true,
+                fillColor: fillCollor,
                 labelStyle:TextStyle(fontSize:40),
                 hintStyle: TextStyle(
                   fontSize: 20,
@@ -91,8 +98,16 @@ class CustomClassicForm extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 hintText: hint,
+                enabled: enabled,
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                    width: 5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: const Color.fromARGB(255, 238, 238, 238),
@@ -160,3 +175,29 @@ class LeftWidget extends StatelessWidget {
     );
   }
 }
+
+class CustomTextButton extends StatelessWidget {
+  const CustomTextButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.padding,
+  });
+  final text;
+  final onPressed;
+  final padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicWidth(
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          padding: padding,
+        ),
+        child: text,
+      ),
+    );
+  }
+}
+

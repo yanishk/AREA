@@ -4,11 +4,13 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:namer_app/login_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import "custom_widget.dart";
-import "explore.dart";
 import "footer_page.dart";
 import "editPassword.dart";
+import "globalData.dart";
 
 class EditAccount extends StatelessWidget {
   @override
@@ -28,53 +30,52 @@ class APICall extends StatefulWidget {
 
 class _APICallState extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
-  final TextEditingController passwordController = TextEditingController();
-  String result = '';
-  String apiRoute = 'modify-password';
+  String apiRoute = 'user/delete-account';
 
-  @override
-  void dispose() {
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _postData() async {
+  Future<void> _deleteAccount() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
       developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.post(
+      final response = await http.delete(
         Uri.parse(apiUrl + apiRoute),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          'Cookie': Globaldata.JWToken,
         },
-        body: jsonEncode(<String, dynamic>{
-          'password': passwordController.text,
-        }),
       );
 
       if (response.statusCode == 200) {
+        developer.log("Account deleted by user, JWToken : ${Globaldata.JWToken}");
         setState(() {
-          result = "";
+          Globaldata.JWToken = "";
+          Fluttertoast.showToast(msg: "Account deleted", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 24.0);
 
-          Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ExplorePage()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         });
       } else {
         final responseData = jsonDecode(response.body);
         setState(() {
-          result = '${responseData['error']}';
+          Fluttertoast.showToast(msg: '${responseData['error']}', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 24.0);
         });
       }
     } catch (e) {
       setState(() {
-        result = '$e';
-        if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
-          debugPrint(result);
-          result = "Could not find the server\nPlease try again later";
+        developer.log('$e');
+        if ('$e'.split(' ').contains("SocketException:") == true ||
+           ('$e'.split(' ').contains("Invalid") == true && '$e'.split(' ').contains("argument(s):") == true)) {
+          Fluttertoast.showToast(
+            msg: Globaldata.ErrorServerConnection,
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 24.0
+          );
+        } else {
+          Fluttertoast.showToast(msg: '$e', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 24.0);
         }
       });
     }
@@ -97,25 +98,22 @@ class _APICallState extends State<APICall> {
             CustomClassicForm(hint:'Email', padding: EdgeInsets.symmetric(horizontal: 15),),
             Padding (padding: EdgeInsets.only(top: 20)),
             LeftWidget(child: AutoSizeText("Password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
-            CustomClassicForm(hint: 'Password', controller: passwordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
+            CustomClassicForm(
+              hint: '••••••••',
+              obscureText: true,
+              enabled: false,
+              fillCollor: Color.fromARGB(255, 238, 238, 238),
+              padding: EdgeInsets.symmetric(horizontal: 15),
+            ),
+
             LeftWidget(
-              child: IntrinsicWidth(
-                child: TextButton(
-                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPassword()),);},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text(
-                    "Change password",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 0, 160, 255),
-                    ),
-                  ),
-                ),
+              child: CustomTextButton(
+                text: Text("Change password",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 160, 255),),),
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPassword()),);},
+                padding: EdgeInsets.zero,
               ),
             ),
+
             Padding(padding: EdgeInsets.only(top: 20)),
             CustomButton(
               backgroundColor:Color.fromARGB(255, 34, 34, 34),
@@ -124,26 +122,20 @@ class _APICallState extends State<APICall> {
               size: Size(double.infinity, 55),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
+            Padding(padding: EdgeInsets.only(top: 80)),
+
+            CustomButton(
+              backgroundColor:Color.fromARGB(255, 240, 240, 240),
+              text: AutoSizeText("Delete my account", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 0, 0)),),
+              onPressed: _deleteAccount,
+              size: Size(double.infinity, 55),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+            ),
+
           ],
         ),
       ),
       bottomNavigationBar: FooterNavigationBar(currentIndex: 4),
-    );
-  }
-}
-
-class FormWithTitle extends StatelessWidget {
-  const FormWithTitle({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column (
-      children: [
-        AutoSizeText("All", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1, textAlign: TextAlign.right,),
-        CustomClassicForm(hint:'Email'),
-      ],
     );
   }
 }

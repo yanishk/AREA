@@ -71,7 +71,6 @@ class _APICallState extends State<APICall> {
             result = "";
             developer.log("Password putData succes");
 
-            Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => EditAccount()),
@@ -88,10 +87,10 @@ class _APICallState extends State<APICall> {
         developer.log("Password putData ERROR: $e", level: 1);
         setState(() {
           result = '$e';
+          developer.log(result);
           if (result.split(' ').contains("SocketException:") == true ||
              (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
-            debugPrint(result);
-            result = "Could not find the server\nPlease try again later";
+            result = Globaldata.ErrorServerConnection;
           }
         });
       }
@@ -158,22 +157,6 @@ class EditPasswordTopBar extends StatelessWidget {
         Center(
           child: AutoSizeText("Account", style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
         ),
-      ],
-    );
-  }
-}
-
-class FormWithTitle extends StatelessWidget {
-  const FormWithTitle({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column (
-      children: [
-        AutoSizeText("All", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1, textAlign: TextAlign.right,),
-        CustomClassicForm(hint:'Email'),
       ],
     );
   }

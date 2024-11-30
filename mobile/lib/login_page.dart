@@ -67,7 +67,6 @@ class _APICallState extends State<APICall> {
             developer.log("JWToken : {${JWToken}}");
             Globaldata.JWToken = JWToken;
 
-            Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ExplorePage()),
@@ -90,7 +89,7 @@ class _APICallState extends State<APICall> {
         if (result.split(' ').contains("SocketException:") == true ||
            (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
           debugPrint(result);
-          result = "Could not find the server\nPlease try again later";
+          result = Globaldata.ErrorServerConnection;
         }
       });
     }
@@ -181,20 +180,10 @@ class _APICallState extends State<APICall> {
 
               Padding(padding: EdgeInsets.only(top: 30)),
 
-              ElevatedButton(
-                child: const Text("New to AREA? Sign up here. ", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  overlayColor: const Color.fromARGB(255, 204, 204, 204),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUp()),
-                  );
-                },
+              CustomTextButton(
+                text: Text("New to AREA? Sign up here.",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black,),),
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()),);},
               ),
-
             ],
           ),
         ),
