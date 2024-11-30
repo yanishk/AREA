@@ -45,7 +45,7 @@ class EditPassword extends State<APICall> {
     developer.log('SERVER_LINK : $apiUrl');
     if (repeatNewPasswordController.text != newPasswordController.text) {
       setState(() {
-        notSamePasswd = "Password don't match";
+        notSamePasswd = "Password doesn't match";
       });
       developer.log('USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
     } else {
@@ -78,7 +78,7 @@ class EditPassword extends State<APICall> {
           });
         } else {
           final responseData = jsonDecode(response.body);
-          developer.log("Password putData FAILE ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          developer.log("Password putData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
           setState(() {
             result = '${responseData['error']}';
           });
