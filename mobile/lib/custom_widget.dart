@@ -14,7 +14,7 @@ class CustomButton extends StatelessWidget {
   });
 
   final Color backgroundColor;
-  final AutoSizeText text;
+  final Widget? text;
   final VoidCallback? onPressed;
   final Size size;
   final EdgeInsets padding;
@@ -201,3 +201,49 @@ class CustomTextButton extends StatelessWidget {
   }
 }
 
+class TwoChoiceAlertDialog extends StatelessWidget {
+  const TwoChoiceAlertDialog({
+    super.key,
+    required this.firstChoiceText,
+    required this.secondChoiceText,
+    required this.firstChoiceonPressed,
+    required this.secondChoiceonPressed,
+  });
+
+  final Text firstChoiceText;
+  final Text secondChoiceText;
+  final dynamic firstChoiceonPressed;
+  final dynamic secondChoiceonPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: const SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Center(
+              child: Text("Are you sure?", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Colors.black,)),
+            )
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        Center(
+          child: CustomButton(
+            backgroundColor:Color.fromARGB(255, 34, 34, 34),
+            text: firstChoiceText,
+            onPressed: firstChoiceonPressed,
+            size: Size(double.infinity, 55),
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+          ),
+        ),
+        Center(
+          child: CustomTextButton(
+            text: secondChoiceText,
+            onPressed: secondChoiceonPressed,
+          ),
+        ),
+      ],
+    );
+  }
+}

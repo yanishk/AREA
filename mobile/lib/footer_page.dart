@@ -17,7 +17,7 @@ class FooterNavigationBar extends StatelessWidget {
     ExplorePage(),
     SignUp(),
     LoginPage(),
-    EditAccount(),
+    EditAccountPage(),
   ];
 
   @override

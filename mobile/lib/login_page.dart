@@ -96,6 +96,23 @@ class _APICallState extends State<APICall> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _checkJWToken();
+  }
+
+  void _checkJWToken() {
+    if (Globaldata.JWToken.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ExplorePage()),
+        );
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(

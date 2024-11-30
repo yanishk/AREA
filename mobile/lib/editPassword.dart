@@ -9,7 +9,7 @@ import "custom_widget.dart";
 import "edit_account.dart";
 import "globalData.dart";
 
-class EditPassword extends StatelessWidget {
+class EditPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,10 +22,10 @@ class EditPassword extends StatelessWidget {
 
 class APICall extends StatefulWidget {
   @override
-  _APICallState createState() => _APICallState();
+  EditPassword createState() => EditPassword();
 }
 
-class _APICallState extends State<APICall> {
+class EditPassword extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
@@ -73,7 +73,7 @@ class _APICallState extends State<APICall> {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditAccount()),
+              MaterialPageRoute(builder: (context) => EditAccountPage()),
             );
           });
         } else {
@@ -150,7 +150,7 @@ class EditPasswordTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAccount()),);},
+            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAccountPage()),);},
             icon: Icon(Icons.arrow_back, size: 32),
           ),
         ),

@@ -12,12 +12,11 @@ import "footer_page.dart";
 import "editPassword.dart";
 import "globalData.dart";
 
-class EditAccount extends StatelessWidget {
+class EditAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: new ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      title: "Account",
       home: APICall(),
     );
   }
@@ -25,10 +24,10 @@ class EditAccount extends StatelessWidget {
 
 class APICall extends StatefulWidget {
   @override
-  _APICallState createState() => _APICallState();
+  EditAccount createState() => EditAccount();
 }
 
-class _APICallState extends State<APICall> {
+class EditAccount extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
   String apiRoute = 'user/delete-account';
 
@@ -81,6 +80,39 @@ class _APICallState extends State<APICall> {
     }
   }
 
+  Future<void> deleteAccountConfirmDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return TwoChoiceAlertDialog(
+          firstChoiceText: Text("Delete my account", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+          secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
+          firstChoiceonPressed: () {_deleteAccount(); Navigator.of(context).pop();},
+          secondChoiceonPressed: () {Navigator.of(context).pop();},
+        );
+      },
+    );
+  }
+
+  Future<void> signOutConfirmDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return TwoChoiceAlertDialog(
+          firstChoiceText: Text("Sign out", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+          secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
+          firstChoiceonPressed: () {
+            Globaldata.JWToken = "";
+            Navigator.push(context,MaterialPageRoute(builder: (context) => LoginPage()),);
+          },
+          secondChoiceonPressed: () {Navigator.of(context).pop();},
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,29 +141,30 @@ class _APICallState extends State<APICall> {
             LeftWidget(
               child: CustomTextButton(
                 text: Text("Change password",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 160, 255),),),
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPassword()),);},
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPasswordPage()),);},
                 padding: EdgeInsets.zero,
               ),
             ),
 
-            Padding(padding: EdgeInsets.only(top: 20)),
-            CustomButton(
-              backgroundColor:Color.fromARGB(255, 34, 34, 34),
-              text: AutoSizeText("Save", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              onPressed: () {},
-              size: Size(double.infinity, 55),
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-            ),
-            Padding(padding: EdgeInsets.only(top: 80)),
+            Padding(padding: EdgeInsets.only(top: 40)),
 
             CustomButton(
               backgroundColor:Color.fromARGB(255, 240, 240, 240),
               text: AutoSizeText("Delete my account", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 0, 0)),),
-              onPressed: _deleteAccount,
+              onPressed: deleteAccountConfirmDialog,
               size: Size(double.infinity, 55),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
 
+            Padding(padding: EdgeInsets.only(top: 50)),
+
+            CustomButton(
+              backgroundColor:Color.fromARGB(255, 34, 34, 34),
+              text: AutoSizeText("Sign out", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: signOutConfirmDialog,
+              size: Size(double.infinity, 55),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+            ),
           ],
         ),
       ),
