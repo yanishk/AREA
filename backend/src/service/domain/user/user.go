@@ -69,8 +69,8 @@ func (self *UserService) ModifyPassword(userEmail string, newPassword entities.U
 		return fmt.Errorf("Could not find requested user")
 	}
 
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(newPassword.OldPassword), []byte(foundUser.Password))
-	if resBcrypt == nil {
+	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(newPassword.OldPassword))
+	if resBcrypt != nil {
 		return fmt.Errorf("Old password is incorrect")
 	}
 
