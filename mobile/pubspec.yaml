@@ -33,4 +33,7 @@ flutter:
     - assets/icon/facebook_icon.png
     - assets/icon/X-Logo.png
     - assets/icon/apple_logo.png
+    - assets/icon/github.png
+    - assets/icon/spotify.png
+    - assets/icon/youtube.png
     - .env

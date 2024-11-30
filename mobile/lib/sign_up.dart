@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "login_page.dart";
-import "explore.dart";
+import "exploreAll.dart";
 import "globalData.dart";
 
 class SignUp extends StatelessWidget {
@@ -154,7 +154,7 @@ class _APICallState extends State<APICall> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ExplorePage()),
+                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
                   );
                 },
                 size: Size(double.infinity, 60),
