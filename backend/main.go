@@ -10,8 +10,8 @@ import (
 )
 
 
-//	@title	Documentation for AREA Rest API
-//	@host	localhost:8080
+// @title	Documentation for AREA Rest API
+// @host	localhost:8080
 func main() {
 	repositories := postgres.New()
 	services := domain.New(repositories)
