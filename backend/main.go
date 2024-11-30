@@ -14,8 +14,8 @@ import (
 	_ "poc-goland.com/poc/docs"
 )
 
-//	@title	Documentation for AREA Rest API
-//	@host	localhost:8080
+// @title	Documentation for AREA Rest API
+// @host	localhost:8080
 func main() {
 	var databaseContext entities.Database
 	var err error
@@ -35,6 +35,8 @@ func main() {
 
 	routes.PublicRoutes(router, databaseContext)
 	routes.PrivateRoutes(router, databaseContext)
+
+	routes.PrivateServicesRoutes(router, databaseContext)
 
 	handler := corsAllow.Handler(router)
 

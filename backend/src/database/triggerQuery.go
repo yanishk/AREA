@@ -20,7 +20,7 @@ func CreateTrigger(db *sql.DB, name string, description string, serviceName stri
 		return fmt.Errorf("Trigger already exist")
 	}
 
-	retrievedService, err := findServiceByName(db, serviceName)
+	retrievedService, err := FindServiceByName(db, serviceName)
 	if err != nil {
 		return err
 	}
