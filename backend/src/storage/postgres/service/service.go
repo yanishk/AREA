@@ -15,15 +15,15 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 	return &ServiceRepository{db: db}
 }
 
-func (self *ServiceRepository) CreateService(name string) error {
-	sqlStatement := `INSERT INTO services (name) VALUES ($1);`
+func (self *ServiceRepository) CreateService(name string, accessToken string, refreshToken string, uuidUser string, expiry string) error {
+	sqlStatement := `INSERT INTO services (name, accessToken, refreshToken, iduser, expirytoken) VALUES ($1, $2, $3, $4, $5);`
 
 	_, err := self.FindServiceByName(name)
 	if err == nil {
 		return fmt.Errorf("service already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, name)
+	_, err = self.db.Exec(sqlStatement, name, accessToken, refreshToken, uuidUser, expiry)
 	if err != nil {
 		return err
 	}

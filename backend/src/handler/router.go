@@ -2,25 +2,36 @@ package handler
 
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 
+	service_handler "backend/src/handler/service"
+	user_handler "backend/src/handler/user"
 	"backend/src/service"
-	"backend/src/handler/user"
 )
 
 type UserHandler interface {
 	SetupRoutes(router *gin.Engine)
 }
 
+type ServiceHandler interface {
+	SetupRoutes(router *gin.Engine)
+}
+
 type Handler struct {
-	UserHandler UserHandler
-	router *gin.Engine
+	UserHandler    UserHandler
+	ServiceHandler ServiceHandler
+	router         *gin.Engine
 }
 
 func New(services *service.Service) *Handler {
 	router := gin.Default()
-	return &Handler{UserHandler: user_handler.NewUserHandler(services.UserService, router), router: router}
+	return &Handler{
+		UserHandler:    user_handler.NewUserHandler(services.UserService, router),
+		ServiceHandler: service_handler.NewServiceHandler(services.ServiceService, router),
+		router:         router,
+	}
 }
 
 func (self *Handler) Run() error {
