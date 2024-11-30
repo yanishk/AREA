@@ -103,8 +103,10 @@ definitions:
       password:
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
+  title: Documentation for AREA Rest API
 paths:
   /login:
     post:

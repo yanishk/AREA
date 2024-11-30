@@ -1,8 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
+        "title": "Documentation for AREA Rest API",
         "contact": {}
     },
+    "host": "localhost:8080",
     "paths": {
         "/login": {
             "post": {
