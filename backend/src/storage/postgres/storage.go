@@ -9,7 +9,10 @@ import (
 
 	"backend/src/storage"
 	"backend/src/storage/postgres/user"
+	"backend/src/storage/postgres/service"
 	"backend/src/storage/postgres/action"
+	"backend/src/storage/postgres/trigger"
+	"backend/src/storage/postgres/workflow"
 )
 
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
@@ -45,6 +48,9 @@ func New() *storage.Repository {
 
 	return &storage.Repository{
 		UserRepository: user_repository.NewUserRepository(db),
+		ServiceRepository: service_repository.NewServiceRepository(db),
 		ActionRepository: action_repository.NewActionRepository(db),
+		TriggerRepository: trigger_repository.NewTriggerRepository(db),
+		WorkflowRepository: workflow_repository.NewWorkflowRepository(db),
 	}
 }
