@@ -1,4 +1,4 @@
-package database
+package postgres
 
 import (
 	"database/sql"
@@ -7,6 +7,13 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
+
+	"backend/src/storage"
+	action_repository "backend/src/storage/postgres/action"
+	service_repository "backend/src/storage/postgres/service"
+	trigger_repository "backend/src/storage/postgres/trigger"
+	user_repository "backend/src/storage/postgres/user"
+	workflow_repository "backend/src/storage/postgres/workflow"
 )
 
 func retrieveDatabaseInfos() (string, int, string, string, string, error) {
@@ -17,7 +24,7 @@ func retrieveDatabaseInfos() (string, int, string, string, string, error) {
 	return os.Getenv("PGHOST"), port, os.Getenv("PGUSER"), os.Getenv("PGPASSWORD"), os.Getenv("PGDATABASE"), err
 }
 
-func ConnectToDatabase() (*sql.DB, error) {
+func New() *storage.Repository {
 	godotenv.Load()
 
 	host, port, user, password, dbname, err := retrieveDatabaseInfos()
@@ -38,7 +45,13 @@ func ConnectToDatabase() (*sql.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println("Successfully connected!")
-	return db, err
+
+	return &storage.Repository{
+		UserRepository:     user_repository.NewUserRepository(db),
+		ServiceRepository:  service_repository.NewServiceRepository(db),
+		ActionRepository:   action_repository.NewActionRepository(db),
+		TriggerRepository:  trigger_repository.NewTriggerRepository(db),
+		WorkflowRepository: workflow_repository.NewWorkflowRepository(db),
+	}
 }
