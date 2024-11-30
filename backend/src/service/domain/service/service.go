@@ -24,7 +24,7 @@ func NewServiceService(ServiceRepository storage.ServiceRepository, UserReposito
 	}
 }
 
-func (self *ServiceService) GettUser(emailStr string) (entities.User, error) {
+func (self *ServiceService) GetUser(emailStr string) (entities.User, error) {
 	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(emailStr)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return foundUser, fmt.Errorf("could not find requested user")

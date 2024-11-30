@@ -13,7 +13,7 @@ type UserService interface {
 
 type ServiceService interface {
 	GetAccesTokenFromCode(codeSpotify string) (entities.ResultToken, error)
-	GettUser(emailStr string) (entities.User, error)
+	GetUser(emailStr string) (entities.User, error)
 	CreateOrUpdateSpotify(userId string, tokenSpotify entities.ResultToken)
 	FindUserServiceByName(name string, userId string) (entities.Service, error)
 	RefreshToken(refreshToken string, userUuid string) (entities.ResultToken, error)

@@ -25,11 +25,11 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	user := router.Group("/spotify")
+	spotify := router.Group("/spotify")
 	{
-		user.GET("/authentication", self.Auth02Spotify)
-		user.GET("/call-api", self.SpotifyCallApi)
-		user.GET("/spotify-callback", self.SpotifyCallBack)
+		spotify.GET("/authentication", self.Auth02Spotify)
+		spotify.GET("/call-api", self.SpotifyCallApi)
+		spotify.GET("/spotify-callback", self.SpotifyCallBack)
 	}
 }
 
@@ -67,7 +67,6 @@ func (self *ServiceHandler) SpotifyCallBack(context *gin.Context) {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid code authorization",
 		})
-		fmt.Println("Invalid code authorization")
 		return
 	}
 	tokenSpotify, errToken := self.ServiceService.GetAccesTokenFromCode(codeSpotify)
@@ -76,8 +75,6 @@ func (self *ServiceHandler) SpotifyCallBack(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to exchange token",
 		})
-		fmt.Print("Failed to exchange: ")
-		fmt.Println(errToken)
 		return
 	}
 
@@ -89,13 +86,11 @@ func (self *ServiceHandler) SpotifyCallBack(context *gin.Context) {
 		return
 	}
 
-	foundUser, errGetUser := self.ServiceService.GettUser(emailStr)
+	foundUser, errGetUser := self.ServiceService.GetUser(emailStr)
 	if errGetUser != nil || len(foundUser.Email) <= 0 {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Could not find requested user",
 		})
-		fmt.Print("Could not find requested user: ")
-		fmt.Println(errToken)
 		return
 	}
 
@@ -115,7 +110,7 @@ func (self *ServiceHandler) SpotifyCallApi(context *gin.Context) {
 		return
 	}
 
-	foundUser, errGetUser := self.ServiceService.GettUser(emailStr)
+	foundUser, errGetUser := self.ServiceService.GetUser(emailStr)
 	if errGetUser != nil || len(foundUser.Email) <= 0 {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Could not find requested user",
@@ -125,7 +120,6 @@ func (self *ServiceHandler) SpotifyCallApi(context *gin.Context) {
 
 	foundService, errServiceFound := self.ServiceService.FindUserServiceByName("spotify", foundUser.Id)
 	if errServiceFound != nil {
-		fmt.Println(errServiceFound)
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "User is not connected to the service",
 		})
@@ -134,7 +128,6 @@ func (self *ServiceHandler) SpotifyCallApi(context *gin.Context) {
 
 	expiryTime, errTimestamp := time.Parse("2006-01-02T15:04:05Z", foundService.ExpiryToken)
 	if errTimestamp != nil {
-		fmt.Println(errTimestamp)
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not check timestamp",
 		})
@@ -144,12 +137,12 @@ func (self *ServiceHandler) SpotifyCallApi(context *gin.Context) {
 	if expiryTime.Before(time.Now()) {
 		refreshedToken, errRefresh := self.ServiceService.RefreshToken(foundService.RefreshToken, foundUser.Id)
 		if errRefresh != nil {
+			fmt.Println(refreshedToken)
 			context.IndentedJSON(http.StatusInternalServerError, gin.H{
 				"error": "Could not refresh token",
 			})
 			return
 		}
-		fmt.Println(refreshedToken)
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"Success": "API successfully called",
 		})
