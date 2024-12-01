@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
-import RegisterForm from './components/Register'
-import LoginForm from './components/Login'
+import RegisterForm from './pages/register'
+import LoginForm from './pages/login'
+// import RegisterForm from './components/Register'
+// import LoginForm from './components/Login'
 
 function App() {
   return (
