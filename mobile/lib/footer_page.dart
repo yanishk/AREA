@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import "login_page.dart";
 import "sign_up.dart";
 import "explore.dart";
+import "edit_account.dart";
 
 class FooterNavigationBar extends StatelessWidget {
   FooterNavigationBar({
@@ -16,7 +17,7 @@ class FooterNavigationBar extends StatelessWidget {
     ExplorePage(),
     SignUp(),
     LoginPage(),
-    SignUp(),
+    EditAccountPage(),
   ];
 
   @override
@@ -27,7 +28,7 @@ class FooterNavigationBar extends StatelessWidget {
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
       backgroundColor: Colors.white,
-      selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      selectedLabelStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
       onTap: (int index) {

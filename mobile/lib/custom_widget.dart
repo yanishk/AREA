@@ -14,7 +14,7 @@ class CustomButton extends StatelessWidget {
   });
 
   final Color backgroundColor;
-  final AutoSizeText text;
+  final Widget? text;
   final VoidCallback? onPressed;
   final Size size;
   final EdgeInsets padding;
@@ -59,11 +59,17 @@ class CustomClassicForm extends StatelessWidget {
     required this.hint,
     this.controller,
     this.obscureText = false,
+    this.padding = const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    this.enabled = true,
+    this.fillCollor = Colors.white,
   });
 
   final String hint;
   final TextEditingController? controller;
   final bool obscureText;
+  final EdgeInsetsGeometry padding;
+  final bool enabled;
+  final Color fillCollor;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +77,7 @@ class CustomClassicForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: padding,
           child:
           Container(
             decoration: BoxDecoration(
@@ -81,7 +87,10 @@ class CustomClassicForm extends StatelessWidget {
               style: TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,
+              cursorColor: Colors.black,
               decoration: InputDecoration(
+                filled: true,
+                fillColor: fillCollor,
                 labelStyle:TextStyle(fontSize:40),
                 hintStyle: TextStyle(
                   fontSize: 20,
@@ -89,8 +98,16 @@ class CustomClassicForm extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 hintText: hint,
+                enabled: enabled,
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                    width: 5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: const Color.fromARGB(255, 238, 238, 238),
@@ -134,6 +151,98 @@ class MyDivider extends StatelessWidget {
         Expanded(child: Divider(thickness: thickness, color: color,),),
         Padding(padding: textPadding, child: text,),
         Expanded(child: Divider(thickness: thickness, color: color,),),
+      ],
+    );
+  }
+}
+
+class LeftWidget extends StatelessWidget {
+  const LeftWidget({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class CustomTextButton extends StatelessWidget {
+  const CustomTextButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.padding,
+  });
+  final text;
+  final onPressed;
+  final padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicWidth(
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          padding: padding,
+        ),
+        child: text,
+      ),
+    );
+  }
+}
+
+class TwoChoiceAlertDialog extends StatelessWidget {
+  const TwoChoiceAlertDialog({
+    super.key,
+    required this.firstChoiceText,
+    required this.secondChoiceText,
+    required this.firstChoiceonPressed,
+    required this.secondChoiceonPressed,
+  });
+
+  final Text firstChoiceText;
+  final Text secondChoiceText;
+  final dynamic firstChoiceonPressed;
+  final dynamic secondChoiceonPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: const SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Center(
+              child: Text("Are you sure?", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Colors.black,)),
+            )
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        Center(
+          child: CustomButton(
+            backgroundColor:Color.fromARGB(255, 34, 34, 34),
+            text: firstChoiceText,
+            onPressed: firstChoiceonPressed,
+            size: Size(double.infinity, 55),
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+          ),
+        ),
+        Center(
+          child: CustomTextButton(
+            text: secondChoiceText,
+            onPressed: secondChoiceonPressed,
+          ),
+        ),
       ],
     );
   }
