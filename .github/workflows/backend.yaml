@@ -29,8 +29,8 @@ jobs:
 
       - name: Run Swag init
         run: |
-          go install github.com/swaggo/swag/cmd/swag@latest
-          echo "$GOPATH/bin" >> $GITHUB_PATH
+          go get -u github.com/swaggo/swag/cmd/swag
+          export PATH=$GOPATH/bin:$PATH
           cd backend
           swag init
 
