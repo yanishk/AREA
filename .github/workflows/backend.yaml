@@ -37,7 +37,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config --local user.email "actions@github.com"
             git config --local user.name "GitHub Actions"
-            git add main.go src
+            git add backend
             git commit -m "style(back-end): :art: format code"
             git push -f origin "HEAD:${{ github.head_ref }}"
           fi
