@@ -27,7 +27,7 @@ const RegisterForm = () => {
             });
 
             if (result.data.success) {
-                alert("Successful registered");
+                alert("Successful register");
             } else {
                 setEmail("");
                 setPassword("");
