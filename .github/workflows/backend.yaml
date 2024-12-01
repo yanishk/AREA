@@ -29,9 +29,9 @@ jobs:
 
       - name: Run Swag init
         run: |
+          cd backend
           go get -u github.com/swaggo/swag/cmd/swag
           export PATH=$GOPATH/bin:$PATH
-          cd backend
           swag init
 
       - name: Push swagger documentation updates
