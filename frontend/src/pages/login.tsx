@@ -97,7 +97,7 @@ const LoginForm = () => {
                     <div className="flex items-center mt-6">
                         <div className="flex-grow border-t border-[#999999]" />
                             <span
-                            className="mx-4 text-[#999999] font-[600]">
+                                className="mx-4 text-[#999999] font-[600]">
                                 or
                             </span>
                         <div className="flex-grow border-t border-[#999999]" />

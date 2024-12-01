@@ -1,7 +1,11 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
+import ErrorMessage from "../components/ErrorMessage";
+import InputField from "../components/inputs/InputsField";
+import ButtonValidation from "../components/buttons/ButtonValidation";
+import SocialButton from "../components/buttons/SocialButton";
+import CallToActionLink from "../components/CallToActionLink";
 
 const RegisterForm = () => {
 
@@ -34,101 +38,102 @@ const RegisterForm = () => {
             setPassword("");
             setError("The email and password don't match");
         }
-      }
+    }
+
+    const handleGoogleRegister = () => {
+        return;
+    };
+
+    const handleFacebookRegister = () => {
+        return;
+    };
+
+    const handleTwitterRegister = () => {
+        return;
+    };
+
+    const handleAppleRegister = () => {
+        return;
+    };
 
     return (
         <>
-            {error && (
-                <div
-                    className="flex justify-center text-center">
-                    <p
-                        className="text-white bg-[#d0011b] fixed top-0 left-0 z-[9999] w-full p-5 text-[1.5em] font-[700] text-lg">
-                            {error}
-                    </p>
-                </div>
-            )}
+            <ErrorMessage message={error} />
             <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
 
                     <div className="relative mt-5 items-center flex flex-col justify-center">
-                    <h1
-                        className=" text-[2.7rem] font-[900] text-black">
-                        Sign up
-                    </h1>
+                        <h1
+                            className=" text-[2.7rem] font-[900] text-black">
+                            Sign up
+                        </h1>
                     </div>
 
                     <div className="mt-6">
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 h-[4.8rem] mb-3 border-[7px] rounded-[15px] border-[#EEEEEE] focus:outline-none focus:border-black placeholder-[#C8C8C8] font-[900] text-[25px] leading-7"
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 h-[4.8rem] mt-2.5 border-[7px] rounded-[15px] border-[#EEEEEE] focus:outline-none focus:border-black placeholder-[#C8C8C8] font-[900] text-[25px] leading-7"
-                    />
+                        <InputField
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <InputField
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
 
-                    <button
-                        onClick={sendFormOnClick}
-                        className="w-full h-28 bg-[#222222] text-white text-[2.2rem] rounded-full hover:bg-[#333333] mt-8 font-[900]">
-                        Get started
-                    </button>
+                        <ButtonValidation onClick={sendFormOnClick} text="Get started" />
                     </div>
 
                     <div className="flex items-center mt-6">
-                    <div className="flex-grow border-t border-[#999999]" />
-                        <span
-                        className="mx-4 text-[#999999] font-[600]">
-                            or
-                        </span>
-                    <div className="flex-grow border-t border-[#999999]" />
+                        <div className="flex-grow border-t border-[#999999]" />
+                            <span
+                                className="mx-4 text-[#999999] font-[600]">
+                                or
+                            </span>
+                        <div className="flex-grow border-t border-[#999999]" />
                     </div>
 
-                    <button
-                    className="w-full h-[75px] bg-[#E84A4A] text-white text-[1.6rem] rounded-full hover:bg-[#F55B5B] mt-6 font-[900] flex items-center justify-center relative">
-                    <FontAwesomeIcon
+                    <SocialButton
                         icon={faGoogle}
-                        className="absolute left-6 size-8"/>
-                    <span className="flex justify-center items-center w-full ml-4">Continue with Google</span>
-                    </button>
-                    <button
-                    className="w-full h-[75px] bg-[#3B579D] text-white text-[1.6rem] rounded-full hover:bg-[#4C6AAE] mt-4 font-[900] flex items-center justify-center relative">
-                    <FontAwesomeIcon
+                        bgColor="bg-[#E84A4A]"
+                        hoverColor="bg-[#F55B5B]"
+                        text="Continue with Google"
+                        onClick={handleGoogleRegister}
+                    />
+                    <SocialButton
                         icon={faFacebookF}
-                        className="absolute left-6 size-8"/>
-                    <span className="flex justify-center items-center w-full ml-4">Continue with Facebook</span>
-                    </button>
-                    <button
-                    className="w-full h-[75px] bg-[#A9A9A9] text-white text-[1.6rem] rounded-full hover:bg-[#B8B8B8] mt-4 font-[900] flex items-center justify-center relative">
-                    <FontAwesomeIcon
+                        bgColor="bg-[#3B579D]"
+                        hoverColor="bg-[#4C6AAE]"
+                        text="Continue with Facebook"
+                        onClick={handleFacebookRegister}
+                    />
+                    <SocialButton
                         icon={faXTwitter}
-                        className="absolute left-[27px] size-8"/>
-                    <span className="flex justify-center items-center w-full">Continue with X</span>
-                    </button>
-                    <button
-                    className="w-full h-[75px] bg-[#222222] text-white text-[1.6rem] rounded-full hover:bg-[#333333] mt-4 font-[900] flex items-center justify-center relative">
-                    <FontAwesomeIcon
+                        bgColor="bg-[#A9A9A9]"
+                        hoverColor="bg-[#B8B8B8]"
+                        text="Continue with X"
+                        iconPosition="left-[27px]"
+                        onClick={handleTwitterRegister}
+                    />
+                    <SocialButton
                         icon={faApple}
-                        className="absolute left-[20px] size-11"/>
-                    <span className="flex justify-center items-center w-full mt-1 ml-4">Continue with Apple</span>
-                    </button>
+                        bgColor="bg-[#222222]"
+                        hoverColor="bg-[#333333]"
+                        text="Continue with Apple"
+                        iconPosition="left-[20px]"
+                        iconSize="size-11"
+                        onClick={handleAppleRegister}
+                    />
 
                     <div
-                    className="flex justify-center mt-6">
-                    <a
-                        href="/login"
-                        className="text-[19px] mt-3 mb-6 font-[900] text-black ">
-                        Already on AREA?
-                        <span
-                            className="underline">
-                            Log in here.
-                        </span>
-                    </a>
+                        className="flex justify-center mt-8">
+                        <CallToActionLink
+                            href="/login"
+                            mainText="Already on AREA?"
+                            underlinedText="Log in here."
+                        />
                     </div>
 
 
