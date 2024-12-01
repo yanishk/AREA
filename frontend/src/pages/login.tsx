@@ -111,21 +111,21 @@ const LoginForm = () => {
                     <SocialButton
                         icon={faGoogle}
                         bgColor="bg-[#E84A4A]"
-                        hoverColor="bg-[#F55B5B]"
+                        hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
                         onClick={handleGoogleLogin}
                     />
                     <SocialButton
                         icon={faFacebookF}
                         bgColor="bg-[#3B579D]"
-                        hoverColor="bg-[#4C6AAE]"
+                        hoverColor="hover:bg-[#4C6AAE]"
                         text="Continue with Facebook"
                         onClick={handleFacebookLogin}
                     />
                     <SocialButton
                         icon={faXTwitter}
                         bgColor="bg-[#A9A9A9]"
-                        hoverColor="bg-[#B8B8B8]"
+                        hoverColor="hover:bg-[#B8B8B8]"
                         text="Continue with X"
                         iconPosition="left-[27px]"
                         onClick={handleTwitterLogin}
@@ -133,7 +133,7 @@ const LoginForm = () => {
                     <SocialButton
                         icon={faApple}
                         bgColor="bg-[#222222]"
-                        hoverColor="bg-[#333333]"
+                        hoverColor="hover:bg-[#333333]"
                         text="Continue with Apple"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
