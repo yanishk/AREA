@@ -2,10 +2,10 @@ name: backend
 
 on:
   push:
-    branches: ["ci/backend"]
+    branches: ["ci/backend", "main", "dev"]
 
 jobs:
-  check-backend-compilation:
+  check-compilation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,3 +21,18 @@ jobs:
             echo "Compilation succeed."
             exit 0
           fi
+  check-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push golang formatting if needed
+        run: |
+          cd backend
+          if [ -n "$(go fmt)" ]; then
+            git config --local user.email "actions@github.com"
+            git config --local user.name "GitHub Actions"
+            git add main.go src
+            git commit -m "style(back-end): :art: format code"
+            git push -f origin "HEAD:${{ github.head_ref }}"
+          # fi
