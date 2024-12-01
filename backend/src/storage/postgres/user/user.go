@@ -35,7 +35,7 @@ func (self *UserRepository) FindUserByEmail(email string) (entities.User, error)
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, email)
-	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt)
+	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone)
 	if err != nil {
 		return retrievedUser, err
 	}
