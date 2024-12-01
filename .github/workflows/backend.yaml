@@ -35,4 +35,4 @@ jobs:
             git add main.go src
             git commit -m "style(back-end): :art: format code"
             git push -f origin "HEAD:${{ github.head_ref }}"
-          # fi
+          fi
