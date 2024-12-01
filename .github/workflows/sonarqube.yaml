@@ -1,11 +1,11 @@
 name: sonarqube
 
 on:
-  push:
-    branches: ["ci/sonarqube"]
+  pull_request:
+    branches: ["main", "dev"]
 
 jobs:
-  build:
+  run-sonarqube:
     name: Analyze with sonarqube
     runs-on: ubuntu-latest
 
