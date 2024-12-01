@@ -21,15 +21,20 @@ jobs:
             echo "Compilation succeed."
             exit 0
           fi
+  
   check-formatting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Push golang formatting if needed
+      - name: Run Golang formatting
         run: |
           cd backend
-          if [ -n "$(go fmt)" ]; then
+          gofmt -w -s .
+    
+      - name: Push Golang formatting changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
             git config --local user.email "actions@github.com"
             git config --local user.name "GitHub Actions"
             git add main.go src
