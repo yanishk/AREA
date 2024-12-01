@@ -4,11 +4,10 @@ import (
 	_ "github.com/lib/pq"
 
 	_ "backend/docs"
-	"backend/src/storage/postgres"
-	"backend/src/service/domain"
 	"backend/src/handler"
+	"backend/src/service/domain"
+	"backend/src/storage/postgres"
 )
-
 
 // @title	Documentation for AREA Rest API
 // @host	localhost:8080

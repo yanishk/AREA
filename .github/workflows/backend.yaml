@@ -1,0 +1,43 @@
+name: backend
+
+on:
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  check-compilation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check backend compilation
+        run: |
+          cd backend
+          go build main.go
+           if [ $? -ne 0 ]; then
+            echo "Compilation failed."
+            exit 1
+          else
+            echo "Compilation succeed."
+            exit 0
+          fi
+  
+  check-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Golang formatting
+        run: |
+          cd backend
+          gofmt -w -s .
+    
+      - name: Push Golang formatting changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --local user.email "actions@github.com"
+            git config --local user.name "GitHub Actions"
+            git add backend
+            git commit -m "style(back-end): :art: format code"
+            git push -f origin "HEAD:${{ github.head_ref }}"
+          fi
