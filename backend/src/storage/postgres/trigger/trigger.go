@@ -1,8 +1,8 @@
 package trigger_repository
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"backend/src/entities"
 )
@@ -12,7 +12,7 @@ type TriggerRepository struct {
 }
 
 func NewTriggerRepository(db *sql.DB) *TriggerRepository {
-	return &TriggerRepository {db: db}
+	return &TriggerRepository{db: db}
 }
 
 func (self *TriggerRepository) CreateTrigger(name string, description string, serviceId string) error {

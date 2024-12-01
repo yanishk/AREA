@@ -1,17 +1,17 @@
 package user_handler
 
 import (
-		"fmt"
-		"net/http"
-		"github.com/gin-gonic/gin"
-		swaggerFiles "github.com/swaggo/files"
-		ginSwagger "github.com/swaggo/gin-swagger"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"net/http"
 
-		"backend/src/entities"
-		"backend/src/service"
-		"backend/src/handler/middleware"
-		_ "backend/src/handler/user/docs"
-	)
+	"backend/src/entities"
+	"backend/src/handler/middleware"
+	_ "backend/src/handler/user/docs"
+	"backend/src/service"
+)
 
 type UserHandler struct {
 	UserService service.UserService

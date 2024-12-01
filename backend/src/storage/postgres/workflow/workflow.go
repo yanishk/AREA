@@ -1,8 +1,8 @@
 package workflow_repository
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"backend/src/entities"
 )
@@ -12,7 +12,7 @@ type WorkflowRepository struct {
 }
 
 func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
-	return &WorkflowRepository {db: db}
+	return &WorkflowRepository{db: db}
 }
 
 func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, triggerId string, actionId string) error {
