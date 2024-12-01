@@ -12,12 +12,14 @@ const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [errorTrigger, setErrorTrigger] = useState(0);
 
     const sendFormOnClick = async () => {
         if (!email || !password) {
             setEmail("");
             setPassword("");
             setError("Please fill email and password");
+            setErrorTrigger(Date.now());
             return;
         }
 
@@ -32,11 +34,13 @@ const LoginForm = () => {
                 setEmail("");
                 setPassword("");
                 setError("The email and password don't match");
+                setErrorTrigger(Date.now());
             }
         } catch (error) {
             setEmail("");
             setPassword("");
             setError("The email and password don't match");
+            setErrorTrigger(Date.now());
         }
     }
 
@@ -58,7 +62,8 @@ const LoginForm = () => {
 
     return (
         <>
-            <ErrorMessage message={error} />
+            {/* <ErrorMessage message={error} /> */}
+            <ErrorMessage message={error} trigger={errorTrigger} />
             <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
 
