@@ -1,6 +1,6 @@
-FROM node:14-alpine AS builder
+FROM node:18-alpine AS builder
 
-WORKDIR /
+WORKDIR /app
 
 COPY package.json ./
 
@@ -12,12 +12,14 @@ RUN npm run build
 
 # -------------------------------------------- #
 
-FROM node:14-alpine
+FROM node:18-alpine
 
-RUN npm install -g serve
+WORKDIR /app
 
-COPY --from=builder /dist /dist
+RUN npm install vite
+
+COPY --from=builder /app/dist /app/dist
 
 EXPOSE 8081
 
-CMD ["serve", "-s", "/dist", "-l", "8081"]
+CMD ["npx", "vite", "preview", "--port", "8081", "--host"]
