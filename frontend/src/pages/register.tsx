@@ -10,15 +10,15 @@ import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
     const navigate = useNavigate();
 
     const goToLogin = () => {
         navigate("/login");
     }
-
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
 
     const sendFormOnClick = async () => {
         if (!email || !password) {

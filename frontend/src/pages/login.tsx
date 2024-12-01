@@ -6,6 +6,7 @@ import ButtonValidation from "../components/buttons/ButtonValidation";
 import CallToActionLink from "../components/CallToActionLink";
 import SocialButton from "../components/buttons/SocialButton";
 import ErrorMessage from "../components/ErrorMessage";
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
 
@@ -13,6 +14,12 @@ const LoginForm = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [errorTrigger, setErrorTrigger] = useState(0);
+
+    const navigate = useNavigate();
+
+    const goToHome = () => {
+        navigate("/");
+    }
 
     const sendFormOnClick = async () => {
         if (!email || !password) {
@@ -29,7 +36,7 @@ const LoginForm = () => {
             });
 
             if (result.data.success) {
-                alert("Successful login");
+                goToHome();
             } else {
                 setEmail("");
                 setPassword("");
@@ -62,7 +69,6 @@ const LoginForm = () => {
 
     return (
         <>
-            {/* <ErrorMessage message={error} /> */}
             <ErrorMessage message={error} trigger={errorTrigger} />
             <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
