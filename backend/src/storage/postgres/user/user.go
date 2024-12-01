@@ -1,8 +1,8 @@
 package user_repository
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"backend/src/entities"
 )
@@ -12,7 +12,7 @@ type UserRepository struct {
 }
 
 func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository {db: db}
+	return &UserRepository{db: db}
 }
 
 func (self *UserRepository) CreateUser(email string, password string) error {

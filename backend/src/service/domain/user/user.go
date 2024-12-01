@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/bcrypt"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 
 	"backend/src/entities"
 	"backend/src/storage"
@@ -17,7 +17,7 @@ type UserService struct {
 }
 
 func NewUserService(UserRepository storage.UserRepository) *UserService {
-	return &UserService {UserRepository: UserRepository}
+	return &UserService{UserRepository: UserRepository}
 }
 
 func (self *UserService) CreateUser(newEmail string, newPassword string) error {

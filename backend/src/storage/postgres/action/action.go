@@ -1,8 +1,8 @@
 package action_repository
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"backend/src/entities"
 )
@@ -12,7 +12,7 @@ type ActionRepository struct {
 }
 
 func NewActionRepository(db *sql.DB) *ActionRepository {
-	return &ActionRepository {db: db}
+	return &ActionRepository{db: db}
 }
 
 func (self *ActionRepository) CreateAction(name string, description string, serviceId string) error {
