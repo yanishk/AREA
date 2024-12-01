@@ -12,7 +12,7 @@ const Navbar = () => {
     return (
         <>
             <div className="bg-white">
-                <div className="mt-6 pb-6 flex justify-between items-center px-6">
+                <div className="pt-6 pb-6 flex justify-between items-center px-6">
 
                     <h1
                         className="text-4xl font-extrabold ml-4">
