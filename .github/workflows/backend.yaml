@@ -21,7 +21,28 @@ jobs:
             echo "Compilation succeed."
             exit 0
           fi
-  
+
+  check-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Swag init
+        run: |
+          PATH=$(go env GOPATH)/bin:$PATH
+          cd backend
+          swag init
+
+      - name: Push swagger documentation updates
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --local user.email "actions@github.com"
+            git config --local user.name "GitHub Actions"
+            git add backend
+            git commit -m "docs(back-end): :memo: update swagger documentation"
+            git push -f origin "HEAD:${{ github.head_ref }}"
+          fi
+
   check-formatting:
     runs-on: ubuntu-latest
     steps:
@@ -31,8 +52,8 @@ jobs:
         run: |
           cd backend
           gofmt -w -s .
-    
-      - name: Push Golang formatting changes
+
+      - name: Push formatting changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             git config --local user.email "actions@github.com"
