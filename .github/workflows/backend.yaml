@@ -1,0 +1,23 @@
+name: backend
+
+on:
+  push:
+    branches: ["ci/backend"]
+
+jobs:
+  check-backend-compilation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check backend compilation
+        run: |
+          cd backend
+          go build main.go
+           if [ $? -ne 0 ]; then
+            echo "Compilation failed."
+            exit 1
+          else
+            echo "Compilation succeed."
+            exit 0
+          fi
