@@ -5,6 +5,7 @@ type User struct {
 	Email     string
 	Password  string
 	CreatedAt string
+	Timezone  string
 }
 
 type UserCredentials struct {
