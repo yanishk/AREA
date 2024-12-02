@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "sign_up.dart";
-import "explore.dart";
+import "exploreAll.dart";
 import "globalData.dart";
 
 class LoginPage extends StatelessWidget {
@@ -69,7 +69,7 @@ class _APICallState extends State<APICall> {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ExplorePage()),
+              MaterialPageRoute(builder: (context) => ExplorePageAll()),
             );
           });
         } else {
@@ -106,7 +106,7 @@ class _APICallState extends State<APICall> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ExplorePage()),
+          MaterialPageRoute(builder: (context) => ExplorePageAll()),
         );
       });
     }
@@ -186,7 +186,7 @@ class _APICallState extends State<APICall> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ExplorePage()),
+                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
                   );
                 },
                 size: Size(double.infinity, 60),
