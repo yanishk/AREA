@@ -7,6 +7,8 @@ import ButtonValidation from "../components/buttons/ButtonValidation";
 import SocialButton from "../components/buttons/SocialButton";
 import CallToActionLink from "../components/CallToActionLink";
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const RegisterForm = () => {
 
@@ -18,6 +20,10 @@ const RegisterForm = () => {
 
     const goToLogin = () => {
         navigate("/login");
+    }
+
+    const goBack = () => {
+        navigate(-1);
     }
 
     const sendFormOnClick = async () => {
@@ -69,6 +75,7 @@ const RegisterForm = () => {
             <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
 
+                    <FontAwesomeIcon icon={faArrowLeft} className="size-8 cursor-pointer" onClick={goBack}></FontAwesomeIcon>
                     <div className="relative mt-5 items-center flex flex-col justify-center">
                         <h1
                             className=" text-[2.7rem] font-[900] text-black">

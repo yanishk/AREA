@@ -1,4 +1,6 @@
-import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle, faFacebookF, faApple, faXTwitter} from '@fortawesome/free-brands-svg-icons';
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
 import InputField from "../components/inputs/InputsField";
@@ -19,6 +21,10 @@ const LoginForm = () => {
 
     const goToHome = () => {
         navigate("/");
+    }
+
+    const goBack = () => {
+        navigate(-1);
     }
 
     const sendFormOnClick = async () => {
@@ -73,6 +79,7 @@ const LoginForm = () => {
             <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
 
+                    <FontAwesomeIcon icon={faArrowLeft} className="size-8 cursor-pointer" onClick={goBack}></FontAwesomeIcon>
                     <div className="relative mt-5 items-center flex flex-col justify-center">
                         <h1
                             className=" text-[2.7rem] font-[900] text-black">
