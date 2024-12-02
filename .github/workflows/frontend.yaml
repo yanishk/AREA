@@ -22,24 +22,3 @@ jobs:
             echo "Compilation succeed."
             exit 0
           fi
-
-  check-formatting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Prettier formatting
-        run: |
-          cd frontend
-          npm install
-          npm run format
-
-      - name: Push formatting changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config --local user.email "actions@github.com"
-            git config --local user.name "GitHub Actions"
-            git add frontend
-            git commit -m "style(front-end): :art: format code"
-            git push -f origin "HEAD:${{ github.head_ref }}"
-          fi
