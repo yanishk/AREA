@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(),
     this.textPaddingLeft = 0,
     this.image,
+    this.borderCircularRadius = 32.0,
   });
 
   final Color backgroundColor;
@@ -21,6 +22,7 @@ class CustomButton extends StatelessWidget {
   final EdgeInsets padding;
   final double textPaddingLeft;
   final Image? image;
+  final double borderCircularRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class CustomButton extends StatelessWidget {
           elevation: 3,
           minimumSize: size,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
+            borderRadius: BorderRadius.circular(borderCircularRadius),
           ),
         ),
         onPressed: onPressed,
@@ -45,7 +47,7 @@ class CustomButton extends StatelessWidget {
                 child: image!,
               ),
             Padding(padding: EdgeInsets.only(left: textPaddingLeft), child: text),
-            Center(),
+            const Center(),
           ],
         ),
       ),
@@ -85,39 +87,39 @@ class CustomClassicForm extends StatelessWidget {
               borderRadius:  BorderRadius.circular(10),
             ),
             child: TextField(
-              style: TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
+              style: const TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,
               cursorColor: Colors.black,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: fillCollor,
-                labelStyle:TextStyle(fontSize:40),
-                hintStyle: TextStyle(
+                labelStyle:const TextStyle(fontSize:40),
+                hintStyle: const TextStyle(
                   fontSize: 20,
-                  color: const Color.fromARGB(255, 150, 150, 150),
+                  color: Color.fromARGB(255, 150, 150, 150),
                   fontWeight: FontWeight.bold,
                 ),
                 hintText: hint,
                 enabled: enabled,
-                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: const Color.fromARGB(255, 238, 238, 238),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(255, 238, 238, 238),
                     width: 5,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                    color: const Color.fromARGB(255, 238, 238, 238),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(255, 238, 238, 238),
                     width: 5,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.black,
                     width: 5,
                   ),
@@ -157,17 +159,85 @@ class MyDivider extends StatelessWidget {
   }
 }
 
+class MyVerticalDivider extends StatelessWidget {
+  const MyVerticalDivider({
+    super.key,
+    this.height,
+    this.width,
+    this.color = Colors.black,
+    this.padding = const EdgeInsets.only(left: 0),
+  });
+
+  final double? height;
+  final double? width;
+  final Color color;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row (
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Padding(
+          padding: padding,
+          child: SizedBox(
+            height: height,
+            width: width,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: color,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PlaceableWidget extends StatelessWidget {
+  const PlaceableWidget({
+    super.key,
+    required this.child,
+    this.left = 0,
+    this.right = 0,
+    this.top = 0,
+    this.bottom = 0,
+  });
+
+  final Widget child;
+  final double left;
+  final double right;
+  final double top;
+  final double bottom;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row (
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: left, right: right, top: top, bottom: bottom),
+          child: child,
+        ),
+      ],
+    );
+  }
+}
+
 class LeftWidget extends StatelessWidget {
   const LeftWidget({
     super.key,
     required this.child,
+    this.padding = const EdgeInsets.symmetric(horizontal: 20),
   });
 
   final Widget child;
+  final EdgeInsetsGeometry padding;
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: padding,
       child: Row(
         children: [
           child,
@@ -231,11 +301,11 @@ class TwoChoiceAlertDialog extends StatelessWidget {
       actions: <Widget>[
         Center(
           child: CustomButton(
-            backgroundColor:Color.fromARGB(255, 34, 34, 34),
+            backgroundColor:const Color.fromARGB(255, 34, 34, 34),
             text: firstChoiceText,
             onPressed: firstChoiceonPressed,
-            size: Size(double.infinity, 55),
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            size: const Size(double.infinity, 55),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
           ),
         ),
         Center(
@@ -265,7 +335,7 @@ class WorkflowCard extends StatelessWidget {
     int colorIndex = Random().nextInt(colorList.length);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
@@ -292,10 +362,10 @@ class WorkflowCard extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     child: SizedBox(
                     width: constraints.maxWidth,
-                    child: Text( "A card that can be tapped\nAnd how fit with his content",
+                    child: const Text( "A card that can be tapped\nAnd how fit with his content",
                         style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,),
                       ),
                     ),
@@ -336,7 +406,7 @@ class ServicesCard extends StatelessWidget {
     int serviceIndex = Random().nextInt(colorList.length);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
@@ -359,11 +429,11 @@ class ServicesCard extends StatelessWidget {
                     width: constraints.maxWidth,
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                     child: Column(
                       children: [
                         Image.asset(iconList[serviceIndex], width: 75, height: 75),
-                        AutoSizeText(nameList[serviceIndex], style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                        AutoSizeText(nameList[serviceIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
                       ]
                     ),
                   ),
@@ -373,6 +443,79 @@ class ServicesCard extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class TextWithBackground extends StatelessWidget {
+  const TextWithBackground({
+    super.key,
+    required this.text,
+    this.backgroundColor = Colors.white,
+    this.padding = const EdgeInsets.symmetric(horizontal: 15.0),
+    this.borderWidth = 1.0,
+    this.borderRadius = 15.0,
+    this.fontSize = 30,
+    this.textColor = Colors.black,
+    this.maxLines = 1,
+  });
+
+  final Color backgroundColor;
+  final EdgeInsetsGeometry? padding;
+  final double borderWidth;
+  final double borderRadius;
+  final String text;
+  final double fontSize;
+  final Color textColor;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container (
+      padding: padding,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border.all(
+          color: backgroundColor,
+          width: borderWidth,
+        ),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: AutoSizeText(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: textColor,
+          backgroundColor: backgroundColor,
+        ),
+        maxLines: maxLines,
+      ),
+    );
+  }
+}
+
+class DoubleWidget extends StatelessWidget {
+  const DoubleWidget({
+    super.key,
+    required this.firstChild,
+    required this.secondChild,
+    this.padding = const EdgeInsets.only(left: 50),
+  });
+
+  final Widget firstChild;
+  final Widget secondChild;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row (
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        firstChild,
+        Padding(padding: padding),
+        secondChild,
+      ],
     );
   }
 }

@@ -1,0 +1,181 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+
+import "package:namer_app/custom_widget.dart";
+import "package:namer_app/footer_page.dart";
+
+class CreateWorkflowsPage extends StatelessWidget {
+  const CreateWorkflowsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      home: APICall(),
+    );
+  }
+}
+
+class APICall extends StatefulWidget {
+  const APICall({super.key});
+
+  @override
+  CreateWorkflows createState() => CreateWorkflows();
+}
+
+class CreateWorkflows extends State<APICall> {
+  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  String apiRoute = 'user/delete-account';
+
+  bool firstButtonComplete = false;
+  int secondButtonState = 0;
+  Color enableButton = Color.fromARGB(255, 34, 34, 34);
+  Color firstButtonColor = Color.fromARGB(255, 34, 34, 34);
+  Color secondButtonColor = Color.fromARGB(255, 182, 182, 182);
+  double firstButtonHight = 70;
+
+  Widget firstButton(BuildContext context) {
+    if (firstButtonComplete) {
+      return LeftWidget(
+        padding: EdgeInsets.symmetric(horizontal: 0),
+        child: AutoSizeText(
+          "If {trigger name}",
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        )
+      );
+    } else {
+      return PlaceableWidget (
+        left: MediaQuery.sizeOf(context).width / 10,
+        child : DoubleWidget(
+          firstChild: AutoSizeText(
+            "If This",
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          secondChild: TextWithBackground(text: "add"),
+          padding: EdgeInsets.only(left: MediaQuery.sizeOf(context).width / 5),
+        ),
+      );
+    }
+  }
+
+  Widget secondButton(BuildContext context) {
+    if (secondButtonState == 1) {
+      return DoubleWidget(
+        firstChild: PlaceableWidget(
+          child: AutoSizeText(
+            "Then That",
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ),
+        secondChild: TextWithBackground(text: "add"),
+        padding: EdgeInsets.only(left: MediaQuery.sizeOf(context).width / 10),
+      );
+    } else if (secondButtonState == 2) {
+      return LeftWidget(
+        padding: EdgeInsets.symmetric(horizontal: 0),
+        child: AutoSizeText(
+          "Then {action name}",
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        )
+      );
+    } else {
+      return const AutoSizeText("Then That", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),);
+    }
+  }
+
+  Widget continueCutton(BuildContext context) {
+    if (secondButtonState == 2) {
+      return CustomButton(
+        backgroundColor:Color.fromARGB(255, 34, 34, 34),
+        text: AutoSizeText("Continue", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+        onPressed: () {},
+        size: Size(double.infinity, 60),
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+      );
+    } else {
+      return SizedBox();
+    }
+  }
+
+  Future<void> firstButtonNextState() async {
+    setState(() {
+      if (firstButtonComplete == false) {
+        firstButtonComplete = true;
+        secondButtonState++;
+        firstButtonColor = Color.fromARGB(255, 57, 61, 62);
+        secondButtonColor = enableButton;
+        firstButtonHight = 50;
+      }
+    });
+  }
+
+  Future<void> secondButtonNextState() async {
+    setState(() {
+      if (secondButtonState == 1) {
+        secondButtonState++;
+      }
+    });
+  }
+
+  Future<void> resetButton() async {
+    setState(() {
+      firstButtonComplete = false;
+      secondButtonState = 0;
+      firstButtonColor = Color.fromARGB(255, 34, 34, 34);
+      secondButtonColor = Color.fromARGB(255, 182, 182, 182);
+      firstButtonHight = 70;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Padding(padding: EdgeInsets.only(top: 30)),
+            const AutoSizeText("Create workflows", style: TextStyle (fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
+            const SizedBox(width: 16),
+            const MyDivider(),
+            const Padding(padding: EdgeInsets.only(top: 30)),
+
+            CustomButton(
+              backgroundColor: firstButtonColor,
+              text: firstButton(context),
+              onPressed: () => firstButtonNextState(),
+              size: Size(double.infinity, firstButtonHight),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              borderCircularRadius: 10,
+            ),
+            const MyVerticalDivider(
+              height: 40,
+              width: 5,
+              color: Color.fromARGB(255, 222, 222, 222),
+            ),
+            CustomButton(
+              backgroundColor: secondButtonColor,
+              text: secondButton(context),
+              onPressed: () => secondButtonNextState(),
+              size: const Size(double.infinity, 70),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              borderCircularRadius: 10,
+            ),
+
+            Padding(padding: EdgeInsets.only(top: 50)),
+            continueCutton(context),
+            Padding(padding: EdgeInsets.only(top: 80)),
+            CustomButton(
+              backgroundColor:Color.fromARGB(255, 34, 34, 34),
+              text: AutoSizeText("Reset", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: () => resetButton(),
+              size: Size(double.infinity, 60),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: FooterNavigationBar(currentIndex: 2),
+    );
+  }
+}
