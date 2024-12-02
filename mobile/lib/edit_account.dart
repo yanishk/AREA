@@ -50,7 +50,7 @@ class EditAccount extends State<APICall> {
           Fluttertoast.showToast(msg: "Account deleted", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 24.0);
 
           Navigator.push(
-            context,
+            Globaldata.myContext,
             MaterialPageRoute(builder: (context) => LoginPage()),
           );
         });
@@ -82,14 +82,14 @@ class EditAccount extends State<APICall> {
 
   Future<void> deleteAccountConfirmDialog() async {
     return showDialog<void>(
-      context: context,
+      context: Globaldata.myContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return TwoChoiceAlertDialog(
           firstChoiceText: Text("Delete my account", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
           secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
-          firstChoiceonPressed: () {_deleteAccount(); Navigator.of(context).pop();},
-          secondChoiceonPressed: () {Navigator.of(context).pop();},
+          firstChoiceonPressed: () {_deleteAccount(); Navigator.of(Globaldata.myContext).pop();},
+          secondChoiceonPressed: () {Navigator.of(Globaldata.myContext).pop();},
         );
       },
     );
@@ -97,7 +97,7 @@ class EditAccount extends State<APICall> {
 
   Future<void> signOutConfirmDialog() async {
     return showDialog<void>(
-      context: context,
+      context: Globaldata.myContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return TwoChoiceAlertDialog(
@@ -105,9 +105,9 @@ class EditAccount extends State<APICall> {
           secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
           firstChoiceonPressed: () {
             Globaldata.JWToken = "";
-            Navigator.push(context,MaterialPageRoute(builder: (context) => LoginPage()),);
+            Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => LoginPage()),);
           },
-          secondChoiceonPressed: () {Navigator.of(context).pop();},
+          secondChoiceonPressed: () {Navigator.of(Globaldata.myContext).pop();},
         );
       },
     );
@@ -141,7 +141,7 @@ class EditAccount extends State<APICall> {
             LeftWidget(
               child: CustomTextButton(
                 text: Text("Change password",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Color.fromARGB(255, 0, 160, 255),),),
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditPasswordPage()),);},
+                onPressed: () {Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => EditPasswordPage()),);},
                 padding: EdgeInsets.zero,
               ),
             ),

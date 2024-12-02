@@ -68,7 +68,7 @@ class _APICallState extends State<APICall> {
             Globaldata.JWToken = JWToken;
 
             Navigator.push(
-              context,
+              Globaldata.myContext,
               MaterialPageRoute(builder: (context) => ExplorePageAll()),
             );
           });
@@ -114,6 +114,7 @@ class _APICallState extends State<APICall> {
 
   @override
   Widget build(BuildContext context) {
+    Globaldata.myContext = context;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -185,7 +186,7 @@ class _APICallState extends State<APICall> {
                 text: AutoSizeText("Continue with Apple", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {
                   Navigator.push(
-                    context,
+                    Globaldata.myContext,
                     MaterialPageRoute(builder: (context) => ExplorePageAll()),
                   );
                 },
@@ -199,7 +200,7 @@ class _APICallState extends State<APICall> {
 
               CustomTextButton(
                 text: Text("New to AREA? Sign up here.",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black,),),
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignUp()),);},
+                onPressed: () {Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => SignUp()),);},
               ),
             ],
           ),

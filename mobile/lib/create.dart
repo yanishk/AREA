@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import "package:namer_app/custom_widget.dart";
 import "package:namer_app/footer_page.dart";
+import "package:namer_app/selectService.dart";
+import "globalData.dart";
 
 class CreateWorkflowsPage extends StatelessWidget {
   const CreateWorkflowsPage({super.key});
@@ -25,9 +26,6 @@ class APICall extends StatefulWidget {
 }
 
 class CreateWorkflows extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
-  String apiRoute = 'user/delete-account';
-
   bool firstButtonComplete = false;
   int secondButtonState = 0;
   Color enableButton = Color.fromARGB(255, 34, 34, 34);
@@ -35,7 +33,7 @@ class CreateWorkflows extends State<APICall> {
   Color secondButtonColor = Color.fromARGB(255, 182, 182, 182);
   double firstButtonHight = 70;
 
-  Widget firstButton(BuildContext context) {
+  Widget firstButton() {
     if (firstButtonComplete) {
       return LeftWidget(
         padding: EdgeInsets.symmetric(horizontal: 0),
@@ -46,20 +44,20 @@ class CreateWorkflows extends State<APICall> {
       );
     } else {
       return PlaceableWidget (
-        left: MediaQuery.sizeOf(context).width / 10,
+        left: MediaQuery.sizeOf(Globaldata.myContext).width / 10,
         child : DoubleWidget(
           firstChild: AutoSizeText(
             "If This",
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           secondChild: TextWithBackground(text: "add"),
-          padding: EdgeInsets.only(left: MediaQuery.sizeOf(context).width / 5),
+          padding: EdgeInsets.only(left: MediaQuery.sizeOf(Globaldata.myContext).width / 5),
         ),
       );
     }
   }
 
-  Widget secondButton(BuildContext context) {
+  Widget secondButton() {
     if (secondButtonState == 1) {
       return DoubleWidget(
         firstChild: PlaceableWidget(
@@ -69,7 +67,7 @@ class CreateWorkflows extends State<APICall> {
           ),
         ),
         secondChild: TextWithBackground(text: "add"),
-        padding: EdgeInsets.only(left: MediaQuery.sizeOf(context).width / 10),
+        padding: EdgeInsets.only(left: MediaQuery.sizeOf(Globaldata.myContext).width / 10),
       );
     } else if (secondButtonState == 2) {
       return LeftWidget(
@@ -84,7 +82,7 @@ class CreateWorkflows extends State<APICall> {
     }
   }
 
-  Widget continueCutton(BuildContext context) {
+  Widget continueButton() {
     if (secondButtonState == 2) {
       return CustomButton(
         backgroundColor:Color.fromARGB(255, 34, 34, 34),
@@ -106,6 +104,10 @@ class CreateWorkflows extends State<APICall> {
         firstButtonColor = Color.fromARGB(255, 57, 61, 62);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
+        Navigator.push(
+          Globaldata.myContext,
+          MaterialPageRoute(builder: (context) => SelectServicePage()),
+        );
       }
     });
   }
@@ -142,7 +144,7 @@ class CreateWorkflows extends State<APICall> {
 
             CustomButton(
               backgroundColor: firstButtonColor,
-              text: firstButton(context),
+              text: firstButton(),
               onPressed: () => firstButtonNextState(),
               size: Size(double.infinity, firstButtonHight),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -155,7 +157,7 @@ class CreateWorkflows extends State<APICall> {
             ),
             CustomButton(
               backgroundColor: secondButtonColor,
-              text: secondButton(context),
+              text: secondButton(),
               onPressed: () => secondButtonNextState(),
               size: const Size(double.infinity, 70),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -163,12 +165,12 @@ class CreateWorkflows extends State<APICall> {
             ),
 
             Padding(padding: EdgeInsets.only(top: 50)),
-            continueCutton(context),
+            continueButton(),
             Padding(padding: EdgeInsets.only(top: 80)),
             CustomButton(
               backgroundColor:Color.fromARGB(255, 34, 34, 34),
               text: AutoSizeText("Reset", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              onPressed: () => resetButton(),
+              onPressed: () => {resetButton()},
               size: Size(double.infinity, 60),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),

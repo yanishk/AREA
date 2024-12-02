@@ -4,6 +4,7 @@ import "login_page.dart";
 import "exploreAll.dart";
 import "edit_account.dart";
 import "create.dart";
+import 'globalData.dart';
 
 class FooterNavigationBar extends StatelessWidget {
   FooterNavigationBar({
@@ -34,7 +35,7 @@ class FooterNavigationBar extends StatelessWidget {
       onTap: (int index) {
         if (index != currentIndex) {
           Navigator.push(
-            context,
+            Globaldata.myContext,
             MaterialPageRoute(builder: (context) => _pages[index]),
           );
         }
