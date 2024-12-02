@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:math';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -244,6 +245,134 @@ class TwoChoiceAlertDialog extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class WorkflowCard extends StatelessWidget {
+  const WorkflowCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colorList = [
+      const Color.fromARGB(255, 46, 41, 78),
+      const Color.fromARGB(255, 44, 110, 252),
+      const Color.fromARGB(255, 228, 64, 95),
+      const Color.fromARGB(255, 29, 185, 84),
+      const Color.fromARGB(255, 205, 65, 43),
+    ];
+
+    int colorIndex = Random().nextInt(colorList.length);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: colorList[colorIndex],
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: InkWell(
+              onTap: () {
+                debugPrint('Card tapped.');
+              },
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    height: 20,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colorList[colorIndex],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: Text( "A card that can be tapped\nAnd how fit with his content",
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ServicesCard extends StatelessWidget {
+  const ServicesCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colorList = [
+      const Color.fromARGB(255, 41, 44, 45),
+      const Color.fromARGB(255, 255, 0, 0),
+      const Color.fromARGB(255, 29, 185, 84),
+    ];
+
+    List<String> nameList = [
+      "Github",
+      "Youtube",
+      "Spotify",
+    ];
+
+    List<String> iconList = [
+      "assets/icon/github.png",
+      "assets/icon/youtube.png",
+      "assets/icon/spotify.png",
+    ];
+
+    int serviceIndex = Random().nextInt(colorList.length);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: colorList[serviceIndex],
+              border: Border.all(
+                color: colorList[serviceIndex],
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+
+            child: InkWell(
+              onTap: () {
+                debugPrint('Card tapped.');
+              },
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    child: Column(
+                      children: [
+                        Image.asset(iconList[serviceIndex], width: 75, height: 75),
+                        AutoSizeText(nameList[serviceIndex], style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                      ]
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
