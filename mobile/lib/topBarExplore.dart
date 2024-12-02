@@ -41,7 +41,7 @@ class TopBarExplore extends StatelessWidget {
 
         TextButton(
           onPressed: () {changePage(1, context);},
-          child: AutoSizeText("Workflow", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1,),
+          child: AutoSizeText("Workflows", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1,),
         ),
 
         TextButton(
