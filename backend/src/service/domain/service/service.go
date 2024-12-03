@@ -32,15 +32,18 @@ func (self *ServiceService) GetUser(emailStr string) (entities.User, error) {
 	return foundUser, nil
 }
 
-func (self *ServiceService) CreateOrUpdateSpotify(userId string, tokenSpotify entities.ResultToken) {
+func (self *ServiceService) CreateOrUpdateUserService(idService string, userId string, tokenSpotify entities.ResultToken) {
+	var retrievedService entities.UserService
+
 	currentTime := time.Now()
 	expiryTime := currentTime.Add(time.Duration(tokenSpotify.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
 
-	_, errFindingService := self.ServiceRepository.FindUserServiceByName("spotify", userId)
-	if errFindingService == nil {
-		self.ServiceRepository.UpdateServiceByUserAndName("spotify", tokenSpotify.AccessToken, tokenSpotify.RefreshToken, userId, expiryTime)
+	retrievedService, errUserService := self.ServiceRepository.FindUserServiceByIdServiceandIdUser(idService, userId)
+
+	if errUserService == nil {
+		self.ServiceRepository.UpdateUserServiceByServiceIdAndUserId(retrievedService.Id, userId, tokenSpotify.AccessToken, tokenSpotify.RefreshToken, expiryTime)
 	} else {
-		self.ServiceRepository.CreateService("spotify", tokenSpotify.AccessToken, tokenSpotify.RefreshToken, userId, expiryTime)
+		self.ServiceRepository.CreateUserService(userId, tokenSpotify.AccessToken, tokenSpotify.RefreshToken, expiryTime, idService)
 	}
 }
 
@@ -80,8 +83,12 @@ func (self *ServiceService) GetAccesTokenFromCode(codeSpotify string) (entities.
 	return tokensRes, nil
 }
 
-func (self *ServiceService) FindUserServiceByName(name string, userId string) (entities.Service, error) {
-	return self.ServiceRepository.FindUserServiceByName(name, userId)
+func (self *ServiceService) FindServiceByName(name string) (entities.Service, error) {
+	return self.ServiceRepository.FindServiceByName(name)
+}
+
+func (self *ServiceService) FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error) {
+	return self.ServiceRepository.FindUserServiceByIdServiceandIdUser(idservice, userId)
 }
 
 func (self *ServiceService) RefreshToken(refreshToken string, userUuid string) (entities.ResultToken, error) {
@@ -91,6 +98,7 @@ func (self *ServiceService) RefreshToken(refreshToken string, userUuid string) (
 		refreshToken,
 	)
 	var tokensRefreshRes entities.ResultToken
+	var serviceFound entities.Service
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -119,7 +127,11 @@ func (self *ServiceService) RefreshToken(refreshToken string, userUuid string) (
 	currentTime := time.Now()
 	expiryTime := currentTime.Add(time.Duration(tokensRefreshRes.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
 
-	fmt.Println("TOKEN REFRESH -> " + tokensRefreshRes.RefreshToken)
-	self.ServiceRepository.UpdateServiceByUserAndName("spotify", tokensRefreshRes.AccessToken, tokensRefreshRes.RefreshToken, userUuid, expiryTime)
+	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName("Spotify")
+	if errServiceFound != nil {
+		return tokensRefreshRes, errServiceFound
+	}
+
+	self.ServiceRepository.UpdateUserServiceByServiceIdAndUserId(serviceFound.Id, userUuid, tokensRefreshRes.AccessToken, tokensRefreshRes.RefreshToken, expiryTime)
 	return tokensRefreshRes, err
 }

@@ -14,9 +14,10 @@ type UserService interface {
 type ServiceService interface {
 	GetAccesTokenFromCode(codeSpotify string) (entities.ResultToken, error)
 	GetUser(emailStr string) (entities.User, error)
-	CreateOrUpdateSpotify(userId string, tokenSpotify entities.ResultToken)
-	FindUserServiceByName(name string, userId string) (entities.Service, error)
+	CreateOrUpdateUserService(serviceId string, userId string, tokenSpotify entities.ResultToken)
 	RefreshToken(refreshToken string, userUuid string) (entities.ResultToken, error)
+	FindServiceByName(name string) (entities.Service, error)
+	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
 }
 
 type Service struct {

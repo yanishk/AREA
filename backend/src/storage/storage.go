@@ -12,10 +12,11 @@ type UserRepository interface {
 }
 
 type ServiceRepository interface {
-	CreateService(name string, accessToken string, refreshToken string, uuidUser string, expiry string) error
+	CreateService(name string, color string, logo string) error
 	FindServiceByName(name string) (entities.Service, error)
-	FindUserServiceByName(name string, userId string) (entities.Service, error)
-	UpdateServiceByUserAndName(name string, accessToken string, refreshToken string, uuidUser string, expiryToken string) error
+	UpdateUserServiceByServiceIdAndUserId(uuidService string, uuidUser string, accessToken string, refreshToken string, expiryToken string) error
+	CreateUserService(idUser string, token string, refreshToken string, expiryDate string, idService string) error
+	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
 }
 
 type ActionRepository interface {

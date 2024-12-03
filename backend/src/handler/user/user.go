@@ -1,11 +1,11 @@
 package user_handler
 
 import (
-	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 
 	"backend/src/entities"
 	"backend/src/handler/middleware"
@@ -62,7 +62,6 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 	var invalidRequestBodyMessage InvalidRequestBodyMessage
 
 	err := context.ShouldBindJSON(&newUser)
-	fmt.Println(newUser)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": invalidRequestBodyMessage,
