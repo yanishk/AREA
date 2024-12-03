@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 
+	service_handler "backend/src/handler/service"
 	user_handler "backend/src/handler/user"
 	user_service_handler "backend/src/handler/userservice"
 	"backend/src/service"
@@ -35,8 +36,8 @@ func New(services *service.Service) *Handler {
 	return &Handler{
 		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
 		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
-		// ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, router),
-		router: router,
+		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, router),
+		router:             router,
 	}
 }
 
