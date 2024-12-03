@@ -14,6 +14,9 @@ type UserRepository interface {
 type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
 	FindServiceByName(name string) (entities.Service, error)
+}
+
+type UserServiceRepository interface {
 	UpdateUserServiceByServiceIdAndUserId(uuidService string, uuidUser string, accessToken string, refreshToken string, expiryToken string) error
 	CreateUserService(idUser string, token string, refreshToken string, expiryDate string, idService string) error
 	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
@@ -35,9 +38,10 @@ type WorkflowRepository interface {
 }
 
 type Repository struct {
-	UserRepository     UserRepository
-	ServiceRepository  ServiceRepository
-	ActionRepository   ActionRepository
-	TriggerRepository  TriggerRepository
-	WorkflowRepository WorkflowRepository
+	UserRepository        UserRepository
+	ServiceRepository     ServiceRepository
+	UserServiceRepository UserServiceRepository
+	ActionRepository      ActionRepository
+	TriggerRepository     TriggerRepository
+	WorkflowRepository    WorkflowRepository
 }

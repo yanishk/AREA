@@ -7,14 +7,14 @@ type Service struct {
 	Logo  string
 }
 
-type UserService struct {
-	Id           string
-	IdUser       string
-	AccessToken  string
-	RefreshToken string
-	ExpiryToken  string
-	IdService    string
-}
+// type UserService struct {
+// Id           string
+// IdUser       string
+// AccessToken  string
+// RefreshToken string
+// ExpiryToken  string
+// IdService    string
+// }
 
 type ResultToken struct {
 	AccessToken  string `json:"access_token"`
