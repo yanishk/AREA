@@ -8,6 +8,7 @@ import (
 
 	service_handler "backend/src/handler/service"
 	user_handler "backend/src/handler/user"
+	user_service_handler "backend/src/handler/userservice"
 	"backend/src/service"
 )
 
@@ -19,18 +20,24 @@ type ServiceHandler interface {
 	SetupRoutes(router *gin.Engine)
 }
 
+type UserServiceHandler interface {
+	SetupRoutes(router *gin.Engine)
+}
+
 type Handler struct {
-	UserHandler    UserHandler
-	ServiceHandler ServiceHandler
-	router         *gin.Engine
+	UserHandler        UserHandler
+	ServiceHandler     ServiceHandler
+	UserServiceHandler UserServiceHandler
+	router             *gin.Engine
 }
 
 func New(services *service.Service) *Handler {
 	router := gin.Default()
 	return &Handler{
-		UserHandler:    user_handler.NewUserHandler(services.UserService, router),
-		ServiceHandler: service_handler.NewServiceHandler(services.ServiceService, router),
-		router:         router,
+		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
+		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
+		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, router),
+		router:             router,
 	}
 }
 
