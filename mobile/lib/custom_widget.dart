@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:math';
+import 'globalData.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -65,6 +66,11 @@ class CustomClassicForm extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
     this.enabled = true,
     this.fillCollor = Colors.white,
+    this.borderRadius = 10,
+    this.borderWidth = 5,
+    this.focusedBorderColor = Colors.black,
+    this.disabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
+    this.enabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
   });
 
   final String hint;
@@ -73,6 +79,11 @@ class CustomClassicForm extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final bool enabled;
   final Color fillCollor;
+  final double borderRadius;
+  final double borderWidth;
+  final Color focusedBorderColor;
+  final Color disabledBorderColor;
+  final Color enabledBorderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +95,7 @@ class CustomClassicForm extends StatelessWidget {
           child:
           Container(
             decoration: BoxDecoration(
-              borderRadius:  BorderRadius.circular(10),
+              borderRadius:  BorderRadius.circular(borderRadius),
             ),
             child: TextField(
               style: const TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
@@ -104,24 +115,24 @@ class CustomClassicForm extends StatelessWidget {
                 enabled: enabled,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: Color.fromARGB(255, 238, 238, 238),
-                    width: 5,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: enabledBorderColor,
+                    width: borderWidth,
                   ),
                 ),
                 disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: Color.fromARGB(255, 238, 238, 238),
-                    width: 5,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: disabledBorderColor,
+                    width: borderWidth,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: Colors.black,
-                    width: 5,
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  borderSide: BorderSide(
+                    color: focusedBorderColor,
+                    width: borderWidth,
                   ),
                 ),
               ),
@@ -427,6 +438,112 @@ class ServicesCard extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: constraints.maxWidth,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    child: Column(
+                      children: [
+                        Image.asset(iconList[serviceIndex], width: 75, height: 75),
+                        AutoSizeText(nameList[serviceIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                      ]
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class WidgetCard extends StatelessWidget {
+  const WidgetCard({
+    super.key,
+    required this.child,
+    this.backgroundColor = Colors.black,
+    this.borderRadius = 4.0,
+  });
+
+  final Widget child;
+  final Color backgroundColor;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              border: Border.all(
+                color: backgroundColor,
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
+            child: Column(
+              children: [child,],
+            )
+          );
+        },
+      ),
+    );
+  }
+}
+
+class SquareServicesCard extends StatelessWidget {
+  const SquareServicesCard({
+    super.key,
+    this.onTap,
+  });
+
+  final Function()? onTap;
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colorList = [
+      const Color.fromARGB(255, 41, 44, 45),
+      const Color.fromARGB(255, 255, 0, 0),
+      const Color.fromARGB(255, 29, 185, 84),
+    ];
+
+    List<String> nameList = [
+      "Github",
+      "Youtube",
+      "Spotify",
+    ];
+
+    List<String> iconList = [
+      "assets/icon/github.png",
+      "assets/icon/youtube.png",
+      "assets/icon/spotify.png",
+    ];
+
+    int serviceIndex = Random().nextInt(colorList.length);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: colorList[serviceIndex],
+              border: Border.all(
+                color: colorList[serviceIndex],
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+
+            child: InkWell(
+              onTap: onTap,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),

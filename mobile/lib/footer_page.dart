@@ -34,10 +34,8 @@ class FooterNavigationBar extends StatelessWidget {
       currentIndex: currentIndex,
       onTap: (int index) {
         if (index != currentIndex) {
-          Navigator.push(
-            Globaldata.myContext,
-            MaterialPageRoute(builder: (context) => _pages[index]),
-          );
+          // Navigator.removeRoute(Globaldata.myContext, MaterialPageRoute(builder: (BuildContext context) =>  _pages[index]));
+          Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => _pages[index]),);
         }
       },
       items: const <BottomNavigationBarItem>[

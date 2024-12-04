@@ -5,6 +5,7 @@ import "package:namer_app/custom_widget.dart";
 import "package:namer_app/footer_page.dart";
 import "package:namer_app/selectService.dart";
 import "globalData.dart";
+import "saveNewWorkflows.dart";
 
 class CreateWorkflowsPage extends StatelessWidget {
   const CreateWorkflowsPage({super.key});
@@ -87,7 +88,7 @@ class CreateWorkflows extends State<APICall> {
       return CustomButton(
         backgroundColor:Color.fromARGB(255, 34, 34, 34),
         text: AutoSizeText("Continue", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-        onPressed: () {},
+        onPressed: () {Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SaveNewWorkflowsPage()));},
         size: Size(double.infinity, 60),
         padding: EdgeInsets.symmetric(horizontal: 15.0),
       );
@@ -104,10 +105,6 @@ class CreateWorkflows extends State<APICall> {
         firstButtonColor = Color.fromARGB(255, 57, 61, 62);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
-        Navigator.push(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => SelectServicePage()),
-        );
       }
     });
   }
@@ -117,16 +114,6 @@ class CreateWorkflows extends State<APICall> {
       if (secondButtonState == 1) {
         secondButtonState++;
       }
-    });
-  }
-
-  Future<void> resetButton() async {
-    setState(() {
-      firstButtonComplete = false;
-      secondButtonState = 0;
-      firstButtonColor = Color.fromARGB(255, 34, 34, 34);
-      secondButtonColor = Color.fromARGB(255, 182, 182, 182);
-      firstButtonHight = 70;
     });
   }
 
@@ -145,7 +132,7 @@ class CreateWorkflows extends State<APICall> {
             CustomButton(
               backgroundColor: firstButtonColor,
               text: firstButton(),
-              onPressed: () => firstButtonNextState(),
+              onPressed: () {firstButtonNextState(); Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: true,)),);},
               size: Size(double.infinity, firstButtonHight),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               borderCircularRadius: 10,
@@ -158,7 +145,7 @@ class CreateWorkflows extends State<APICall> {
             CustomButton(
               backgroundColor: secondButtonColor,
               text: secondButton(),
-              onPressed: () => secondButtonNextState(),
+              onPressed: () {secondButtonNextState(); Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: false)),);},
               size: const Size(double.infinity, 70),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               borderCircularRadius: 10,
@@ -167,13 +154,6 @@ class CreateWorkflows extends State<APICall> {
             Padding(padding: EdgeInsets.only(top: 50)),
             continueButton(),
             Padding(padding: EdgeInsets.only(top: 80)),
-            CustomButton(
-              backgroundColor:Color.fromARGB(255, 34, 34, 34),
-              text: AutoSizeText("Reset", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              onPressed: () => {resetButton()},
-              size: Size(double.infinity, 60),
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-            ),
           ],
         ),
       ),
