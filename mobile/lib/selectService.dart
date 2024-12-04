@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:math';
 
 import "custom_widget.dart";
 import "globalData.dart";
@@ -36,7 +37,6 @@ class SelectService extends State<APICall> {
     required this.isAnAction,
   });
   final bool isAnAction;
-  final nbRepeat = 10;
   String title = "Select action service";
 
   @override
@@ -49,8 +49,14 @@ class SelectService extends State<APICall> {
       services.add(
         Row(
           children: [
-            SquareServicesCard(onTap: () {Navigator.pop(Globaldata.myContext);},),
-            SquareServicesCard(onTap: () {Navigator.pop(Globaldata.myContext);},),
+            SquareServicesCard(
+              servicesIndex: Random().nextInt(3),
+              isAnAction: isAnAction,
+            ),
+            SquareServicesCard(
+              servicesIndex: Random().nextInt(3),
+              isAnAction: isAnAction,
+            ),
           ],
         ),
       );

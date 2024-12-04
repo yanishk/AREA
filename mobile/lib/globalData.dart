@@ -6,4 +6,12 @@ class Globaldata {
   static String ErrorServerConnection = "Could not find the server\nPlease try again later";
   static BuildContext myContext = myContext;
   static Widget lastPage = LoginPage();
+  static int firstService = -1;
+  static int secondService = -1;
+
+  static List<String> nameList = [
+    "Github",
+    "Youtube",
+    "Spotify",
+  ];
 }

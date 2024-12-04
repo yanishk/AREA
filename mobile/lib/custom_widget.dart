@@ -498,10 +498,13 @@ class WidgetCard extends StatelessWidget {
 class SquareServicesCard extends StatelessWidget {
   const SquareServicesCard({
     super.key,
-    this.onTap,
+    required this.servicesIndex,
+    this.isAnAction = true,
   });
 
-  final Function()? onTap;
+  final int servicesIndex;
+  final bool isAnAction;
+
   @override
   Widget build(BuildContext context) {
     List<Color> colorList = [
@@ -522,24 +525,29 @@ class SquareServicesCard extends StatelessWidget {
       "assets/icon/spotify.png",
     ];
 
-    int serviceIndex = Random().nextInt(colorList.length);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
             decoration: BoxDecoration(
-              color: colorList[serviceIndex],
+              color: colorList[servicesIndex],
               border: Border.all(
-                color: colorList[serviceIndex],
+                color: colorList[servicesIndex],
                 width: 2.0,
               ),
               borderRadius: BorderRadius.circular(4.0),
             ),
 
             child: InkWell(
-              onTap: onTap,
+              onTap: () {
+                if (isAnAction) {
+                  Globaldata.firstService = servicesIndex;
+                } else {
+                  Globaldata.secondService = servicesIndex;
+                }
+                Navigator.pop(Globaldata.myContext);
+              },
               child: Column(
                 children: [
                   SizedBox(
@@ -549,8 +557,8 @@ class SquareServicesCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                     child: Column(
                       children: [
-                        Image.asset(iconList[serviceIndex], width: 75, height: 75),
-                        AutoSizeText(nameList[serviceIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                        Image.asset(iconList[servicesIndex], width: 75, height: 75),
+                        AutoSizeText(nameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
                       ]
                     ),
                   ),

@@ -39,7 +39,7 @@ class CreateWorkflows extends State<APICall> {
       return LeftWidget(
         padding: EdgeInsets.symmetric(horizontal: 0),
         child: AutoSizeText(
-          "If {trigger name}",
+          "If ${Globaldata.nameList[Globaldata.firstService]}",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );
@@ -74,7 +74,7 @@ class CreateWorkflows extends State<APICall> {
       return LeftWidget(
         padding: EdgeInsets.symmetric(horizontal: 0),
         child: AutoSizeText(
-          "Then {action name}",
+          "Then ${Globaldata.nameList[Globaldata.secondService]}",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );

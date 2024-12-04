@@ -36,6 +36,7 @@ class SaveNewWorkflows extends State<APICall> {
     required this.isAnAction,
   });
   final bool isAnAction;
+  TextEditingController workflowTitleController = new TextEditingController(text: "${Globaldata.nameList[Globaldata.firstService]} ${Globaldata.nameList[Globaldata.secondService]}");
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,7 @@ class SaveNewWorkflows extends State<APICall> {
                   debugPrint('Card tapped.');
                 },
                 child: Column(
-                  children: const [
+                  children: [
                     Padding(padding: EdgeInsets.only(top: 30)),
                     SelectServiceTopBar(title: "Review and finish", color: Colors.white),
                     Padding(padding: EdgeInsets.only(top: 20)),
@@ -67,6 +68,7 @@ class SaveNewWorkflows extends State<APICall> {
                       backgroundColor: Colors.white,
                       borderRadius: 10,
                       child: CustomClassicForm(
+                        controller: workflowTitleController,
                         hint:'Email',
                         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         focusedBorderColor: Colors.white,
