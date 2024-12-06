@@ -1,17 +1,19 @@
 import React from "react";
 
-interface ButtonDefaultProps {
+interface ButtonIfDefaultProps {
+    onClick: () => void;
     text: string;
 }
 
-const ButtonDefault: React.FC<ButtonDefaultProps> = ({text }) => {
+const ButtonIfDefault: React.FC<ButtonIfDefaultProps> = ({ text, onClick }) => {
     return (
         <button
-            className="w-full h-28 bg-[#222222] text-white text-[2.2rem] rounded-full hover:bg-[#333333] mt-5 font-[900]"
+            onClick={onClick}
+            className="px-64 bg-[#222222] flex justify-center items-center text-white text-[5.2rem] rounded-lg font-[900]"
         >
             {text}
         </button>
     );
 };
 
-export default ButtonDefault;
+export default ButtonIfDefault;
