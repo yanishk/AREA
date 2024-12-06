@@ -2,7 +2,7 @@ package docs_service
 
 type ServiceActionsReactionsExample struct {
 	Name  string `json:"Name" example:"Google"`
-	Color string `json:"Color" example:"#FFFFFF"`
+	Color string `json:"Color" example:"#E84A4A"`
 	Logo  string `json:"Logo" example:"assets/logos/Google.png"`
 }
 

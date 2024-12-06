@@ -8,7 +8,7 @@ definitions:
   docs_service.ServiceActionsReactionsExample:
     properties:
       Color:
-        example: '#FFFFFF'
+        example: '#E84A4A'
         type: string
       Logo:
         example: assets/logos/Google.png

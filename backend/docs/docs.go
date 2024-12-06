@@ -368,7 +368,7 @@ const docTemplate = `{
             "properties": {
                 "Color": {
                     "type": "string",
-                    "example": "#FFFFFF"
+                    "example": "#E84A4A"
                 },
                 "Logo": {
                     "type": "string",
