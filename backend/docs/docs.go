@@ -15,6 +15,46 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/authentication/Google": {
+            "get": {
+                "description": "Get Google OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Spotify": {
+            "get": {
+                "description": "Get Spotify OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Spotify OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -346,6 +386,15 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "New user created"
+                }
+            }
+        },
+        "docs_userservice.OAuth2Response": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
                 }
             }
         },

@@ -1,12 +1,14 @@
 package userservice_handler
 
 import (
+	_ "backend/src/handler/userservice/docs"
 	"backend/src/service"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
 )
 
 type UserServiceHandler struct {
@@ -41,6 +43,12 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 	}
 }
 
+// @Summary		Google OAuth2
+// @Description	Get Google OAuth2 URL
+// @Tags			Authentication
+// @Produce		json
+// @Success		200		{object}	docs_userservice.OAuth2Response
+// @Router			/authentication/Google [get]
 func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
 		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
@@ -51,6 +59,12 @@ func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 	})
 }
 
+// @Summary		Spotify OAuth2
+// @Description	Get Spotify OAuth2 URL
+// @Tags			Authentication
+// @Produce		json
+// @Success		200		{object}	docs_userservice.OAuth2Response
+// @Router			/authentication/Spotify [get]
 func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
