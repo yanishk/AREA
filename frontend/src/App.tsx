@@ -5,6 +5,7 @@ import LoginForm from './pages/Login'
 import HomePage from './pages/Home'
 import CreatePage from './pages/Create'
 import SelectActionPage from './pages/SelectAction'
+import SelectReactionPage from './pages/SelectReaction'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/select-action" element={<SelectActionPage />} />
+        <Route path="/select-reaction" element={<SelectReactionPage />} />
       </Routes>
     </Router>
   )
