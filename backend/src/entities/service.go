@@ -1,11 +1,11 @@
 package entities
 
 type Service struct {
-	Id    string
-	Name  string
-	Color string
-	Logo  string
-	HasActions bool
+	Id           string
+	Name         string
+	Color        string
+	Logo         string
+	HasActions   bool
 	HasReactions bool
 }
 

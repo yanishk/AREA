@@ -47,7 +47,7 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulIn
 	var retrievedServices []entities.ServiceUsefulInformations
 
 	rows, err := self.db.Query(sqlStatement)
-	if (err != nil) {
+	if err != nil {
 		return retrievedServices, err
 	}
 	defer rows.Close()
@@ -56,7 +56,7 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulIn
 		var retrievedService entities.ServiceUsefulInformations
 		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
 		if err != nil {
-		    return retrievedServices, err
+			return retrievedServices, err
 		}
 		retrievedServices = append(retrievedServices, retrievedService)
 	}
@@ -68,7 +68,7 @@ func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUseful
 	var retrievedServices []entities.ServiceUsefulInformations
 
 	rows, err := self.db.Query(sqlStatement)
-	if (err != nil) {
+	if err != nil {
 		return retrievedServices, err
 	}
 	defer rows.Close()
@@ -77,10 +77,9 @@ func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUseful
 		var retrievedService entities.ServiceUsefulInformations
 		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
 		if err != nil {
-		    return retrievedServices, err
+			return retrievedServices, err
 		}
 		retrievedServices = append(retrievedServices, retrievedService)
 	}
 	return retrievedServices, nil
 }
-

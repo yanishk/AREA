@@ -1,8 +1,8 @@
 package service_service
 
 import (
-	"backend/src/storage"
 	"backend/src/entities"
+	"backend/src/storage"
 )
 
 type ServiceService struct {

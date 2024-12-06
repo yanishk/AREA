@@ -4,8 +4,8 @@ import (
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 
-	"net/http"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type ServiceHandler struct {
