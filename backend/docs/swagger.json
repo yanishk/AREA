@@ -6,6 +6,120 @@
     },
     "host": "localhost:8080",
     "paths": {
+        "/actionsServices": {
+            "get": {
+                "description": "Get Retrieve Actions Services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Google": {
+            "get": {
+                "description": "Get Google OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Spotify": {
+            "get": {
+                "description": "Get Spotify OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Spotify OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/callback/{service}": {
+            "get": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -53,6 +167,32 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/reactionsServices": {
+            "get": {
+                "description": "Get Retrieve Reactions Services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Reactions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
                         }
                     }
                 }
@@ -205,6 +345,43 @@
         }
     },
     "definitions": {
+        "docs_service.ServiceActionReactionInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Internal Server Error"
+                }
+            }
+        },
+        "docs_service.ServiceActionsReactionsExample": {
+            "type": "object",
+            "properties": {
+                "Color": {
+                    "type": "string",
+                    "example": "#FFFFFF"
+                },
+                "Logo": {
+                    "type": "string",
+                    "example": "assets/logos/Google.png"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Google"
+                }
+            }
+        },
+        "docs_service.ServiceActionsReactionsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ServiceActionsReactionsExample"
+                    }
+                }
+            }
+        },
         "docs_user.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -337,6 +514,42 @@
                 "success": {
                     "type": "string",
                     "example": "New user created"
+                }
+            }
+        },
+        "docs_userservice.OAuth2Response": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization-Could not find requested user-Could not find requested service"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to exchange token-Failed to get email"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Token generated"
                 }
             }
         },

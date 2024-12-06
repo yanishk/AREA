@@ -1,4 +1,29 @@
 definitions:
+  docs_service.ServiceActionReactionInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal Server Error
+        type: string
+    type: object
+  docs_service.ServiceActionsReactionsExample:
+    properties:
+      Color:
+        example: '#FFFFFF'
+        type: string
+      Logo:
+        example: assets/logos/Google.png
+        type: string
+      Name:
+        example: Google
+        type: string
+    type: object
+  docs_service.ServiceActionsReactionsSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/docs_service.ServiceActionsReactionsExample'
+        type: array
+    type: object
   docs_user.DeleteAccountFailureInternalServerErrorResponse:
     properties:
       error:
@@ -89,6 +114,31 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.OAuth2Response:
+    properties:
+      auth-url:
+        example: url-example.com
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization-Could not find requested user-Could not
+          find requested service
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to exchange token-Failed to get email
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackSuccessResponse:
+    properties:
+      success:
+        example: Token generated
+        type: string
+    type: object
   entities.UserCredentials:
     properties:
       email:
@@ -108,6 +158,81 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
+  /actionsServices:
+    get:
+      description: Get Retrieve Actions Services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+      summary: Actions Services
+      tags:
+      - Services
+  /authentication/Google:
+    get:
+      description: Get Google OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Google OAuth2
+      tags:
+      - Authentication
+  /authentication/Spotify:
+    get:
+      description: Get Spotify OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Spotify OAuth2
+      tags:
+      - Authentication
+  /callback/{service}:
+    get:
+      description: Callback for services
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse'
+      summary: Service Callback
+      tags:
+      - Authentication
   /login:
     post:
       consumes:
@@ -142,6 +267,23 @@ paths:
       summary: Login
       tags:
       - Users
+  /reactionsServices:
+    get:
+      description: Get Retrieve Reactions Services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+      summary: Reactions Services
+      tags:
+      - Services
   /register:
     post:
       consumes:
