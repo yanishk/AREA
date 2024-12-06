@@ -18,6 +18,7 @@ type UserHandler interface {
 
 type ServiceHandler interface {
 	SetupRoutes(router *gin.Engine)
+	CallTimeApi() error
 }
 
 type UserServiceHandler interface {
