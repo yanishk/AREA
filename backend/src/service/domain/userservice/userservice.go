@@ -17,6 +17,9 @@ type UserServiceService struct {
 	UserRepository        storage.UserRepository
 }
 
+const ContentType = "Content-Type"
+const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+
 func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository, UserServiceRepository storage.UserServiceRepository) *UserServiceService {
 	return &UserServiceService{
 		ServiceRepository:     ServiceRepository,
@@ -65,7 +68,7 @@ func GetGoogleOAuth2Request(code string) (*http.Request, error) {
 		return request, errRequest
 	}
 
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 	return request, nil
 }
 
@@ -83,7 +86,7 @@ func GetSpotifyOAuth2Request(code string) (*http.Request, error) {
 	}
 
 	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
 	return request, nil
 }
@@ -102,7 +105,7 @@ func GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 		return request, errRequest
 	}
 
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
 	return request, nil
 }
@@ -120,7 +123,7 @@ func GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	}
 
 	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
 	return request, nil
 }
