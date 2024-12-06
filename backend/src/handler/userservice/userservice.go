@@ -89,6 +89,16 @@ func (self *UserServiceHandler) getEmailFromContext(context *gin.Context) (strin
 	return emailStr, true
 }
 
+// @Summary      Service Callback
+// @Description  Callback for services
+// @Tags         Authentication
+// @Produce      json
+// @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        code     query     string  true  "Authorization code given by the service"
+// @Failure		200		{object}	docs_userservice.ServiceCallBackSuccessResponse
+// @Failure		400		{object}	docs_userservice.ServiceCallBackBadRequestResponse
+// @Failure		500		{object}	docs_userservice.ServiceCallBackInternalServerErrorResponse
+// @Router       /callback/{service} [get]
 func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 	code := context.Query("code")
 	serviceName := context.Param("service")

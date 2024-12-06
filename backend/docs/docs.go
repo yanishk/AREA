@@ -55,6 +55,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/callback/{service}": {
+            "get": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -395,6 +443,33 @@ const docTemplate = `{
                 "auth-url": {
                     "type": "string",
                     "example": "url-example.com"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization-Could not find requested user-Could not find requested service"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to exchange token-Failed to get email"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Token generated"
                 }
             }
         },
