@@ -37,102 +37,171 @@ func (self *UserServiceService) GetUser(emailStr string) (entities.User, error) 
 	return foundUser, nil
 }
 
-func (self *UserServiceService) CreateOrUpdateUserService(idService string, userId string, tokenSpotify entities.ResultToken) {
-	var retrievedService entities.UserService
-
+func (self *UserServiceService) CreateOrUpdateUserService(idUser string, idService string, token entities.ResultToken) {
 	currentTime := time.Now()
-	expiryTime := currentTime.Add(time.Duration(tokenSpotify.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
+	expiryTime := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
 
-	retrievedService, errUserService := self.UserServiceRepository.FindUserServiceByIdServiceandIdUser(idService, userId)
+	_, errUserService := self.UserServiceRepository.FindUserServiceByIdServiceandIdUser(idUser, idService)
 
 	if errUserService == nil {
-		self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(retrievedService.Id, userId, tokenSpotify.AccessToken, tokenSpotify.RefreshToken, expiryTime)
+		self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(idUser, token.AccessToken, token.RefreshToken, expiryTime, idService)
 	} else {
-		self.UserServiceRepository.CreateUserService(userId, tokenSpotify.AccessToken, tokenSpotify.RefreshToken, expiryTime, idService)
+		self.UserServiceRepository.CreateUserService(idUser, token.AccessToken, token.RefreshToken, expiryTime, idService)
 	}
 }
 
-func (self *UserServiceService) GetAccesTokenFromCode(codeSpotify string) (entities.ResultToken, error) {
-	tokenUrl := "https://accounts.spotify.com/api/token"
+func GetGoogleOAuth2Request(code string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
-		codeSpotify,
-		os.Getenv("CALLBACK_SPOTIFY"),
+		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
+		code,
+		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		os.Getenv("GOOGLE_CALLBACK"),
 	)
-	var tokensRes entities.ResultToken
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
-		return tokensRes, errRequest
+		return request, errRequest
 	}
 
-	request.SetBasicAuth(os.Getenv("SPOTIFY_ID_CLIENT"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return request, nil
+}
+
+func GetSpotifyOAuth2Request(code string) (*http.Request, error) {
+	tokenUrl := "https://accounts.spotify.com/api/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		code,
+		os.Getenv("SPOTIFY_CALLBACK"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return tokensRes, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return tokensRes, err
-	}
-
-	errDecoder := json.NewDecoder(res.Body).Decode(&tokensRes)
-	if errDecoder != nil {
-		return tokensRes, errDecoder
-	}
-
-	return tokensRes, nil
+	return request, nil
 }
 
-func (self *UserServiceService) FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error) {
-	return self.UserServiceRepository.FindUserServiceByIdServiceandIdUser(idservice, userId)
+func GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s",
+		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return request, nil
 }
 
-func (self *UserServiceService) RefreshToken(refreshToken string, userUuid string) (entities.ResultToken, error) {
+func GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
 		"grant_type=refresh_token&refresh_token=%s",
 		refreshToken,
 	)
-	var tokensRefreshRes entities.ResultToken
-	var serviceFound entities.Service
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
-		return tokensRefreshRes, errRequest
+		return request, errRequest
 	}
 
-	request.SetBasicAuth(os.Getenv("SPOTIFY_ID_CLIENT"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return request, nil
+}
+
+func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
+	var tokenRes entities.ResultToken
+	var request *http.Request
+	var errRequest error
+
+	if (serviceName == "Google") {
+		request, errRequest = GetGoogleOAuth2Request(code)
+	} else if (serviceName == "Spotify") {
+		request, errRequest = GetSpotifyOAuth2Request(code)
+	}
+
+	if (errRequest != nil) {
+		return tokenRes, errRequest
+	}
 
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
-		return tokensRefreshRes, err
+		return tokenRes, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return tokensRefreshRes, err
+		return tokenRes, err
 	}
 
-	errDecoder := json.NewDecoder(res.Body).Decode(&tokensRefreshRes)
+	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
 	if errDecoder != nil {
-		return tokensRefreshRes, errDecoder
+		return tokenRes, errDecoder
+	}
+	return tokenRes, nil
+}
+
+func (self *UserServiceService) FindUserServiceByIdServiceandIdUser(idUser string, idService string) (entities.UserService, error) {
+	return self.UserServiceRepository.FindUserServiceByIdServiceandIdUser(idUser, idService)
+}
+
+func (self *UserServiceService) RefreshToken(refreshToken string, userUuid string, serviceName string) (entities.ResultToken, error) {
+	var tokenRes entities.ResultToken
+	var serviceFound entities.Service
+	var request *http.Request
+	var errRequest error
+
+	if (serviceName == "Google") {
+		request, errRequest = GetGoogleRefreshTokenRequest(refreshToken)
+	} else if (serviceName == "Spotify") {
+		request, errRequest = GetSpotifyRefreshTokenRequest(refreshToken)
+	}
+
+	if (errRequest != nil) {
+		return tokenRes, errRequest
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return tokenRes, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return tokenRes, err
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
+	if errDecoder != nil {
+		return tokenRes, errDecoder
 	}
 
 	currentTime := time.Now()
-	expiryTime := currentTime.Add(time.Duration(tokensRefreshRes.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
+	expiryTime := currentTime.Add(time.Duration(tokenRes.ExpiresIn) * time.Second).Format("2006-01-02 15:04:05-07:00")
 
 	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName("Spotify")
 	if errServiceFound != nil {
-		return tokensRefreshRes, errServiceFound
+		return tokenRes, errServiceFound
 	}
 
-	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(serviceFound.Id, userUuid, tokensRefreshRes.AccessToken, tokensRefreshRes.RefreshToken, expiryTime)
-	return tokensRefreshRes, err
+	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userUuid, tokenRes.AccessToken, tokenRes.RefreshToken, expiryTime, serviceFound.Id)
+	return tokenRes, err
 }
