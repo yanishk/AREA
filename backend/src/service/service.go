@@ -15,12 +15,12 @@ type ServiceService interface {
 }
 
 type UserServiceService interface {
-	GetAccesTokenFromCode(codeSpotify string) (entities.ResultToken, error)
-	RefreshToken(refreshToken string, userUuid string) (entities.ResultToken, error)
+	GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error)
+	RefreshToken(refreshToken string, userUuid string, serviceName string) (entities.ResultToken, error)
 	GetUser(emailStr string) (entities.User, error)
 	FindServiceByName(name string) (entities.Service, error)
-	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
-	CreateOrUpdateUserService(serviceId string, userId string, tokenSpotify entities.ResultToken)
+	FindUserServiceByIdServiceandIdUser(idUser string, idService string) (entities.UserService, error)
+	CreateOrUpdateUserService(idUser string, idService string, token entities.ResultToken)
 }
 
 type Service struct {
