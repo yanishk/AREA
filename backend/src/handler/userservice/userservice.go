@@ -2,6 +2,7 @@ package userservice_handler
 
 import (
 	_ "backend/src/handler/userservice/docs"
+	"backend/src/handler/middleware"
 	"backend/src/service"
 	"net/http"
 	"os"
@@ -32,7 +33,7 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 		authentication.GET("/Google", self.Auth02Google)
 	}
 
-	callback := router.Group("/callback")
+	callback := router.Group("/callback", middleware.VerifyJWTCookie)
 	{
 		callback.GET("/:service", self.ServiceCallBack)
 	}
