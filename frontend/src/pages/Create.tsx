@@ -15,12 +15,22 @@ const WorkflowBuilder = () => {
 
     const handleDeleteAction = () => {
         setSelectedAction(null);
-        navigate(location.pathname, { state: { ...location.state, selectedAction: null } });
+        navigate(location.pathname, {
+            state: {
+                ...location.state,
+                selectedAction: null
+            }
+        });
     };
 
     const handleDeleteReaction = () => {
         setSelectedReaction(null);
-        navigate(location.pathname, { state: { ...location.state, selectedReaction: null } });
+        navigate(location.pathname, {
+            state: {
+                ...location.state,
+                selectedReaction: null
+            }
+        });
     };
 
     const handleOnEditAction = () => {
@@ -41,54 +51,64 @@ const WorkflowBuilder = () => {
         })
     }
 
-    const goBack = () => {
-        navigate(-1);
+    const goHome = () => {
+        navigate("/");
     }
 
     return (
         <div>
-            <h1>Create</h1>
-            <CancelButton
-                text="Cancel"
-                onClick={goBack}
-            />
-            <div>
-                {selectedAction ? (
-                    <ButtonIfCustom
-                        text={selectedAction.name}
-                        color={selectedAction.color}
-                        onEdit={handleOnEditAction}
-                        onDelete={handleDeleteAction}
+            <div className="flex items-center justify-between px-10 py-5">
+                <div>
+                    <CancelButton
+                        text="Cancel"
+                        onClick={goHome}
                     />
-                ) : (
-                    <ButtonIfDefault
-                        onClick={() =>
-                            navigate("/select-action", {
-                                state: { selectedReaction },
-                            })
-                        }
-                        text="If This"
-                    />
-                )}
+                </div>
+
+                <h1 className="text-[3.2rem] font-extrabold text-center flex-1">
+                    Create
+                </h1>
             </div>
-            <div>
-                {selectedReaction ? (
-                    <ButtonThenCustom
-                        text={selectedReaction.name}
-                        color={selectedReaction.color}
-                        onEdit={handleOnEditReaction}
-                        onDelete={handleDeleteReaction}
-                    />
-                ) : (
-                    <ButtonThenDefault
-                        onClick={() =>
-                            navigate("/select-reaction", {
-                                state: { selectedAction },
-                            })
-                        }
-                        text="Then That"
-                    />
-                )}
+
+            <div className="flex items-center justify-center flex-col px-10 py-5">
+                <div className="pt-10">
+                    {selectedAction ? (
+                        <ButtonIfCustom
+                            text={selectedAction.name}
+                            color={selectedAction.color}
+                            onEdit={handleOnEditAction}
+                            onDelete={handleDeleteAction}
+                        />
+                    ) : (
+                        <ButtonIfDefault
+                            onClick={() =>
+                                navigate("/select-action", {
+                                    state: { selectedReaction },
+                                })
+                            }
+                            text="If This"
+                        />
+                    )}
+                </div>
+                <div className="pt-10">
+                    {selectedReaction ? (
+                        <ButtonThenCustom
+                            text={selectedReaction.name}
+                            color={selectedReaction.color}
+                            onEdit={handleOnEditReaction}
+                            onDelete={handleDeleteReaction}
+                        />
+                    ) : (
+                        <ButtonThenDefault
+                            onClick={() =>
+                                navigate("/select-reaction", {
+                                    state: { selectedAction },
+                                })
+                            }
+                            text="Then That"
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );
