@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"backend/src/entities"
 	"backend/src/handler/middleware"
@@ -31,7 +29,6 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
 }
