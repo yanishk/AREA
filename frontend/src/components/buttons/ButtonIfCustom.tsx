@@ -2,15 +2,29 @@ import React from "react";
 
 interface ButtonIfCustomProps {
     text: string;
+    color: string;
+    onDelete: () => void;
 }
 
-const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({text }) => {
+const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, onDelete }) => {
+    const buttonColor = color || "#222222";
+
     return (
-        <button
-            className="w-full h-28 bg-[#222222] text-white text-[2.2rem] rounded-full hover:bg-[#333333] mt-5 font-[900]"
-        >
-            {text}
-        </button>
+        <div className="relative inline-block">
+            <button
+                style={{ backgroundColor: buttonColor }}
+                className="px-64 flex justify-center items-center text-white text-[5.2rem] rounded-lg font-[900]"
+            >
+                {text}
+            </button>
+
+            <button
+                onClick={onDelete}
+                className="absolute top-[-10px] right-[-10px] text-sm text-red-500 underline hover:text-red-700"
+            >
+                Delete
+            </button>
+        </div>
     );
 };
 
