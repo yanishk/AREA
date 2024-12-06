@@ -26,8 +26,8 @@ func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/spotify", self.Auth02Spotify)
-		authentication.GET("/google", self.Auth02Google)
+		authentication.GET("/Spotify", self.Auth02Spotify)
+		authentication.GET("/Google", self.Auth02Google)
 	}
 
 	callback := router.Group("/callback")
@@ -37,7 +37,7 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 
 	callApi := router.Group("/call-api")
 	{
-		callApi.GET("/spotify", self.SpotifyCallApi)
+		callApi.GET("/Spotify", self.SpotifyCallApi)
 	}
 }
 
