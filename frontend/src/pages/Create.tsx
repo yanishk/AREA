@@ -23,6 +23,24 @@ const WorkflowBuilder = () => {
         navigate(location.pathname, { state: { ...location.state, selectedReaction: null } });
     };
 
+    const handleOnEditAction = () => {
+        navigate("/select-action", {
+            state: {
+                selectedReaction,
+                selectedAction
+            }
+        })
+    }
+
+    const handleOnEditReaction = () => {
+        navigate("/select-reaction", {
+            state: {
+                selectedReaction,
+                selectedAction
+            }
+        })
+    }
+
     const goBack = () => {
         navigate(-1);
     }
@@ -30,10 +48,18 @@ const WorkflowBuilder = () => {
     return (
         <div>
             <h1>Create</h1>
-            <CancelButton text="Cancel" onClick={goBack}/>
+            <CancelButton
+                text="Cancel"
+                onClick={goBack}
+            />
             <div>
                 {selectedAction ? (
-                    <ButtonIfCustom text={selectedAction.name} color={selectedAction.color} onDelete={handleDeleteAction}/>
+                    <ButtonIfCustom
+                        text={selectedAction.name}
+                        color={selectedAction.color}
+                        onEdit={handleOnEditAction}
+                        onDelete={handleDeleteAction}
+                    />
                 ) : (
                     <ButtonIfDefault
                         onClick={() =>
@@ -47,7 +73,12 @@ const WorkflowBuilder = () => {
             </div>
             <div>
                 {selectedReaction ? (
-                    <ButtonThenCustom text={selectedReaction.name} color={selectedReaction.color} onDelete={handleDeleteReaction}/>
+                    <ButtonThenCustom
+                        text={selectedReaction.name}
+                        color={selectedReaction.color}
+                        onEdit={handleOnEditReaction}
+                        onDelete={handleDeleteReaction}
+                    />
                 ) : (
                     <ButtonThenDefault
                         onClick={() =>
