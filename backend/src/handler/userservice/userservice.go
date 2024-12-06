@@ -45,14 +45,20 @@ func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
 		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
 		os.Getenv("GOOGLE_CALLBACK") + "&scope=email"
-	context.Redirect(http.StatusTemporaryRedirect, googleAuthUrl)
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": googleAuthUrl,
+	})
 }
 
 func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
 		os.Getenv("SPOTIFY_CALLBACK") + "&scope=user-read-private user-read-email"
-	context.Redirect(http.StatusTemporaryRedirect, spotifyAuthUrl)
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": spotifyAuthUrl,
+	})
 }
 
 func (self *UserServiceHandler) getEmailFromContext(context *gin.Context) (string, bool) {
@@ -115,7 +121,7 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 	self.UserServiceService.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"access_token": token,
+		"success": "Token generated",
 	})
 }
 
@@ -169,13 +175,13 @@ func (self *UserServiceHandler) SpotifyCallApi(context *gin.Context) {
 			return
 		}
 		context.IndentedJSON(http.StatusOK, gin.H{
-			"Success": "API successfully called",
+			"success": "API successfully called",
 		})
 		return
 	}
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"Success": "no refresh need and API work",
+		"success": "no refresh need and API work",
 	})
 
 	// call API instead of this stooooopid print
