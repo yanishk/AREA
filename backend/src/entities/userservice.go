@@ -5,6 +5,6 @@ type UserService struct {
 	IdUser       string
 	AccessToken  string
 	RefreshToken string
-	ExpiryDate  string
+	ExpiryDate   string
 	IdService    string
 }

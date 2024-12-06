@@ -130,13 +130,13 @@ func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName 
 	var request *http.Request
 	var errRequest error
 
-	if (serviceName == "Google") {
+	if serviceName == "Google" {
 		request, errRequest = GetGoogleOAuth2Request(code)
-	} else if (serviceName == "Spotify") {
+	} else if serviceName == "Spotify" {
 		request, errRequest = GetSpotifyOAuth2Request(code)
 	}
 
-	if (errRequest != nil) {
+	if errRequest != nil {
 		return tokenRes, errRequest
 	}
 
@@ -168,13 +168,13 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userUuid strin
 	var request *http.Request
 	var errRequest error
 
-	if (serviceName == "Google") {
+	if serviceName == "Google" {
 		request, errRequest = GetGoogleRefreshTokenRequest(refreshToken)
-	} else if (serviceName == "Spotify") {
+	} else if serviceName == "Spotify" {
 		request, errRequest = GetSpotifyRefreshTokenRequest(refreshToken)
 	}
 
-	if (errRequest != nil) {
+	if errRequest != nil {
 		return tokenRes, errRequest
 	}
 

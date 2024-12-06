@@ -1,15 +1,14 @@
 package userservice_handler
 
 import (
-	_ "backend/src/handler/userservice/docs"
 	"backend/src/handler/middleware"
+	_ "backend/src/handler/userservice/docs"
 	"backend/src/service"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
-
 )
 
 type UserServiceHandler struct {
