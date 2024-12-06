@@ -21,5 +21,15 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	// Function that be implemented soon
+	router.GET("/actionsServices", self.RetrieveActionsServices)
+	router.GET("/reactionsServices", self.RetrieveReactionsServices)
+}
+
+// à documenter
+func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+	//
+}
+
+func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+	//
 }

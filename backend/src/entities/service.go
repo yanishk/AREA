@@ -5,8 +5,8 @@ type Service struct {
 	Name  string
 	Color string
 	Logo  string
-	hasActions bool
-	hasReactions bool
+	HasActions bool
+	HasReactions bool
 }
 
 type ResultToken struct {
