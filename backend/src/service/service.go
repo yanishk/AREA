@@ -12,6 +12,9 @@ type UserService interface {
 }
 
 type ServiceService interface {
+	FindServiceByName(name string) (entities.Service, error)
+	FindTriggerByIdService(idService string) ([]entities.Trigger, error)
+	FindWorkflowByIdTrigger(idTrigger string) ([]entities.Workflow, error)
 }
 
 type UserServiceService interface {
