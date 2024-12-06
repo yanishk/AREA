@@ -15,15 +15,15 @@ func NewActionRepository(db *sql.DB) *ActionRepository {
 	return &ActionRepository{db: db}
 }
 
-func (self *ActionRepository) CreateAction(name string, description string, serviceId string) error {
-	sqlStatement := `INSERT INTO actions (name, description, serviceid) VALUES ($1, $2, $3);`
+func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
+	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
 
 	_, err := self.FindActionByName(name)
 	if err == nil {
 		return fmt.Errorf("Action already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, name, description, serviceId)
+	_, err = self.db.Exec(sqlStatement, name, description, serviceId, nbParam)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (self *ActionRepository) FindActionByName(name string) (entities.Action, er
 	var retrievedAction entities.Action
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description)
+	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
 	if err != nil {
 		return retrievedAction, err
 	}
