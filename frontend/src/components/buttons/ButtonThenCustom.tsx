@@ -3,10 +3,11 @@ import React from "react";
 interface ButtonThenCustomProps {
     text: string;
     color: string;
+    onEdit: () => void;
     onDelete: () => void;
 }
 
-const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, onDelete }) => {
+const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, onEdit, onDelete }) => {
     const buttonColor = color || "#222222";
 
     return (
@@ -19,8 +20,15 @@ const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, onDele
             </button>
 
             <button
+                onClick={onEdit}
+                className="absolute top-[10px] right-[70px] text-sm font-extrabold text-white underline"
+            >
+                Edit
+            </button>
+
+            <button
                 onClick={onDelete}
-                className="absolute top-[-10px] right-[-10px] text-sm text-red-500 underline hover:text-red-700"
+                className="absolute top-[10px] right-[10px] text-sm font-extrabold text-white underline"
             >
                 Delete
             </button>
