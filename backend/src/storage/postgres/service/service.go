@@ -42,9 +42,9 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 	return retrievedService, nil
 }
 
-func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
-	sqlStatement := `SELECT name FROM services where hasactions = true`
-	var retrievedServices []entities.Service
+func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulInformations, error) {
+	sqlStatement := `SELECT name, color, logo FROM services where hasactions = true`
+	var retrievedServices []entities.ServiceUsefulInformations
 
 	rows, err := self.db.Query(sqlStatement)
 	if (err != nil) {
@@ -53,8 +53,8 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error)
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedService entities.Service
-		err := rows.Scan(&retrievedService.Name)
+		var retrievedService entities.ServiceUsefulInformations
+		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
 		if err != nil {
 		    return retrievedServices, err
 		}
@@ -63,9 +63,9 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error)
 	return retrievedServices, nil
 }
 
-func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
-	sqlStatement := `SELECT name FROM services where hasreactions = true`
-	var retrievedServices []entities.Service
+func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUsefulInformations, error) {
+	sqlStatement := `SELECT name, color, logo FROM services where hasreactions = true`
+	var retrievedServices []entities.ServiceUsefulInformations
 
 	rows, err := self.db.Query(sqlStatement)
 	if (err != nil) {
@@ -74,8 +74,8 @@ func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, erro
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedService entities.Service
-		err := rows.Scan(&retrievedService.Name)
+		var retrievedService entities.ServiceUsefulInformations
+		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
 		if err != nil {
 		    return retrievedServices, err
 		}

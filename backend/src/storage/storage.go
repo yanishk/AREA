@@ -14,8 +14,8 @@ type UserRepository interface {
 type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
 	FindServiceByName(name string) (entities.Service, error)
-	FindActionsServices() ([]entities.Service, error)
-	FindReactionsServices() ([]entities.Service, error)
+	FindActionsServices() ([]entities.ServiceUsefulInformations, error)
+	FindReactionsServices() ([]entities.ServiceUsefulInformations, error)
 }
 
 type UserServiceRepository interface {
