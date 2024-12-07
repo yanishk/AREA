@@ -9,6 +9,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (entities.User, error)
 	UpdateUser(email string, password string) error
 	DeleteUser(email string) error
+	FindUserById(idUser string) (entities.User, error)
 }
 
 type ServiceRepository interface {
@@ -22,9 +23,10 @@ type UserServiceRepository interface {
 	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
 }
 
-type ActionRepository interface {
-	CreateAction(name string, description string, serviceId string, nbParam int) error
-	FindActionByName(name string) (entities.Action, error)
+type ReactionRepository interface {
+	CreateReaction(name string, description string, serviceId string, nbParam int) error
+	FindReactionByName(name string) (entities.Action, error)
+	FindReactionByID(id string) (entities.Action, error)
 }
 
 type TriggerRepository interface {
@@ -43,7 +45,7 @@ type Repository struct {
 	UserRepository        UserRepository
 	ServiceRepository     ServiceRepository
 	UserServiceRepository UserServiceRepository
-	ActionRepository      ActionRepository
+	ReactionRepository    ReactionRepository
 	TriggerRepository     TriggerRepository
 	WorkflowRepository    WorkflowRepository
 }

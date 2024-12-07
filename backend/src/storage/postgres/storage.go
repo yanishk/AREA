@@ -52,7 +52,7 @@ func New() *storage.Repository {
 		UserRepository:        user_repository.NewUserRepository(db),
 		ServiceRepository:     service_repository.NewServiceRepository(db),
 		UserServiceRepository: user_service_repository.NewUserServiceRepository(db),
-		ActionRepository:      action_repository.NewActionRepository(db),
+		ReactionRepository:    action_repository.NewReactionRepository(db),
 		TriggerRepository:     trigger_repository.NewTriggerRepository(db),
 		WorkflowRepository:    workflow_repository.NewWorkflowRepository(db),
 	}
