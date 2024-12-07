@@ -11,20 +11,45 @@ import (
 )
 
 type ServiceHandler struct {
-	ServiceService service.ServiceService
+	ServiceService     service.ServiceService
+	UserServiceService service.UserServiceService
+	UserService        service.UserService
 }
 
-func NewServiceHandler(ServiceService service.ServiceService, router *gin.Engine) *ServiceHandler {
-	handler := &ServiceHandler{ServiceService: ServiceService}
-	handler.SetupRoutes(router)
+func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
+	handler := &ServiceHandler{
+		ServiceService:     ServiceService,
+		UserServiceService: UserServiceService,
+		UserService:        UserService,
+	}
 	return handler
 }
 
-func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
-	self.PrivateRoutes(router)
-}
+func (self *ServiceHandler) ReactionStartPlayback(accessToken string, reactionName string) error {
+	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
+	if reactionName != "Start playback" {
+		return nil
+	}
 
-func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
+	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Spotify API call failed")
+	}
+	return nil
 }
 
 func (self *ServiceHandler) CallTimeApi() error {
@@ -78,7 +103,19 @@ func (self *ServiceHandler) CallTimeApi() error {
 				}
 
 				if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute {
-					fmt.Println("TRIGGER CALLED: matching time found")
+					reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+					if errReaction != nil {
+						return errReaction
+					}
+					foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+					if errUser != nil {
+						return errUser
+					}
+					accessToken, errRefreshing := self.UserServiceService.SpotifyCallApi(foundUser.Email)
+					if errRefreshing != nil {
+						return errRefreshing
+					}
+					return self.ReactionStartPlayback(accessToken, reactionFound.Name)
 				}
 			}
 		}
