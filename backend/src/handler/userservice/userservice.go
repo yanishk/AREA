@@ -6,7 +6,6 @@ import (
 	"backend/src/service"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,10 +36,6 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 		callback.GET("/:service", self.ServiceCallBack)
 	}
 
-	callApi := router.Group("/call-api")
-	{
-		callApi.GET("/Spotify", self.SpotifyCallApi)
-	}
 }
 
 // @Summary		Google OAuth2
@@ -68,25 +63,11 @@ func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		os.Getenv("SPOTIFY_CALLBACK") + "&scope=user-read-private user-read-email"
+		os.Getenv("SPOTIFY_CALLBACK") + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"auth-url": spotifyAuthUrl,
 	})
-}
-
-func (self *UserServiceHandler) getEmailFromContext(context *gin.Context) (string, bool) {
-	email, err := context.Get("email")
-
-	if !err {
-		return "", err
-	}
-
-	emailStr, errEmail := email.(string)
-	if !errEmail {
-		return "", errEmail
-	}
-	return emailStr, true
 }
 
 // @Summary      Service Callback
@@ -118,7 +99,7 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
-	emailStr, err := self.getEmailFromContext(context)
+	emailStr, err := self.UserServiceService.GetEmailFromContext(context)
 	if !err {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get email",
@@ -147,66 +128,4 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Token generated",
 	})
-}
-
-func (self *UserServiceHandler) SpotifyCallApi(context *gin.Context) {
-	emailStr, err := self.getEmailFromContext(context)
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get email",
-		})
-		return
-	}
-
-	foundUser, errGetUser := self.UserServiceService.GetUser(emailStr)
-	if errGetUser != nil || len(foundUser.Email) <= 0 {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested user",
-		})
-		return
-	}
-
-	foundService, errServiceFound := self.UserServiceService.FindServiceByName("Spotify")
-	if errServiceFound != nil {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Service does not exist",
-		})
-		return
-	}
-
-	foundUserService, errUserService := self.UserServiceService.FindUserServiceByIdServiceandIdUser(foundUser.Id, foundService.Id)
-	if errUserService != nil {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "User is not registered to the service",
-		})
-		return
-	}
-
-	expiryTime, errTimestamp := time.Parse("2006-01-02 15:04:05-07:00", foundUserService.ExpiryDate)
-	if errTimestamp != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not check timestamp",
-		})
-		return
-	}
-
-	if expiryTime.Before(time.Now()) {
-		_, errRefresh := self.UserServiceService.RefreshToken(foundUserService.RefreshToken, foundUser.Id, "Spotify")
-		if errRefresh != nil {
-			context.IndentedJSON(http.StatusInternalServerError, gin.H{
-				"error": "Could not refresh token",
-			})
-			return
-		}
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "API successfully called",
-		})
-		return
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": "no refresh need and API work",
-	})
-
-	// call API instead of this stooooopid print
 }

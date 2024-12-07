@@ -9,6 +9,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (entities.User, error)
 	UpdateUser(email string, password string) error
 	DeleteUser(email string) error
+	FindUserById(userId string) (entities.User, error)
 }
 
 type ServiceRepository interface {
@@ -19,31 +20,34 @@ type ServiceRepository interface {
 }
 
 type UserServiceRepository interface {
-	CreateUserService(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
-	FindUserServiceByIdServiceandIdUser(idUser, idService string) (entities.UserService, error)
-	UpdateUserServiceByServiceIdAndUserId(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
+	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
+	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
+	UpdateUserServiceByServiceIdAndUserId(userId string, accessToken string, refreshToken string, expiryDate string, serviceId string) error
+}
+
+type ReactionRepository interface {
+	CreateReaction(name string, description string, serviceId string, nbParam int) error
+	FindReactionByName(name string) (entities.Reaction, error)
+	FindReactionByID(id string) (entities.Reaction, error)
 }
 
 type ActionRepository interface {
-	CreateAction(name string, description string, serviceId string) error
+	CreateAction(name string, description string, serviceId string, nbParam int) error
 	FindActionByName(name string) (entities.Action, error)
-}
-
-type TriggerRepository interface {
-	CreateTrigger(name string, description string, serviceId string) error
-	FindTriggerByName(name string) (entities.Trigger, error)
+	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, triggerId string, actionId string) error
-	FindWorkflowByName(name string) (entities.Workflow, error)
+	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
+	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 }
 
 type Repository struct {
 	UserRepository        UserRepository
 	ServiceRepository     ServiceRepository
 	UserServiceRepository UserServiceRepository
+	ReactionRepository    ReactionRepository
 	ActionRepository      ActionRepository
-	TriggerRepository     TriggerRepository
 	WorkflowRepository    WorkflowRepository
 }

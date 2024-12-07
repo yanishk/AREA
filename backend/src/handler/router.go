@@ -15,15 +15,13 @@ import (
 )
 
 type UserHandler interface {
-	SetupRoutes(router *gin.Engine)
 }
 
 type ServiceHandler interface {
-	SetupRoutes(router *gin.Engine)
+	CallTimeApi() error
 }
 
 type UserServiceHandler interface {
-	SetupRoutes(router *gin.Engine)
 }
 
 type Handler struct {
@@ -39,7 +37,7 @@ func New(services *service.Service) *Handler {
 	return &Handler{
 		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
 		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
-		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, router),
+		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserServiceService, services.UserService, router),
 		router:             router,
 	}
 }
