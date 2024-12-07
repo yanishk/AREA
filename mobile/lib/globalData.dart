@@ -17,6 +17,8 @@ class Globaldata {
   static List<String> reactionServicesColor = [];
   static List<String> reactionServicesIcons = [];
 
+  static String domainName = "https://mathisbrehm.fr/";
+
   static int getActionServicesSize() {
     return actionServicesName.length;
   }

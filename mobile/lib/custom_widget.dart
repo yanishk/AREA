@@ -566,3 +566,33 @@ class DoubleWidget extends StatelessWidget {
     );
   }
 }
+
+class SafeWebImage extends StatelessWidget {
+  const SafeWebImage({
+    super.key,
+    required this.url,
+    this.width = 75,
+    this.height = 75,
+  });
+
+  final String url;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeInImage(
+      image: NetworkImage(url),
+      placeholder: AssetImage('assets/icon/noImage.png'),
+      imageErrorBuilder: (context, error, stackTrace) {
+        return Image.asset(
+          'assets/icon/noImage.png',
+          width: width,
+          height: height,
+        );
+      },
+      width: width,
+      height: height,
+    );
+  }
+}

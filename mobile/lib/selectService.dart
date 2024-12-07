@@ -206,19 +206,11 @@ class MySquareServicesCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
                     child: Column(
                       children: [
-                        FadeInImage(
-                          image: NetworkImage("https://mathisbrehm.fr/${serviceIconsList[servicesIndex]}"),
-                          placeholder: AssetImage('assets/icon/noImage.png'),
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              'assets/icon/youtube.png',
-                              width: 75,
-                              height: 75,
-                            );
-                          },
-                          width: 75,
-                          height: 75,
-                        ),
+                        SafeWebImage(
+                            url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}",
+                            width: 30,
+                            height: 30,
+                          ),
                         AutoSizeText(serviceNameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
                       ]
                     ),

@@ -63,6 +63,24 @@ class SaveNewWorkflows extends State<APICall> {
                     Padding(padding: EdgeInsets.only(top: 30)),
                     SelectServiceTopBar(title: "Review and finish", color: Colors.white),
                     Padding(padding: EdgeInsets.only(top: 20)),
+                    LeftWidget(
+                      child: Row(
+                        children: [
+                          SafeWebImage(
+                            url: "${Globaldata.domainName}${Globaldata.actionServicesIcons[Globaldata.firstService]}",
+                            width: 30,
+                            height: 30,
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 10)),
+                          SafeWebImage(
+                            url: "${Globaldata.domainName}${Globaldata.reactionServicesIcons[Globaldata.secondService]}",
+                            width: 30,
+                            height: 30,
+                          ),
+                        ],
+                      )
+                    ),
+                    Padding(padding: EdgeInsets.only(top: 5)),
                     LeftWidget(child: AutoSizeText("Workflow title", style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),),
                     WidgetCard (
                       backgroundColor: Colors.white,
