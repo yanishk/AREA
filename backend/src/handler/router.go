@@ -47,6 +47,7 @@ func (self *Handler) Run() error {
 		AllowedOrigins: []string{"http://localhost:8081"},
 		AllowedMethods: []string{"GET", "POST"},
 		AllowedHeaders: []string{"Content-Type"},
+		AllowCredentials: true,
 	})
 
 	handler := corsAllow.Handler(self.router)
