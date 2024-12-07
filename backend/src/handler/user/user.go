@@ -116,8 +116,8 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 			})
 		}
 	} else {
-		context.SetSameSite(http.SameSiteLaxMode)
-		context.SetCookie("JWToken", token, 3600, "", "", false, true)
+		context.SetSameSite(http.SameSiteNoneMode)
+		context.SetCookie("JWToken", token, 3600, "", "", true, true)
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"success": "Connection successful",
 		})
