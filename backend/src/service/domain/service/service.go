@@ -8,18 +8,18 @@ import (
 type ServiceService struct {
 	ServiceRepository  storage.ServiceRepository
 	UserRepository     storage.UserRepository
-	TriggerRepository  storage.TriggerRepository
+	ActionRepository   storage.ActionRepository
 	WorkflowRepository storage.WorkflowRepository
 	ReactionRepository storage.ReactionRepository
 }
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
-	TriggerRepository storage.TriggerRepository, WorkflowRepository storage.WorkflowRepository,
+	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
 	ReactionRepository storage.ReactionRepository) *ServiceService {
 	return &ServiceService{
 		ServiceRepository:  ServiceRepository,
 		UserRepository:     UserRepository,
-		TriggerRepository:  TriggerRepository,
+		ActionRepository:   ActionRepository,
 		WorkflowRepository: WorkflowRepository,
 		ReactionRepository: ReactionRepository,
 	}
@@ -29,15 +29,15 @@ func (self *ServiceService) FindServiceByName(name string) (entities.Service, er
 	return self.ServiceRepository.FindServiceByName(name)
 }
 
-func (self *ServiceService) FindTriggerByServiceId(serviceId string) ([]entities.Trigger, error) {
-	return self.TriggerRepository.FindTriggerByServiceId(serviceId)
+func (self *ServiceService) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+	return self.ActionRepository.FindActionByServiceId(serviceId)
 }
 
-func (self *ServiceService) FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByTriggerId(triggerId)
+func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
+	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
 }
 
-func (self *ServiceService) FindReactionByID(id string) (entities.Action, error) {
+func (self *ServiceService) FindReactionByID(id string) (entities.Reaction, error) {
 	return self.ReactionRepository.FindReactionByID(id)
 }
 

@@ -1,6 +1,6 @@
 package entities
 
-type Trigger struct {
+type Reaction struct {
 	Id          string
 	Name        string
 	Description string

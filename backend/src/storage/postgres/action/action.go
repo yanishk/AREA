@@ -7,20 +7,20 @@ import (
 	"backend/src/entities"
 )
 
-type ReactionRepository struct {
+type actionRepository struct {
 	db *sql.DB
 }
 
-func NewReactionRepository(db *sql.DB) *ReactionRepository {
-	return &ReactionRepository{db: db}
+func NewActionRepository(db *sql.DB) *actionRepository {
+	return &actionRepository{db: db}
 }
 
-func (self *ReactionRepository) CreateReaction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO reactions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
+func (self *actionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
+	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
 
-	_, err := self.FindReactionByName(name)
+	_, err := self.FindActionByName(name)
 	if err == nil {
-		return fmt.Errorf("Action already exist")
+		return fmt.Errorf("action already exist")
 	}
 
 	_, err = self.db.Exec(sqlStatement, name, description, serviceId, nbParam)
@@ -30,26 +30,36 @@ func (self *ReactionRepository) CreateReaction(name string, description string, 
 	return nil
 }
 
-func (self *ReactionRepository) FindReactionByName(name string) (entities.Action, error) {
-	sqlStatement := `SELECT * FROM reactions where name = ($1)`
-	var retrievedAction entities.Action
+func (self *actionRepository) FindActionByName(name string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM actions where name = ($1)`
+	var retrievedaction entities.Action
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
+	err := row.Scan(&retrievedaction.Id, &retrievedaction.ServiceId, &retrievedaction.Name, &retrievedaction.Description, &retrievedaction.NbParam)
 	if err != nil {
-		return retrievedAction, err
+		return retrievedaction, err
 	}
-	return retrievedAction, nil
+	return retrievedaction, nil
 }
 
-func (self *ReactionRepository) FindReactionByID(id string) (entities.Action, error) {
-	sqlStatement := `SELECT * FROM reactions where id = ($1)`
-	var retrievedAction entities.Action
+func (self *actionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+	sqlStatement := `SELECT * FROM actions where serviceid = ($1)`
+	var actions []entities.Action
 
-	row := self.db.QueryRow(sqlStatement, id)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
-	if err != nil {
-		return retrievedAction, err
+	rows, errQuery := self.db.Query(sqlStatement, serviceId)
+	if errQuery != nil {
+		return nil, errQuery
 	}
-	return retrievedAction, nil
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var retrievedaction entities.Action
+		err := rows.Scan(&retrievedaction.Id, &retrievedaction.ServiceId, &retrievedaction.Name, &retrievedaction.Description, &retrievedaction.NbParam)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, retrievedaction)
+	}
+	return actions, nil
 }

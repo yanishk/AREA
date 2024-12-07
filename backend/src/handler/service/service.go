@@ -68,7 +68,7 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	return nil
 }
 
-func (self *ServiceHandler) executeActiveTriggerEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
+func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
 	for _, workflow := range AllworkflowFound {
 		hour, hourExists := workflow.ActionParam["hour"]
 		minute, minuteExists := workflow.ActionParam["minute"]
@@ -92,14 +92,14 @@ func (self *ServiceHandler) executeActiveTriggerEveryDay(timeRes entities.TimeRe
 	return nil
 }
 
-func (self *ServiceHandler) checkNameOfTrigger(timeRes entities.TimeResponse, trigger entities.Trigger) error {
-	if trigger.Name == "Every day at" {
+func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
+	if action.Name == "Every day at" {
 
-		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByTriggerId(trigger.Id)
+		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
 		if errWorkflow != nil {
 			return errWorkflow
 		}
-		return self.executeActiveTriggerEveryDay(timeRes, AllworkflowFound)
+		return self.executeActiveActionsEveryDay(timeRes, AllworkflowFound)
 	}
 	return nil
 }
@@ -144,13 +144,13 @@ func (self *ServiceHandler) CallTimeApi() error {
 		return errFindingService
 	}
 
-	allTriggerFound, errFindingTrigger := self.ServiceService.FindTriggerByServiceId(serviceFound.Id)
-	if errFindingTrigger != nil {
-		return errFindingTrigger
+	allactionFound, errFindingaction := self.ServiceService.FindActionByServiceId(serviceFound.Id)
+	if errFindingaction != nil {
+		return errFindingaction
 	}
 
-	for _, trigger := range allTriggerFound {
-		errCheckName := self.checkNameOfTrigger(timeRes, trigger)
+	for _, action := range allactionFound {
+		errCheckName := self.checkNameOfAction(timeRes, action)
 		if errCheckName != nil {
 			return errCheckName
 		}

@@ -45,11 +45,11 @@ func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error) {
+func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows where actionid = ($1)`
 	var retrievedWorkflows []entities.Workflow
 
-	rows, errQuery := self.db.Query(sqlStatement, triggerId)
+	rows, errQuery := self.db.Query(sqlStatement, actionId)
 	if errQuery != nil {
 		return nil, errQuery
 	}

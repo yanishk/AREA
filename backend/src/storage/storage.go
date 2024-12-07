@@ -27,20 +27,20 @@ type UserServiceRepository interface {
 
 type ReactionRepository interface {
 	CreateReaction(name string, description string, serviceId string, nbParam int) error
-	FindReactionByName(name string) (entities.Action, error)
-	FindReactionByID(id string) (entities.Action, error)
+	FindReactionByName(name string) (entities.Reaction, error)
+	FindReactionByID(id string) (entities.Reaction, error)
 }
 
-type TriggerRepository interface {
-	CreateTrigger(name string, description string, serviceId string, nbParam int) error
-	FindTriggerByName(name string) (entities.Trigger, error)
-	FindTriggerByServiceId(serviceId string) ([]entities.Trigger, error)
+type ActionRepository interface {
+	CreateAction(name string, description string, serviceId string, nbParam int) error
+	FindActionByName(name string) (entities.Action, error)
+	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, triggerId string, actionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
 	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
-	FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error)
+	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 }
 
 type Repository struct {
@@ -48,6 +48,6 @@ type Repository struct {
 	ServiceRepository     ServiceRepository
 	UserServiceRepository UserServiceRepository
 	ReactionRepository    ReactionRepository
-	TriggerRepository     TriggerRepository
+	ActionRepository      ActionRepository
 	WorkflowRepository    WorkflowRepository
 }
