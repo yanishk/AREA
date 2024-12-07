@@ -9,5 +9,5 @@ type Workflow struct {
 	IsActivated   bool
 	CreatedAt     string
 	ActionParam   map[string]interface{} `json:"actionparam"`
-	ReactionParam map[string]interface{} `json:"Reactionparam"`
+	ReactionParam map[string]interface{} `json:"reactionparam"`
 }
