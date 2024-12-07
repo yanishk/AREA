@@ -6,8 +6,6 @@ interface ErrorMessageProps {
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger }) => {
-    if (!message) return null;
-
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -21,6 +19,8 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger }) => {
             return () => clearTimeout(timer);
         }
     }, [message, trigger]);
+
+    if (!message) return null;
 
     return (
         <div

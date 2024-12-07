@@ -15,7 +15,7 @@ const Navbar = () => {
                 <div className="pt-6 pb-6 flex justify-between items-center px-6">
 
                     <h1
-                        className="text-4xl font-extrabold ml-4">
+                        className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                             <a
                                 href="/"
                             >

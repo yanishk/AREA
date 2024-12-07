@@ -1,13 +1,11 @@
 package service_handler
 
 import (
+	_ "backend/src/handler/service/docs"
 	"backend/src/service"
-	"fmt"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type ServiceHandler struct {
@@ -25,132 +23,42 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	spotify := router.Group("/spotify")
-	{
-		spotify.GET("/authentication", self.Auth02Spotify)
-		spotify.GET("/call-api", self.SpotifyCallApi)
-		spotify.GET("/spotify-callback", self.SpotifyCallBack)
+	router.GET("/actionsServices", self.RetrieveActionsServices)
+	router.GET("/reactionsServices", self.RetrieveReactionsServices)
+}
+
+// @Summary		Actions Services
+// @Description	Get Retrieve Actions Services
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
+// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
+// @Router			/actionsServices [get]
+func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+	actionsServices, err := self.ServiceService.RetrieveActionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+	} else {
+		context.IndentedJSON(http.StatusOK, actionsServices)
 	}
 }
 
-func (self *ServiceHandler) Auth02Spotify(context *gin.Context) {
-	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
-		os.Getenv("SPOTIFY_ID_CLIENT") + "&response_type=code&redirect_uri=" +
-		os.Getenv("CALLBACK_SPOTIFY") + "&scope=user-read-private user-read-email"
-	context.Redirect(http.StatusTemporaryRedirect, spotifyAuthUrl)
-}
-
-func (self *ServiceHandler) getEmailFromContext(context *gin.Context) (string, bool) {
-	email, err := context.Get("email")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
-		})
-		return "", err
-	}
-
-	emailStr, errEmail := email.(string)
-	if !errEmail {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
-		})
-		return "", errEmail
-	}
-	return emailStr, true
-}
-
-func (self *ServiceHandler) SpotifyCallBack(context *gin.Context) {
-	codeSpotify := context.Query("code")
-
-	if codeSpotify == "" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid code authorization",
-		})
-		return
-	}
-	tokenSpotify, errToken := self.ServiceService.GetAccesTokenFromCode(codeSpotify)
-
-	if errToken != nil {
+// @Summary		Reactions Services
+// @Description	Get Retrieve Reactions Services
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
+// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
+// @Router			/reactionsServices [get]
+func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
+	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to exchange token",
+			"error": "Internal Server Error",
 		})
-		return
+	} else {
+		context.IndentedJSON(http.StatusOK, reactionsServices)
 	}
-
-	emailStr, err := self.getEmailFromContext(context)
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get email",
-		})
-		return
-	}
-
-	foundUser, errGetUser := self.ServiceService.GetUser(emailStr)
-	if errGetUser != nil || len(foundUser.Email) <= 0 {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested user",
-		})
-		return
-	}
-
-	self.ServiceService.CreateOrUpdateSpotify(foundUser.Id, tokenSpotify)
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"access_token": tokenSpotify,
-	})
-}
-
-func (self *ServiceHandler) SpotifyCallApi(context *gin.Context) {
-	emailStr, err := self.getEmailFromContext(context)
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get email",
-		})
-		return
-	}
-
-	foundUser, errGetUser := self.ServiceService.GetUser(emailStr)
-	if errGetUser != nil || len(foundUser.Email) <= 0 {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested user",
-		})
-		return
-	}
-
-	foundService, errServiceFound := self.ServiceService.FindUserServiceByName("spotify", foundUser.Id)
-	if errServiceFound != nil {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "User is not connected to the service",
-		})
-		return
-	}
-
-	expiryTime, errTimestamp := time.Parse("2006-01-02T15:04:05Z", foundService.ExpiryToken)
-	if errTimestamp != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not check timestamp",
-		})
-		return
-	}
-
-	if expiryTime.Before(time.Now()) {
-		refreshedToken, errRefresh := self.ServiceService.RefreshToken(foundService.RefreshToken, foundUser.Id)
-		if errRefresh != nil {
-			fmt.Println(refreshedToken)
-			context.IndentedJSON(http.StatusInternalServerError, gin.H{
-				"error": "Could not refresh token",
-			})
-			return
-		}
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"Success": "API successfully called",
-		})
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"Success": "no refresh need and API work",
-	})
-
-	// call API instead of this stooooopid print
 }

@@ -3,10 +3,16 @@ package entities
 type Service struct {
 	Id           string
 	Name         string
-	AccessToken  string
-	RefreshToken string
-	IdUser       string
-	ExpiryToken  string
+	Color        string
+	Logo         string
+	HasActions   bool
+	HasReactions bool
+}
+
+type ServiceUsefulInformations struct {
+	Name  string
+	Color string
+	Logo  string
 }
 
 type ResultToken struct {

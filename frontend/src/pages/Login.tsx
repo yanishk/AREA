@@ -1,4 +1,6 @@
-import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle, faFacebookF, faApple, faXTwitter} from '@fortawesome/free-brands-svg-icons';
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
 import InputField from "../components/inputs/InputsField";
@@ -21,6 +23,10 @@ const LoginForm = () => {
         navigate("/");
     }
 
+    const goBack = () => {
+        navigate(-1);
+    }
+
     const sendFormOnClick = async () => {
         if (!email || !password) {
             setEmail("");
@@ -33,6 +39,9 @@ const LoginForm = () => {
         try {
             const result = await axios.post(`${import.meta.env.VITE_API_URL}login`, {
                 email, password
+            },
+            {
+                withCredentials: true
             });
 
             if (result.data.success) {
@@ -70,12 +79,21 @@ const LoginForm = () => {
     return (
         <>
             <ErrorMessage message={error} trigger={errorTrigger} />
-            <div className="flex items-center justify-center min-h-screen bg-[#F9FAFB]">
-                <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-24 mb-24">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
+                <h1
+                    className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
+                    <a
+                        href="/"
+                    >
+                        AREA
+                    </a>
+                </h1>
+                <div className="relative flex w-full max-w-[480px] flex-col rounded-lg bg-white shadow-sm p-6 mt-12 mb-24">
 
+                    <FontAwesomeIcon icon={faArrowLeft} className="size-8 cursor-pointer" onClick={goBack}></FontAwesomeIcon>
                     <div className="relative mt-5 items-center flex flex-col justify-center">
                         <h1
-                            className=" text-[2.7rem] font-[900] text-black">
+                            className=" text-[2.7rem] font-[900] text-[#222222]">
                             Log in
                         </h1>
                     </div>
