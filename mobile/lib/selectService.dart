@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "globalData.dart";
@@ -40,6 +41,7 @@ class SelectService extends State<APICall> {
   List<String> serviceNameList = Globaldata.actionServicesName;
   List<String> serviceColorList = Globaldata.actionServicesColor;
   List<String> serviceIconsList = Globaldata.actionServicesIcons;
+  int serviceIndex = 0;
 
   Future<void> setReactionService() async {
     setState(() {
@@ -50,29 +52,54 @@ class SelectService extends State<APICall> {
     });
   }
 
+  Widget serviceTiles(int index) {
+    if (index + 1 < serviceNameList.length && index % 2 == 0) {
+      serviceIndex++;
+      developer.log("index : $index, index2 : ${index + 1}");
+      return Row(
+        children: [
+          MySquareServicesCard(
+            servicesIndex: index++,
+            isAnAction: isAnAction,
+            serviceColorList: serviceColorList,
+            serviceNameList: serviceNameList,
+            serviceIconsList: serviceIconsList,
+          ),
+          MySquareServicesCard(
+            servicesIndex: index,
+            isAnAction: isAnAction,
+            serviceColorList: serviceColorList,
+            serviceNameList: serviceNameList,
+            serviceIconsList: serviceIconsList,
+          ),
+        ],
+      );
+    } else {
+      developer.log("index : $index");
+      return Row(
+        children: [
+          MySquareServicesCard(
+            servicesIndex: index,
+            isAnAction: isAnAction,
+            serviceColorList: serviceColorList,
+            serviceNameList: serviceNameList,
+            serviceIconsList: serviceIconsList,
+          ),
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isAnAction != true) {
       setReactionService();
     }
     List<Widget> services = [];
-    for (int i = 0; i < serviceNameList.length; i++) {
+    for (serviceIndex = 0; serviceIndex < serviceNameList.length; serviceIndex++) {
+      developer.log("index : ${serviceIndex}, list size : ${serviceNameList.length}");
       services.add(
-        Row(
-          children: [
-            MySquareServicesCard(
-              servicesIndex: i,
-              isAnAction: isAnAction,
-              serviceColorList: serviceColorList,
-              serviceNameList: serviceNameList,
-              serviceIconsList: serviceIconsList,
-            ),
-            // MySquareServicesCard(
-            //   servicesIndex: i + 1,
-            //   isAnAction: isAnAction,
-            // ),
-          ],
-        ),
+        serviceTiles(serviceIndex)
       );
     }
 
@@ -146,6 +173,7 @@ class MySquareServicesCard extends StatelessWidget {
     if (servicesIndex >= Globaldata.actionServicesName.length) {
       return MyDivider();
     }
+    developer.log("https://mathisbrehm.fr/${serviceIconsList[servicesIndex]}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: LayoutBuilder(
@@ -183,7 +211,7 @@ class MySquareServicesCard extends StatelessWidget {
                           placeholder: AssetImage('assets/icon/noImage.png'),
                           imageErrorBuilder: (context, error, stackTrace) {
                             return Image.asset(
-                              'assets/icon/noImage.png',
+                              'assets/icon/youtube.png',
                               width: 75,
                               height: 75,
                             );
