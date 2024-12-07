@@ -42,6 +42,18 @@ func (self *UserRepository) FindUserByEmail(email string) (entities.User, error)
 	return retrievedUser, nil
 }
 
+func (self *UserRepository) FindUserById(idUser string) (entities.User, error) {
+	sqlStatement := `SELECT * FROM users where id = ($1)`
+	var retrievedUser entities.User
+
+	row := self.db.QueryRow(sqlStatement, idUser)
+	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone)
+	if err != nil {
+		return retrievedUser, err
+	}
+	return retrievedUser, nil
+}
+
 func (self *UserRepository) UpdateUser(email string, password string) error {
 	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2);`
 
