@@ -27,6 +27,18 @@ const SelectServicePage = () => {
         { id: 5, name: "Youtube", color: "#FF0200", iconPath: "/images/Youtube.webp"},
     ];
 
+    const handleSelect = (id: number, name: string, color: string, iconPath: string) => {
+        navigate(`/select-service/${id}`, {
+            state: {
+                type,
+                id,
+                name,
+                color,
+                iconPath,
+            }
+        });
+    };
+
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="flex items-center justify-between px-10 py-5">
@@ -50,7 +62,8 @@ const SelectServicePage = () => {
                         <div
                             key={service.id}
                             style={{ backgroundColor: service.color }}
-                            className="h-[240px] flex flex-col items-center "
+                            className="h-[240px] flex flex-col items-center cursor-pointer"
+                            onClick={() => handleSelect(service.id, service.name, service.color, service.iconPath)}
                         >
                             <img src={service.iconPath} className="size-28 mt-9" />
                             <h2 className="text-white text-lg text-[20.5px] font-bold mt-6">{service.name}</h2>
@@ -65,7 +78,8 @@ const SelectServicePage = () => {
                         <div
                             key={service2.id}
                             style={{ backgroundColor: service2.color }}
-                            className="h-[240px] flex flex-col items-center "
+                            className="h-[240px] flex flex-col items-center cursor-pointer"
+                            onClick={() => handleSelect(service2.id, service2.name, service2.color, service2.iconPath)}
                         >
                             <img src={service2.iconPath} className="size-28 mt-9" />
                             <h2 className="text-white text-lg text-[20.5px] font-bold mt-6">{service2.name}</h2>
