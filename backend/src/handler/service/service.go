@@ -36,10 +36,15 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactionsServices", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(accessToken string, reactionName string) error {
+func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
 	if reactionName != "Start playback" {
 		return nil
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
 	}
 
 	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
@@ -63,29 +68,75 @@ func (self *ServiceHandler) ReactionStartPlayback(accessToken string, reactionNa
 	return nil
 }
 
-func (self *ServiceHandler) CallTimeApi() error {
+func (self *ServiceHandler) executeActiveTriggerEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
+	for _, workflow := range AllworkflowFound {
+		hour, hourExists := workflow.ActionParam["hour"]
+		minute, minuteExists := workflow.ActionParam["minute"]
+		if !hourExists || !minuteExists {
+			return fmt.Errorf("missing hour or minute in ActionParam")
+		}
+
+		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+			if errReaction != nil {
+				return errReaction
+			}
+			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+			if errUser != nil {
+				return errUser
+			}
+
+			return self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+		}
+	}
+	return nil
+}
+
+func (self *ServiceHandler) checkNameOfTrigger(timeRes entities.TimeResponse, trigger entities.Trigger) error {
+	if trigger.Name == "Every day at" {
+
+		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByTriggerId(trigger.Id)
+		if errWorkflow != nil {
+			return errWorkflow
+		}
+		return self.executeActiveTriggerEveryDay(timeRes, AllworkflowFound)
+	}
+	return nil
+}
+
+func (self *ServiceHandler) requestToTimeAPI() (entities.TimeResponse, error) {
 	timeUrl := "https://tools.aimylogic.com/api/now?tz=Europe/Paris"
 	var timeRes entities.TimeResponse
 
 	request, errRequest := http.NewRequest("GET", timeUrl, nil)
 	if errRequest != nil {
-		return errRequest
+		return timeRes, errRequest
 	}
 
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
-		return err
+		return timeRes, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return fmt.Errorf("HTTP request failed: %s", res.Status)
+		return timeRes, fmt.Errorf("HTTP request failed: %s", res.Status)
 	}
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&timeRes)
 	if errDecoder != nil {
-		return errDecoder
+		return timeRes, errDecoder
+	}
+	return timeRes, nil
+}
+
+func (self *ServiceHandler) CallTimeApi() error {
+	var timeRes entities.TimeResponse
+
+	timeRes, errRequest := self.requestToTimeAPI()
+	if errRequest != nil {
+		return errRequest
 	}
 
 	serviceFound, errFindingService := self.ServiceService.FindServiceByName("Time & Date")
@@ -93,42 +144,15 @@ func (self *ServiceHandler) CallTimeApi() error {
 		return errFindingService
 	}
 
-	allTriggerFound, errFindingTrigger := self.ServiceService.FindTriggerByIdService(serviceFound.Id)
+	allTriggerFound, errFindingTrigger := self.ServiceService.FindTriggerByServiceId(serviceFound.Id)
 	if errFindingTrigger != nil {
 		return errFindingTrigger
 	}
 
 	for _, trigger := range allTriggerFound {
-		if trigger.Name == "Every day at" {
-
-			AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByIdTrigger(trigger.Id)
-			if errWorkflow != nil {
-				return errWorkflow
-			}
-
-			for _, workflow := range AllworkflowFound {
-				hour, hourExists := workflow.ActionParam["hour"]
-				minute, minuteExists := workflow.ActionParam["minute"]
-				if !hourExists || !minuteExists {
-					return fmt.Errorf("missing hour or minute in ActionParam")
-				}
-
-				if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute {
-					reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-					if errReaction != nil {
-						return errReaction
-					}
-					foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-					if errUser != nil {
-						return errUser
-					}
-					accessToken, errRefreshing := self.UserServiceService.SpotifyCallApi(foundUser.Email)
-					if errRefreshing != nil {
-						return errRefreshing
-					}
-					return self.ReactionStartPlayback(accessToken, reactionFound.Name)
-				}
-			}
+		errCheckName := self.checkNameOfTrigger(timeRes, trigger)
+		if errCheckName != nil {
+			return errCheckName
 		}
 	}
 	return nil
