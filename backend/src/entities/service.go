@@ -1,10 +1,12 @@
 package entities
 
 type Service struct {
-	Id    string
-	Name  string
-	Color string
-	Logo  string
+	Id           string
+	Name         string
+	Color        string
+	Logo         string
+	HasActions   bool
+	HasReactions bool
 }
 
 type ResultToken struct {
