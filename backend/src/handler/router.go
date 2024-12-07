@@ -44,9 +44,9 @@ func New(services *service.Service) *Handler {
 func (self *Handler) Run() error {
 
 	corsAllow := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8081"},
-		AllowedMethods: []string{"GET", "POST"},
-		AllowedHeaders: []string{"Content-Type"},
+		AllowedOrigins:   []string{"http://localhost:8081"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
 	})
 
