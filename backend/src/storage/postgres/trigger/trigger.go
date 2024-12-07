@@ -42,11 +42,11 @@ func (self *TriggerRepository) FindTriggerByName(name string) (entities.Trigger,
 	return retrievedTrigger, nil
 }
 
-func (self *TriggerRepository) FindTriggerByIdService(idService string) ([]entities.Trigger, error) {
+func (self *TriggerRepository) FindTriggerByServiceId(serviceId string) ([]entities.Trigger, error) {
 	sqlStatement := `SELECT * FROM actions where serviceid = ($1)`
 	var triggers []entities.Trigger
 
-	rows, errQuery := self.db.Query(sqlStatement, idService)
+	rows, errQuery := self.db.Query(sqlStatement, serviceId)
 	if errQuery != nil {
 		return nil, errQuery
 	}

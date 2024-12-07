@@ -2,9 +2,9 @@ package entities
 
 type UserService struct {
 	Id           string
-	IdUser       string
+	UserId       string
 	AccessToken  string
 	RefreshToken string
 	ExpiryDate   string
-	IdService    string
+	ServiceId    string
 }

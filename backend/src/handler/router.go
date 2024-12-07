@@ -15,7 +15,6 @@ import (
 )
 
 type UserHandler interface {
-	SetupRoutes(router *gin.Engine)
 }
 
 type ServiceHandler interface {
@@ -23,7 +22,6 @@ type ServiceHandler interface {
 }
 
 type UserServiceHandler interface {
-	SetupRoutes(router *gin.Engine)
 }
 
 type Handler struct {

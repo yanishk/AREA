@@ -29,12 +29,12 @@ func (self *ServiceService) FindServiceByName(name string) (entities.Service, er
 	return self.ServiceRepository.FindServiceByName(name)
 }
 
-func (self *ServiceService) FindTriggerByIdService(idService string) ([]entities.Trigger, error) {
-	return self.TriggerRepository.FindTriggerByIdService(idService)
+func (self *ServiceService) FindTriggerByServiceId(serviceId string) ([]entities.Trigger, error) {
+	return self.TriggerRepository.FindTriggerByServiceId(serviceId)
 }
 
-func (self *ServiceService) FindWorkflowByIdTrigger(idTrigger string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByIdTrigger(idTrigger)
+func (self *ServiceService) FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error) {
+	return self.WorkflowRepository.FindWorkflowByTriggerId(triggerId)
 }
 
 func (self *ServiceService) FindReactionByID(id string) (entities.Action, error) {

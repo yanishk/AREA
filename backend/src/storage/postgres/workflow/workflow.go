@@ -20,7 +20,7 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	actionParam map[string]interface{}, reactionParam map[string]interface{}) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7);`
 
-	_, err := self.FindWorkflowByNameAndIdUser(name, ownerId)
+	_, err := self.FindWorkflowByNameAndUserId(name, ownerId)
 	if err == nil {
 		return fmt.Errorf("Workflow already exist")
 	}
@@ -32,7 +32,7 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	return nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByNameAndIdUser(name string, ownerId string) (entities.Workflow, error) {
+func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows where name = ($1) AND ownerid = ($2)`
 	var retrievedWorkflow entities.Workflow
 
@@ -45,7 +45,7 @@ func (self *WorkflowRepository) FindWorkflowByNameAndIdUser(name string, ownerId
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByIdTrigger(triggerId string) ([]entities.Workflow, error) {
+func (self *WorkflowRepository) FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows where actionid = ($1)`
 	var retrievedWorkflows []entities.Workflow
 

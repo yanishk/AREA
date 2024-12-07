@@ -9,7 +9,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (entities.User, error)
 	UpdateUser(email string, password string) error
 	DeleteUser(email string) error
-	FindUserById(idUser string) (entities.User, error)
+	FindUserById(userId string) (entities.User, error)
 }
 
 type ServiceRepository interface {
@@ -20,9 +20,9 @@ type ServiceRepository interface {
 }
 
 type UserServiceRepository interface {
-	CreateUserService(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
-	FindUserServiceByIdServiceandIdUser(idUser, idService string) (entities.UserService, error)
-	UpdateUserServiceByServiceIdAndUserId(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
+	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
+	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
+	UpdateUserServiceByServiceIdAndUserId(uuuserId string, accessToken string, refreshToken string, expiryDate string, uuserviceId string) error
 }
 
 type ReactionRepository interface {
@@ -34,13 +34,13 @@ type ReactionRepository interface {
 type TriggerRepository interface {
 	CreateTrigger(name string, description string, serviceId string, nbParam int) error
 	FindTriggerByName(name string) (entities.Trigger, error)
-	FindTriggerByIdService(idService string) ([]entities.Trigger, error)
+	FindTriggerByServiceId(serviceId string) ([]entities.Trigger, error)
 }
 
 type WorkflowRepository interface {
 	CreateWorkflow(name string, ownerId string, triggerId string, actionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
-	FindWorkflowByNameAndIdUser(name string, ownerId string) (entities.Workflow, error)
-	FindWorkflowByIdTrigger(triggerId string) ([]entities.Workflow, error)
+	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
+	FindWorkflowByTriggerId(triggerId string) ([]entities.Workflow, error)
 }
 
 type Repository struct {
