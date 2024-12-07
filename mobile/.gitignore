@@ -1,0 +1,6 @@
+.dart_tool
+build
+.env
+*.yaml
+pubspec.lock
+!pubspec.yaml
