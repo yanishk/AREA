@@ -22,7 +22,7 @@ type ServiceRepository interface {
 type UserServiceRepository interface {
 	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
 	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
-	UpdateUserServiceByServiceIdAndUserId(uuuserId string, accessToken string, refreshToken string, expiryDate string, uuserviceId string) error
+	UpdateUserServiceByServiceIdAndUserId(userId string, accessToken string, refreshToken string, expiryDate string, serviceId string) error
 }
 
 type ReactionRepository interface {

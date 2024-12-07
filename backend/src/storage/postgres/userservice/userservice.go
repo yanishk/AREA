@@ -42,15 +42,15 @@ func (self *UserServiceRepository) FindUserServiceByServiceIdandUserId(userId, s
 	return retrievedUserService, nil
 }
 
-func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(uuserviceId string, uuuserId string, accessToken string, refreshToken string, expiryToken string) error {
+func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(serviceId string, userId string, accessToken string, refreshToken string, expiryToken string) error {
 	sqlStatement := `UPDATE userservices SET token = ($1), tokenrefresh = ($2), expiry = ($3) WHERE iduser = ($4) AND idservice = ($5);`
 
-	_, err := self.FindUserServiceByServiceIdandUserId(uuuserId, uuserviceId)
+	_, err := self.FindUserServiceByServiceIdandUserId(userId, serviceId)
 	if err != nil {
 		return fmt.Errorf("service doesn't exist for user")
 	}
 
-	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, uuuserId, uuserviceId)
+	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, userId, serviceId)
 	if err != nil {
 		return err
 	}

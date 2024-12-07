@@ -43,16 +43,16 @@ func (self *UserServiceService) GetUser(emailStr string) (entities.User, error) 
 	return foundUser, nil
 }
 
-func (self *UserServiceService) CreateOrUpdateUserService(uuuserId string, uuserviceId string, token entities.ResultToken) {
+func (self *UserServiceService) CreateOrUpdateUserService(userId string, serviceId string, token entities.ResultToken) {
 	currentTime := time.Now()
 	expiryDate := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format(FormattingDate)
 
-	_, errUserService := self.UserServiceRepository.FindUserServiceByServiceIdandUserId(uuuserId, uuserviceId)
+	_, errUserService := self.UserServiceRepository.FindUserServiceByServiceIdandUserId(userId, serviceId)
 
 	if errUserService == nil {
-		self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(uuuserId, token.AccessToken, token.RefreshToken, expiryDate, uuserviceId)
+		self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, token.AccessToken, token.RefreshToken, expiryDate, serviceId)
 	} else {
-		self.UserServiceRepository.CreateUserService(uuuserId, token.AccessToken, token.RefreshToken, expiryDate, uuserviceId)
+		self.UserServiceRepository.CreateUserService(userId, token.AccessToken, token.RefreshToken, expiryDate, serviceId)
 	}
 }
 
@@ -164,11 +164,11 @@ func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName 
 	return tokenRes, nil
 }
 
-func (self *UserServiceService) FindUserServiceByServiceIdandUserId(uuuserId string, uuserviceId string) (entities.UserService, error) {
-	return self.UserServiceRepository.FindUserServiceByServiceIdandUserId(uuuserId, uuserviceId)
+func (self *UserServiceService) FindUserServiceByServiceIdandUserId(userId string, serviceId string) (entities.UserService, error) {
+	return self.UserServiceRepository.FindUserServiceByServiceIdandUserId(userId, serviceId)
 }
 
-func (self *UserServiceService) RefreshToken(refreshToken string, uuuserId string, serviceName string) (entities.ResultToken, error) {
+func (self *UserServiceService) RefreshToken(refreshToken string, userId string, serviceName string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var serviceFound entities.Service
 	var request *http.Request
@@ -208,7 +208,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, uuuserId strin
 		return tokenRes, errServiceFound
 	}
 
-	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(uuuserId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
+	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
 	return tokenRes, err
 }
 
