@@ -7,18 +7,18 @@ import (
 	"backend/src/entities"
 )
 
-type ActionRepository struct {
+type ReactionRepository struct {
 	db *sql.DB
 }
 
-func NewActionRepository(db *sql.DB) *ActionRepository {
-	return &ActionRepository{db: db}
+func NewReactionRepository(db *sql.DB) *ReactionRepository {
+	return &ReactionRepository{db: db}
 }
 
-func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
+func (self *ReactionRepository) CreateReaction(name string, description string, serviceId string, nbParam int) error {
+	sqlStatement := `INSERT INTO reactions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
 
-	_, err := self.FindActionByName(name)
+	_, err := self.FindReactionByName(name)
 	if err == nil {
 		return fmt.Errorf("Action already exist")
 	}
@@ -30,11 +30,23 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 	return nil
 }
 
-func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
-	sqlStatement := `SELECT * FROM actions where name = ($1)`
+func (self *ReactionRepository) FindReactionByName(name string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM reactions where name = ($1)`
 	var retrievedAction entities.Action
 
 	row := self.db.QueryRow(sqlStatement, name)
+	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
+	if err != nil {
+		return retrievedAction, err
+	}
+	return retrievedAction, nil
+}
+
+func (self *ReactionRepository) FindReactionByID(id string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM reactions where id = ($1)`
+	var retrievedAction entities.Action
+
+	row := self.db.QueryRow(sqlStatement, id)
 	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
 	if err != nil {
 		return retrievedAction, err
