@@ -15,6 +15,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/actionsServices": {
+            "get": {
+                "description": "Get Retrieve Actions Services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authentication/Google": {
             "get": {
                 "description": "Get Google OAuth2 URL",
@@ -150,6 +176,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/reactionsServices": {
+            "get": {
+                "description": "Get Retrieve Reactions Services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Reactions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
                         }
                     }
                 }
@@ -302,6 +354,43 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "docs_service.ServiceActionReactionInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Internal Server Error"
+                }
+            }
+        },
+        "docs_service.ServiceActionsReactionsExample": {
+            "type": "object",
+            "properties": {
+                "Color": {
+                    "type": "string",
+                    "example": "#E84A4A"
+                },
+                "Logo": {
+                    "type": "string",
+                    "example": "assets/logos/Google.png"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Google"
+                }
+            }
+        },
+        "docs_service.ServiceActionsReactionsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ServiceActionsReactionsExample"
+                    }
+                }
+            }
+        },
         "docs_user.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {

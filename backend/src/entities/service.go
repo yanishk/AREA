@@ -1,7 +1,15 @@
 package entities
 
 type Service struct {
-	Id    string
+	Id           string
+	Name         string
+	Color        string
+	Logo         string
+	HasActions   bool
+	HasReactions bool
+}
+
+type ServiceUsefulInformations struct {
 	Name  string
 	Color string
 	Logo  string

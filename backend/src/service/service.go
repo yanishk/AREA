@@ -12,6 +12,8 @@ type UserService interface {
 }
 
 type ServiceService interface {
+	RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error)
+	RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error)
 }
 
 type UserServiceService interface {

@@ -1,4 +1,29 @@
 definitions:
+  docs_service.ServiceActionReactionInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal Server Error
+        type: string
+    type: object
+  docs_service.ServiceActionsReactionsExample:
+    properties:
+      Color:
+        example: '#E84A4A'
+        type: string
+      Logo:
+        example: assets/logos/Google.png
+        type: string
+      Name:
+        example: Google
+        type: string
+    type: object
+  docs_service.ServiceActionsReactionsSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/docs_service.ServiceActionsReactionsExample'
+        type: array
+    type: object
   docs_user.DeleteAccountFailureInternalServerErrorResponse:
     properties:
       error:
@@ -133,6 +158,23 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
+  /actionsServices:
+    get:
+      description: Get Retrieve Actions Services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+      summary: Actions Services
+      tags:
+      - Services
   /authentication/Google:
     get:
       description: Get Google OAuth2 URL
@@ -225,6 +267,23 @@ paths:
       summary: Login
       tags:
       - Users
+  /reactionsServices:
+    get:
+      description: Get Retrieve Reactions Services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+      summary: Reactions Services
+      tags:
+      - Services
   /register:
     post:
       consumes:
