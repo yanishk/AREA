@@ -19,6 +19,7 @@ type ServiceService interface {
 	RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error)
 	FindServiceByName(name string) (entities.Service, error)
 	FindActionByServiceId(serviceId string) ([]entities.Action, error)
+	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindReactionByID(id string) (entities.Reaction, error)
 }

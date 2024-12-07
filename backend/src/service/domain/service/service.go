@@ -37,6 +37,10 @@ func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.
 	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
 }
 
+func (self *ServiceService) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
+	return self.ReactionRepository.FindReactionByServiceId(serviceId)
+}
+
 func (self *ServiceService) FindReactionByID(id string) (entities.Reaction, error) {
 	return self.ReactionRepository.FindReactionByID(id)
 }
