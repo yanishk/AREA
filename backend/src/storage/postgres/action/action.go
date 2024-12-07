@@ -7,15 +7,15 @@ import (
 	"backend/src/entities"
 )
 
-type actionRepository struct {
+type ActionRepository struct {
 	db *sql.DB
 }
 
-func NewActionRepository(db *sql.DB) *actionRepository {
-	return &actionRepository{db: db}
+func NewActionRepository(db *sql.DB) *ActionRepository {
+	return &ActionRepository{db: db}
 }
 
-func (self *actionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
+func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
 	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
 
 	_, err := self.FindActionByName(name)
@@ -30,19 +30,19 @@ func (self *actionRepository) CreateAction(name string, description string, serv
 	return nil
 }
 
-func (self *actionRepository) FindActionByName(name string) (entities.Action, error) {
+func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions where name = ($1)`
-	var retrievedaction entities.Action
+	var retrievedAction entities.Action
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedaction.Id, &retrievedaction.ServiceId, &retrievedaction.Name, &retrievedaction.Description, &retrievedaction.NbParam)
+	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
 	if err != nil {
-		return retrievedaction, err
+		return retrievedAction, err
 	}
-	return retrievedaction, nil
+	return retrievedAction, nil
 }
 
-func (self *actionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions where serviceid = ($1)`
 	var actions []entities.Action
 
@@ -54,12 +54,12 @@ func (self *actionRepository) FindActionByServiceId(serviceId string) ([]entitie
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedaction entities.Action
-		err := rows.Scan(&retrievedaction.Id, &retrievedaction.ServiceId, &retrievedaction.Name, &retrievedaction.Description, &retrievedaction.NbParam)
+		var retrievedAction entities.Action
+		err := rows.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
 		if err != nil {
 			return nil, err
 		}
-		actions = append(actions, retrievedaction)
+		actions = append(actions, retrievedAction)
 	}
 	return actions, nil
 }

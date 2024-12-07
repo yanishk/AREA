@@ -37,8 +37,8 @@ func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId
 	var retrievedWorkflow entities.Workflow
 
 	row := self.db.QueryRow(sqlStatement, name, ownerId)
-	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ActionId,
-		&retrievedWorkflow.ReactionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &retrievedWorkflow.ActionParam, &retrievedWorkflow.ReactionParam)
+	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ReactionId,
+		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &retrievedWorkflow.ActionParam, &retrievedWorkflow.ReactionParam)
 	if err != nil {
 		return retrievedWorkflow, err
 	}
