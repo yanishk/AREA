@@ -16,15 +16,22 @@ const SelectServicePage = () => {
 
     const getServices = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}actionsServices`);
-            console.log(result);
+            let result;
 
-            const propertiesServices = result.data.map((service: any) => ({
-                name: service.Name,
-                color: service.Color,
-                iconPath: service.Logo,
-            }));
-            setServices(propertiesServices);
+            if (type === "action") {
+                result = await axios.get(`${import.meta.env.VITE_API_URL}actionsServices`);
+            } else if (type === "reaction") {
+                result = await axios.get(`${import.meta.env.VITE_API_URL}reactionsServices`);
+            }
+
+            if (result) {
+                const propertiesServices = result.data.map((service: any) => ({
+                    name: service.Name,
+                    color: service.Color,
+                    iconPath: service.Logo,
+                }));
+                setServices(propertiesServices);
+            }
         } catch (err) {
             console.error("Error fetching services:", err);
         }
