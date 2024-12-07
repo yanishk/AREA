@@ -22,7 +22,6 @@ func NewUserServiceHandler(UserServiceService service.UserServiceService, router
 
 func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 	self.PrivateRoutes(router)
-
 }
 
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
