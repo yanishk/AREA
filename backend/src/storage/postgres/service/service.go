@@ -35,7 +35,7 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 	var retrievedService entities.Service
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
+	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
 	if err != nil {
 		return retrievedService, err
 	}

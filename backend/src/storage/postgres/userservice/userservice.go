@@ -43,7 +43,7 @@ func (self *UserServiceRepository) FindUserServiceByIdServiceandIdUser(idservice
 }
 
 func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(uuidService string, uuidUser string, accessToken string, refreshToken string, expiryToken string) error {
-	sqlStatement := `UPDATE userservices SET accessToken = ($1), refreshToken = ($2), expirytoken = ($3) WHERE iduser = ($4) AND idservice = ($5);`
+	sqlStatement := `UPDATE userservices SET token = ($1), tokenrefresh = ($2), expiry = ($3) WHERE iduser = ($4) AND idservice = ($5);`
 
 	_, err := self.FindUserServiceByIdServiceandIdUser(uuidService, uuidUser)
 	if err != nil {

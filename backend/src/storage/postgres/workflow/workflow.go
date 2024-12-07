@@ -63,7 +63,6 @@ func (self *WorkflowRepository) FindWorkflowByIdTrigger(triggerId string) ([]ent
 		err := rows.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ActionId,
 			&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamByte, &reactionParamByte)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 
