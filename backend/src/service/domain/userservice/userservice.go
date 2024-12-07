@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserServiceService struct {
@@ -57,7 +59,7 @@ func (self *UserServiceService) GetAccesTokenFromCode(codeSpotify string) (entit
 	jsonBody := fmt.Sprintf(
 		"grant_type=authorization_code&code=%s&redirect_uri=%s",
 		codeSpotify,
-		os.Getenv("CALLBACK_SPOTIFY"),
+		os.Getenv("SPOTIFY_CALLBACK"),
 	)
 	var tokensRes entities.ResultToken
 
@@ -135,4 +137,50 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userUuid strin
 
 	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(serviceFound.Id, userUuid, tokensRefreshRes.AccessToken, tokensRefreshRes.RefreshToken, expiryTime)
 	return tokensRefreshRes, err
+}
+
+func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (string, bool) {
+	email, err := context.Get("email")
+
+	if !err {
+		return "", err
+	}
+
+	emailStr, errEmail := email.(string)
+	if !errEmail {
+		return "", errEmail
+	}
+	return emailStr, true
+}
+
+func (self *UserServiceService) SpotifyCallApi(email string) (string, error) {
+	foundUser, errGetUser := self.GetUser(email)
+	if errGetUser != nil || len(foundUser.Email) <= 0 {
+		return "", errGetUser
+	}
+
+	foundService, errServiceFound := self.FindServiceByName("Spotify")
+	if errServiceFound != nil {
+		return "", errServiceFound
+	}
+
+	foundUserService, errUserService := self.FindUserServiceByIdServiceandIdUser(foundService.Id, foundUser.Id)
+	token := foundUserService.AccessToken
+	if errUserService != nil {
+		return "", errUserService
+	}
+
+	expiryTime, errTimestamp := time.Parse("2006-01-02 15:04:05-07:00", foundUserService.ExpiryToken)
+	if errTimestamp != nil {
+		return "", errTimestamp
+	}
+
+	if expiryTime.Before(time.Now()) {
+		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id)
+		token = tokenFromRefresh.AccessToken
+		if errRefresh != nil {
+			return "", errRefresh
+		}
+	}
+	return token, nil
 }
