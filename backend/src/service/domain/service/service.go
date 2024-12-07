@@ -10,15 +10,18 @@ type ServiceService struct {
 	UserRepository     storage.UserRepository
 	TriggerRepository  storage.TriggerRepository
 	WorkflowRepository storage.WorkflowRepository
+	ReactionRepository storage.ReactionRepository
 }
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
-	TriggerRepository storage.TriggerRepository, WorkflowRepository storage.WorkflowRepository) *ServiceService {
+	TriggerRepository storage.TriggerRepository, WorkflowRepository storage.WorkflowRepository,
+	ReactionRepository storage.ReactionRepository) *ServiceService {
 	return &ServiceService{
 		ServiceRepository:  ServiceRepository,
 		UserRepository:     UserRepository,
 		TriggerRepository:  TriggerRepository,
 		WorkflowRepository: WorkflowRepository,
+		ReactionRepository: ReactionRepository,
 	}
 }
 
@@ -32,4 +35,8 @@ func (self *ServiceService) FindTriggerByIdService(idService string) ([]entities
 
 func (self *ServiceService) FindWorkflowByIdTrigger(idTrigger string) ([]entities.Workflow, error) {
 	return self.WorkflowRepository.FindWorkflowByIdTrigger(idTrigger)
+}
+
+func (self *ServiceService) FindReactionByID(id string) (entities.Action, error) {
+	return self.ReactionRepository.FindReactionByID(id)
 }

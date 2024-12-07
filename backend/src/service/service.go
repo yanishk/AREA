@@ -2,6 +2,8 @@ package service
 
 import (
 	"backend/src/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserService interface {
@@ -9,12 +11,14 @@ type UserService interface {
 	LoginAuthentication(userEmail string, userPassword string) (string, error)
 	ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string) error
+	FindUserById(idUser string) (entities.User, error)
 }
 
 type ServiceService interface {
 	FindServiceByName(name string) (entities.Service, error)
 	FindTriggerByIdService(idService string) ([]entities.Trigger, error)
 	FindWorkflowByIdTrigger(idTrigger string) ([]entities.Workflow, error)
+	FindReactionByID(id string) (entities.Action, error)
 }
 
 type UserServiceService interface {
@@ -24,6 +28,8 @@ type UserServiceService interface {
 	FindServiceByName(name string) (entities.Service, error)
 	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
 	CreateOrUpdateUserService(serviceId string, userId string, tokenSpotify entities.ResultToken)
+	GetEmailFromContext(context *gin.Context) (string, bool)
+	SpotifyCallApi(email string) (string, error)
 }
 
 type Service struct {
