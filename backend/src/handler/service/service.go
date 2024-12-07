@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +23,17 @@ func NewServiceHandler(ServiceService service.ServiceService, UserServiceService
 		UserServiceService: UserServiceService,
 		UserService:        UserService,
 	}
+	handler.SetupRoutes(router)
 	return handler
+}
+
+func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
+	self.PrivateRoutes(router)
+}
+
+func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
+	router.GET("/actionsServices", self.RetrieveActionsServices)
+	router.GET("/reactionsServices", self.RetrieveReactionsServices)
 }
 
 func (self *ServiceHandler) ReactionStartPlayback(accessToken string, reactionName string) error {
@@ -124,8 +132,6 @@ func (self *ServiceHandler) CallTimeApi() error {
 		}
 	}
 	return nil
-	router.GET("/actionsServices", self.RetrieveActionsServices)
-	router.GET("/reactionsServices", self.RetrieveReactionsServices)
 }
 
 // @Summary		Actions Services

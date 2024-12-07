@@ -236,65 +236,19 @@ func (self *UserServiceService) SpotifyCallApi(email string) (string, error) {
 		return "", errServiceFound
 	}
 
-	foundUserService, errUserService := self.FindUserServiceByIdServiceandIdUser(foundService.Id, foundUser.Id)
+	foundUserService, errUserService := self.FindUserServiceByIdServiceandIdUser(foundUser.Id, foundService.Id)
 	token := foundUserService.AccessToken
 	if errUserService != nil {
 		return "", errUserService
 	}
 
-	expiryTime, errTimestamp := time.Parse("2006-01-02 15:04:05-07:00", foundUserService.ExpiryToken)
+	expiryTime, errTimestamp := time.Parse("2006-01-02 15:04:05-07:00", foundUserService.ExpiryDate)
 	if errTimestamp != nil {
 		return "", errTimestamp
 	}
 
 	if expiryTime.Before(time.Now()) {
-		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id)
-		token = tokenFromRefresh.AccessToken
-		if errRefresh != nil {
-			return "", errRefresh
-		}
-	}
-	return token, nil
-}
-
-func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (string, bool) {
-	email, err := context.Get("email")
-
-	if !err {
-		return "", err
-	}
-
-	emailStr, errEmail := email.(string)
-	if !errEmail {
-		return "", errEmail
-	}
-	return emailStr, true
-}
-
-func (self *UserServiceService) SpotifyCallApi(email string) (string, error) {
-	foundUser, errGetUser := self.GetUser(email)
-	if errGetUser != nil || len(foundUser.Email) <= 0 {
-		return "", errGetUser
-	}
-
-	foundService, errServiceFound := self.FindServiceByName("Spotify")
-	if errServiceFound != nil {
-		return "", errServiceFound
-	}
-
-	foundUserService, errUserService := self.FindUserServiceByIdServiceandIdUser(foundService.Id, foundUser.Id)
-	token := foundUserService.AccessToken
-	if errUserService != nil {
-		return "", errUserService
-	}
-
-	expiryTime, errTimestamp := time.Parse("2006-01-02 15:04:05-07:00", foundUserService.ExpiryToken)
-	if errTimestamp != nil {
-		return "", errTimestamp
-	}
-
-	if expiryTime.Before(time.Now()) {
-		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id)
+		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, "Spotify")
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {
 			return "", errRefresh

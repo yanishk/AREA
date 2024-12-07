@@ -37,10 +37,6 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 		callback.GET("/:service", self.ServiceCallBack)
 	}
 
-	callApi := router.Group("/call-api")
-	{
-		callApi.GET("/Spotify", self.SpotifyCallApi)
-	}
 }
 
 // @Summary		Google OAuth2
