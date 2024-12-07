@@ -46,7 +46,7 @@ func createToken(email string) (string, error) {
 	return tokenString, nil
 }
 
-func (self *UserService) LoginAuthentication(userEmail string, userPassword string) (string, error) { // changerr le nom
+func (self *UserService) LoginAuthentication(userEmail string, userPassword string) (string, error) {
 	foundUser, err := self.UserRepository.FindUserByEmail(userEmail)
 	if err != nil || len(foundUser.Email) <= 0 {
 		return "", fmt.Errorf("Could not find requested user")

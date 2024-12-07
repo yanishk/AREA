@@ -9,6 +9,12 @@ type Service struct {
 	HasReactions bool
 }
 
+type ServiceUsefulInformations struct {
+	Name  string
+	Color string
+	Logo  string
+}
+
 type ResultToken struct {
 	AccessToken  string `json:"access_token"`
 	TokenType    string `json:"token_type"`

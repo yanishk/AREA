@@ -14,28 +14,28 @@ func NewUserServiceRepository(db *sql.DB) *UserServiceRepository {
 	return &UserServiceRepository{db: db}
 }
 
-func (self *UserServiceRepository) CreateUserService(idUser string, token string, refreshToken string, expiryDate string, idService string) error {
+func (self *UserServiceRepository) CreateUserService(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error {
 	sqlStatement := `INSERT INTO userservices (iduser, token, tokenrefresh, expiry, idservice) VALUES ($1, $2, $3, $4, $5);`
 
-	_, err := self.FindUserServiceByIdServiceandIdUser(idService, idUser)
+	_, err := self.FindUserServiceByIdServiceandIdUser(idUser, idService)
 	if err == nil {
 		return fmt.Errorf("service for user already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, idUser, token, refreshToken, expiryDate, idService)
+	_, err = self.db.Exec(sqlStatement, idUser, token, tokenRefresh, expiryDate, idService)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (self *UserServiceRepository) FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error) {
+func (self *UserServiceRepository) FindUserServiceByIdServiceandIdUser(idUser, idService string) (entities.UserService, error) {
 	sqlStatement := `SELECT * FROM userservices where iduser = ($1) AND idservice = ($2)`
 	var retrievedUserService entities.UserService
 
-	row := self.db.QueryRow(sqlStatement, userId, idservice)
+	row := self.db.QueryRow(sqlStatement, idUser, idService)
 	err := row.Scan(&retrievedUserService.Id, &retrievedUserService.IdUser, &retrievedUserService.AccessToken,
-		&retrievedUserService.RefreshToken, &retrievedUserService.ExpiryToken, &retrievedUserService.IdService)
+		&retrievedUserService.RefreshToken, &retrievedUserService.ExpiryDate, &retrievedUserService.IdService)
 	if err != nil {
 		return retrievedUserService, err
 	}
@@ -45,12 +45,12 @@ func (self *UserServiceRepository) FindUserServiceByIdServiceandIdUser(idservice
 func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(uuidService string, uuidUser string, accessToken string, refreshToken string, expiryToken string) error {
 	sqlStatement := `UPDATE userservices SET token = ($1), tokenrefresh = ($2), expiry = ($3) WHERE iduser = ($4) AND idservice = ($5);`
 
-	_, err := self.FindUserServiceByIdServiceandIdUser(uuidService, uuidUser)
+	_, err := self.FindUserServiceByIdServiceandIdUser(idUser, idService)
 	if err != nil {
 		return fmt.Errorf("service doesn't exist for user")
 	}
 
-	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, uuidUser, uuidService)
+	_, err = self.db.Exec(sqlStatement, token, tokenRefresh, expiryDate, idUser, idService)
 	if err != nil {
 		return err
 	}

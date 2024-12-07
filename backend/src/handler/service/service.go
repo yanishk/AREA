@@ -2,9 +2,12 @@ package service_handler
 
 import (
 	"backend/src/entities"
+	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -121,4 +124,42 @@ func (self *ServiceHandler) CallTimeApi() error {
 		}
 	}
 	return nil
+	router.GET("/actionsServices", self.RetrieveActionsServices)
+	router.GET("/reactionsServices", self.RetrieveReactionsServices)
+}
+
+// @Summary		Actions Services
+// @Description	Get Retrieve Actions Services
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
+// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
+// @Router			/actionsServices [get]
+func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+	actionsServices, err := self.ServiceService.RetrieveActionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+	} else {
+		context.IndentedJSON(http.StatusOK, actionsServices)
+	}
+}
+
+// @Summary		Reactions Services
+// @Description	Get Retrieve Reactions Services
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
+// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
+// @Router			/reactionsServices [get]
+func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server Error",
+		})
+	} else {
+		context.IndentedJSON(http.StatusOK, reactionsServices)
+	}
 }

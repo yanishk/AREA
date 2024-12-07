@@ -15,12 +15,14 @@ type UserRepository interface {
 type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
 	FindServiceByName(name string) (entities.Service, error)
+	FindActionsServices() ([]entities.ServiceUsefulInformations, error)
+	FindReactionsServices() ([]entities.ServiceUsefulInformations, error)
 }
 
 type UserServiceRepository interface {
-	UpdateUserServiceByServiceIdAndUserId(uuidService string, uuidUser string, accessToken string, refreshToken string, expiryToken string) error
-	CreateUserService(idUser string, token string, refreshToken string, expiryDate string, idService string) error
-	FindUserServiceByIdServiceandIdUser(idservice string, userId string) (entities.UserService, error)
+	CreateUserService(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
+	FindUserServiceByIdServiceandIdUser(idUser, idService string) (entities.UserService, error)
+	UpdateUserServiceByServiceIdAndUserId(idUser string, token string, tokenRefresh string, expiryDate string, idService string) error
 }
 
 type ReactionRepository interface {

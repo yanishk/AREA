@@ -40,3 +40,11 @@ func (self *ServiceService) FindWorkflowByIdTrigger(idTrigger string) ([]entitie
 func (self *ServiceService) FindReactionByID(id string) (entities.Action, error) {
 	return self.ReactionRepository.FindReactionByID(id)
 }
+
+func (self *ServiceService) RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error) {
+	return self.ServiceRepository.FindActionsServices()
+}
+
+func (self *ServiceService) RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error) {
+	return self.ServiceRepository.FindReactionsServices()
+}
