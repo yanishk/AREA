@@ -21,4 +21,5 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
+	// Function that be implemented soon
 }
