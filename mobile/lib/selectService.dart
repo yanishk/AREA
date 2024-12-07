@@ -207,9 +207,7 @@ class MySquareServicesCard extends StatelessWidget {
                     child: Column(
                       children: [
                         SafeWebImage(
-                            url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}",
-                            width: 30,
-                            height: 30,
+                            url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"
                           ),
                         AutoSizeText(serviceNameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
                       ]
