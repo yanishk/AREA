@@ -93,3 +93,7 @@ func (self *UserService) DeleteAccount(userEmail string) error {
 	}
 	return nil
 }
+
+func (self *UserService) FindUserById(userId string) (entities.User, error) {
+	return self.UserRepository.FindUserById(userId)
+}

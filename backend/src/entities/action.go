@@ -5,4 +5,5 @@ type Action struct {
 	Name        string
 	Description string
 	ServiceId   string
+	NbParam     int
 }

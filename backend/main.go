@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	_ "github.com/lib/pq"
+	"github.com/robfig/cron/v3"
 
 	_ "backend/docs"
 	"backend/src/handler"
@@ -16,8 +19,21 @@ func main() {
 	services := domain.New(repositories)
 	handlers := handler.New(services)
 
-	err := handlers.Run()
-	if err != nil {
-		panic(err)
+	cronJob := cron.New()
+
+	_, errCronCreation := cronJob.AddFunc("@every 1m", func() {
+		err := handlers.ServiceHandler.CallTimeApi()
+		if err != nil {
+			fmt.Println("call Time API Failed")
+		}
+	})
+	if errCronCreation != nil {
+		panic(errCronCreation)
+	}
+	cronJob.Start()
+
+	errHandler := handlers.Run()
+	if errHandler != nil {
+		panic(errHandler)
 	}
 }
