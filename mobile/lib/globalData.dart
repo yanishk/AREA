@@ -9,9 +9,15 @@ class Globaldata {
   static int firstService = -1;
   static int secondService = -1;
 
-  static List<String> nameList = [
-    "Github",
-    "Youtube",
-    "Spotify",
-  ];
+  static List<String> actionServicesName = [];
+  static List<String> actionServicesColor = [];
+  static List<String> actionServicesIcons = [];
+
+  static List<String> reactionServicesName = [];
+  static List<String> reactionServicesColor = [];
+  static List<String> reactionServicesIcons = [];
+
+  static int getActionServicesSize() {
+    return actionServicesName.length;
+  }
 }

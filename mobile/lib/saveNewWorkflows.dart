@@ -36,7 +36,7 @@ class SaveNewWorkflows extends State<APICall> {
     required this.isAnAction,
   });
   final bool isAnAction;
-  TextEditingController workflowTitleController = new TextEditingController(text: "${Globaldata.nameList[Globaldata.firstService]} ${Globaldata.nameList[Globaldata.secondService]}");
+  TextEditingController workflowTitleController = new TextEditingController(text: "${Globaldata.actionServicesName[Globaldata.firstService]} -> ${Globaldata.reactionServicesName[Globaldata.secondService]}");
 
   @override
   Widget build(BuildContext context) {

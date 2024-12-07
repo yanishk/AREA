@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:math';
-import 'globalData.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -488,83 +487,6 @@ class WidgetCard extends StatelessWidget {
             child: Column(
               children: [child,],
             )
-          );
-        },
-      ),
-    );
-  }
-}
-
-class SquareServicesCard extends StatelessWidget {
-  const SquareServicesCard({
-    super.key,
-    required this.servicesIndex,
-    this.isAnAction = true,
-  });
-
-  final int servicesIndex;
-  final bool isAnAction;
-
-  @override
-  Widget build(BuildContext context) {
-    List<Color> colorList = [
-      const Color.fromARGB(255, 41, 44, 45),
-      const Color.fromARGB(255, 255, 0, 0),
-      const Color.fromARGB(255, 29, 185, 84),
-    ];
-
-    List<String> nameList = [
-      "Github",
-      "Youtube",
-      "Spotify",
-    ];
-
-    List<String> iconList = [
-      "assets/icon/github.png",
-      "assets/icon/youtube.png",
-      "assets/icon/spotify.png",
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            decoration: BoxDecoration(
-              color: colorList[servicesIndex],
-              border: Border.all(
-                color: colorList[servicesIndex],
-                width: 2.0,
-              ),
-              borderRadius: BorderRadius.circular(4.0),
-            ),
-
-            child: InkWell(
-              onTap: () {
-                if (isAnAction) {
-                  Globaldata.firstService = servicesIndex;
-                } else {
-                  Globaldata.secondService = servicesIndex;
-                }
-                Navigator.pop(Globaldata.myContext);
-              },
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                    child: Column(
-                      children: [
-                        Image.asset(iconList[servicesIndex], width: 75, height: 75),
-                        AutoSizeText(nameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
-                      ]
-                    ),
-                  ),
-                ],
-              ),
-            ),
           );
         },
       ),

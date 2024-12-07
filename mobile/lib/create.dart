@@ -33,13 +33,15 @@ class CreateWorkflows extends State<APICall> {
   Color firstButtonColor = Color.fromARGB(255, 34, 34, 34);
   Color secondButtonColor = Color.fromARGB(255, 182, 182, 182);
   double firstButtonHight = 70;
+  String firstSelectedService = "";
+  String secondSelectedService = "";
 
   Widget firstButton() {
     if (firstButtonComplete) {
       return LeftWidget(
         padding: EdgeInsets.symmetric(horizontal: 0),
         child: AutoSizeText(
-          "If ${Globaldata.nameList[Globaldata.firstService]}",
+          "If $firstSelectedService",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );
@@ -74,7 +76,7 @@ class CreateWorkflows extends State<APICall> {
       return LeftWidget(
         padding: EdgeInsets.symmetric(horizontal: 0),
         child: AutoSizeText(
-          "Then ${Globaldata.nameList[Globaldata.secondService]}",
+          "Then $secondSelectedService",
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );
@@ -98,23 +100,31 @@ class CreateWorkflows extends State<APICall> {
   }
 
   Future<void> firstButtonNextState() async {
+    final result = await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: true,)),);
     setState(() {
-      if (firstButtonComplete == false) {
+      if (firstButtonComplete == false && result != null) {
         firstButtonComplete = true;
         secondButtonState++;
         firstButtonColor = Color.fromARGB(255, 57, 61, 62);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
       }
+      if (result != null) {
+        firstSelectedService = "$result";
+      }
     });
   }
 
   Future<void> secondButtonNextState() async {
-    setState(() {
-      if (secondButtonState == 1) {
-        secondButtonState++;
-      }
-    });
+    if (secondButtonState != 0) {
+      final result = await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: false)),);
+      setState(() {
+        if (result != null) {
+          secondButtonState = 2;
+          secondSelectedService = "$result";
+        }
+      });
+    }
   }
 
   @override
@@ -132,7 +142,7 @@ class CreateWorkflows extends State<APICall> {
             CustomButton(
               backgroundColor: firstButtonColor,
               text: firstButton(),
-              onPressed: () {firstButtonNextState(); Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: true,)),);},
+              onPressed: () {firstButtonNextState();},
               size: Size(double.infinity, firstButtonHight),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               borderCircularRadius: 10,
@@ -145,7 +155,7 @@ class CreateWorkflows extends State<APICall> {
             CustomButton(
               backgroundColor: secondButtonColor,
               text: secondButton(),
-              onPressed: () {secondButtonNextState(); Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectServicePage(isAnAction: false)),);},
+              onPressed: () {secondButtonNextState();},
               size: const Size(double.infinity, 70),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               borderCircularRadius: 10,

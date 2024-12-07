@@ -9,6 +9,7 @@ import "custom_widget.dart";
 import "sign_up.dart";
 import "exploreAll.dart";
 import "globalData.dart";
+import "loadServicesList.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -69,7 +70,7 @@ class _APICallState extends State<APICall> {
 
             Navigator.push(
               Globaldata.myContext,
-              MaterialPageRoute(builder: (context) => ExplorePageAll()),
+              MaterialPageRoute(builder: (context) => LoadServicePage()),
             );
           });
         } else {
@@ -187,7 +188,7 @@ class _APICallState extends State<APICall> {
                 onPressed: () {
                   Navigator.push(
                     Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
+                    MaterialPageRoute(builder: (context) => LoadServicePage()),
                   );
                 },
                 size: Size(double.infinity, 60),

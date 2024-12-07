@@ -36,4 +36,5 @@ flutter:
     - assets/icon/github.png
     - assets/icon/spotify.png
     - assets/icon/youtube.png
+    - assets/icon/noImage.png
     - .env
