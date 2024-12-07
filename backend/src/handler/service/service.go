@@ -17,6 +17,8 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
+const InternalServerErrorMessage = "Internal server error"
+
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
 		ServiceService:     ServiceService,
@@ -174,7 +176,7 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, actionsServices)
@@ -192,7 +194,7 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, reactionsServices)
@@ -221,7 +223,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	actions, errFindActions := self.ServiceService.FindActionByServiceId(foundService.Id)
 	if errFindActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, gin.H{
@@ -252,7 +254,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	reactions, errFindReactions := self.ServiceService.FindReactionByServiceId(foundService.Id)
 	if errFindReactions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, gin.H{
