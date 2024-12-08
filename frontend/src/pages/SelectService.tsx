@@ -19,9 +19,9 @@ const SelectServicePage = () => {
             let result;
 
             if (type === "action") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}actionsServices`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`);
             } else if (type === "reaction") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}reactionsServices`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`);
             }
 
             if (result) {
@@ -58,6 +58,9 @@ const SelectServicePage = () => {
                 <div>
                     <CancelButton
                         text="Cancel"
+                        textColor="text-[#222222]"
+                        borderColor="border-[#222222]"
+                        bgColor="bg-[#F9FAFB]"
                         onClick={goBack}
                     />
                 </div>

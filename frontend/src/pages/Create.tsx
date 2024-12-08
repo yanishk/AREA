@@ -179,6 +179,9 @@ const WorkflowBuilder = () => {
                 <div>
                     <CancelButton
                         text="Cancel"
+                        textColor="text-[#222222]"
+                        borderColor="border-[#222222]"
+                        bgColor="bg-[#F9FAFB]"
                         onClick={goHome}
                     />
                 </div>
