@@ -13,6 +13,8 @@ const SelectServicePage = () => {
     };
 
     const type = location.state?.type;
+    const selectedAction = location.state?.selectedAction;
+    const selectedReaction = location.state?.selectedReaction;
 
     const getServices = async () => {
         try {
@@ -44,6 +46,8 @@ const SelectServicePage = () => {
     const handleSelect = (name: string, color: string, iconPath: string) => {
         navigate(`/select-service/${encodeURIComponent(name)}`, {
             state: {
+                selectedReaction,
+                selectedAction,
                 type,
                 name,
                 color,

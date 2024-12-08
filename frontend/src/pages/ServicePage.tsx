@@ -21,6 +21,8 @@ const ServicePage = () => {
     const serviceName = location.state?.name;
     const serviceColor = location.state?.color;
     const serviceIcon = location.state?.iconPath;
+    const selectedAction = location.state?.selectedAction;
+    const selectedReaction = location.state?.selectedReaction;
 
     const getElements = async () => {
         try {
@@ -60,6 +62,7 @@ const ServicePage = () => {
         if (type === "action") {
             navigate(`/select-action/${encodeURIComponent(actionName)}`, {
                 state: {
+                    selectedReaction,
                     type,
                     serviceName,
                     actionName,
@@ -71,6 +74,7 @@ const ServicePage = () => {
         if (type === "reaction") {
             navigate(`/connect-service/${encodeURIComponent(serviceName)}`, {
                 state: {
+                    selectedAction,
                     type,
                     serviceName,
                     reactionName,

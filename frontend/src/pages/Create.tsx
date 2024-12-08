@@ -222,6 +222,7 @@ const WorkflowBuilder = () => {
                         <ButtonThenCustom
                             text={selectedReaction.name}
                             color={selectedReaction.color}
+                            iconPath={selectedReaction.icon}
                             onEdit={handleOnEditReaction}
                             onDelete={handleDeleteReaction}
                         />

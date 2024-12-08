@@ -9,11 +9,12 @@ const TriggerActionPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const type = location.state?.type;
+    // const type = location.state?.type;
     const serviceName = location.state?.serviceName;
     const serviceColor = location.state?.serviceColor;
     const serviceIcon = location.state?.serviceIcon;
     const actionName = location.state?.actionName;
+    const selectedReaction = location.state?.selectedReaction;
 
     const fields = serviceName && actionName &&
         servicesData[serviceName]?.actions?.[actionName]
@@ -32,6 +33,7 @@ const TriggerActionPage = () => {
     const handleActionClick = () => {
         navigate("/create", {
             state: {
+                selectedReaction,
                 selectedAction: {
                     name: actionName,
                     color: serviceColor,
