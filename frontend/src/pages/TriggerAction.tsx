@@ -5,7 +5,7 @@ import { useState } from "react";
 import DynamicFields from "../components/inputs/DynamicFields";
 import TriggerButton from "../components/buttons/TriggerButton";
 
-const SelectActionPage = () => {
+const TriggerActionPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -85,4 +85,4 @@ const SelectActionPage = () => {
     );
 };
 
-export default SelectActionPage
+export default TriggerActionPage
