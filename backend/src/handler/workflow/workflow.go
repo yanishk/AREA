@@ -3,8 +3,8 @@ package workflow_handler
 import (
 	"backend/src/entities"
 	"backend/src/handler/middleware"
-	"backend/src/service"
 	_ "backend/src/handler/workflow/docs"
+	"backend/src/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
