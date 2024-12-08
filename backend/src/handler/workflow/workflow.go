@@ -71,4 +71,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		})
 		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "successful workflow creation",
+	})
 }
