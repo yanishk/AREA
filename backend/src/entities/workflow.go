@@ -11,3 +11,11 @@ type Workflow struct {
 	ActionParam   map[string]interface{} `json:"actionparam"`
 	ReactionParam map[string]interface{} `json:"reactionparam"`
 }
+
+type NewWorkflow struct {
+	NameWorkflow  string                 `json:"name"`
+	ActionId      string                 `json:"actionid"`
+	ReactionId    string                 `json:"reactionid"`
+	ActionParam   map[string]interface{} `json:"actionparam"`
+	ReactionParam map[string]interface{} `json:"reactionparam"`
+}
