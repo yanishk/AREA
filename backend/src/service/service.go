@@ -36,8 +36,7 @@ type UserServiceService interface {
 }
 
 type WorkflowService interface {
-	CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
-		actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+	CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error
 }
 
 type Service struct {

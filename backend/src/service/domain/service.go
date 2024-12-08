@@ -14,6 +14,6 @@ func New(repositories *storage.Repository) *service.Service {
 		UserService:        user_service.NewUserService(repositories.UserRepository),
 		ServiceService:     service_service.NewServiceService(repositories.ServiceRepository, repositories.UserRepository, repositories.ActionRepository, repositories.WorkflowRepository, repositories.ReactionRepository),
 		UserServiceService: user_service_service.NewUserServiceService(repositories.ServiceRepository, repositories.UserRepository, repositories.UserServiceRepository),
-		WorkflowService:    workflow_service.NewWorkflowService(repositories.WorkflowRepository),
+		WorkflowService:    workflow_service.NewWorkflowService(repositories.WorkflowRepository, repositories.UserRepository),
 	}
 }

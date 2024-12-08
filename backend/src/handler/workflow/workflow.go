@@ -64,16 +64,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		})
 		return
 	}
-	userFound, errFindingUser := self.UserService.FindUserByEmail(emailStr)
-	if errFindingUser != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "User was not found",
-		})
-		return
-	}
-	errCreationWorkflow := self.WorkflowService.CreateWorkflow(newWorkflow.NameWorkflow,
-		userFound.Id, newWorkflow.ActionId, newWorkflow.ReactionId,
-		newWorkflow.ActionParam, newWorkflow.ReactionParam)
+	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, newWorkflow)
 	if errCreationWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "could not create workflow",
