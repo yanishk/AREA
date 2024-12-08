@@ -123,6 +123,7 @@ import ButtonIfDefault from "../components/buttons/ButtonIfDefault";
 import CancelButton from "../components/buttons/CancelButton";
 import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
 import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
+import TriggerButton from "../components/buttons/TriggerButton";
 
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
@@ -173,6 +174,10 @@ const WorkflowBuilder = () => {
         navigate("/");
     }
 
+    const handleContinue = () => {
+        return;
+    }
+
     return (
         <div>
             <div className="flex items-center justify-between px-10 py-5">
@@ -217,7 +222,7 @@ const WorkflowBuilder = () => {
 
                 <div className="h-[70px] w-[5px] bg-[#EEEEEE]" />
 
-                <div className="">
+                <div className="mb-[50px]">
                     {selectedReaction ? (
                         <ButtonThenCustom
                             text={selectedReaction.name}
@@ -236,6 +241,18 @@ const WorkflowBuilder = () => {
                             text="Then That"
                         />
                     )}
+                </div>
+
+                <div
+                    className="w-full max-w-[350px] flex flex-col items-center justify-center"
+                >
+                    <TriggerButton
+                        text="Continue"
+                        textColor="text-white"
+                        bgColor="bg-[#222222]"
+                        hoverColor="hover:bg-[#333333]"
+                        onClick={handleContinue}
+                    />
                 </div>
             </div>
         </div>
