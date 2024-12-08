@@ -70,16 +70,35 @@ const TriggerActionPage = () => {
                 <div className="w-[100px]"></div>
             </div>
 
-                <div style={{ backgroundColor: serviceColor }} className="flex flex-col items-center justify-center">
-                    <img src={serviceIcon} className="w-[122px] h-[122px] mt-14" />
-                    <h2 className="text-white text-[52px] font-bold mt-6 mb-8">{actionName}</h2>
+                <div
+                    style={{ backgroundColor: serviceColor }}
+                    className="flex flex-col items-center justify-center"
+                >
+                    <img
+                        src={serviceIcon}
+                        className="w-[122px] h-[122px] mt-14"
+                    />
+                    <h2
+                        className="text-white text-[52px] font-bold mt-6 mb-8"
+                    >
+                        {actionName}
+                    </h2>
                 </div>
 
-                <div className="flex flex-col items-center">
-                    <DynamicFields fields={fields} values={fieldValues} onChange={handleFieldChange} />
+                <div
+                    className="flex flex-col items-center"
+                >
+                    <DynamicFields
+                        fields={fields}
+                        values={fieldValues}
+                        onChange={handleFieldChange}
+                    />
                     <TriggerButton
-                        onClick={handleActionClick}
                         text="Create Trigger"
+                        textColor="text-black"
+                        bgColor="bg-white"
+                        hoverColor="hover:bg-[#EEEEEE]"
+                        onClick={handleActionClick}
                     />
                 </div>
 

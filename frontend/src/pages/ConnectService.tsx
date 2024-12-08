@@ -59,10 +59,15 @@ const ConnectService = () => {
                 <img src={serviceIcon} className="w-[122px] h-[122px] mt-14" />
                 <h2 className="text-white text-[52px] font-bold mt-6 mb-14">{serviceName}</h2>
             </div>
-            <div className="cursor-pointer flex justify-center items-center">
+            <div
+                className="cursor-pointer flex justify-center items-center"
+            >
                 <TriggerButton
-                    onClick={handleConnect}
-                    text="Connect"
+                        text="Connect"
+                        textColor="text-black"
+                        bgColor="bg-white"
+                        hoverColor="hover:bg-[#EEEEEE]"
+                        onClick={handleConnect}
                 />
             </div>
 
