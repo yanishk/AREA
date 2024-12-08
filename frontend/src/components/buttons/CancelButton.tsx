@@ -14,7 +14,7 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, text, textColor, b
         <button
             onClick={onClick}
             className={clsx(
-                "w-full border-4 text-[18px] rounded-full font-[900] py-3",
+                "w-full border-4 text-[18px] rounded-full font-[800] py-3 px-8",
                 textColor,
                 borderColor,
                 bgColor

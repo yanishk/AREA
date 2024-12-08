@@ -186,12 +186,14 @@ const WorkflowBuilder = () => {
                     />
                 </div>
 
-                <h1 className="text-[3.2rem] font-extrabold text-center flex-1">
+                <h1 className="text-[3.2rem] font-[900] text-center flex-1">
                     Create
                 </h1>
+
+                <div className="w-[140px]"></div>
             </div>
 
-            <div className="flex items-center justify-center flex-col px-10 py-5">
+            <div className="flex items-center justify-center flex-col px-10 pt-[100px] py-5">
                 <div className="pt-10">
                     {selectedAction ? (
                         <ButtonIfCustom
@@ -211,7 +213,10 @@ const WorkflowBuilder = () => {
                         />
                     )}
                 </div>
-                <div className="pt-10">
+
+                <div className="h-[70px] w-[5px] bg-[#EEEEEE]" />
+
+                <div className="">
                     {selectedReaction ? (
                         <ButtonThenCustom
                             text={selectedReaction.name}
