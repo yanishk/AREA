@@ -17,6 +17,8 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
+const InternalServerErrorMessage = "Internal server error"
+
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
 		ServiceService:     ServiceService,
@@ -32,8 +34,13 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	router.GET("/actionsServices", self.RetrieveActionsServices)
-	router.GET("/reactionsServices", self.RetrieveReactionsServices)
+	service := router.Group("/:service")
+	{
+		service.GET("/actions", self.RetrieveActionsFromService)
+		service.GET("/reactions", self.RetrieveReactionsFromService)
+	}
+	router.GET("/actions-services", self.RetrieveActionsServices)
+	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
 func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
@@ -159,17 +166,17 @@ func (self *ServiceHandler) CallTimeApi() error {
 }
 
 // @Summary		Actions Services
-// @Description	Get Retrieve Actions Services
+// @Description	Retrieve services with actions available
 // @Tags			Services
 // @Produce		json
-// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
-// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
-// @Router			/actionsServices [get]
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/actions-services [get]
 func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, actionsServices)
@@ -177,19 +184,81 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 }
 
 // @Summary		Reactions Services
-// @Description	Get Retrieve Reactions Services
+// @Description	Retrieve services with reactions available
 // @Tags			Services
 // @Produce		json
-// @Success		200		{object}	docs_service.ServiceActionsReactionsSuccessResponse
-// @Success		500		{object}	docs_service.ServiceActionReactionInternalServerErrorResponse
-// @Router			/reactionsServices [get]
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/reactions-services [get]
 func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error": InternalServerErrorMessage,
 		})
 	} else {
 		context.IndentedJSON(http.StatusOK, reactionsServices)
+	}
+}
+
+// @Summary		Actions From Service
+// @Description	Retrieve actions from requested service
+// @Tags			Services
+// @Produce		json
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/{service}/actions [get]
+func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+	foundService, errFoundService := self.ServiceService.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find requested service",
+		})
+		return
+	}
+
+	actions, errFindActions := self.ServiceService.FindActionByServiceId(foundService.Id)
+	if errFindActions != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+	} else {
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"actions": actions,
+		})
+	}
+}
+
+// @Summary		Reactions From Service
+// @Description	Retrieve reactions from requested service
+// @Tags			Services
+// @Produce		json
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/{service}/reactions [get]
+func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+	foundService, errFoundService := self.ServiceService.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find requested service",
+		})
+		return
+	}
+
+	reactions, errFindReactions := self.ServiceService.FindReactionByServiceId(foundService.Id)
+	if errFindReactions != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+	} else {
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"reactions": reactions,
+		})
 	}
 }
