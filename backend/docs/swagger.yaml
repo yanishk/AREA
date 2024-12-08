@@ -139,6 +139,45 @@ definitions:
         example: Token generated
         type: string
     type: object
+  docs_workflow.WorkflowCreateWorkflowBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not create workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Successful workflow creation
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  entities.NewWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
   entities.UserCredentials:
     properties:
       email:
@@ -379,4 +418,36 @@ paths:
       summary: Modify Password
       tags:
       - Users
+  /workflow/create:
+    post:
+      description: Create a Workflow
+      parameters:
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.NewWorkflow'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
+      summary: Create Workflow
+      tags:
+      - Workflow
 swagger: "2.0"

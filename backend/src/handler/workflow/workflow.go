@@ -4,6 +4,7 @@ import (
 	"backend/src/entities"
 	"backend/src/handler/middleware"
 	"backend/src/service"
+	_ "backend/src/handler/workflow/docs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,16 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 
 }
 
+// @Summary		Create Workflow
+// @Description	Create a Workflow
+// @Tags			Workflow
+// @Produce		json
+// @Param			workflow	body		entities.NewWorkflow	true	"Workflow informations"
+// @Success		200		{object}	docs_workflow.WorkflowCreateWorkflowSuccessResponse
+// @Failure		400		{object}	docs_workflow.WorkflowCreateWorkflowBadRequestResponse
+// @Failure		401		{object}	docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse
+// @Failure		500		{object}	docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse
+// @Router			/workflow/create [post]
 func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 
 	var newWorkflow entities.NewWorkflow
@@ -67,11 +78,11 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, newWorkflow)
 	if errCreationWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "could not create workflow",
+			"error": "Could not create workflow",
 		})
 		return
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": "successful workflow creation",
+		"success": "Successful workflow creation",
 	})
 }
