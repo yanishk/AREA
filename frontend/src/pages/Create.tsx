@@ -199,6 +199,7 @@ const WorkflowBuilder = () => {
                         <ButtonIfCustom
                             text={selectedAction.name}
                             color={selectedAction.color}
+                            iconPath={selectedAction.icon}
                             onEdit={handleOnEditAction}
                             onDelete={handleDeleteAction}
                         />
