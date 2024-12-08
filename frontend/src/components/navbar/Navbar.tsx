@@ -1,12 +1,22 @@
 import NavbarLink from "./NavbarLink"
 import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../pages/AuthContext";
 
 const Navbar = () => {
+    const { isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
         navigate("/register");
+    }
+
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
+    const handleCreate = () => {
+        navigate("/create");
     }
 
     return (
@@ -38,18 +48,37 @@ const Navbar = () => {
                                 text="Explore"
                             />
                         </li>
-                        <li>
-                            <NavbarLink
-                                href="/login"
-                                text="Log in"
-                            />
-                        </li>
-                        <li>
-                            <NavbarButton
-                                onClick={handleGetStarted}
-                                text="Get Started"
-                            />
-                        </li>
+                        {!isAuthenticated ? (
+                            <>
+                                <li>
+                                    <NavbarLink
+                                        href="/login"
+                                        text="Log in"
+                                    />
+                                </li>
+                                <li>
+                                    <NavbarButton
+                                        onClick={handleGetStarted}
+                                        text="Get Started"
+                                    />
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li>
+                                    <NavbarButton
+                                        onClick={handleCreate}
+                                        text="Create"
+                                    />
+                                </li>
+                                <li>
+                                    <NavbarButton
+                                        onClick={handleLogout}
+                                        text="Log out"
+                                    />
+                                </li>
+                            </>
+                        )}
                     </ul>
 
                 </div>
