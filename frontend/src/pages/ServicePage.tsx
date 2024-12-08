@@ -28,12 +28,9 @@ const ServicePage = () => {
 
             if (type === "action") {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/actions`);
-                console.log("API Response Data: ", result.data);
             } else if (type === "reaction") {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/reactions`);
             }
-
-            console.log("API Response: ", result);
 
             if (result && result.data) {
                 const dataKey = type === "action" ? "actions" : "reactions";
@@ -43,14 +40,12 @@ const ServicePage = () => {
                         name: element.Name,
                         description: element.Description,
                     }));
-
-                    console.log("Mapped Elements: ", propertiesElements);
                     setElements(propertiesElements);
                 } else {
-                    console.error(`Unexpected structure for ${dataKey}:`, result.data[dataKey]);
+                    console.error(`Error for ${dataKey}:`, result.data[dataKey]);
                 }
             } else {
-                console.error("Unexpected API response structure:", result);
+                console.error("Unexpected API response", result);
             }
         } catch (err) {
             console.error("Error fetching services:", err);
@@ -60,6 +55,31 @@ const ServicePage = () => {
     useEffect(() => {
         getElements();
     }, []);
+
+    const handleSelect = (type: string, serviceName:string, actionName: string, reactionName: string, serviceColor: string, serviceIcon: string) => {
+        if (type === "action") {
+            navigate(`/select-action/${encodeURIComponent(actionName)}`, {
+                state: {
+                    type,
+                    serviceName,
+                    actionName,
+                    serviceColor,
+                    serviceIcon,
+                }
+            });
+        }
+        if (type === "reaction") {
+            navigate(`/connect-service/${encodeURIComponent(serviceName)}`, {
+                state: {
+                    type,
+                    serviceName,
+                    reactionName,
+                    serviceColor,
+                    serviceIcon,
+                }
+            });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -93,6 +113,14 @@ const ServicePage = () => {
                             key={element.name}
                             style={{ backgroundColor: serviceColor }}
                             className="h-[240px] flex flex-col items-start pl-[30px] pt-2 cursor-pointer rounded-[10px]"
+                            onClick={() => handleSelect(
+                                type,
+                                serviceName,
+                                element.name,
+                                element.name,
+                                serviceColor,
+                                serviceIcon,
+                            )}
                         >
                             <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6">{element.name}</h2>
                             <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6">{element.description}</h2>
