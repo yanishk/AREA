@@ -11,6 +11,7 @@ import (
 	service_handler "backend/src/handler/service"
 	user_handler "backend/src/handler/user"
 	user_service_handler "backend/src/handler/userservice"
+	workflow_handler "backend/src/handler/workflow"
 	"backend/src/service"
 )
 
@@ -24,10 +25,14 @@ type ServiceHandler interface {
 type UserServiceHandler interface {
 }
 
+type WorkflowHandler interface {
+}
+
 type Handler struct {
 	UserHandler        UserHandler
 	ServiceHandler     ServiceHandler
 	UserServiceHandler UserServiceHandler
+	WorkflowHandler    WorkflowHandler
 	router             *gin.Engine
 }
 
@@ -38,6 +43,7 @@ func New(services *service.Service) *Handler {
 		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
 		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
 		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserServiceService, services.UserService, router),
+		WorkflowHandler:    workflow_handler.NewWorkflowHandler(services.WorkflowService, services.UserService, router),
 		router:             router,
 	}
 }

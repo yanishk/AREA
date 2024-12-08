@@ -2,6 +2,7 @@ package service_handler
 
 import (
 	"backend/src/entities"
+	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"encoding/json"
@@ -34,13 +35,13 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	service := router.Group("/:service")
+	service := router.Group("/:service", middleware.VerifyJWTCookie)
 	{
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	router.GET("/actions-services", self.RetrieveActionsServices)
-	router.GET("/reactions-services", self.RetrieveReactionsServices)
+	router.GET("/actions-services", middleware.VerifyJWTCookie, self.RetrieveActionsServices)
+	router.GET("/reactions-services", middleware.VerifyJWTCookie, self.RetrieveReactionsServices)
 }
 
 func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
@@ -178,9 +179,9 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, actionsServices)
+		return
 	}
+	context.IndentedJSON(http.StatusOK, actionsServices)
 }
 
 // @Summary		Reactions Services
@@ -196,9 +197,9 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, reactionsServices)
+		return
 	}
+	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
 // @Summary		Actions From Service
@@ -225,11 +226,11 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"actions": actions,
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"actions": actions,
+	})
 }
 
 // @Summary		Reactions From Service
@@ -256,9 +257,9 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"reactions": reactions,
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"reactions": reactions,
+	})
 }
