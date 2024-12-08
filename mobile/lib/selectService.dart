@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "globalData.dart";
+import "selectActionOrReaction.dart";
 
 class SelectServicePage extends StatelessWidget {
   const SelectServicePage({
@@ -150,8 +151,6 @@ class SelectServiceTopBar extends StatelessWidget {
   }
 }
 
-
-
 class MySquareServicesCard extends StatelessWidget {
   const MySquareServicesCard({
     super.key,
@@ -167,6 +166,11 @@ class MySquareServicesCard extends StatelessWidget {
   final List<String> serviceNameList;
   final List<String> serviceColorList;
   final List<String> serviceIconsList;
+
+  Future<void> redirectToSelectActionOrReactionPage() async {
+      await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectActionOrReactionPage(isAnAction: isAnAction, serviceIndex: servicesIndex,)),);
+      Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,10 +196,16 @@ class MySquareServicesCard extends StatelessWidget {
               onTap: () {
                 if (isAnAction) {
                   Globaldata.firstService = servicesIndex;
+                  redirectToSelectActionOrReactionPage();
                 } else {
                   Globaldata.secondService = servicesIndex;
+                  if (serviceNameList[servicesIndex] == "Spotify") {
+                    developer.log("spotify");
+                    redirectToSelectActionOrReactionPage();
+                  } else {
+                    redirectToSelectActionOrReactionPage();
+                  }
                 }
-                Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
               },
               child: Column(
                 children: [

@@ -18,6 +18,7 @@ class Globaldata {
   static List<String> reactionServicesIcons = [];
 
   static String domainName = "https://mathisbrehm.fr/";
+  static String spotifyConnectionLink = "";
 
   static int getActionServicesSize() {
     return actionServicesName.length;

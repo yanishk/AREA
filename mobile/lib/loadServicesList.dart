@@ -26,8 +26,10 @@ class APICall extends StatefulWidget {
 class LoadService extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
   String result = '';
-  String apiRoute = 'actionsServices';
+  String apiRoute = 'actions-services';
   String title = "Select action service";
+  String actionsServices = "actions-services";
+  String reactionsServices = "reactions-services";
   bool isInit = true;
 
   Future<void> getServices() async {
@@ -51,18 +53,18 @@ class LoadService extends State<APICall> {
             if (firstService is Map<String, dynamic>) {
               result = firstService['Name'] ?? 'No Name';
               developer.log("getServices OK :\n$result");
-              if (apiRoute == 'actionsServices') {
+              if (apiRoute == actionsServices) {
                 Globaldata.actionServicesName.add(firstService['Name']);
                 Globaldata.actionServicesColor.add(firstService['Color']);
                 Globaldata.actionServicesIcons.add(firstService['Logo']);
-                developer.log("getServices actionsServices");
-                apiRoute = "reactionsServices";
+                developer.log("getServices $actionsServices");
+                apiRoute = reactionsServices;
                 getServices();
               } else {
                 Globaldata.reactionServicesName.add(firstService['Name']);
                 Globaldata.reactionServicesColor.add(firstService['Color']);
                 Globaldata.reactionServicesIcons.add(firstService['Logo']);
-                developer.log("getServices reactionsServices");
+                developer.log("getServices $reactionsServices");
                 Navigator.push(
                   Globaldata.myContext,
                   MaterialPageRoute(builder: (context) => ExplorePageAll()),
