@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/actionsServices": {
+        "/actions-services": {
             "get": {
-                "description": "Get Retrieve Actions Services",
+                "description": "Retrieve services with actions available",
                 "produces": [
                     "application/json"
                 ],
@@ -29,13 +29,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -181,9 +181,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/reactionsServices": {
+        "/reactions-services": {
             "get": {
-                "description": "Get Retrieve Reactions Services",
+                "description": "Retrieve services with reactions available",
                 "produces": [
                     "application/json"
                 ],
@@ -195,13 +195,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceActionsReactionsSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -352,6 +352,88 @@ const docTemplate = `{
                 }
             }
         },
+        "/{service}/actions": {
+            "get": {
+                "description": "Retrieve actions from requested service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actions From Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify, Time \u0026 Date..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/{service}/reactions": {
+            "get": {
+                "description": "Retrieve reactions from requested service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Reactions From Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify, Time \u0026 Date..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/workflow/create": {
             "post": {
                 "description": "Create a Workflow",
@@ -403,16 +485,55 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "docs_service.ServiceActionReactionInternalServerErrorResponse": {
+        "docs_service.ActionExample": {
             "type": "object",
             "properties": {
-                "error": {
+                "Description": {
                     "type": "string",
-                    "example": "Internal Server Error"
+                    "example": "This Trigger fires every single day at a specific time set by you."
+                },
+                "Id": {
+                    "type": "string",
+                    "example": "2685fc54-d1e2-43d8-9525-56ab7a91e351"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Every day at"
+                },
+                "ServiceId": {
+                    "type": "string",
+                    "example": "203a1f6a-b2d7-4011-a73b-e9585907835b"
+                },
+                "nbParam": {
+                    "type": "integer"
                 }
             }
         },
-        "docs_service.ServiceActionsReactionsExample": {
+        "docs_service.ReactionExample": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string",
+                    "example": "Start a new context or resume current playback on the user’s active device. Only available for Spotify premium accounts."
+                },
+                "Id": {
+                    "type": "string",
+                    "example": "5dccb0f3-64db-4456-8286-4678857ae394"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Start playback"
+                },
+                "ServiceId": {
+                    "type": "string",
+                    "example": "4f6f8655-8e0f-4f96-ba7f-d3cab1577b74"
+                },
+                "nbParam": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.ServiceExample": {
             "type": "object",
             "properties": {
                 "Color": {
@@ -421,7 +542,7 @@ const docTemplate = `{
                 },
                 "Logo": {
                     "type": "string",
-                    "example": "assets/logos/Google.png"
+                    "example": "assets/logos/Google.webp"
                 },
                 "Name": {
                     "type": "string",
@@ -429,13 +550,53 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ServiceActionsReactionsSuccessResponse": {
+        "docs_service.ServiceInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Internal server error"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ActionExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested service"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse": {
             "type": "object",
             "properties": {
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceActionsReactionsExample"
+                        "$ref": "#/definitions/docs_service.ServiceExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ReactionExample"
                     }
                 }
             }

@@ -1,27 +1,82 @@
 definitions:
-  docs_service.ServiceActionReactionInternalServerErrorResponse:
+  docs_service.ActionExample:
     properties:
-      error:
-        example: Internal Server Error
+      Description:
+        example: This Trigger fires every single day at a specific time set by you.
         type: string
+      Id:
+        example: 2685fc54-d1e2-43d8-9525-56ab7a91e351
+        type: string
+      Name:
+        example: Every day at
+        type: string
+      ServiceId:
+        example: 203a1f6a-b2d7-4011-a73b-e9585907835b
+        type: string
+      nbParam:
+        type: integer
     type: object
-  docs_service.ServiceActionsReactionsExample:
+  docs_service.ReactionExample:
+    properties:
+      Description:
+        example: Start a new context or resume current playback on the user’s active
+          device. Only available for Spotify premium accounts.
+        type: string
+      Id:
+        example: 5dccb0f3-64db-4456-8286-4678857ae394
+        type: string
+      Name:
+        example: Start playback
+        type: string
+      ServiceId:
+        example: 4f6f8655-8e0f-4f96-ba7f-d3cab1577b74
+        type: string
+      nbParam:
+        type: integer
+    type: object
+  docs_service.ServiceExample:
     properties:
       Color:
         example: '#E84A4A'
         type: string
       Logo:
-        example: assets/logos/Google.png
+        example: assets/logos/Google.webp
         type: string
       Name:
         example: Google
         type: string
     type: object
-  docs_service.ServiceActionsReactionsSuccessResponse:
+  docs_service.ServiceInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/docs_service.ActionExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Could not find requested service
+        type: string
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
     properties:
       services:
         items:
-          $ref: '#/definitions/docs_service.ServiceActionsReactionsExample'
+          $ref: '#/definitions/docs_service.ServiceExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
+    properties:
+      reactions:
+        items:
+          $ref: '#/definitions/docs_service.ReactionExample'
         type: array
     type: object
   docs_user.DeleteAccountFailureInternalServerErrorResponse:
@@ -197,20 +252,74 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
-  /actionsServices:
+  /{service}/actions:
     get:
-      description: Get Retrieve Actions Services
+      description: Retrieve actions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Actions From Service
+      tags:
+      - Services
+  /{service}/reactions:
+    get:
+      description: Retrieve reactions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Reactions From Service
+      tags:
+      - Services
+  /actions-services:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
       summary: Actions Services
       tags:
       - Services
@@ -306,20 +415,20 @@ paths:
       summary: Login
       tags:
       - Users
-  /reactionsServices:
+  /reactions-services:
     get:
-      description: Get Retrieve Reactions Services
+      description: Retrieve services with reactions available
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceActionsReactionsSuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceActionReactionInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
       summary: Reactions Services
       tags:
       - Services
