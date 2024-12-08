@@ -424,6 +424,55 @@
                     }
                 }
             }
+        },
+        "/workflow/create": {
+            "post": {
+                "description": "Create a Workflow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Create Workflow",
+                "parameters": [
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.NewWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -711,6 +760,64 @@
                 "success": {
                     "type": "string",
                     "example": "Token generated"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not create workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Successful workflow creation"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "entities.NewWorkflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },

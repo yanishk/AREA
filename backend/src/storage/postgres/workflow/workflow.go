@@ -20,12 +20,21 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	actionParam map[string]interface{}, reactionParam map[string]interface{}) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7);`
 
+	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
+	if errMarshallActionParam != nil {
+		return errMarshallActionParam
+	}
+	reactionParamJson, errMarshallReactionParam := json.Marshal(reactionParam)
+	if errMarshallReactionParam != nil {
+		return errMarshallReactionParam
+	}
+
 	_, err := self.FindWorkflowByNameAndUserId(name, ownerId)
 	if err == nil {
 		return fmt.Errorf("Workflow already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParam, reactionParam)
+	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParamJson, reactionParamJson)
 	if err != nil {
 		return err
 	}
