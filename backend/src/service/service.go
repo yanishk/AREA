@@ -12,6 +12,7 @@ type UserService interface {
 	ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string) error
 	FindUserById(userId string) (entities.User, error)
+	FindUserByEmail(email string) (entities.User, error)
 }
 
 type ServiceService interface {
@@ -34,8 +35,14 @@ type UserServiceService interface {
 	CallApiAndRefresh(email string, serviceName string) (string, error)
 }
 
+type WorkflowService interface {
+	CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
+		actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+}
+
 type Service struct {
 	UserService        UserService
 	ServiceService     ServiceService
 	UserServiceService UserServiceService
+	WorkflowService    WorkflowService
 }
