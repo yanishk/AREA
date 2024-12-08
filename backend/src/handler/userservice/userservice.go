@@ -21,21 +21,23 @@ func NewUserServiceHandler(UserServiceService service.UserServiceService, router
 }
 
 func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
+	self.PublicRoutes(router)
 	self.PrivateRoutes(router)
 }
 
-func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
+func (self *UserServiceHandler) PublicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
 		authentication.GET("/Spotify", self.Auth02Spotify)
 		authentication.GET("/Google", self.Auth02Google)
 	}
+}
 
+func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 	callback := router.Group("/callback", middleware.VerifyJWTCookie)
 	{
 		callback.GET("/:service", self.ServiceCallBack)
 	}
-
 }
 
 // @Summary		Google OAuth2
