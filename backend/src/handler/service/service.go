@@ -178,9 +178,9 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, actionsServices)
+		return
 	}
+	context.IndentedJSON(http.StatusOK, actionsServices)
 }
 
 // @Summary		Reactions Services
@@ -196,9 +196,9 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, reactionsServices)
+		return
 	}
+	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
 // @Summary		Actions From Service
@@ -225,11 +225,11 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"actions": actions,
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"actions": actions,
+	})
 }
 
 // @Summary		Reactions From Service
@@ -256,9 +256,9 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"reactions": reactions,
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"reactions": reactions,
+	})
 }
