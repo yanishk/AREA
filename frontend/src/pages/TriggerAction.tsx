@@ -9,7 +9,6 @@ const TriggerActionPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // const type = location.state?.type;
     const serviceName = location.state?.serviceName;
     const serviceColor = location.state?.serviceColor;
     const serviceIcon = location.state?.serviceIcon;
