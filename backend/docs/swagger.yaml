@@ -1,106 +1,250 @@
 definitions:
-  entities.DeleteAccountFailureInternalServerErrorResponse:
+  docs_service.ActionExample:
     properties:
-      error:
-        example: Could not delete account
+      Description:
+        example: This Trigger fires every single day at a specific time set by you.
+        type: string
+      Id:
+        example: 2685fc54-d1e2-43d8-9525-56ab7a91e351
+        type: string
+      Name:
+        example: Every day at
+        type: string
+      ServiceId:
+        example: 203a1f6a-b2d7-4011-a73b-e9585907835b
+        type: string
+      nbParam:
+        type: integer
+    type: object
+  docs_service.ReactionExample:
+    properties:
+      Description:
+        example: Start a new context or resume current playback on the user’s active
+          device. Only available for Spotify premium accounts.
+        type: string
+      Id:
+        example: 5dccb0f3-64db-4456-8286-4678857ae394
+        type: string
+      Name:
+        example: Start playback
+        type: string
+      ServiceId:
+        example: 4f6f8655-8e0f-4f96-ba7f-d3cab1577b74
+        type: string
+      nbParam:
+        type: integer
+    type: object
+  docs_service.ServiceExample:
+    properties:
+      Color:
+        example: '#E84A4A'
+        type: string
+      Logo:
+        example: assets/logos/Google.webp
+        type: string
+      Name:
+        example: Google
         type: string
     type: object
-  entities.DeleteAccountFailureUnauthorizedResponse:
-    properties:
-      error:
-        example: Email not found in token-Email is not a valid string
-        type: string
-    type: object
-  entities.DeleteAccountSuccessResponse:
-    properties:
-      success:
-        example: Account deleted
-        type: string
-    type: object
-  entities.FailureInternalServerErrorResponse:
+  docs_service.ServiceInternalServerErrorResponse:
     properties:
       error:
         example: Internal server error
         type: string
     type: object
-  entities.FailureInvalidBodyResponse:
+  docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/docs_service.ActionExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Could not find requested service
+        type: string
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/docs_service.ServiceExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
+    properties:
+      reactions:
+        items:
+          $ref: '#/definitions/docs_service.ReactionExample'
+        type: array
+    type: object
+  docs_user.DeleteAccountFailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not delete account
+        type: string
+    type: object
+  docs_user.DeleteAccountFailureUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.DeleteAccountSuccessResponse:
+    properties:
+      success:
+        example: Account deleted
+        type: string
+    type: object
+  docs_user.FailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  docs_user.FailureInvalidBodyResponse:
     properties:
       error:
         example: Invalid request body
         type: string
     type: object
-  entities.LoginData:
+  docs_user.LoginFailureTokenErrorResponse:
+    properties:
+      error:
+        example: Error creating token
+        type: string
+    type: object
+  docs_user.LoginFailureUnauthorizedResponse:
+    properties:
+      error:
+        example: Could not find requested user-Wrong password
+        type: string
+    type: object
+  docs_user.LoginSuccessResponse:
+    properties:
+      success:
+        example: Connection successful
+        type: string
+    type: object
+  docs_user.ModifyPasswordBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Could not find requested user
+        type: string
+    type: object
+  docs_user.ModifyPasswordFailureEmailNotValidResponse:
+    properties:
+      error:
+        example: Email is not a valid string
+        type: string
+    type: object
+  docs_user.ModifyPasswordFailureInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to hash password-Could not modify the password
+        type: string
+    type: object
+  docs_user.ModifyPasswordFailureOldPasswordNotValidResponse:
+    properties:
+      error:
+        example: Old password is incorrect
+        type: string
+    type: object
+  docs_user.ModifyPasswordSuccessResponse:
+    properties:
+      success:
+        example: Password modified
+        type: string
+    type: object
+  docs_user.RegisterFailureEmailAlreadyUsedResponse:
+    properties:
+      error:
+        example: Email address already used
+        type: string
+    type: object
+  docs_user.RegisterSuccessResponse:
+    properties:
+      success:
+        example: New user created
+        type: string
+    type: object
+  docs_userservice.OAuth2Response:
+    properties:
+      auth-url:
+        example: url-example.com
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization-Could not find requested user-Could not
+          find requested service
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to exchange token-Failed to get email
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackSuccessResponse:
+    properties:
+      success:
+        example: Token generated
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not create workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Successful workflow creation
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  entities.NewWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
+  entities.UserCredentials:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  entities.LoginFailureTokenErrorResponse:
-    properties:
-      error:
-        example: Error creating token
-        type: string
-    type: object
-  entities.LoginFailureUnauthorizedResponse:
-    properties:
-      error:
-        example: Could not find requested user-Wrong password
-        type: string
-    type: object
-  entities.LoginSuccessResponse:
-    properties:
-      success:
-        example: Connection successful
-        type: string
-    type: object
-  entities.ModifyPasswordBadRequestResponse:
-    properties:
-      error:
-        example: Invalid request body-Could not find requested user
-        type: string
-    type: object
-  entities.ModifyPasswordData:
+  entities.UserModifyPassword:
     properties:
       oldpassword:
         type: string
       password:
-        type: string
-    type: object
-  entities.ModifyPasswordFailureEmailNotValidResponse:
-    properties:
-      errorr:
-        example: Email is not a valid string
-        type: string
-    type: object
-  entities.ModifyPasswordFailureInternalServerErrorResponse:
-    properties:
-      error:
-        example: Failed to hash password-Could not modify the password
-        type: string
-    type: object
-  entities.ModifyPasswordFailureOldPasswordNotValidResponse:
-    properties:
-      errorr:
-        example: Old password is incorrect
-        type: string
-    type: object
-  entities.ModifyPasswordSuccessResponse:
-    properties:
-      success:
-        example: Password modified
-        type: string
-    type: object
-  entities.RegisterFailureEmailAlreadyUsedResponse:
-    properties:
-      error:
-        example: Email address already used
-        type: string
-    type: object
-  entities.RegisterSuccessResponse:
-    properties:
-      success:
-        example: New user created
         type: string
     type: object
 host: localhost:8080
@@ -108,6 +252,135 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
+  /{service}/actions:
+    get:
+      description: Retrieve actions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Actions From Service
+      tags:
+      - Services
+  /{service}/reactions:
+    get:
+      description: Retrieve reactions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Reactions From Service
+      tags:
+      - Services
+  /actions-services:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Actions Services
+      tags:
+      - Services
+  /authentication/Google:
+    get:
+      description: Get Google OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Google OAuth2
+      tags:
+      - Authentication
+  /authentication/Spotify:
+    get:
+      description: Get Spotify OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Spotify OAuth2
+      tags:
+      - Authentication
+  /callback/{service}:
+    get:
+      description: Callback for services
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse'
+      summary: Service Callback
+      tags:
+      - Authentication
   /login:
     post:
       consumes:
@@ -119,29 +392,46 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entities.LoginData'
+          $ref: '#/definitions/entities.UserCredentials'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entities.LoginSuccessResponse'
+            $ref: '#/definitions/docs_user.LoginSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
+            $ref: '#/definitions/docs_user.FailureInvalidBodyResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/entities.LoginFailureUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.LoginFailureUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/entities.LoginFailureTokenErrorResponse'
+            $ref: '#/definitions/docs_user.LoginFailureTokenErrorResponse'
       summary: Login
       tags:
       - Users
+  /reactions-services:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Reactions Services
+      tags:
+      - Services
   /register:
     post:
       consumes:
@@ -153,26 +443,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entities.LoginData'
+          $ref: '#/definitions/entities.UserCredentials'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entities.RegisterSuccessResponse'
+            $ref: '#/definitions/docs_user.RegisterSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/entities.FailureInvalidBodyResponse'
+            $ref: '#/definitions/docs_user.FailureInvalidBodyResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/entities.RegisterFailureEmailAlreadyUsedResponse'
+            $ref: '#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/entities.FailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.FailureInternalServerErrorResponse'
       summary: Register
       tags:
       - Users
@@ -187,15 +477,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entities.DeleteAccountSuccessResponse'
+            $ref: '#/definitions/docs_user.DeleteAccountSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/entities.DeleteAccountFailureUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.DeleteAccountFailureUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/entities.DeleteAccountFailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.DeleteAccountFailureInternalServerErrorResponse'
       summary: Delete Account
       tags:
       - Users
@@ -210,31 +500,63 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/entities.ModifyPasswordData'
+          $ref: '#/definitions/entities.UserModifyPassword'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entities.ModifyPasswordSuccessResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/entities.ModifyPasswordBadRequestResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordBadRequestResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/entities.ModifyPasswordFailureEmailNotValidResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/entities.ModifyPasswordFailureOldPasswordNotValidResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordFailureOldPasswordNotValidResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/entities.ModifyPasswordFailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordFailureInternalServerErrorResponse'
       summary: Modify Password
       tags:
       - Users
+  /workflow/create:
+    post:
+      description: Create a Workflow
+      parameters:
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.NewWorkflow'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
+      summary: Create Workflow
+      tags:
+      - Workflow
 swagger: "2.0"

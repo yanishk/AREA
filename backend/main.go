@@ -1,47 +1,39 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"github.com/rs/cors"
+	"github.com/robfig/cron/v3"
 
-	"poc-goland.com/poc/src/database"
-	"poc-goland.com/poc/src/entities"
-	"poc-goland.com/poc/src/routes"
-
-	_ "poc-goland.com/poc/docs"
+	_ "backend/docs"
+	"backend/src/handler"
+	"backend/src/service/domain"
+	"backend/src/storage/postgres"
 )
 
-//	@title	Documentation for AREA Rest API
-//	@host	localhost:8080
+// @title	Documentation for AREA Rest API
+// @host	localhost:8080
 func main() {
-	var databaseContext entities.Database
-	var err error
+	repositories := postgres.New()
+	services := domain.New(repositories)
+	handlers := handler.New(services)
 
-	databaseContext.Db, err = database.ConnectToDatabase()
-	if err != nil {
-		panic(err)
-	}
+	cronJob := cron.New()
 
-	corsAllow := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8081"},
-		AllowedMethods: []string{"GET", "POST"},
-		AllowedHeaders: []string{"Content-Type"},
+	_, errCronCreation := cronJob.AddFunc("@every 1m", func() {
+		err := handlers.ServiceHandler.CallTimeApi()
+		if err != nil {
+			fmt.Println("call Time API Failed")
+		}
 	})
-
-	var router *gin.Engine = gin.Default()
-
-	routes.PublicRoutes(router, databaseContext)
-	routes.PrivateRoutes(router, databaseContext)
-
-	handler := corsAllow.Handler(router)
-
-	err = http.ListenAndServe(":8080", handler)
-	if err != nil {
-		panic(err)
+	if errCronCreation != nil {
+		panic(errCronCreation)
 	}
+	cronJob.Start()
 
-	defer databaseContext.Db.Close()
+	errHandler := handlers.Run()
+	if errHandler != nil {
+		panic(errHandler)
+	}
 }

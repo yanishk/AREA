@@ -1,0 +1,24 @@
+name: frontend
+
+on:
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  check-compilation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check frontend compilation
+        run: |
+          cd frontend
+          npm install
+          npm run build
+           if [ $? -ne 0 ]; then
+            echo "Compilation failed."
+            exit 1
+          else
+            echo "Compilation succeed."
+            exit 0
+          fi

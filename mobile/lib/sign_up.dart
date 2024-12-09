@@ -7,7 +7,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "login_page.dart";
-import "explore.dart";
+import "exploreAll.dart";
+import "globalData.dart";
 
 class SignUp extends StatelessWidget {
   @override
@@ -56,8 +57,8 @@ class _APICallState extends State<APICall> {
       if (response.statusCode == 200) {
         setState(() {
           result = "";
+          developer.log("HEADER : ${response.headers}");
 
-          Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),
@@ -75,7 +76,7 @@ class _APICallState extends State<APICall> {
         if (result.split(' ').contains("SocketException:") == true ||
            (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
           debugPrint(result);
-          result = "Could not find the server\nPlease try again later";
+          result = Globaldata.ErrorServerConnection;
         }
       });
     }
@@ -153,7 +154,7 @@ class _APICallState extends State<APICall> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ExplorePage()),
+                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
                   );
                 },
                 size: Size(double.infinity, 60),
@@ -163,18 +164,10 @@ class _APICallState extends State<APICall> {
               ),
 
               Padding(padding: EdgeInsets.only(top: 30)),
-              ElevatedButton(
-                child: const Text("Already on AREA? Log in here", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  overlayColor: const Color.fromARGB(255, 204, 204, 204),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
+
+              CustomTextButton(
+                text: Text("Already on AREA? Log in here",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black,),),
+                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()),);},
               ),
 
             ],

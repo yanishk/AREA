@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:math';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -14,7 +15,7 @@ class CustomButton extends StatelessWidget {
   });
 
   final Color backgroundColor;
-  final AutoSizeText text;
+  final Widget? text;
   final VoidCallback? onPressed;
   final Size size;
   final EdgeInsets padding;
@@ -59,11 +60,17 @@ class CustomClassicForm extends StatelessWidget {
     required this.hint,
     this.controller,
     this.obscureText = false,
+    this.padding = const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+    this.enabled = true,
+    this.fillCollor = Colors.white,
   });
 
   final String hint;
   final TextEditingController? controller;
   final bool obscureText;
+  final EdgeInsetsGeometry padding;
+  final bool enabled;
+  final Color fillCollor;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +78,7 @@ class CustomClassicForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          padding: padding,
           child:
           Container(
             decoration: BoxDecoration(
@@ -81,7 +88,10 @@ class CustomClassicForm extends StatelessWidget {
               style: TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,
+              cursorColor: Colors.black,
               decoration: InputDecoration(
+                filled: true,
+                fillColor: fillCollor,
                 labelStyle:TextStyle(fontSize:40),
                 hintStyle: TextStyle(
                   fontSize: 20,
@@ -89,8 +99,16 @@ class CustomClassicForm extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 hintText: hint,
+                enabled: enabled,
                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: const Color.fromARGB(255, 238, 238, 238),
+                    width: 5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
                     color: const Color.fromARGB(255, 238, 238, 238),
@@ -135,6 +153,226 @@ class MyDivider extends StatelessWidget {
         Padding(padding: textPadding, child: text,),
         Expanded(child: Divider(thickness: thickness, color: color,),),
       ],
+    );
+  }
+}
+
+class LeftWidget extends StatelessWidget {
+  const LeftWidget({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class CustomTextButton extends StatelessWidget {
+  const CustomTextButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.padding,
+  });
+  final text;
+  final onPressed;
+  final padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicWidth(
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          padding: padding,
+        ),
+        child: text,
+      ),
+    );
+  }
+}
+
+class TwoChoiceAlertDialog extends StatelessWidget {
+  const TwoChoiceAlertDialog({
+    super.key,
+    required this.firstChoiceText,
+    required this.secondChoiceText,
+    required this.firstChoiceonPressed,
+    required this.secondChoiceonPressed,
+  });
+
+  final Text firstChoiceText;
+  final Text secondChoiceText;
+  final dynamic firstChoiceonPressed;
+  final dynamic secondChoiceonPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: const SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Center(
+              child: Text("Are you sure?", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Colors.black,)),
+            )
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        Center(
+          child: CustomButton(
+            backgroundColor:Color.fromARGB(255, 34, 34, 34),
+            text: firstChoiceText,
+            onPressed: firstChoiceonPressed,
+            size: Size(double.infinity, 55),
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+          ),
+        ),
+        Center(
+          child: CustomTextButton(
+            text: secondChoiceText,
+            onPressed: secondChoiceonPressed,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class WorkflowCard extends StatelessWidget {
+  const WorkflowCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colorList = [
+      const Color.fromARGB(255, 46, 41, 78),
+      const Color.fromARGB(255, 44, 110, 252),
+      const Color.fromARGB(255, 228, 64, 95),
+      const Color.fromARGB(255, 29, 185, 84),
+      const Color.fromARGB(255, 205, 65, 43),
+    ];
+
+    int colorIndex = Random().nextInt(colorList.length);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: colorList[colorIndex],
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: InkWell(
+              onTap: () {
+                debugPrint('Card tapped.');
+              },
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    height: 20,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colorList[colorIndex],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: Text( "A card that can be tapped\nAnd how fit with his content",
+                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ServicesCard extends StatelessWidget {
+  const ServicesCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colorList = [
+      const Color.fromARGB(255, 41, 44, 45),
+      const Color.fromARGB(255, 255, 0, 0),
+      const Color.fromARGB(255, 29, 185, 84),
+    ];
+
+    List<String> nameList = [
+      "Github",
+      "Youtube",
+      "Spotify",
+    ];
+
+    List<String> iconList = [
+      "assets/icon/github.png",
+      "assets/icon/youtube.png",
+      "assets/icon/spotify.png",
+    ];
+
+    int serviceIndex = Random().nextInt(colorList.length);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: colorList[serviceIndex],
+              border: Border.all(
+                color: colorList[serviceIndex],
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+
+            child: InkWell(
+              onTap: () {
+                debugPrint('Card tapped.');
+              },
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    child: Column(
+                      children: [
+                        Image.asset(iconList[serviceIndex], width: 75, height: 75),
+                        AutoSizeText(nameList[serviceIndex], style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                      ]
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
