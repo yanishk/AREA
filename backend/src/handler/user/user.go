@@ -16,6 +16,8 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
+const EmailNotFoundInTokenMessage = "Email not found in token"
+const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -142,7 +144,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
+			"error": EmailNotFoundInTokenMessage,
 		})
 		return
 	}
@@ -150,7 +152,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
+			"error": EmailNotValidMessage,
 		})
 		return
 	}
@@ -201,7 +203,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
+			"error": EmailNotFoundInTokenMessage,
 		})
 		return
 	}
@@ -209,7 +211,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
+			"error": EmailNotValidMessage,
 		})
 		return
 	}
@@ -231,7 +233,7 @@ func (self *UserHandler) GetUserEmail(context *gin.Context) {
 
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
+			"error": EmailNotFoundInTokenMessage,
 		})
 		return
 	}
@@ -239,7 +241,7 @@ func (self *UserHandler) GetUserEmail(context *gin.Context) {
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
+			"error": EmailNotValidMessage,
 		})
 		return
 	}
