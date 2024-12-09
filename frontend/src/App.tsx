@@ -14,19 +14,19 @@ import TriggerReactionPage from './pages/TriggerReaction'
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/create" element={<CreatePage />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/select-service" element={<SelectServicePage />} />
-          <Route path="/select-service/:name" element={<ServicePage />} />
-          <Route path="/select-action/:name" element={<TriggerActionPage />} />
-          <Route path="/select-reaction/:name" element={<TriggerReactionPage />} />
-          <Route path="/connect-service/:name" element={<ConnectService />} />
-        </Routes>
-      </Router>
+        <Router>
+          <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/create" element={<CreatePage />} />
+              <Route path="/register" element={<RegisterForm />} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/select-service" element={<SelectServicePage />} />
+              <Route path="/select-service/:name" element={<ServicePage />} />
+              <Route path="/select-action/:name" element={<TriggerActionPage />} />
+              <Route path="/select-reaction/:name" element={<TriggerReactionPage />} />
+              <Route path="/connect-service/:name" element={<ConnectService />} />
+          </Routes>
+        </Router>
     </AuthProvider>
   )
 }

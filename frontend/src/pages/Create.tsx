@@ -7,12 +7,37 @@ import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
 import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
 
+type AuthData = {
+    selectedAction: {
+        name: string;
+        color: string;
+        icon: string;
+    } | null;
+    selectedReaction: {
+        name: string;
+        color: string;
+        icon: string;
+    } | null;
+} | null;
+
+
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [selectedAction, setSelectedAction] = useState(location.state?.selectedAction || null);
-    const [selectedReaction, setSelectedReaction] = useState(location.state?.selectedReaction || null);
+    // const [selectedAction, setSelectedAction] = useState(location.state?.selectedAction || null);
+    // const [selectedReaction, setSelectedReaction] = useState(location.state?.selectedReaction || null);
+
+    const savedData: AuthData = JSON.parse(localStorage.getItem("authData") || "null");
+
+    const [selectedAction, setSelectedAction] = useState(
+        location.state?.selectedAction || savedData?.selectedAction || null
+    );
+
+    const [selectedReaction, setSelectedReaction] = useState(
+        location.state?.selectedReaction || savedData?.selectedReaction || null
+    );
+
 
     const handleDeleteAction = () => {
         setSelectedAction(null);
