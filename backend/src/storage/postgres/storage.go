@@ -10,9 +10,10 @@ import (
 
 	"backend/src/storage"
 	action_repository "backend/src/storage/postgres/action"
+	reaction_repository "backend/src/storage/postgres/reaction"
 	service_repository "backend/src/storage/postgres/service"
-	trigger_repository "backend/src/storage/postgres/trigger"
 	user_repository "backend/src/storage/postgres/user"
+	user_service_repository "backend/src/storage/postgres/userservice"
 	workflow_repository "backend/src/storage/postgres/workflow"
 )
 
@@ -48,10 +49,11 @@ func New() *storage.Repository {
 	fmt.Println("Successfully connected!")
 
 	return &storage.Repository{
-		UserRepository:     user_repository.NewUserRepository(db),
-		ServiceRepository:  service_repository.NewServiceRepository(db),
-		ActionRepository:   action_repository.NewActionRepository(db),
-		TriggerRepository:  trigger_repository.NewTriggerRepository(db),
-		WorkflowRepository: workflow_repository.NewWorkflowRepository(db),
+		UserRepository:        user_repository.NewUserRepository(db),
+		ServiceRepository:     service_repository.NewServiceRepository(db),
+		UserServiceRepository: user_service_repository.NewUserServiceRepository(db),
+		ReactionRepository:    reaction_repository.NewReactionRepository(db),
+		ActionRepository:      action_repository.NewActionRepository(db),
+		WorkflowRepository:    workflow_repository.NewWorkflowRepository(db),
 	}
 }

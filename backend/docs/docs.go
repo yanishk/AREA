@@ -15,6 +15,120 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/actions-services": {
+            "get": {
+                "description": "Retrieve services with actions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Google": {
+            "get": {
+                "description": "Get Google OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Spotify": {
+            "get": {
+                "description": "Get Spotify OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Spotify OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/callback/{service}": {
+            "get": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Authentication",
@@ -62,6 +176,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/reactions-services": {
+            "get": {
+                "description": "Retrieve services with reactions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Reactions Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -211,9 +351,256 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/{service}/actions": {
+            "get": {
+                "description": "Retrieve actions from requested service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Actions From Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify, Time \u0026 Date..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/{service}/reactions": {
+            "get": {
+                "description": "Retrieve reactions from requested service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Reactions From Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify, Time \u0026 Date..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/create": {
+            "post": {
+                "description": "Create a Workflow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Create Workflow",
+                "parameters": [
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.NewWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "docs_service.ActionExample": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string",
+                    "example": "This Trigger fires every single day at a specific time set by you."
+                },
+                "Id": {
+                    "type": "string",
+                    "example": "2685fc54-d1e2-43d8-9525-56ab7a91e351"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Every day at"
+                },
+                "ServiceId": {
+                    "type": "string",
+                    "example": "203a1f6a-b2d7-4011-a73b-e9585907835b"
+                },
+                "nbParam": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.ReactionExample": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string",
+                    "example": "Start a new context or resume current playback on the user’s active device. Only available for Spotify premium accounts."
+                },
+                "Id": {
+                    "type": "string",
+                    "example": "5dccb0f3-64db-4456-8286-4678857ae394"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Start playback"
+                },
+                "ServiceId": {
+                    "type": "string",
+                    "example": "4f6f8655-8e0f-4f96-ba7f-d3cab1577b74"
+                },
+                "nbParam": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.ServiceExample": {
+            "type": "object",
+            "properties": {
+                "Color": {
+                    "type": "string",
+                    "example": "#E84A4A"
+                },
+                "Logo": {
+                    "type": "string",
+                    "example": "assets/logos/Google.webp"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "Google"
+                }
+            }
+        },
+        "docs_service.ServiceInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Internal server error"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ActionExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested service"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ServiceExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.ReactionExample"
+                    }
+                }
+            }
+        },
         "docs_user.DeleteAccountFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -346,6 +733,100 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "New user created"
+                }
+            }
+        },
+        "docs_userservice.OAuth2Response": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization-Could not find requested user-Could not find requested service"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to exchange token-Failed to get email"
+                }
+            }
+        },
+        "docs_userservice.ServiceCallBackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Token generated"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not create workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Successful workflow creation"
+                }
+            }
+        },
+        "docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "entities.NewWorkflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },

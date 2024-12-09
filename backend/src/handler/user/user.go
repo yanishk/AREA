@@ -1,11 +1,9 @@
 package user_handler
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	"backend/src/entities"
 	"backend/src/handler/middleware"
@@ -16,6 +14,8 @@ import (
 type UserHandler struct {
 	UserService service.UserService
 }
+
+const InvalidRequestBodyMessage = "Invalid request body"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -29,7 +29,6 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
 }
@@ -57,10 +56,9 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 	var newUser entities.UserCredentials
 
 	err := context.ShouldBindJSON(&newUser)
-	fmt.Println(newUser)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request body",
+			"error": InvalidRequestBodyMessage,
 		})
 		return
 	}
@@ -97,10 +95,11 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 // @Router			/login [post]
 func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 	var user entities.UserCredentials
+
 	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request body",
+			"error": InvalidRequestBodyMessage,
 		})
 		return
 	}
@@ -117,8 +116,8 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 			})
 		}
 	} else {
-		context.SetSameSite(http.SameSiteLaxMode)
-		context.SetCookie("JWToken", token, 3600, "", "", false, true)
+		context.SetSameSite(http.SameSiteNoneMode)
+		context.SetCookie("JWToken", token, 3600, "", "", true, true)
 		context.IndentedJSON(http.StatusOK, gin.H{
 			"success": "Connection successful",
 		})
@@ -160,7 +159,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request body",
+			"error": InvalidRequestBodyMessage,
 		})
 		return
 	}

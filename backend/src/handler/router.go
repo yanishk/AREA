@@ -5,41 +5,56 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	service_handler "backend/src/handler/service"
 	user_handler "backend/src/handler/user"
+	user_service_handler "backend/src/handler/userservice"
+	workflow_handler "backend/src/handler/workflow"
 	"backend/src/service"
 )
 
 type UserHandler interface {
-	SetupRoutes(router *gin.Engine)
 }
 
 type ServiceHandler interface {
-	SetupRoutes(router *gin.Engine)
+	CallTimeApi() error
+}
+
+type UserServiceHandler interface {
+}
+
+type WorkflowHandler interface {
 }
 
 type Handler struct {
-	UserHandler    UserHandler
-	ServiceHandler ServiceHandler
-	router         *gin.Engine
+	UserHandler        UserHandler
+	ServiceHandler     ServiceHandler
+	UserServiceHandler UserServiceHandler
+	WorkflowHandler    WorkflowHandler
+	router             *gin.Engine
 }
 
 func New(services *service.Service) *Handler {
 	router := gin.Default()
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return &Handler{
-		UserHandler:    user_handler.NewUserHandler(services.UserService, router),
-		ServiceHandler: service_handler.NewServiceHandler(services.ServiceService, router),
-		router:         router,
+		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
+		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
+		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserServiceService, services.UserService, router),
+		WorkflowHandler:    workflow_handler.NewWorkflowHandler(services.WorkflowService, services.UserService, router),
+		router:             router,
 	}
 }
 
 func (self *Handler) Run() error {
 
 	corsAllow := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8081"},
-		AllowedMethods: []string{"GET", "POST"},
-		AllowedHeaders: []string{"Content-Type"},
+		AllowedOrigins:   []string{"http://localhost:8081"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
 	})
 
 	handler := corsAllow.Handler(self.router)

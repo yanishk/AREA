@@ -15,15 +15,15 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 	return &ServiceRepository{db: db}
 }
 
-func (self *ServiceRepository) CreateService(name string, accessToken string, refreshToken string, uuidUser string, expiry string) error {
-	sqlStatement := `INSERT INTO services (name, accessToken, refreshToken, iduser, expirytoken) VALUES ($1, $2, $3, $4, $5);`
+func (self *ServiceRepository) CreateService(name string, color string, logo string) error {
+	sqlStatement := `INSERT INTO services (name, color, logo) VALUES ($1, $2, $3);`
 
 	_, err := self.FindServiceByName(name)
 	if err == nil {
 		return fmt.Errorf("service already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, name, accessToken, refreshToken, uuidUser, expiry)
+	_, err = self.db.Exec(sqlStatement, name, color, logo)
 	if err != nil {
 		return err
 	}
@@ -35,36 +35,51 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 	var retrievedService entities.Service
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedService.Id, &retrievedService.Name)
+	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
 	if err != nil {
 		return retrievedService, err
 	}
 	return retrievedService, nil
 }
 
-func (self *ServiceRepository) FindUserServiceByName(name string, userId string) (entities.Service, error) {
-	sqlStatement := `SELECT * FROM services where name = ($1) AND iduser = ($2)`
-	var retrievedService entities.Service
+func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulInformations, error) {
+	sqlStatement := `SELECT name, color, logo FROM services where hasactions = true`
+	var retrievedServices []entities.ServiceUsefulInformations
 
-	row := self.db.QueryRow(sqlStatement, name, userId)
-	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.AccessToken, &retrievedService.RefreshToken, &retrievedService.IdUser, &retrievedService.ExpiryToken)
+	rows, err := self.db.Query(sqlStatement)
 	if err != nil {
-		return retrievedService, err
+		return retrievedServices, err
 	}
-	return retrievedService, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var retrievedService entities.ServiceUsefulInformations
+		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
+		if err != nil {
+			return retrievedServices, err
+		}
+		retrievedServices = append(retrievedServices, retrievedService)
+	}
+	return retrievedServices, nil
 }
 
-func (self *ServiceRepository) UpdateServiceByUserAndName(name string, accessToken string, refreshToken string, uuidUser string, expiryToken string) error {
-	sqlStatement := `UPDATE services SET accessToken = ($1), refreshToken = ($2), expirytoken = ($3) WHERE name = ($4);`
+func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUsefulInformations, error) {
+	sqlStatement := `SELECT name, color, logo FROM services where hasreactions = true`
+	var retrievedServices []entities.ServiceUsefulInformations
 
-	_, err := self.FindUserServiceByName(name, uuidUser)
+	rows, err := self.db.Query(sqlStatement)
 	if err != nil {
-		return fmt.Errorf("service doesn't exist")
+		return retrievedServices, err
 	}
+	defer rows.Close()
 
-	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, name)
-	if err != nil {
-		return err
+	for rows.Next() {
+		var retrievedService entities.ServiceUsefulInformations
+		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
+		if err != nil {
+			return retrievedServices, err
+		}
+		retrievedServices = append(retrievedServices, retrievedService)
 	}
-	return nil
+	return retrievedServices, nil
 }

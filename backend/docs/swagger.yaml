@@ -1,4 +1,84 @@
 definitions:
+  docs_service.ActionExample:
+    properties:
+      Description:
+        example: This Trigger fires every single day at a specific time set by you.
+        type: string
+      Id:
+        example: 2685fc54-d1e2-43d8-9525-56ab7a91e351
+        type: string
+      Name:
+        example: Every day at
+        type: string
+      ServiceId:
+        example: 203a1f6a-b2d7-4011-a73b-e9585907835b
+        type: string
+      nbParam:
+        type: integer
+    type: object
+  docs_service.ReactionExample:
+    properties:
+      Description:
+        example: Start a new context or resume current playback on the user’s active
+          device. Only available for Spotify premium accounts.
+        type: string
+      Id:
+        example: 5dccb0f3-64db-4456-8286-4678857ae394
+        type: string
+      Name:
+        example: Start playback
+        type: string
+      ServiceId:
+        example: 4f6f8655-8e0f-4f96-ba7f-d3cab1577b74
+        type: string
+      nbParam:
+        type: integer
+    type: object
+  docs_service.ServiceExample:
+    properties:
+      Color:
+        example: '#E84A4A'
+        type: string
+      Logo:
+        example: assets/logos/Google.webp
+        type: string
+      Name:
+        example: Google
+        type: string
+    type: object
+  docs_service.ServiceInternalServerErrorResponse:
+    properties:
+      error:
+        example: Internal server error
+        type: string
+    type: object
+  docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/docs_service.ActionExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Could not find requested service
+        type: string
+    type: object
+  docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/docs_service.ServiceExample'
+        type: array
+    type: object
+  docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
+    properties:
+      reactions:
+        items:
+          $ref: '#/definitions/docs_service.ReactionExample'
+        type: array
+    type: object
   docs_user.DeleteAccountFailureInternalServerErrorResponse:
     properties:
       error:
@@ -89,6 +169,70 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.OAuth2Response:
+    properties:
+      auth-url:
+        example: url-example.com
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization-Could not find requested user-Could not
+          find requested service
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to exchange token-Failed to get email
+        type: string
+    type: object
+  docs_userservice.ServiceCallBackSuccessResponse:
+    properties:
+      success:
+        example: Token generated
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not create workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Successful workflow creation
+        type: string
+    type: object
+  docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  entities.NewWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
   entities.UserCredentials:
     properties:
       email:
@@ -108,6 +252,135 @@ info:
   contact: {}
   title: Documentation for AREA Rest API
 paths:
+  /{service}/actions:
+    get:
+      description: Retrieve actions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Actions From Service
+      tags:
+      - Services
+  /{service}/reactions:
+    get:
+      description: Retrieve reactions from requested service
+      parameters:
+      - description: Service name (Google, Spotify, Time & Date..)
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Reactions From Service
+      tags:
+      - Services
+  /actions-services:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Actions Services
+      tags:
+      - Services
+  /authentication/Google:
+    get:
+      description: Get Google OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Google OAuth2
+      tags:
+      - Authentication
+  /authentication/Spotify:
+    get:
+      description: Get Spotify OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Spotify OAuth2
+      tags:
+      - Authentication
+  /callback/{service}:
+    get:
+      description: Callback for services
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse'
+      summary: Service Callback
+      tags:
+      - Authentication
   /login:
     post:
       consumes:
@@ -142,6 +415,23 @@ paths:
       summary: Login
       tags:
       - Users
+  /reactions-services:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Reactions Services
+      tags:
+      - Services
   /register:
     post:
       consumes:
@@ -237,4 +527,36 @@ paths:
       summary: Modify Password
       tags:
       - Users
+  /workflow/create:
+    post:
+      description: Create a Workflow
+      parameters:
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.NewWorkflow'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
+      summary: Create Workflow
+      tags:
+      - Workflow
 swagger: "2.0"
