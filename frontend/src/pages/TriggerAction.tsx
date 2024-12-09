@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import CancelButton from "../components/buttons/CancelButton";
 import { servicesData } from "../ServicesData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DynamicFields from "../components/inputs/DynamicFields";
 import TriggerButton from "../components/buttons/TriggerButton";
 
@@ -28,6 +28,14 @@ const TriggerActionPage = () => {
             [id]: value,
         }));
     };
+
+    useEffect(() => {
+        const defaultValues = fields.reduce((acc, field) => {
+            acc[field.id] = field.options?.[0] || "";
+            return acc;
+        }, {} as Record<string, string>);
+        setFieldValues(defaultValues);
+    }, [fields]);
 
     const handleActionClick = () => {
         navigate("/create", {
