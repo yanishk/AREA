@@ -7,6 +7,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
+import 'getApi.dart';
+import "spotifyAuth.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -119,6 +121,27 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     });
   }
 
+  Future<void> getSpotifyAuthLink() async {
+    final AuthLink = await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => GetAPICall(apiRoute: "authentication/Spotify")));
+    Globaldata.spotifyConnectionLink = AuthLink["auth-url"];
+    developer.log("getSpotifyAuthLink responce : ${Globaldata.spotifyConnectionLink}");
+    await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
+  }
+
+  Widget connectButton() {
+    if (serviceNameList[serviceIndex] == "Spotify") {
+      return CustomButton(
+        backgroundColor:colorTheme,
+        text: AutoSizeText("Connect", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+        onPressed: getSpotifyAuthLink,
+        size: Size(double.infinity, 60),
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+      );
+    } else {
+      return SizedBox();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     serviceName = serviceNameList[serviceIndex];
@@ -145,9 +168,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
               ),
 
               child: InkWell(
-                onTap: () {
-                  debugPrint('Card tapped.');
-                },
                 child: Column(
                   children: [
                     Padding(padding: EdgeInsets.only(top: 30)),
@@ -177,6 +197,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
               ),
             ),
             Padding(padding: EdgeInsets.only(top: 50)),
+            connectButton(),
           ],
         ),
       ),
