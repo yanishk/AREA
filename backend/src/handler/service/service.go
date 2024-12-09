@@ -81,20 +81,23 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 		hour, hourExists := workflow.ActionParam["hour"]
 		minute, minuteExists := workflow.ActionParam["minute"]
 		if !hourExists || !minuteExists {
-			return fmt.Errorf("missing hour or minute in ActionParam")
+			continue
 		}
 
 		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
 			if errReaction != nil {
-				return errReaction
+				continue
 			}
 			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
 			if errUser != nil {
-				return errUser
+				continue
 			}
 
-			return self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			if errPlayback != nil {
+				continue
+			}
 		}
 	}
 	return nil
