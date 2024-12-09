@@ -46,7 +46,6 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           domStorageEnabled: true,
-          incognito: true,
         ),
         onLoadStart: (controller, url) {
           _setCookiesAndNavigate();
