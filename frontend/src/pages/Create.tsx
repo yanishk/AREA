@@ -135,13 +135,17 @@ const WorkflowBuilder = () => {
                 <div
                     className="w-full max-w-[350px] flex flex-col items-center justify-center"
                 >
-                    <TriggerButton
-                        text="Continue"
-                        textColor="text-white"
-                        bgColor="bg-[#222222]"
-                        hoverColor="hover:bg-[#333333]"
-                        onClick={handleContinue}
-                    />
+                    {selectedAction && selectedReaction ? (
+                        <TriggerButton
+                            text="Continue"
+                            textColor="text-white"
+                            bgColor="bg-[#222222]"
+                            hoverColor="hover:bg-[#333333]"
+                            onClick={handleContinue}
+                        />
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </div>
         </div>
