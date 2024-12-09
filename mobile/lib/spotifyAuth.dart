@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'dart:developer' as developer;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import "custom_widget.dart";
 import "globalData.dart";
-import 'getApi.dart';
 
 class SpotifyAuthPage extends StatelessWidget {
   @override
@@ -28,37 +20,40 @@ class SpotifyAuthAPICall extends StatefulWidget {
 }
 
 class SpotifyAuth extends State<SpotifyAuthAPICall> {
+  late InAppWebViewController webViewController;
+  @override
+  void initState() {
+    super.initState();
+    _setCookiesAndNavigate();
+  }
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
-  List<String> serviceNameList = Globaldata.actionServicesName;
-  List<String> serviceColorList = Globaldata.actionServicesColor;
-  List<String> serviceIconsList = Globaldata.actionServicesIcons;
-  Color colorTheme = Colors.black;
-  String title = "Select action";
-  String serviceName = "";
-  String result = '';
-  String apiRoute = "callback/";
-  String actionDescription = "";
-  bool isInit = false;
 
-  Future<void> setReactionService() async {
-    // final result = await FlutterWebAuth2.authenticate(url: Globaldata.spotifyConnectionLink, callbackUrlScheme: "${apiUrl + apiRoute}Spotify");
-    await launchUrl(Uri.parse(Globaldata.spotifyConnectionLink));
-
-    final token = Uri.parse(result).queryParameters['token'];
-    developer.log("token : $token");
-    Navigator.pop(Globaldata.myContext);
+  Future<void> _setCookiesAndNavigate() async {
+    final cookieManager = CookieManager();
+    await cookieManager.setCookie(
+      url: WebUri(apiUrl),
+      name: "JWToken",
+      value: Globaldata.JWToken.split('=').last,
+      isSecure: true,
+      isHttpOnly: true,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!isInit) {
-      isInit = true;
-      setReactionService();
-    }
-    return Column(
-      children: const [
-        MyDivider(),
-      ],
+    return Scaffold(
+      body: InAppWebView(
+        initialUrlRequest: URLRequest(
+          url: WebUri(Globaldata.spotifyConnectionLink),
+        ),
+        initialSettings: InAppWebViewSettings(
+          javaScriptEnabled: true,
+          domStorageEnabled: true,
+        ),
+        onWebViewCreated: (controller) {
+          webViewController = controller;
+        },
+      ),
     );
   }
 }
