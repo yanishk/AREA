@@ -19,6 +19,7 @@ dependencies:
   http: ^1.2.2
   flutter_dotenv: ^5.2.1
   fluttertoast: ^8.2.8
+  flutter_web_auth: ^0.6.0
 
 dev_dependencies:
   flutter_test:
@@ -36,4 +37,5 @@ flutter:
     - assets/icon/github.png
     - assets/icon/spotify.png
     - assets/icon/youtube.png
+    - assets/icon/noImage.png
     - .env
