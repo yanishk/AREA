@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:developer' as developer;
 
 import "globalData.dart";
 
@@ -21,12 +22,8 @@ class SpotifyAuthAPICall extends StatefulWidget {
 
 class SpotifyAuth extends State<SpotifyAuthAPICall> {
   late InAppWebViewController webViewController;
-  @override
-  void initState() {
-    super.initState();
-    _setCookiesAndNavigate();
-  }
   final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  String newUrl = "";
 
   Future<void> _setCookiesAndNavigate() async {
     final cookieManager = CookieManager();
@@ -49,9 +46,22 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           domStorageEnabled: true,
+          incognito: true,
         ),
-        onWebViewCreated: (controller) {
-          webViewController = controller;
+        onLoadStart: (controller, url) {
+          _setCookiesAndNavigate();
+        },
+        onLoadStop: (controller, url) async {
+          if (url != null && url.toString().contains("${apiUrl}callback/Spotify")) {
+            final content = await controller.evaluateJavascript(source: "document.body.innerText");
+            if (content != null && content.contains('"success": "Token generated"')) {
+              developer.log("User connected :\n$content");
+              Navigator.pop(context);
+              Navigator.pop(Globaldata.myContext);
+            } else {
+              developer.log("Error auth failed :\n$content");
+            }
+          }
         },
       ),
     );
