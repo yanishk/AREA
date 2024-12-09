@@ -38,6 +38,7 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 	{
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
+		user.GET("/email", self.GetUserEmail)
 	}
 }
 
@@ -218,9 +219,31 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "Account deleted",
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Account deleted",
+	})
+}
+
+func (self *UserHandler) GetUserEmail(context *gin.Context) {
+	email, err := context.Get("email")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email not found in token",
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email is not a valid string",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"email": emailStr,
+	})
 }
