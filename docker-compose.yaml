@@ -15,16 +15,7 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - client_mobile
       - server
-    volumes:
-      - shared:/shared
-    networks:
-      - app-network
-
-  client_mobile:
-    build:
-      context: ./mobile
     volumes:
       - shared:/shared
     networks:
