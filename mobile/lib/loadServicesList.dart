@@ -32,6 +32,31 @@ class LoadService extends State<APICall> {
   String reactionsServices = "reactions-services";
   bool isInit = true;
 
+  void storeData(dynamic responseData) {
+    final firstService = responseData[0];
+    if (firstService is Map<String, dynamic>) {
+      result = firstService['Name'] ?? 'No Name';
+      developer.log("getServices OK :\n$result");
+      if (apiRoute == actionsServices) {
+        Globaldata.actionServicesName.add(firstService['Name']);
+        Globaldata.actionServicesColor.add(firstService['Color']);
+        Globaldata.actionServicesIcons.add(firstService['Logo']);
+        developer.log("getServices $actionsServices");
+        apiRoute = reactionsServices;
+        getServices();
+      } else {
+        Globaldata.reactionServicesName.add(firstService['Name']);
+        Globaldata.reactionServicesColor.add(firstService['Color']);
+        Globaldata.reactionServicesIcons.add(firstService['Logo']);
+        developer.log("getServices $reactionsServices");
+        Navigator.push(
+          Globaldata.myContext,
+          MaterialPageRoute(builder: (context) => ExplorePageAll()),
+        );
+      }
+    }
+  }
+
   Future<void> getServices() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
@@ -43,40 +68,18 @@ class LoadService extends State<APICall> {
           'Cookie': Globaldata.JWToken,
         },
       );
+      final responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
 
         setState(() {
           developer.log("getServices OK :\n$responseData");
           if (responseData is List && responseData.isNotEmpty) {
-            final firstService = responseData[0];
-            if (firstService is Map<String, dynamic>) {
-              result = firstService['Name'] ?? 'No Name';
-              developer.log("getServices OK :\n$result");
-              if (apiRoute == actionsServices) {
-                Globaldata.actionServicesName.add(firstService['Name']);
-                Globaldata.actionServicesColor.add(firstService['Color']);
-                Globaldata.actionServicesIcons.add(firstService['Logo']);
-                developer.log("getServices $actionsServices");
-                apiRoute = reactionsServices;
-                getServices();
-              } else {
-                Globaldata.reactionServicesName.add(firstService['Name']);
-                Globaldata.reactionServicesColor.add(firstService['Color']);
-                Globaldata.reactionServicesIcons.add(firstService['Logo']);
-                developer.log("getServices $reactionsServices");
-                Navigator.push(
-                  Globaldata.myContext,
-                  MaterialPageRoute(builder: (context) => ExplorePageAll()),
-                );
-              }
-            }
+            storeData(responseData);
           } else {
             result = 'No data available';
           }
         });
       } else {
-        final responseData = jsonDecode(response.body);
         developer.log("getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
         setState(() {
           result = '${responseData['error']}';

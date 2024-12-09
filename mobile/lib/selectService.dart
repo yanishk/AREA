@@ -75,20 +75,19 @@ class SelectService extends State<APICall> {
           ),
         ],
       );
-    } else {
-      developer.log("index : $index");
-      return Row(
-        children: [
-          MySquareServicesCard(
-            servicesIndex: index,
-            isAnAction: isAnAction,
-            serviceColorList: serviceColorList,
-            serviceNameList: serviceNameList,
-            serviceIconsList: serviceIconsList,
-          ),
-        ],
-      );
     }
+    developer.log("index : $index");
+    return Row(
+      children: [
+        MySquareServicesCard(
+          servicesIndex: index,
+          isAnAction: isAnAction,
+          serviceColorList: serviceColorList,
+          serviceNameList: serviceNameList,
+          serviceIconsList: serviceIconsList,
+        ),
+      ],
+    );
   }
 
   @override
@@ -180,49 +179,45 @@ class MySquareServicesCard extends StatelessWidget {
     developer.log("https://mathisbrehm.fr/${serviceIconsList[servicesIndex]}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Container(
-            decoration: BoxDecoration(
-              color: HexColor(serviceColorList[servicesIndex]),
-              border: Border.all(
-                color: HexColor(serviceColorList[servicesIndex]),
-                width: 2.0,
-              ),
-              borderRadius: BorderRadius.circular(4.0),
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: HexColor(serviceColorList[servicesIndex]),
+          border: Border.all(
+            color: HexColor(serviceColorList[servicesIndex]),
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(4.0),
+        ),
 
-            child: InkWell(
-              onTap: () {
-                if (isAnAction) {
-                  Globaldata.firstService = servicesIndex;
-                  redirectToSelectActionOrReactionPage();
-                } else {
-                  Globaldata.secondService = servicesIndex;
-                  redirectToSelectActionOrReactionPage();
-                }
-              },
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                    child: Column(
-                      children: [
-                        SafeWebImage(
-                            url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"
-                          ),
-                        AutoSizeText(serviceNameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
-                      ]
-                    ),
-                  ),
-                ],
+        child: InkWell(
+          onTap: () {
+            if (isAnAction) {
+              Globaldata.firstService = servicesIndex;
+              redirectToSelectActionOrReactionPage();
+            } else {
+              Globaldata.secondService = servicesIndex;
+              redirectToSelectActionOrReactionPage();
+            }
+          },
+          child: Column(
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
               ),
-            ),
-          );
-        },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                child: Column(
+                  children: [
+                    SafeWebImage(
+                        url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"
+                      ),
+                    AutoSizeText(serviceNameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
+                  ]
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

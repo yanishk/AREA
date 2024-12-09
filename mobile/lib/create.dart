@@ -45,19 +45,18 @@ class CreateWorkflows extends State<APICall> {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );
-    } else {
-      return PlaceableWidget (
-        left: MediaQuery.sizeOf(Globaldata.myContext).width / 10,
-        child : DoubleWidget(
-          firstChild: AutoSizeText(
-            "If This",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          secondChild: TextWithBackground(text: "add"),
-          padding: EdgeInsets.only(left: MediaQuery.sizeOf(Globaldata.myContext).width / 5),
-        ),
-      );
     }
+    return PlaceableWidget (
+      left: MediaQuery.sizeOf(Globaldata.myContext).width / 10,
+      child : DoubleWidget(
+        firstChild: AutoSizeText(
+          "If This",
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        secondChild: TextWithBackground(text: "add"),
+        padding: EdgeInsets.only(left: MediaQuery.sizeOf(Globaldata.myContext).width / 5),
+      ),
+    );
   }
 
   Widget secondButton() {
@@ -80,9 +79,8 @@ class CreateWorkflows extends State<APICall> {
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         )
       );
-    } else {
-      return const AutoSizeText("Then That", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),);
     }
+    return const AutoSizeText("Then That", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),);
   }
 
   Widget continueButton() {
@@ -94,9 +92,8 @@ class CreateWorkflows extends State<APICall> {
         size: Size(double.infinity, 60),
         padding: EdgeInsets.symmetric(horizontal: 15.0),
       );
-    } else {
-      return SizedBox();
     }
+    return SizedBox();
   }
 
   Future<void> firstButtonNextState() async {

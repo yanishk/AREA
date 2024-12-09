@@ -58,6 +58,23 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   String actionDescription = "";
   bool isInit = false;
 
+  void storeServiceDescription(dynamic responseData) {
+    developer.log("getServices OK :\n$responseData");
+    if (responseData is Map<String, dynamic> && responseData[apiRoute] is List) {
+      final actions = responseData[apiRoute];
+      if (actions.isNotEmpty) {
+        final actionResponce = actions[0];
+        if (actionResponce is Map<String, dynamic>) {
+          actionDescription = actionResponce['Description'] ?? 'No Description';
+        }
+      } else {
+        result = 'No actions available';
+      }
+    } else {
+      result = 'Invalid response structure';
+    }
+  }
+
   Future<void> getServices() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
@@ -69,27 +86,12 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           'Cookie': Globaldata.JWToken,
         },
       );
+      final responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-
         setState(() {
-          developer.log("getServices OK :\n$responseData");
-          if (responseData is Map<String, dynamic> && responseData[apiRoute] is List) {
-            final actions = responseData[apiRoute];
-            if (actions.isNotEmpty) {
-              final actionResponce = actions[0];
-              if (actionResponce is Map<String, dynamic>) {
-                actionDescription = actionResponce['Description'] ?? 'No Description';
-              }
-            } else {
-              result = 'No actions available';
-            }
-          } else {
-            result = 'Invalid response structure';
-          }
+          storeServiceDescription(responseData);
         });
       } else {
-        final responseData = jsonDecode(response.body);
         developer.log("getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
         setState(() {
           result = '${responseData['error']}';
@@ -175,13 +177,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
               ),
             ),
             Padding(padding: EdgeInsets.only(top: 50)),
-            // CustomButton (
-            //   backgroundColor:colorTheme,
-            //   text: AutoSizeText("reset", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-            //   onPressed: () {isInit = false;},
-            //   size: Size(double.infinity, 60),
-            //   padding: EdgeInsets.symmetric(horizontal: 15.0),
-            // ),
           ],
         ),
       ),
