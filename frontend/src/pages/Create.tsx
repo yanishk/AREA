@@ -25,8 +25,6 @@ const WorkflowBuilder = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // const [selectedAction, setSelectedAction] = useState(location.state?.selectedAction || null);
-    // const [selectedReaction, setSelectedReaction] = useState(location.state?.selectedReaction || null);
 
     const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") || "null");
 
@@ -87,10 +85,11 @@ const WorkflowBuilder = () => {
     }
 
     const handleContinue = () => {
-        console.log("action : ", selectedAction);
-        console.log("reaction : ", selectedReaction);
-        return;
-    }
+        localStorage.removeItem("workflowData");
+        setSelectedAction(null);
+        setSelectedReaction(null);
+        navigate("/");
+    };
 
     return (
         <div>
@@ -153,6 +152,7 @@ const WorkflowBuilder = () => {
                                 })
                             }
                             text="Then That"
+                            disabled={!selectedAction}
                         />
                     )}
                 </div>
