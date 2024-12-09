@@ -32,22 +32,24 @@ class LoadService extends State<APICall> {
   String reactionsServices = "reactions-services";
   bool isInit = true;
 
-  void storeData(dynamic responseData) {
+  void storeData(List<String> servicesName, List<String> servicesColor, List<String> servicesIcons, dynamic service) {
+    servicesName.add(service['Name']);
+    servicesColor.add(service['Color']);
+    servicesIcons.add(service['Logo']);
+  }
+
+  void setStoreData(dynamic responseData) {
     final firstService = responseData[0];
     if (firstService is Map<String, dynamic>) {
       result = firstService['Name'] ?? 'No Name';
       developer.log("getServices OK :\n$result");
       if (apiRoute == actionsServices) {
-        Globaldata.actionServicesName.add(firstService['Name']);
-        Globaldata.actionServicesColor.add(firstService['Color']);
-        Globaldata.actionServicesIcons.add(firstService['Logo']);
+        storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor, Globaldata.actionServicesIcons, firstService);
         developer.log("getServices $actionsServices");
         apiRoute = reactionsServices;
         getServices();
       } else {
-        Globaldata.reactionServicesName.add(firstService['Name']);
-        Globaldata.reactionServicesColor.add(firstService['Color']);
-        Globaldata.reactionServicesIcons.add(firstService['Logo']);
+        storeData(Globaldata.reactionServicesName, Globaldata.reactionServicesColor, Globaldata.reactionServicesIcons, firstService);
         developer.log("getServices $reactionsServices");
         Navigator.push(
           Globaldata.myContext,
@@ -70,11 +72,10 @@ class LoadService extends State<APICall> {
       );
       final responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-
         setState(() {
           developer.log("getServices OK :\n$responseData");
           if (responseData is List && responseData.isNotEmpty) {
-            storeData(responseData);
+            setStoreData(responseData);
           } else {
             result = 'No data available';
           }
