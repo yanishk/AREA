@@ -49,7 +49,7 @@ class EditAccount extends State<APICall> {
           Globaldata.JWToken = "";
           Fluttertoast.showToast(msg: "Account deleted", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 24.0);
 
-          Navigator.push(
+          Navigator.push (
             Globaldata.myContext,
             MaterialPageRoute(builder: (context) => LoginPage()),
           );
@@ -88,8 +88,8 @@ class EditAccount extends State<APICall> {
         return TwoChoiceAlertDialog(
           firstChoiceText: Text("Delete my account", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
           secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
-          firstChoiceonPressed: () {_deleteAccount(); Navigator.of(Globaldata.myContext).pop();},
-          secondChoiceonPressed: () {Navigator.of(Globaldata.myContext).pop();},
+          firstChoiceonPressed: () {_deleteAccount(); Navigator.of(context).pop();},
+          secondChoiceonPressed: () {Navigator.of(context).pop();},
         );
       },
     );
@@ -105,9 +105,10 @@ class EditAccount extends State<APICall> {
           secondChoiceText: Text("Cancel",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black,),),
           firstChoiceonPressed: () {
             Globaldata.JWToken = "";
+            Navigator.of(context).pop();
             Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => LoginPage()),);
           },
-          secondChoiceonPressed: () {Navigator.of(Globaldata.myContext).pop();},
+          secondChoiceonPressed: () {Navigator.of(context).pop();},
         );
       },
     );

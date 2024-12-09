@@ -199,12 +199,7 @@ class MySquareServicesCard extends StatelessWidget {
                   redirectToSelectActionOrReactionPage();
                 } else {
                   Globaldata.secondService = servicesIndex;
-                  if (serviceNameList[servicesIndex] == "Spotify") {
-                    developer.log("spotify");
-                    redirectToSelectActionOrReactionPage();
-                  } else {
-                    redirectToSelectActionOrReactionPage();
-                  }
+                  redirectToSelectActionOrReactionPage();
                 }
               },
               child: Column(
