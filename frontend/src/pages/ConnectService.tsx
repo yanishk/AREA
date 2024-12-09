@@ -19,7 +19,6 @@ const ConnectService = () => {
     const triggerReactionValue = servicesData[serviceName]?.reactions?.[reactionName]?.[0]?.triggerReaction;
 
     const handleConnect = () => {
-        console.log("Trigger Reaction:", triggerReactionValue);
         if (triggerReactionValue === "no") {
             navigate("/create", {
                 state: {
