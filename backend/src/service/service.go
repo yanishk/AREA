@@ -38,6 +38,7 @@ type UserServiceService interface {
 
 type WorkflowService interface {
 	CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error
+	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
 }
 
 type Service struct {

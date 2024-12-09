@@ -34,6 +34,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	workflow := router.Group("/workflow", middleware.VerifyJWTCookie)
 	{
 		workflow.POST("/create", self.CreateWorkflow)
+		workflow.GET("/retrieve", self.GetUsersWorkflow)
 	}
 
 }
@@ -84,5 +85,41 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Successful workflow creation",
+	})
+}
+
+func (self *WorkflowHandler) GetUsersWorkflow(context *gin.Context) {
+	email, errGetEmail := context.Get("email")
+	if !errGetEmail {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email not found in token",
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Email is not a valid string",
+		})
+		return
+	}
+
+	userFound, errUserFound := self.UserService.FindUserByEmail(emailStr)
+	if errUserFound != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve user",
+		})
+		return
+	}
+	retrievedWorkflow, err := self.WorkflowService.FindWorkflowByUserId(userFound.Id)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve user's workflows",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"workflows": retrievedWorkflow,
 	})
 }
