@@ -7,7 +7,7 @@ import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
 import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
 
-type AuthData = {
+type WorkflowData = {
     selectedAction: {
         name: string;
         color: string;
@@ -28,7 +28,7 @@ const WorkflowBuilder = () => {
     // const [selectedAction, setSelectedAction] = useState(location.state?.selectedAction || null);
     // const [selectedReaction, setSelectedReaction] = useState(location.state?.selectedReaction || null);
 
-    const savedData: AuthData = JSON.parse(localStorage.getItem("authData") || "null");
+    const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") || "null");
 
     const [selectedAction, setSelectedAction] = useState(
         location.state?.selectedAction || savedData?.selectedAction || null
