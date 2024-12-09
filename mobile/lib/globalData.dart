@@ -20,7 +20,26 @@ class Globaldata {
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
 
+  static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
+  static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
+
   static int getActionServicesSize() {
     return actionServicesName.length;
   }
+}
+
+class ActionOrReactionData {
+  String id = "";
+  String name = "";
+  String description = "";
+  String serviceId = "";
+  int nbParam = 0;
+
+  ActionOrReactionData.optional([
+    this.id = "",
+    this.name = "",
+    this.description = "",
+    this.serviceId = "",
+    this.nbParam = 0,
+  ]);
 }

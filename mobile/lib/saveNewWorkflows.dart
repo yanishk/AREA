@@ -36,7 +36,7 @@ class SaveNewWorkflows extends State<APICall> {
     required this.isAnAction,
   });
   final bool isAnAction;
-  TextEditingController workflowTitleController = new TextEditingController(text: "${Globaldata.actionServicesName[Globaldata.firstService]} -> ${Globaldata.reactionServicesName[Globaldata.secondService]}");
+  TextEditingController workflowTitleController = new TextEditingController(text: "If ${Globaldata.actionServicesName[Globaldata.firstService]}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${Globaldata.serviceReaction.name}");
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +87,7 @@ class SaveNewWorkflows extends State<APICall> {
                       borderRadius: 10,
                       child: CustomClassicForm(
                         controller: workflowTitleController,
+                        maxLines: 5,
                         hint:'Email',
                         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         focusedBorderColor: Colors.white,
