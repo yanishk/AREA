@@ -34,6 +34,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	workflow := router.Group("/workflow", middleware.VerifyJWTCookie)
 	{
 		workflow.POST("/create", self.CreateWorkflow)
+		workflow.PUT("/modify-activation", self.ActivateDesactivateWorkflow)
 	}
 
 }
@@ -84,5 +85,38 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Successful workflow creation",
+	})
+}
+
+func (self *WorkflowHandler) ActivateDesactivateWorkflow(context *gin.Context) {
+
+	var workflowActivation entities.ChangeActivationWorkflow
+
+	err := context.ShouldBindJSON(&workflowActivation)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidRequestBodyMessage,
+		})
+		return
+	}
+
+	foundWorkflow, errFetchWorkflow := self.WorkflowService.FindWorkflowById(workflowActivation.WorkflowId)
+	if errFetchWorkflow != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find specified workflow",
+		})
+		return
+	}
+
+	errUpdate := self.WorkflowService.ActivateDesactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
+	if errUpdate != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not update workflow's activation status",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Successfully updates workflow's activation status",
 	})
 }
