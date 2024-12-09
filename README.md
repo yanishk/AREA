@@ -5,11 +5,11 @@
 
 # AREA
 
-AREA is an application development project that aims to replicate the functionning of IFTT. The principle is quite simple, linking actions and reactions from different services to automate workflows.
+AREA is an application development project designed to replicate the functionality of IFTTT. Its principle is straightforward: connecting actions and reactions across different services to automate workflows.
 
 ## Project Description
 
-Our AREA as for sole purpose to make your life easier by integrating automatization of task that can be troublesome and might even be forgotten. For example, if you must send a mail every week to your collegue to remind him to clean his desk, our AREA can automate this task.
+AREA's sole purpose is to make your life easier by automating tasks that can be troublesome or easily forgotten. For example, if you need to send a weekly email to your colleague to remind them to clean their desk, AREA can handle this task automatically.
 
 
 > [!NOTE]
@@ -17,7 +17,7 @@ Our AREA as for sole purpose to make your life easier by integrating automatizat
 
 ## Installation
 
-Our project relies on a docker container to build. You only have to run these two commands to launch AREA:
+Our project relies on a Docker container to build. You only have to run these two commands to launch AREA:
 
 ```bash
 sudo docker-compose build
