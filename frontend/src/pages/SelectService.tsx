@@ -83,7 +83,6 @@ const SelectServicePage = () => {
                             key={service.name}
                             style={{ backgroundColor: service.color }}
                             className="h-[240px] flex flex-col items-center cursor-pointer"
-                            role="button"
                             tabIndex={0}
                             onClick={() => handleSelect(
                                 service.name,
