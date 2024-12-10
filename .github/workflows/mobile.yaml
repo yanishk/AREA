@@ -5,42 +5,6 @@ on:
     branches: ["main", "dev"]
 
 jobs:
-  check-formatting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: |
-          cd mobile
-          flutter pub get
-          touch .env
-
-      - name: Verify formatting
-        run: |
-          cd mobile
-          dart format .
-
-      - name: Analyze project source
-        run: |
-          cd mobile
-          flutter analyze --fatal-warnings
-
-      - name: Push formatting changes
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config --local user.email "actions@github.com"
-            git config --local user.name "GitHub Actions"
-            git add mobile
-            git commit -m "style(mobile): :art: format code"
-            git push -f origin "HEAD:${{ github.head_ref }}"
-          fi
-
   check-compilation:
     runs-on: ubuntu-latest
     steps:
