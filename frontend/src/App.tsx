@@ -9,7 +9,6 @@ import ServicePage from './pages/ServicePage'
 import { AuthProvider } from './pages/AuthContext'
 import ConnectService from './pages/ConnectService'
 import TriggerActionPage from './pages/TriggerAction'
-import TriggerReactionPage from './pages/TriggerReaction'
 
 function App() {
   return (
@@ -23,7 +22,6 @@ function App() {
               <Route path="/select-service" element={<SelectServicePage />} />
               <Route path="/select-service/:name" element={<ServicePage />} />
               <Route path="/select-action/:name" element={<TriggerActionPage />} />
-              <Route path="/select-reaction/:name" element={<TriggerReactionPage />} />
               <Route path="/connect-service/:name" element={<ConnectService />} />
           </Routes>
         </Router>

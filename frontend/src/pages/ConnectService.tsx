@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import CancelButton from "../components/buttons/CancelButton";
 import TriggerButton from "../components/buttons/TriggerButton";
-import { servicesData } from "../ServicesData";
 import axios from "axios";
 
 const ConnectService = () => {
@@ -18,9 +17,6 @@ const ConnectService = () => {
     const serviceColor = location.state?.serviceColor;
     const serviceIcon = location.state?.serviceIcon;
     const selectedAction = location.state?.selectedAction;
-
-    const triggerReactionValue =
-        servicesData[serviceName]?.reactions?.[reactionName]?.[0]?.triggerReaction;
 
     const handleConnect = async () => {
         try {
