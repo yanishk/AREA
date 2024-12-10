@@ -101,7 +101,6 @@ const WorkflowBuilder = () => {
         setSelectedAction(null);
         setSelectedReaction(null);
         navigate("/");
-        return;
     };
 
 
