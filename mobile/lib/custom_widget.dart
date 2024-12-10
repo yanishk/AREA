@@ -70,6 +70,7 @@ class CustomClassicForm extends StatelessWidget {
     this.focusedBorderColor = Colors.black,
     this.disabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
     this.enabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
+    this.maxLines = 1,
   });
 
   final String hint;
@@ -83,6 +84,7 @@ class CustomClassicForm extends StatelessWidget {
   final Color focusedBorderColor;
   final Color disabledBorderColor;
   final Color enabledBorderColor;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +99,8 @@ class CustomClassicForm extends StatelessWidget {
               borderRadius:  BorderRadius.circular(borderRadius),
             ),
             child: TextField(
+              maxLines: maxLines,
+              minLines: 1,
               style: const TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
               controller: controller,
               obscureText: obscureText,

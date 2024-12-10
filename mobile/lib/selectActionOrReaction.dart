@@ -52,6 +52,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   List<String> serviceNameList = Globaldata.actionServicesName;
   List<String> serviceColorList = Globaldata.actionServicesColor;
   List<String> serviceIconsList = Globaldata.actionServicesIcons;
+  List<ActionOrReactionData> actionOrReactionList = [];
   Color colorTheme = Colors.black;
   String title = "Select action";
   String serviceName = "";
@@ -59,18 +60,31 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   String apiRoute = "actions";
   String actionDescription = "";
   bool isInit = false;
+  int actionOrReactionIndex = 0;
+  List<Widget> ActionOrReactionButtonsList = [];
 
   void storeServiceDescription(dynamic responseData) {
     developer.log("getServices OK :\n$responseData");
     if (responseData is Map<String, dynamic> && responseData[apiRoute] is List) {
       final actions = responseData[apiRoute];
-      if (actions.isNotEmpty) {
-        final actionResponce = actions[0];
+      int i = 0;
+      while (actions.isNotEmpty) {
+        final actionResponce = actions[i];
         if (actionResponce is Map<String, dynamic>) {
           actionDescription = actionResponce['Description'] ?? 'No Description';
+          actionOrReactionList.add(ActionOrReactionData.optional(
+            actionResponce['Id'] ?? '',
+            actionResponce['Name'] ?? '',
+            actionResponce['Description'] ?? '',
+            actionResponce['ServiceId'] ?? '',
+            actionResponce['NbParam'] ?? 0,
+          ));
+          developer.log("pass");
+          ActionOrReactionButtonsList.add(
+            actionOrReactionButtons(actionOrReactionList.length - 1),
+          );
         }
-      } else {
-        result = 'No actions available';
+        i++;
       }
     } else {
       result = 'Invalid response structure';
@@ -128,6 +142,16 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
   }
 
+  Future<void> saveSelectedActionOrReaction(int index) async {
+    if (isAnAction) {
+      Globaldata.serviceAction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    } else {
+      Globaldata.serviceReaction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    }
+  }
+
   Widget connectButton() {
     if (serviceNameList[serviceIndex] == "Spotify") {
       return CustomButton(
@@ -142,14 +166,77 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     }
   }
 
+  Future<void> setParameter(int index, String name, dynamic param) async {
+    actionOrReactionList[index].parameterList[name] = param;
+  }
+
+  Future<void> selectTimePopup(int index) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: Globaldata.myContext,
+      initialEntryMode: TimePickerEntryMode.input,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: colorTheme,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(Globaldata.myContext).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
+        );
+      },
+    );
+    actionOrReactionList[index].parameter = "${selectedTime!.hour.toString()}:${selectedTime.minute.toString()}";
+    setParameter(index, "hour", selectedTime.hour);
+    setParameter(index, "minute", selectedTime.minute);
+    saveSelectedActionOrReaction(index);
+  }
+
+
+  Widget selectDateTime(int index) {
+    return CustomButton(
+      backgroundColor: colorTheme,
+      text: AutoSizeText(actionOrReactionList[index].name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+      onPressed: () {
+        selectTimePopup(index);
+      },
+      size: Size(double.infinity, 60),
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+    );
+  }
+
+  Widget actionOrReactionButtons(int index) {
+    if (actionOrReactionList[index].name != "Every day at") {
+      return Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: 30)),
+          CustomButton(
+            backgroundColor: HexColor(serviceColorList[serviceIndex]),
+            text: AutoSizeText(actionOrReactionList[index].name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+            onPressed: () {
+              saveSelectedActionOrReaction(index);
+            },
+            size: Size(MediaQuery.sizeOf(Globaldata.myContext).width, 60),
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+          )
+        ]
+      );
+    }
+    return selectDateTime(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     serviceName = serviceNameList[serviceIndex];
     colorTheme = HexColor(serviceColorList[serviceIndex]);
-    if (isAnAction != true) {
-      setReactionService();
-    }
     if (!isInit) {
+      if (isAnAction != true) {
+        setReactionService();
+      }
       isInit = true;
       getServices();
     }
@@ -157,47 +244,71 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: colorTheme,
-                border: Border.all(
-                  color: colorTheme,
-                  width: 2.0,
-                ),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-
-              child: InkWell(
-                child: Column(
-                  children: [
-                    Padding(padding: EdgeInsets.only(top: 30)),
-                    SelectActionOrReactionTopBar(title: title, color: Colors.white),
-                    Padding(padding: EdgeInsets.only(top: 20)),
-                    SafeWebImage(
-                      url: "${Globaldata.domainName}${serviceIconsList[Globaldata.firstService]}",
-                      width: 75,
-                      height: 75,
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 5)),
-                    AutoSizeText(serviceName, style: TextStyle( fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.0),
-                      child: AutoSizeText(
-                        actionDescription,
-                        style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,),
-                        textAlign: TextAlign.center,
-                        maxLines: 10,
-                      ),
-                    ),
-
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                  ],
-                ),
-              ),
-            ),
+            ActionOrReactionDescription(colorTheme: colorTheme, title: title, serviceIconsList: serviceIconsList, serviceName: serviceName, actionDescription: actionDescription),
             Padding(padding: EdgeInsets.only(top: 50)),
             connectButton(),
+            Column(
+              children: ActionOrReactionButtonsList,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ActionOrReactionDescription extends StatelessWidget {
+  const ActionOrReactionDescription({
+    super.key,
+    required this.colorTheme,
+    required this.title,
+    required this.serviceIconsList,
+    required this.serviceName,
+    required this.actionDescription,
+  });
+
+  final Color colorTheme;
+  final String title;
+  final List<String> serviceIconsList;
+  final String serviceName;
+  final String actionDescription;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colorTheme,
+        border: Border.all(
+          color: colorTheme,
+          width: 2.0,
+        ),
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+
+      child: InkWell(
+        child: Column(
+          children: [
+            Padding(padding: EdgeInsets.only(top: 30)),
+            SelectActionOrReactionTopBar(title: title, color: Colors.white),
+            Padding(padding: EdgeInsets.only(top: 20)),
+            SafeWebImage(
+              url: "${Globaldata.domainName}${serviceIconsList[Globaldata.firstService]}",
+              width: 75,
+              height: 75,
+            ),
+            Padding(padding: EdgeInsets.only(top: 5)),
+            AutoSizeText(serviceName, style: TextStyle( fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),
+            Padding(padding: EdgeInsets.only(top: 10)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: AutoSizeText(
+                actionDescription,
+                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,),
+                textAlign: TextAlign.center,
+                maxLines: 10,
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(top: 10)),
           ],
         ),
       ),
