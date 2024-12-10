@@ -93,12 +93,7 @@ const WorkflowBuilder = () => {
             const { time, quarter } = selectedAction.fields;
             timeValue = parseInt(time) || 0;
             quarterValue = parseInt(quarter) || 0;
-            console.log("time (int):", timeValue);
-            console.log("quarter (int):", quarterValue);
         }
-
-        console.log(selectedAction);
-        console.log(selectedReaction);
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflow/create`,

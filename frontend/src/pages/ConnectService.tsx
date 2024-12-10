@@ -34,8 +34,6 @@ const ConnectService = () => {
                 return;
             }
 
-            console.log("Redirecting to authentication URL:", authUrl);
-
             const authData = {
                 selectedAction,
                 selectedReaction: {
