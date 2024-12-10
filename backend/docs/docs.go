@@ -470,7 +470,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{service}/actions": {
+        "/workflow/retrieve": {
             "get": {
                 "description": "Retrieve the workflows of the user actually connected.",
                 "produces": [
@@ -961,36 +961,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve user-Could not retrieve user's workflows"
-                }
-            }
-        },
-        "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "workflow": {
-                    "description": "Msg string ` + "`" + `json:\"workflows\"example:\"...\"` + "`" + `",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
-                    }
-                }
-            }
-        },
-        "docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
-                }
-            }
-        },
         "docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1015,6 +985,35 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "Successfully updates workflow's activation status"
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve user-Could not retrieve user's workflows"
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workflow": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                    }
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
                 }
             }
         },
