@@ -35,20 +35,20 @@ const Navbar = () => {
                 <ul
                     className="flex flex-row items-center gap-x-6 mr-4"
                 >
-                    <li>
-                        <NavbarLink
-                            href="/"
-                            text="Home"
-                        />
-                    </li>
-                    <li>
-                        <NavbarLink
-                            href="/explore"
-                            text="Explore"
-                        />
-                    </li>
                     {!isAuthenticated ? (
                         <>
+                            <li>
+                                <NavbarLink
+                                    href="/"
+                                    text="Home"
+                                />
+                            </li>
+                            <li>
+                                <NavbarLink
+                                    href="/explore"
+                                    text="Explore"
+                                />
+                            </li>
                             <li>
                                 <NavbarLink
                                     href="/login"
@@ -64,6 +64,18 @@ const Navbar = () => {
                         </>
                     ) : (
                         <>
+                            <li>
+                                <NavbarLink
+                                    href="/explore"
+                                    text="Explore"
+                                />
+                            </li>
+                            <li>
+                                <NavbarLink
+                                    href="/myworkflows"
+                                    text="My workflows"
+                                />
+                            </li>
                             <li>
                                 <NavbarButton
                                     onClick={handleCreate}
