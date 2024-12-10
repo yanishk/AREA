@@ -6,6 +6,7 @@ import CancelButton from "../components/buttons/CancelButton";
 import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
 import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
+import axios from "axios";
 
 type WorkflowData = {
     selectedAction: {
@@ -85,15 +86,44 @@ const WorkflowBuilder = () => {
         navigate("/");
     }
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
+        let timeValue;
+        let quarterValue;
+        if (selectedAction?.fields) {
+            const { time, quarter } = selectedAction.fields;
+            timeValue = parseInt(time) || 0;
+            quarterValue = parseInt(quarter) || 0;
+            console.log("time (int):", timeValue);
+            console.log("quarter (int):", quarterValue);
+        }
+
         console.log(selectedAction);
         console.log(selectedReaction);
-        return;
+
+        await axios.post(
+            `${import.meta.env.VITE_API_URL}workflow/create`,
+            {
+                actionid: selectedAction?.id || "",
+                actionparam: {
+                    hour: timeValue,
+                    minute: quarterValue,
+                },
+                name: "workfloww",
+                reactionid: selectedReaction?.id || "",
+                reactionparam: {}
+            },
+            {
+                withCredentials: true,
+            }
+        );
+
         localStorage.removeItem("workflowData");
         setSelectedAction(null);
         setSelectedReaction(null);
         navigate("/");
+        return;
     };
+
 
     return (
         <div>
@@ -166,7 +196,7 @@ const WorkflowBuilder = () => {
                 >
                     {selectedAction && selectedReaction ? (
                         <TriggerButton
-                            text="Continue"
+                            text="Create Workflow"
                             textColor="text-white"
                             bgColor="bg-[#222222]"
                             hoverColor="hover:bg-[#333333]"
