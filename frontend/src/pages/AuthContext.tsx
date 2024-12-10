@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const checkAuthStatus = async () => {
+        if (isAuthenticated == false)
+            return;
         setIsAuthenticated(true);
     };
 
