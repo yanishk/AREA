@@ -88,6 +88,15 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	})
 }
 
+// @Summary		Modify Workflow Activation Status
+// @Description	Modify the activation status of the specified workflow
+// @Tags			Workflow
+// @Produce		json
+// @Param			workflow	body		entities.ChangeActivationWorkflow	true	"Workflow informations"
+// @Success		200		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse
+// @Failure		400		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse
+// @Failure		500		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse
+// @Router			/workflow/modify-activation [put]
 func (self *WorkflowHandler) ActivateDesactivateWorkflow(context *gin.Context) {
 
 	var workflowActivation entities.ChangeActivationWorkflow
