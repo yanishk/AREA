@@ -30,9 +30,13 @@ const ServicePage = () => {
             let result;
 
             if (type === "action") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/actions`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/actions`, {
+                    withCredentials: true,
+                });
             } else if (type === "reaction") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/reactions`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/reactions`, {
+                    withCredentials: true,
+                });
             }
 
             if (result) {
