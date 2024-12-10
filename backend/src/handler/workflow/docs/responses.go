@@ -15,3 +15,16 @@ type WorkflowCreateWorkflowUnauthorizedResponse struct {
 type WorkflowCreateWorkflowInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not create workflow"`
 }
+
+// Modify Workflow Activation Status Responses
+type WorkflowModifyWorkflowActivationStatusSuccessResponse struct {
+	Msg string `json:"success"example:"Successfully updates workflow's activation status"`
+}
+
+type WorkflowModifyWorkflowActivationStatusBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Could not find specified workflow"`
+}
+
+type WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not update workflow's activation status"`
+}
