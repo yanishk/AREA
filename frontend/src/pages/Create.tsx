@@ -61,25 +61,10 @@ const WorkflowBuilder = () => {
 
     const handleOnEditAction = () => {
         return;
-        navigate(`/select-action/${encodeURIComponent(selectedAction.actionName)}`, {
-            state: {
-                selectedReaction,
-                selectedAction,
-                actionName: selectedAction.name,
-                serviceColor: selectedAction.color,
-                serviceIcon: selectedAction.icon,
-            }
-        });
     }
 
     const handleOnEditReaction = () => {
         return;
-        navigate("/select-reaction", {
-            state: {
-                selectedReaction,
-                selectedAction
-            }
-        })
     }
 
     const goHome = () => {
