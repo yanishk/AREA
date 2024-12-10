@@ -93,7 +93,7 @@ func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entit
 	return retrievedWorkflows, nil
 }
 
-func (self *WorkflowRepository) ActivateDesactivateWorkflow(workflowId string, isActivated bool) error {
+func (self *WorkflowRepository) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
 	sqlStatement := `UPDATE workflows SET isactivated = ($1) WHERE id = ($2)`
 
 	_, err := self.db.Exec(sqlStatement, !isActivated, workflowId)

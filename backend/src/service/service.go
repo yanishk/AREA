@@ -38,7 +38,7 @@ type UserServiceService interface {
 
 type WorkflowService interface {
 	CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error
-	ActivateDesactivateWorkflow(workflowId string, isActivated bool) error
+	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
 }
 

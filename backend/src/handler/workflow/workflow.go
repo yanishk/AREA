@@ -34,7 +34,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	workflow := router.Group("/workflow", middleware.VerifyJWTCookie)
 	{
 		workflow.POST("/create", self.CreateWorkflow)
-		workflow.PUT("/modify-activation", self.ActivateDesactivateWorkflow)
+		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
 	}
 
 }
@@ -88,7 +88,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	})
 }
 
-func (self *WorkflowHandler) ActivateDesactivateWorkflow(context *gin.Context) {
+func (self *WorkflowHandler) ActivateDeactivateWorkflow(context *gin.Context) {
 
 	var workflowActivation entities.ChangeActivationWorkflow
 
@@ -108,7 +108,7 @@ func (self *WorkflowHandler) ActivateDesactivateWorkflow(context *gin.Context) {
 		return
 	}
 
-	errUpdate := self.WorkflowService.ActivateDesactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
+	errUpdate := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not update workflow's activation status",
