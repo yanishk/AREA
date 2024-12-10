@@ -352,6 +352,87 @@ const docTemplate = `{
                 }
             }
         },
+        "/workflow/create": {
+            "post": {
+                "description": "Create a Workflow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Create Workflow",
+                "parameters": [
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.NewWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/retrieve": {
+            "get": {
+                "description": "Retrieve the workflows of the user actually connected.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Retrieve User's Workflows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/{service}/actions": {
             "get": {
                 "description": "Retrieve actions from requested service",
@@ -429,55 +510,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/create": {
-            "post": {
-                "description": "Create a Workflow",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflow"
-                ],
-                "summary": "Create Workflow",
-                "parameters": [
-                    {
-                        "description": "Workflow informations",
-                        "name": "workflow",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.NewWorkflow"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -800,6 +832,70 @@ const docTemplate = `{
             }
         },
         "docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowExample": {
+            "type": "object",
+            "properties": {
+                "actionId": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isActivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "reactionId": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve user-Could not retrieve user's workflows"
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workflow": {
+                    "description": "Msg string ` + "`" + `json:\"workflows\"example:\"...\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                    }
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {

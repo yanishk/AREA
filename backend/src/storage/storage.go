@@ -42,6 +42,7 @@ type WorkflowRepository interface {
 	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
 	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
+	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
 }
 
 type Repository struct {
