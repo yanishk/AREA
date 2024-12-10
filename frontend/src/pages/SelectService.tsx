@@ -83,11 +83,22 @@ const SelectServicePage = () => {
                             key={service.name}
                             style={{ backgroundColor: service.color }}
                             className="h-[240px] flex flex-col items-center cursor-pointer"
+                            role="button"
+                            tabIndex={0}
                             onClick={() => handleSelect(
                                 service.name,
                                 service.color,
                                 `${import.meta.env.VITE_HOST_URL}${service.iconPath}`)
                             }
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleSelect(
+                                    service.name,
+                                    service.color,
+                                    `${import.meta.env.VITE_HOST_URL}${service.iconPath}`
+                                  );
+                                }
+                              }}
                         >
                             <img alt="icon" src={`${import.meta.env.VITE_HOST_URL}${service.iconPath}`} className="size-28 mt-9" />
                             <h2 className="text-white text-lg text-[20.5px] font-bold mt-6">{service.name}</h2>
