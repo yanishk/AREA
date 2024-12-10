@@ -19,6 +19,7 @@ jobs:
         run: |
           cd mobile
           flutter pub get
+          touch .env
 
       - name: Verify formatting
         run: |
@@ -53,6 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd mobile
+          touch .env
           flutter pub get
 
       - name: Build apk
