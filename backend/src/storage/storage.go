@@ -28,6 +28,7 @@ type UserServiceRepository interface {
 type ReactionRepository interface {
 	CreateReaction(name string, description string, serviceId string, nbParam int) error
 	FindReactionByName(name string) (entities.Reaction, error)
+	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
 	FindReactionByID(id string) (entities.Reaction, error)
 }
 
@@ -41,6 +42,9 @@ type WorkflowRepository interface {
 	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
 	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
+	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
+	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
+	FindWorkflowById(workflowId string) (entities.Workflow, error)
 }
 
 type Repository struct {

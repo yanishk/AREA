@@ -42,6 +42,28 @@ func (self *ReactionRepository) FindReactionByName(name string) (entities.Reacti
 	return retrievedReaction, nil
 }
 
+func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
+	sqlStatement := `SELECT * FROM reactions where serviceid = ($1)`
+	var reactions []entities.Reaction
+
+	rows, errQuery := self.db.Query(sqlStatement, serviceId)
+	if errQuery != nil {
+		return nil, errQuery
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var retrievedReaction entities.Reaction
+		err := rows.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam)
+		if err != nil {
+			return nil, err
+		}
+		reactions = append(reactions, retrievedReaction)
+	}
+	return reactions, nil
+}
+
 func (self *ReactionRepository) FindReactionByID(id string) (entities.Reaction, error) {
 	sqlStatement := `SELECT * FROM reactions where id = ($1)`
 	var retrievedReaction entities.Reaction

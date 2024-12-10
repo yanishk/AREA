@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "exploreAll.dart";
 import "exploreWorkflow.dart";
 import "exploreServices.dart";
+import 'globalData.dart';
 
 class TopBarExplore extends StatelessWidget {
   TopBarExplore({
@@ -18,11 +19,11 @@ class TopBarExplore extends StatelessWidget {
     ExplorePageServices(),
   ];
 
-  Future<void>  changePage(int index, BuildContext context) async {
+  Future<void> changePage(int index, BuildContext context) async {
     if (index != currentIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
-          context,
+          Globaldata.myContext,
           MaterialPageRoute(builder: (context) => _pages[index]),
         );
       });
@@ -31,22 +32,41 @@ class TopBarExplore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row (
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         TextButton(
-          onPressed: () {changePage(0, context);},
-          child: AutoSizeText("All", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1,),
+          onPressed: () {
+            changePage(0, Globaldata.myContext);
+          },
+          child: AutoSizeText(
+            "All",
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            maxLines: 1,
+          ),
         ),
-
         TextButton(
-          onPressed: () {changePage(1, context);},
-          child: AutoSizeText("Workflows", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1,),
+          onPressed: () {
+            changePage(1, Globaldata.myContext);
+          },
+          child: AutoSizeText(
+            "Workflows",
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            maxLines: 1,
+          ),
         ),
-
         TextButton(
-          onPressed: () {changePage(2, context);},
-          child: AutoSizeText("Services", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black), maxLines: 1,),
+          onPressed: () {
+            changePage(2, Globaldata.myContext);
+          },
+          child: AutoSizeText(
+            "Services",
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            maxLines: 1,
+          ),
         ),
       ],
     );

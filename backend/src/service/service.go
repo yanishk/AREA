@@ -12,6 +12,7 @@ type UserService interface {
 	ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string) error
 	FindUserById(userId string) (entities.User, error)
+	FindUserByEmail(email string) (entities.User, error)
 }
 
 type ServiceService interface {
@@ -19,6 +20,7 @@ type ServiceService interface {
 	RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error)
 	FindServiceByName(name string) (entities.Service, error)
 	FindActionByServiceId(serviceId string) ([]entities.Action, error)
+	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindReactionByID(id string) (entities.Reaction, error)
 }
@@ -34,8 +36,16 @@ type UserServiceService interface {
 	CallApiAndRefresh(email string, serviceName string) (string, error)
 }
 
+type WorkflowService interface {
+	CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error
+	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
+	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
+	FindWorkflowById(workflowId string) (entities.Workflow, error)
+}
+
 type Service struct {
 	UserService        UserService
 	ServiceService     ServiceService
 	UserServiceService UserServiceService
+	WorkflowService    WorkflowService
 }

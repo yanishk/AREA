@@ -8,7 +8,8 @@ class ExplorePageAll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: new ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: new ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: ExplorePageAllMain(),
     );
   }
@@ -18,11 +19,13 @@ class ExplorePageAllMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView (
+      body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            TopBarExplore(currentIndex: 0,),
+            TopBarExplore(
+              currentIndex: 0,
+            ),
             MyDivider(),
             SearchBar(),
             WorkflowCard(),
@@ -49,7 +52,7 @@ class SearchBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius:  BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: TextField(
           decoration: InputDecoration(
