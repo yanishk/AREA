@@ -109,6 +109,18 @@ definitions:
         example: Invalid request body
         type: string
     type: object
+  docs_user.GetUserEmailSuccessResponse:
+    properties:
+      email:
+        example: email@example.com
+        type: string
+    type: object
+  docs_user.GetUserEmailUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
   docs_user.LoginFailureTokenErrorResponse:
     properties:
       error:
@@ -213,6 +225,92 @@ definitions:
         type: string
     type: object
   docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_workflow.WorkflowExample:
+    properties:
+      actionId:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      isActivated:
+        type: boolean
+      name:
+        type: string
+      ownerId:
+        type: string
+      reactionId:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve user-Could not retrieve user's workflows
+        type: string
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse:
+    properties:
+      workflow:
+        description: Msg string `json:"workflows"example:"..."`
+        items:
+          $ref: '#/definitions/docs_workflow.WorkflowExample'
+        type: array
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_workflow.WorkflowExample:
+    properties:
+      actionId:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      isActivated:
+        type: boolean
+      name:
+        type: string
+      ownerId:
+        type: string
+      reactionId:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve user-Could not retrieve user's workflows
+        type: string
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse:
+    properties:
+      workflow:
+        description: Msg string `json:"workflows"example:"..."`
+        items:
+          $ref: '#/definitions/docs_workflow.WorkflowExample'
+        type: array
+    type: object
+  docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
@@ -512,6 +610,23 @@ paths:
       summary: Delete Account
       tags:
       - Users
+  /user/email:
+    get:
+      description: Get the email of user connected
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.GetUserEmailSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_user.GetUserEmailUnauthorizedResponse'
+      summary: Get User Email
+      tags:
+      - Users
   /user/modify-password:
     put:
       consumes:
@@ -580,6 +695,27 @@ paths:
           schema:
             $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
       summary: Create Workflow
+      tags:
+      - Workflow
+  /workflow/retrieve:
+    get:
+      description: Retrieve the workflows of the user actually connected.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
+      summary: Retrieve User's Workflows
       tags:
       - Workflow
   /workflow/modify-activation:
