@@ -228,6 +228,13 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	})
 }
 
+// @Summary		Get User Email
+// @Description	Get the email of user connected
+// @Tags			Users
+// @Produce		json
+// @Success		200		{object}	docs_user.GetUserEmailSuccessResponse
+// @Failure		401		{object}	docs_user.GetUserEmailUnauthorizedResponse
+// @Router			/user/email [get]
 func (self *UserHandler) GetUserEmail(context *gin.Context) {
 	email, err := context.Get("email")
 
