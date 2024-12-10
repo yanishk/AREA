@@ -9,7 +9,8 @@ class SpotifyAuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: SpotifyAuthAPICall(),
     );
   }
@@ -22,7 +23,8 @@ class SpotifyAuthAPICall extends StatefulWidget {
 
 class SpotifyAuth extends State<SpotifyAuthAPICall> {
   late InAppWebViewController webViewController;
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String newUrl = "";
 
   Future<void> _setCookiesAndNavigate() async {
@@ -51,9 +53,12 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           _setCookiesAndNavigate();
         },
         onLoadStop: (controller, url) async {
-          if (url != null && url.toString().contains("${apiUrl}callback/Spotify")) {
-            final content = await controller.evaluateJavascript(source: "document.body.innerText");
-            if (content != null && content.contains('"success": "Token generated"')) {
+          if (url != null &&
+              url.toString().contains("${apiUrl}callback/Spotify")) {
+            final content = await controller.evaluateJavascript(
+                source: "document.body.innerText");
+            if (content != null &&
+                content.contains('"success": "Token generated"')) {
               developer.log("User connected :\n$content");
               Navigator.pop(context);
               Navigator.pop(Globaldata.myContext);

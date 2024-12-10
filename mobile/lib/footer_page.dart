@@ -23,18 +23,23 @@ class FooterNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar (
+    return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
       backgroundColor: Colors.white,
-      selectedLabelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-      unselectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      selectedLabelStyle:
+          const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+      unselectedLabelStyle:
+          const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
       onTap: (int index) {
         if (index != currentIndex) {
-          Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => _pages[index]),);
+          Navigator.push(
+            Globaldata.myContext,
+            MaterialPageRoute(builder: (context) => _pages[index]),
+          );
         }
       },
       items: const <BottomNavigationBarItem>[

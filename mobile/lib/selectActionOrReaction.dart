@@ -22,8 +22,10 @@ class SelectActionOrReactionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: SelectActionOrReactionAPICall(isAnAction: isAnAction, serviceIndex: serviceIndex),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      home: SelectActionOrReactionAPICall(
+          isAnAction: isAnAction, serviceIndex: serviceIndex),
     );
   }
 }
@@ -38,7 +40,8 @@ class SelectActionOrReactionAPICall extends StatefulWidget {
   final int serviceIndex;
 
   @override
-  SelectActionOrReaction createState() => SelectActionOrReaction(isAnAction: isAnAction, serviceIndex: serviceIndex);
+  SelectActionOrReaction createState() => SelectActionOrReaction(
+      isAnAction: isAnAction, serviceIndex: serviceIndex);
 }
 
 class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
@@ -48,10 +51,12 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   });
   final bool isAnAction;
   final int serviceIndex;
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   List<String> serviceNameList = Globaldata.actionServicesName;
   List<String> serviceColorList = Globaldata.actionServicesColor;
   List<String> serviceIconsList = Globaldata.actionServicesIcons;
+  List<ActionOrReactionData> actionOrReactionList = [];
   Color colorTheme = Colors.black;
   String title = "Select action";
   String serviceName = "";
@@ -59,18 +64,32 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   String apiRoute = "actions";
   String actionDescription = "";
   bool isInit = false;
+  int actionOrReactionIndex = 0;
+  List<Widget> ActionOrReactionButtonsList = [];
 
   void storeServiceDescription(dynamic responseData) {
     developer.log("getServices OK :\n$responseData");
-    if (responseData is Map<String, dynamic> && responseData[apiRoute] is List) {
+    if (responseData is Map<String, dynamic> &&
+        responseData[apiRoute] is List) {
       final actions = responseData[apiRoute];
-      if (actions.isNotEmpty) {
-        final actionResponce = actions[0];
+      int i = 0;
+      while (actions.isNotEmpty) {
+        final actionResponce = actions[i];
         if (actionResponce is Map<String, dynamic>) {
           actionDescription = actionResponce['Description'] ?? 'No Description';
+          actionOrReactionList.add(ActionOrReactionData.optional(
+            actionResponce['Id'] ?? '',
+            actionResponce['Name'] ?? '',
+            actionResponce['Description'] ?? '',
+            actionResponce['ServiceId'] ?? '',
+            actionResponce['NbParam'] ?? 0,
+          ));
+          developer.log("pass");
+          ActionOrReactionButtonsList.add(
+            actionOrReactionButtons(actionOrReactionList.length - 1),
+          );
         }
-      } else {
-        result = 'No actions available';
+        i++;
       }
     } else {
       result = 'Invalid response structure';
@@ -80,7 +99,8 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   Future<void> getServices() async {
     developer.log('SERVER_LINK : $apiUrl');
     try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + serviceNameList[serviceIndex]}/$apiRoute');
+      developer.log(
+          'SERVER_LINK + redirection : ${apiUrl + serviceNameList[serviceIndex]}/$apiRoute');
       final response = await http.get(
         Uri.parse('${apiUrl + serviceNameList[serviceIndex]}/$apiRoute'),
         headers: <String, String>{
@@ -94,7 +114,8 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           storeServiceDescription(responseData);
         });
       } else {
-        developer.log("getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+        developer.log(
+            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
         setState(() {
           result = '${responseData['error']}';
         });
@@ -105,7 +126,8 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         result = '$e';
         developer.log(result);
         if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+            (result.split(' ').contains("Invalid") == true &&
+                result.split(' ').contains("argument(s):") == true)) {
           result = Globaldata.ErrorServerConnection;
         }
       });
@@ -122,17 +144,37 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getSpotifyAuthLink() async {
-    final AuthLink = await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => GetAPICall(apiRoute: "authentication/Spotify")));
+    final AuthLink = await Navigator.push(
+        Globaldata.myContext,
+        MaterialPageRoute(
+            builder: (context) =>
+                GetAPICall(apiRoute: "authentication/Spotify")));
     Globaldata.spotifyConnectionLink = AuthLink["auth-url"];
-    developer.log("getSpotifyAuthLink responce : ${Globaldata.spotifyConnectionLink}");
-    await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
+    developer.log(
+        "getSpotifyAuthLink responce : ${Globaldata.spotifyConnectionLink}");
+    await Navigator.push(Globaldata.myContext,
+        MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
+  }
+
+  Future<void> saveSelectedActionOrReaction(int index) async {
+    if (isAnAction) {
+      Globaldata.serviceAction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    } else {
+      Globaldata.serviceReaction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    }
   }
 
   Widget connectButton() {
     if (serviceNameList[serviceIndex] == "Spotify") {
       return CustomButton(
-        backgroundColor:colorTheme,
-        text: AutoSizeText("Connect", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+        backgroundColor: colorTheme,
+        text: AutoSizeText(
+          "Connect",
+          style: TextStyle(
+              fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         onPressed: getSpotifyAuthLink,
         size: Size(double.infinity, 60),
         padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -142,14 +184,84 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     }
   }
 
+  Future<void> setParameter(int index, String name, dynamic param) async {
+    actionOrReactionList[index].parameterList[name] = param;
+  }
+
+  Future<void> selectTimePopup(int index) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: Globaldata.myContext,
+      initialEntryMode: TimePickerEntryMode.input,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: colorTheme,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(Globaldata.myContext)
+                .copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
+        );
+      },
+    );
+    actionOrReactionList[index].parameter =
+        "${selectedTime!.hour.toString()}:${selectedTime.minute.toString()}";
+    setParameter(index, "hour", selectedTime.hour);
+    setParameter(index, "minute", selectedTime.minute);
+    saveSelectedActionOrReaction(index);
+  }
+
+  Widget selectDateTime(int index) {
+    return CustomButton(
+      backgroundColor: colorTheme,
+      text: AutoSizeText(
+        actionOrReactionList[index].name,
+        style: TextStyle(
+            fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      onPressed: () {
+        selectTimePopup(index);
+      },
+      size: Size(double.infinity, 60),
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+    );
+  }
+
+  Widget actionOrReactionButtons(int index) {
+    if (actionOrReactionList[index].name != "Every day at") {
+      return Column(children: [
+        Padding(padding: EdgeInsets.only(top: 30)),
+        CustomButton(
+          backgroundColor: HexColor(serviceColorList[serviceIndex]),
+          text: AutoSizeText(
+            actionOrReactionList[index].name,
+            style: TextStyle(
+                fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          onPressed: () {
+            saveSelectedActionOrReaction(index);
+          },
+          size: Size(MediaQuery.sizeOf(Globaldata.myContext).width, 60),
+          padding: EdgeInsets.symmetric(horizontal: 15.0),
+        )
+      ]);
+    }
+    return selectDateTime(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     serviceName = serviceNameList[serviceIndex];
     colorTheme = HexColor(serviceColorList[serviceIndex]);
-    if (isAnAction != true) {
-      setReactionService();
-    }
     if (!isInit) {
+      if (isAnAction != true) {
+        setReactionService();
+      }
       isInit = true;
       getServices();
     }
@@ -157,47 +269,88 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: colorTheme,
-                border: Border.all(
-                  color: colorTheme,
-                  width: 2.0,
-                ),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-
-              child: InkWell(
-                child: Column(
-                  children: [
-                    Padding(padding: EdgeInsets.only(top: 30)),
-                    SelectActionOrReactionTopBar(title: title, color: Colors.white),
-                    Padding(padding: EdgeInsets.only(top: 20)),
-                    SafeWebImage(
-                      url: "${Globaldata.domainName}${serviceIconsList[Globaldata.firstService]}",
-                      width: 75,
-                      height: 75,
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 5)),
-                    AutoSizeText(serviceName, style: TextStyle( fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.0),
-                      child: AutoSizeText(
-                        actionDescription,
-                        style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,),
-                        textAlign: TextAlign.center,
-                        maxLines: 10,
-                      ),
-                    ),
-
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                  ],
-                ),
-              ),
-            ),
+            ActionOrReactionDescription(
+                colorTheme: colorTheme,
+                title: title,
+                serviceIconsList: serviceIconsList,
+                serviceName: serviceName,
+                actionDescription: actionDescription),
             Padding(padding: EdgeInsets.only(top: 50)),
             connectButton(),
+            Column(
+              children: ActionOrReactionButtonsList,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ActionOrReactionDescription extends StatelessWidget {
+  const ActionOrReactionDescription({
+    super.key,
+    required this.colorTheme,
+    required this.title,
+    required this.serviceIconsList,
+    required this.serviceName,
+    required this.actionDescription,
+  });
+
+  final Color colorTheme;
+  final String title;
+  final List<String> serviceIconsList;
+  final String serviceName;
+  final String actionDescription;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colorTheme,
+        border: Border.all(
+          color: colorTheme,
+          width: 2.0,
+        ),
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      child: InkWell(
+        child: Column(
+          children: [
+            Padding(padding: EdgeInsets.only(top: 30)),
+            SelectActionOrReactionTopBar(title: title, color: Colors.white),
+            Padding(padding: EdgeInsets.only(top: 20)),
+            SafeWebImage(
+              url:
+                  "${Globaldata.domainName}${serviceIconsList[Globaldata.firstService]}",
+              width: 75,
+              height: 75,
+            ),
+            Padding(padding: EdgeInsets.only(top: 5)),
+            AutoSizeText(
+              serviceName,
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              maxLines: 1,
+            ),
+            Padding(padding: EdgeInsets.only(top: 10)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: AutoSizeText(
+                actionDescription,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 10,
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(top: 10)),
           ],
         ),
       ),
@@ -223,12 +376,26 @@ class SelectActionOrReactionTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.pop(Globaldata.myContext);},
-            icon: Icon(Icons.arrow_back, size: 32, color: color,),
+            onPressed: () {
+              Navigator.pop(Globaldata.myContext);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              size: 32,
+              color: color,
+            ),
           ),
         ),
         Center(
-          child: AutoSizeText(title, style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: color,), maxLines: 1,),
+          child: AutoSizeText(
+            title,
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+            maxLines: 1,
+          ),
         ),
       ],
     );

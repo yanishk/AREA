@@ -285,6 +285,32 @@
                 }
             }
         },
+        "/user/email": {
+            "get": {
+                "description": "Get the email of user connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get User Email",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.GetUserEmailSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.GetUserEmailUnauthorizedResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/modify-password": {
             "put": {
                 "description": "Modify the user password",
@@ -338,6 +364,130 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.ModifyPasswordFailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/create": {
+            "post": {
+                "description": "Create a Workflow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Create Workflow",
+                "parameters": [
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.NewWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/modify-activation": {
+            "put": {
+                "description": "Modify the activation status of the specified workflow",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Modify Workflow Activation Status",
+                "parameters": [
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.ChangeActivationWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/retrieve": {
+            "get": {
+                "description": "Retrieve the workflows of the user actually connected.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Retrieve User's Workflows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
                         }
                     }
                 }
@@ -420,55 +570,6 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/create": {
-            "post": {
-                "description": "Create a Workflow",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflow"
-                ],
-                "summary": "Create Workflow",
-                "parameters": [
-                    {
-                        "description": "Workflow informations",
-                        "name": "workflow",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.NewWorkflow"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowBadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -637,6 +738,24 @@
                 }
             }
         },
+        "docs_user.GetUserEmailSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "email@example.com"
+                }
+            }
+        },
+        "docs_user.GetUserEmailUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
         "docs_user.LoginFailureTokenErrorResponse": {
             "type": "object",
             "properties": {
@@ -796,6 +915,104 @@
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowExample": {
+            "type": "object",
+            "properties": {
+                "actionId": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isActivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "reactionId": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Could not find specified workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not update workflow's activation status"
+                }
+            }
+        },
+        "docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Successfully updates workflow's activation status"
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve user-Could not retrieve user's workflows"
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workflow": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                    }
+                }
+            }
+        },
+        "docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "entities.ChangeActivationWorkflow": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
                 }
             }
         },

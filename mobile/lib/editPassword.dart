@@ -12,7 +12,8 @@ class EditPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: new ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: new ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       title: "Account",
       home: APICall(),
     );
@@ -25,10 +26,12 @@ class APICall extends StatefulWidget {
 }
 
 class EditPassword extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController repeatNewPasswordController = TextEditingController();
+  final TextEditingController repeatNewPasswordController =
+      TextEditingController();
   String result = '';
   String notSamePasswd = "";
   String apiRoute = 'user/modify-password';
@@ -46,7 +49,8 @@ class EditPassword extends State<APICall> {
       setState(() {
         notSamePasswd = "Password doesn't match";
       });
-      developer.log('USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
+      developer.log(
+          'USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
     } else {
       setState(() {
         notSamePasswd = "";
@@ -60,7 +64,7 @@ class EditPassword extends State<APICall> {
             'Cookie': Globaldata.JWToken,
           },
           body: jsonEncode(<String, dynamic>{
-            'oldpassword' : oldPasswordController.text,
+            'oldpassword': oldPasswordController.text,
             'password': newPasswordController.text,
           }),
         );
@@ -74,7 +78,8 @@ class EditPassword extends State<APICall> {
           });
         } else {
           final responseData = jsonDecode(response.body);
-          developer.log("Password putData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          developer.log(
+              "Password putData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
           setState(() {
             result = '${responseData['error']}';
           });
@@ -85,7 +90,8 @@ class EditPassword extends State<APICall> {
           result = '$e';
           developer.log(result);
           if (result.split(' ').contains("SocketException:") == true ||
-             (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+              (result.split(' ').contains("Invalid") == true &&
+                  result.split(' ').contains("argument(s):") == true)) {
             result = Globaldata.ErrorServerConnection;
           }
         });
@@ -101,27 +107,84 @@ class EditPassword extends State<APICall> {
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             EditPasswordTopBar(),
-
             SizedBox(width: 16),
             MyDivider(),
-            Text(result, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),),
-
-            LeftWidget(child: AutoSizeText("Current password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
-            CustomClassicForm(hint: 'Password', controller: oldPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
+            Text(
+              result,
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+            ),
+            LeftWidget(
+              child: AutoSizeText(
+                "Current password",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+              ),
+            ),
+            CustomClassicForm(
+                hint: 'Password',
+                controller: oldPasswordController,
+                obscureText: true,
+                padding: EdgeInsets.symmetric(horizontal: 15)),
             Padding(padding: EdgeInsets.only(top: 30)),
-
-            LeftWidget(child: AutoSizeText("New password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
-            CustomClassicForm(hint: 'Password', controller: newPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
-            Padding (padding: EdgeInsets.only(top: 20)),
-
-            LeftWidget(child: AutoSizeText("Confirm new password", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),),
-            CustomClassicForm(hint: 'Password', controller: repeatNewPasswordController, obscureText: true, padding: EdgeInsets.symmetric(horizontal: 15)),
-            LeftWidget(child: AutoSizeText(notSamePasswd, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 255, 0, 0),), maxLines: 1,),),
+            LeftWidget(
+              child: AutoSizeText(
+                "New password",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+              ),
+            ),
+            CustomClassicForm(
+                hint: 'Password',
+                controller: newPasswordController,
+                obscureText: true,
+                padding: EdgeInsets.symmetric(horizontal: 15)),
+            Padding(padding: EdgeInsets.only(top: 20)),
+            LeftWidget(
+              child: AutoSizeText(
+                "Confirm new password",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                maxLines: 1,
+              ),
+            ),
+            CustomClassicForm(
+                hint: 'Password',
+                controller: repeatNewPasswordController,
+                obscureText: true,
+                padding: EdgeInsets.symmetric(horizontal: 15)),
+            LeftWidget(
+              child: AutoSizeText(
+                notSamePasswd,
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 255, 0, 0),
+                ),
+                maxLines: 1,
+              ),
+            ),
             Padding(padding: EdgeInsets.only(top: 10)),
-
             CustomButton(
-              backgroundColor:Color.fromARGB(255, 34, 34, 34),
-              text: AutoSizeText("Save", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+              backgroundColor: Color.fromARGB(255, 34, 34, 34),
+              text: AutoSizeText(
+                "Save",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
               onPressed: putData,
               size: Size(double.infinity, 55),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -146,12 +209,22 @@ class EditPasswordTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.pop(Globaldata.myContext);},
+            onPressed: () {
+              Navigator.pop(Globaldata.myContext);
+            },
             icon: Icon(Icons.arrow_back, size: 32),
           ),
         ),
         Center(
-          child: AutoSizeText("Account", style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
+          child: AutoSizeText(
+            "Account",
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            maxLines: 1,
+          ),
         ),
       ],
     );

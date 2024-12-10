@@ -2,7 +2,6 @@ package service_handler
 
 import (
 	"backend/src/entities"
-	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"encoding/json"
@@ -35,13 +34,13 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	service := router.Group("/:service", middleware.VerifyJWTCookie)
+	service := router.Group("/:service")
 	{
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	router.GET("/actions-services", middleware.VerifyJWTCookie, self.RetrieveActionsServices)
-	router.GET("/reactions-services", middleware.VerifyJWTCookie, self.RetrieveReactionsServices)
+	router.GET("/actions-services", self.RetrieveActionsServices)
+	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
 func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
@@ -81,20 +80,20 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 		hour, hourExists := workflow.ActionParam["hour"]
 		minute, minuteExists := workflow.ActionParam["minute"]
 		if !hourExists || !minuteExists {
-			return fmt.Errorf("missing hour or minute in ActionParam")
+			continue
 		}
 
 		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-			if errReaction != nil {
-				return errReaction
-			}
 			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-			if errUser != nil {
-				return errUser
+			if errReaction != nil || errUser != nil {
+				continue
 			}
 
-			return self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			if errPlayback != nil {
+				continue
+			}
 		}
 	}
 	return nil
