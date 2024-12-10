@@ -2,7 +2,7 @@ name: mobile
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["ci/mobile"]
 
 jobs:
   flutter_job:
