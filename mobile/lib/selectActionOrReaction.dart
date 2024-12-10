@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import 'getApi.dart';
 import "spotifyAuth.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
@@ -144,11 +143,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getSpotifyAuthLink() async {
-    final AuthLink = await Navigator.push(
-        Globaldata.myContext,
-        MaterialPageRoute(
-            builder: (context) =>
-                GetAPICall(apiRoute: "authentication/Spotify")));
+    final AuthLink = await GetApi.get("authentication/Spotify");
     Globaldata.spotifyConnectionLink = AuthLink["auth-url"];
     developer.log(
         "getSpotifyAuthLink responce : ${Globaldata.spotifyConnectionLink}");

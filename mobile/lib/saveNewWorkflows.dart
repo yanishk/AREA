@@ -50,6 +50,8 @@ class SaveNewWorkflows extends State<APICall> {
       fallback: 'Cannot find .env variable "SERVER_LINK"');
   final String apiRoute = "workflow/create";
   String result = '';
+  String email = "";
+  bool isInit = true;
 
   Future<void> postCreateWorkflows() async {
     developer.log('SERVER_LINK : $apiUrl');
@@ -106,8 +108,17 @@ class SaveNewWorkflows extends State<APICall> {
     }
   }
 
+  Future<void> getEmail() async {
+    final responce = await GetApi.get("user/email");
+    email = responce["email"];
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isInit == true) {
+      isInit = false;
+      getEmail();
+    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -173,7 +184,7 @@ class SaveNewWorkflows extends State<APICall> {
                     ),
                     LeftWidget(
                       child: AutoSizeText(
-                        "By {email/pseudo}",
+                        "By $email",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

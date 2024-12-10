@@ -32,6 +32,8 @@ class EditAccount extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK',
       fallback: 'Cannot find .env variable "SERVER_LINK"');
   String apiRoute = 'user/delete-account';
+  bool isInit = true;
+  final TextEditingController emailController = new TextEditingController(text: "",);
 
   Future<void> _deleteAccount() async {
     developer.log('SERVER_LINK : $apiUrl');
@@ -167,11 +169,20 @@ class EditAccount extends State<APICall> {
     );
   }
 
+  Future<void> getEmail() async {
+    final responce = await GetApi.get("user/email");
+    emailController.text = responce["email"];
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isInit == true) {
+      isInit = false;
+      getEmail();
+    }
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
+        child: Column (
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             AutoSizeText(
@@ -200,6 +211,7 @@ class EditAccount extends State<APICall> {
             CustomClassicForm(
               hint: 'Email',
               padding: EdgeInsets.symmetric(horizontal: 15),
+              controller: emailController,
             ),
             Padding(padding: EdgeInsets.only(top: 20)),
             LeftWidget(
