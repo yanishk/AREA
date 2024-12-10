@@ -88,6 +88,14 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve User's Workflows
+// @Description	Retrieve the workflows of the user actually connected.
+// @Tags			Workflow
+// @Produce		json
+// @Success		200		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse
+// @Failure		401		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse
+// @Failure		500		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse
+// @Router			/workflow/retrieve [get]
 func (self *WorkflowHandler) GetUsersWorkflow(context *gin.Context) {
 	email, errGetEmail := context.Get("email")
 	if !errGetEmail {

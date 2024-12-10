@@ -1,5 +1,18 @@
 package docs_workflow
 
+type WorkflowExample struct {
+	Id            string
+	Name          string
+	OwnerId       string
+	ActionId      string
+	ReactionId    string
+	IsActivated   bool
+	CreatedAt     string
+	ActionParam   map[string]interface{} `json:"actionparam"`
+	ReactionParam map[string]interface{} `json:"reactionparam"`
+}
+
+// Create Workflow Responses
 type WorkflowCreateWorkflowSuccessResponse struct {
 	Msg string `json:"success"example:"Successful workflow creation"`
 }
@@ -14,4 +27,17 @@ type WorkflowCreateWorkflowUnauthorizedResponse struct {
 
 type WorkflowCreateWorkflowInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not create workflow"`
+}
+
+// Retrieve User's Workflow Responses
+type WorkflowRetrieveUserWorkflowsSuccessResponse struct {
+	Workflow []WorkflowExample
+}
+
+type WorkflowRetrieveUserWorkflowsUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}
+
+type WorkflowRetrieveUserWorkflowsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve user-Could not retrieve user's workflows"`
 }
