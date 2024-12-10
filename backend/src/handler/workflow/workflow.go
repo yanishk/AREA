@@ -34,7 +34,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	workflow := router.Group("/workflow", middleware.VerifyJWTCookie)
 	{
 		workflow.POST("/create", self.CreateWorkflow)
-		workflow.GET("/retrieve", self.GetUsersWorkflow)
+		workflow.GET("/retrieve", self.GetUserWorkflows)
 	}
 
 }
@@ -96,7 +96,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 // @Failure		401		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse
 // @Router			/workflow/retrieve [get]
-func (self *WorkflowHandler) GetUsersWorkflow(context *gin.Context) {
+func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 	email, errGetEmail := context.Get("email")
 	if !errGetEmail {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
