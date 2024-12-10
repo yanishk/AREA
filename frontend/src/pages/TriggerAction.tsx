@@ -32,7 +32,7 @@ const TriggerActionPage = () => {
 
     useEffect(() => {
         const defaultValues = fields.reduce((acc, field) => {
-            acc[field.id] = field.options?.[0] || "";
+            acc[field.id] = field.options?.[0] ?? "";
             return acc;
         }, {} as Record<string, string>);
         setFieldValues(defaultValues);

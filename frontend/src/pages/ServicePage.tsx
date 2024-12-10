@@ -35,7 +35,7 @@ const ServicePage = () => {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}${serviceName}/reactions`);
             }
 
-            if (result && result.data) {
+            if (result) {
                 const dataKey = type === "action" ? "actions" : "reactions";
 
                 if (Array.isArray(result.data[dataKey])) {

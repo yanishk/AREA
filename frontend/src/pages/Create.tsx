@@ -28,7 +28,7 @@ const WorkflowBuilder = () => {
     const location = useLocation();
 
 
-    const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") || "null");
+    const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") ?? "null");
 
     const [selectedAction, setSelectedAction] = useState(
         location.state?.selectedAction || savedData?.selectedAction || null
