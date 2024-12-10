@@ -86,11 +86,8 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 
 		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-			if errReaction != nil {
-				continue
-			}
 			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-			if errUser != nil {
+			if errReaction != nil || errUser != nil {
 				continue
 			}
 
