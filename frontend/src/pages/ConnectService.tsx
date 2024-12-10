@@ -14,6 +14,7 @@ const ConnectService = () => {
 
     const serviceName = location.state?.serviceName;
     const reactionName = location.state?.reactionName;
+    const reactionId = location.state?.reactionId;
     const serviceColor = location.state?.serviceColor;
     const serviceIcon = location.state?.serviceIcon;
     const selectedAction = location.state?.selectedAction;
@@ -39,6 +40,7 @@ const ConnectService = () => {
                 selectedAction,
                 selectedReaction: {
                     name: reactionName,
+                    id: reactionId,
                     color: serviceColor,
                     icon: serviceIcon,
                 },

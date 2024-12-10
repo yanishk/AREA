@@ -10,16 +10,17 @@ import TriggerButton from "../components/buttons/TriggerButton";
 type WorkflowData = {
     selectedAction: {
         name: string;
+        id: string;
         color: string;
         icon: string;
     } | null;
     selectedReaction: {
         name: string;
+        id: string;
         color: string;
         icon: string;
     } | null;
 } | null;
-
 
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
@@ -85,6 +86,9 @@ const WorkflowBuilder = () => {
     }
 
     const handleContinue = () => {
+        console.log(selectedAction);
+        console.log(selectedReaction);
+        return;
         localStorage.removeItem("workflowData");
         setSelectedAction(null);
         setSelectedReaction(null);

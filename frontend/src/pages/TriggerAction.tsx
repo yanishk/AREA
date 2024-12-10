@@ -13,6 +13,7 @@ const TriggerActionPage = () => {
     const serviceColor = location.state?.serviceColor;
     const serviceIcon = location.state?.serviceIcon;
     const actionName = location.state?.actionName;
+    const actionId = location.state?.actionId;
     const selectedReaction = location.state?.selectedReaction;
 
     const fields = serviceName && actionName &&
@@ -43,6 +44,7 @@ const TriggerActionPage = () => {
                 selectedReaction,
                 selectedAction: {
                     name: actionName,
+                    id: actionId,
                     color: serviceColor,
                     icon: serviceIcon,
                     fields: fieldValues,

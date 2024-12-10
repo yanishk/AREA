@@ -7,6 +7,7 @@ const ServicePage = () => {
     type ElementType = {
         name: string;
         description: string;
+        id: string;
     };
 
     const navigate = useNavigate();
@@ -41,6 +42,7 @@ const ServicePage = () => {
                     const propertiesElements = result.data[dataKey].map((element: any) => ({
                         name: element.Name,
                         description: element.Description,
+                        id: element.Id,
                     }));
                     setElements(propertiesElements);
                 } else {
@@ -58,7 +60,7 @@ const ServicePage = () => {
         getElements();
     }, []);
 
-    const handleSelect = (type: string, serviceName:string, actionName: string, reactionName: string, serviceColor: string, serviceIcon: string) => {
+    const handleSelect = (type: string, serviceName:string, actionName: string, reactionName: string, actionId: string, reactionId: string, serviceColor: string, serviceIcon: string) => {
         if (type === "action") {
             navigate(`/select-action/${encodeURIComponent(actionName)}`, {
                 state: {
@@ -66,6 +68,7 @@ const ServicePage = () => {
                     type,
                     serviceName,
                     actionName,
+                    actionId,
                     serviceColor,
                     serviceIcon,
                 }
@@ -78,6 +81,7 @@ const ServicePage = () => {
                     type,
                     serviceName,
                     reactionName,
+                    reactionId,
                     serviceColor,
                     serviceIcon,
                 }
@@ -122,6 +126,8 @@ const ServicePage = () => {
                                 serviceName,
                                 element.name,
                                 element.name,
+                                element.id,
+                                element.id,
                                 serviceColor,
                                 serviceIcon,
                             )}
