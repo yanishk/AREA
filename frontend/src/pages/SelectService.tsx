@@ -21,9 +21,13 @@ const SelectServicePage = () => {
             let result;
 
             if (type === "action") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
+                    withCredentials: true,
+                });
             } else if (type === "reaction") {
-                result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`);
+                result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`, {
+                    withCredentials: true,
+                });
             }
 
             if (result) {

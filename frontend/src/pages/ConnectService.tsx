@@ -21,7 +21,10 @@ const ConnectService = () => {
     const handleConnect = async () => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_API_URL}authentication/${serviceName}`
+                `${import.meta.env.VITE_API_URL}authentication/${serviceName}`,
+                {
+                    withCredentials: true,
+                }
             );
 
             const authUrl = result.data["auth-url"];
