@@ -1,8 +1,8 @@
 name: mobile
 
 on:
-  push:
-    branches: ["ci/mobile"]
+  pull_request:
+    branches: ["main", "dev"]
 
 jobs:
   check-formatting:
