@@ -142,6 +142,16 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
   }
 
+  Future<void> saveSelectedActionOrReaction(int index) async {
+    if (isAnAction) {
+      Globaldata.serviceAction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    } else {
+      Globaldata.serviceReaction = actionOrReactionList[index];
+      Navigator.pop(Globaldata.myContext);
+    }
+  }
+
   Widget connectButton() {
     if (serviceNameList[serviceIndex] == "Spotify") {
       return CustomButton(
@@ -156,27 +166,67 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     }
   }
 
-  Widget actionOrReactionButtons(int index) {
-    return Column(
-      children: [
-        Padding(padding: EdgeInsets.only(top: 30)),
-        CustomButton(
-          backgroundColor: HexColor(serviceColorList[serviceIndex]),
-          text: AutoSizeText(actionOrReactionList[index].name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-          onPressed: () {
-            if (isAnAction) {
-              Globaldata.serviceAction = actionOrReactionList[index];
-              Navigator.pop(Globaldata.myContext);
-            } else {
-              Globaldata.serviceReaction = actionOrReactionList[index];
-              Navigator.pop(Globaldata.myContext);
-            }
-          },
-          size: Size(MediaQuery.sizeOf(Globaldata.myContext).width, 60),
-          padding: EdgeInsets.symmetric(horizontal: 15.0),
-        )
-      ]
+  Future<void> setParameter(int index, String name, dynamic param) async {
+    actionOrReactionList[index].parameterList[name] = param;
+  }
+
+  Future<void> selectTimePopup(int index) async {
+    final TimeOfDay? selectedTime = await showTimePicker(
+      context: Globaldata.myContext,
+      initialEntryMode: TimePickerEntryMode.input,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: colorTheme,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(Globaldata.myContext).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          ),
+        );
+      },
     );
+    actionOrReactionList[index].parameter = "${selectedTime!.hour.toString()}:${selectedTime.minute.toString()}";
+    setParameter(index, "hour", selectedTime.hour);
+    setParameter(index, "minute", selectedTime.minute);
+    saveSelectedActionOrReaction(index);
+  }
+
+
+  Widget selectDateTime(int index) {
+    return CustomButton(
+      backgroundColor: colorTheme,
+      text: AutoSizeText(actionOrReactionList[index].name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+      onPressed: () {
+        selectTimePopup(index);
+      },
+      size: Size(double.infinity, 60),
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+    );
+  }
+
+  Widget actionOrReactionButtons(int index) {
+    if (actionOrReactionList[index].name != "Every day at") {
+      return Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: 30)),
+          CustomButton(
+            backgroundColor: HexColor(serviceColorList[serviceIndex]),
+            text: AutoSizeText(actionOrReactionList[index].name, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+            onPressed: () {
+              saveSelectedActionOrReaction(index);
+            },
+            size: Size(MediaQuery.sizeOf(Globaldata.myContext).width, 60),
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+          )
+        ]
+      );
+    }
+    return selectDateTime(index);
   }
 
   @override

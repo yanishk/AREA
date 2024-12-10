@@ -34,6 +34,8 @@ class ActionOrReactionData {
   String description = "";
   String serviceId = "";
   int nbParam = 0;
+  String parameter = "";
+  Map<String, dynamic> parameterList = {};
 
   ActionOrReactionData.optional([
     this.id = "",
@@ -41,5 +43,9 @@ class ActionOrReactionData {
     this.description = "",
     this.serviceId = "",
     this.nbParam = 0,
-  ]);
+    this.parameter = "",
+    Map<String, dynamic>? parameterList,
+  ]) {
+    this.parameterList = parameterList ?? {};
+  }
 }
