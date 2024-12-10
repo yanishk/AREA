@@ -16,7 +16,8 @@ class SelectServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: APICall(isAnAction: isAnAction),
     );
   }
@@ -96,11 +97,12 @@ class SelectService extends State<APICall> {
       setReactionService();
     }
     List<Widget> services = [];
-    for (serviceIndex = 0; serviceIndex < serviceNameList.length; serviceIndex++) {
-      developer.log("index : ${serviceIndex}, list size : ${serviceNameList.length}");
-      services.add(
-        serviceTiles(serviceIndex)
-      );
+    for (serviceIndex = 0;
+        serviceIndex < serviceNameList.length;
+        serviceIndex++) {
+      developer.log(
+          "index : ${serviceIndex}, list size : ${serviceNameList.length}");
+      services.add(serviceTiles(serviceIndex));
     }
 
     return Scaffold(
@@ -109,9 +111,7 @@ class SelectService extends State<APICall> {
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             SelectServiceTopBar(title: title),
-
             MyDivider(),
-
             Column(
               children: services,
             ),
@@ -138,12 +138,22 @@ class SelectServiceTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.pop(Globaldata.myContext);},
+            onPressed: () {
+              Navigator.pop(Globaldata.myContext);
+            },
             icon: Icon(Icons.arrow_back, size: 32),
           ),
         ),
         Center(
-          child: AutoSizeText(title, style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black,), maxLines: 1,),
+          child: AutoSizeText(
+            title,
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            maxLines: 1,
+          ),
         ),
       ],
     );
@@ -167,8 +177,15 @@ class MySquareServicesCard extends StatelessWidget {
   final List<String> serviceIconsList;
 
   Future<void> redirectToSelectActionOrReactionPage() async {
-      await Navigator.push(Globaldata.myContext,MaterialPageRoute(builder: (context) => SelectActionOrReactionPage(isAnAction: isAnAction, serviceIndex: servicesIndex,)),);
-      Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
+    await Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(
+          builder: (context) => SelectActionOrReactionPage(
+                isAnAction: isAnAction,
+                serviceIndex: servicesIndex,
+              )),
+    );
+    Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
   }
 
   @override
@@ -188,7 +205,6 @@ class MySquareServicesCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(4.0),
         ),
-
         child: InkWell(
           onTap: () {
             if (isAnAction) {
@@ -205,15 +221,21 @@ class MySquareServicesCard extends StatelessWidget {
                 width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                child: Column(
-                  children: [
-                    SafeWebImage(
-                        url: "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"
-                      ),
-                    AutoSizeText(serviceNameList[servicesIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
-                  ]
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                child: Column(children: [
+                  SafeWebImage(
+                      url:
+                          "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"),
+                  AutoSizeText(
+                    serviceNameList[servicesIndex],
+                    style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                    maxLines: 1,
+                  )
+                ]),
               ),
             ],
           ),

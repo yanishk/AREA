@@ -46,7 +46,8 @@ class CustomButton extends StatelessWidget {
                 left: 0,
                 child: image!,
               ),
-            Padding(padding: EdgeInsets.only(left: textPaddingLeft), child: text),
+            Padding(
+                padding: EdgeInsets.only(left: textPaddingLeft), child: text),
             const Center(),
           ],
         ),
@@ -54,7 +55,6 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
-
 
 class CustomClassicForm extends StatelessWidget {
   const CustomClassicForm({
@@ -93,22 +93,24 @@ class CustomClassicForm extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: padding,
-          child:
-          Container(
+          child: Container(
             decoration: BoxDecoration(
-              borderRadius:  BorderRadius.circular(borderRadius),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
             child: TextField(
               maxLines: maxLines,
               minLines: 1,
-              style: const TextStyle(fontSize:25, fontWeight: FontWeight.w900, color: Colors.black),
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black),
               controller: controller,
               obscureText: obscureText,
               cursorColor: Colors.black,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: fillCollor,
-                labelStyle:const TextStyle(fontSize:40),
+                labelStyle: const TextStyle(fontSize: 40),
                 hintStyle: const TextStyle(
                   fontSize: 20,
                   color: Color.fromARGB(255, 150, 150, 150),
@@ -116,7 +118,8 @@ class CustomClassicForm extends StatelessWidget {
                 ),
                 hintText: hint,
                 enabled: enabled,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(borderRadius),
                   borderSide: BorderSide(
@@ -165,9 +168,22 @@ class MyDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(thickness: thickness, color: color,),),
-        Padding(padding: textPadding, child: text,),
-        Expanded(child: Divider(thickness: thickness, color: color,),),
+        Expanded(
+          child: Divider(
+            thickness: thickness,
+            color: color,
+          ),
+        ),
+        Padding(
+          padding: textPadding,
+          child: text,
+        ),
+        Expanded(
+          child: Divider(
+            thickness: thickness,
+            color: color,
+          ),
+        ),
       ],
     );
   }
@@ -189,7 +205,7 @@ class MyVerticalDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row (
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Padding(
@@ -227,11 +243,12 @@ class PlaceableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row (
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: left, right: right, top: top, bottom: bottom),
+          padding: EdgeInsets.only(
+              left: left, right: right, top: top, bottom: bottom),
           child: child,
         ),
       ],
@@ -307,7 +324,12 @@ class TwoChoiceAlertDialog extends StatelessWidget {
         child: ListBody(
           children: <Widget>[
             Center(
-              child: Text("Are you sure?", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, color: Colors.black,)),
+              child: Text("Are you sure?",
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                  )),
             )
           ],
         ),
@@ -315,7 +337,7 @@ class TwoChoiceAlertDialog extends StatelessWidget {
       actions: <Widget>[
         Center(
           child: CustomButton(
-            backgroundColor:const Color.fromARGB(255, 34, 34, 34),
+            backgroundColor: const Color.fromARGB(255, 34, 34, 34),
             text: firstChoiceText,
             onPressed: firstChoiceonPressed,
             size: const Size(double.infinity, 55),
@@ -376,11 +398,17 @@ class WorkflowCard extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     child: SizedBox(
-                    width: constraints.maxWidth,
-                    child: const Text( "A card that can be tapped\nAnd how fit with his content",
-                        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black,),
+                      width: constraints.maxWidth,
+                      child: const Text(
+                        "A card that can be tapped\nAnd how fit with his content",
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
@@ -432,7 +460,6 @@ class ServicesCard extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(4.0),
             ),
-
             child: InkWell(
               onTap: () {
                 debugPrint('Card tapped.');
@@ -443,13 +470,20 @@ class ServicesCard extends StatelessWidget {
                     width: constraints.maxWidth,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                    child: Column(
-                      children: [
-                        Image.asset(iconList[serviceIndex], width: 75, height: 75),
-                        AutoSizeText(nameList[serviceIndex], style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,)
-                      ]
-                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    child: Column(children: [
+                      Image.asset(iconList[serviceIndex],
+                          width: 75, height: 75),
+                      AutoSizeText(
+                        nameList[serviceIndex],
+                        style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                        maxLines: 1,
+                      )
+                    ]),
                   ),
                 ],
               ),
@@ -480,18 +514,19 @@ class WidgetCard extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              border: Border.all(
+              decoration: BoxDecoration(
                 color: backgroundColor,
-                width: 2.0,
+                border: Border.all(
+                  color: backgroundColor,
+                  width: 2.0,
+                ),
+                borderRadius: BorderRadius.circular(borderRadius),
               ),
-              borderRadius: BorderRadius.circular(borderRadius),
-            ),
-            child: Column(
-              children: [child,],
-            )
-          );
+              child: Column(
+                children: [
+                  child,
+                ],
+              ));
         },
       ),
     );
@@ -522,7 +557,7 @@ class TextWithBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container (
+    return Container(
       padding: padding,
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -560,7 +595,7 @@ class DoubleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row (
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         firstChild,

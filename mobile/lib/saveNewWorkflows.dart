@@ -20,7 +20,8 @@ class SaveNewWorkflowsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: APICall(isAnAction: isAnAction),
     );
   }
@@ -43,8 +44,10 @@ class SaveNewWorkflows extends State<APICall> {
   });
   final bool isAnAction;
   TextEditingController workflowTitleController = new TextEditingController(
-    text: "If ${Globaldata.serviceAction.name} ${Globaldata.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${Globaldata.serviceReaction.name}");
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+      text:
+          "If ${Globaldata.serviceAction.name} ${Globaldata.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${Globaldata.serviceReaction.name}");
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final String apiRoute = "workflow/create";
   String result = '';
 
@@ -65,15 +68,20 @@ class SaveNewWorkflows extends State<APICall> {
           'reactionid': Globaldata.serviceReaction.id,
           'reactionparam': Globaldata.serviceReaction.parameterList,
         }),
-
       );
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
           result = responseData.toString();
-          Fluttertoast.showToast(msg: "Workflows successfully created", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: const Color.fromARGB(255, 70, 70, 70), textColor: Colors.white, fontSize: 24.0);
-          Navigator.push (
+          Fluttertoast.showToast(
+              msg: "Workflows successfully created",
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1,
+              backgroundColor: const Color.fromARGB(255, 70, 70, 70),
+              textColor: Colors.white,
+              fontSize: 24.0);
+          Navigator.push(
             Globaldata.myContext,
             MaterialPageRoute(builder: (context) => ExplorePageAll()),
           );
@@ -90,7 +98,8 @@ class SaveNewWorkflows extends State<APICall> {
         result = '$e';
         developer.log(result);
         if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+            (result.split(' ').contains("Invalid") == true &&
+                result.split(' ').contains("argument(s):") == true)) {
           result = Globaldata.ErrorServerConnection;
         }
       });
@@ -112,56 +121,85 @@ class SaveNewWorkflows extends State<APICall> {
                 ),
                 borderRadius: BorderRadius.circular(4.0),
               ),
-
               child: InkWell(
                 child: Column(
                   children: [
                     Padding(padding: EdgeInsets.only(top: 30)),
-                    SelectServiceTopBar(title: "Review and finish", color: Colors.white),
+                    SelectServiceTopBar(
+                        title: "Review and finish", color: Colors.white),
                     Padding(padding: EdgeInsets.only(top: 20)),
                     LeftWidget(
-                      child: Row(
-                        children: [
-                          SafeWebImage(
-                            url: "${Globaldata.domainName}${Globaldata.actionServicesIcons[Globaldata.firstService]}",
-                            width: 30,
-                            height: 30,
-                          ),
-                          Padding(padding: EdgeInsets.only(left: 10)),
-                          SafeWebImage(
-                            url: "${Globaldata.domainName}${Globaldata.reactionServicesIcons[Globaldata.secondService]}",
-                            width: 30,
-                            height: 30,
-                          ),
-                        ],
-                      )
-                    ),
+                        child: Row(
+                      children: [
+                        SafeWebImage(
+                          url:
+                              "${Globaldata.domainName}${Globaldata.actionServicesIcons[Globaldata.firstService]}",
+                          width: 30,
+                          height: 30,
+                        ),
+                        Padding(padding: EdgeInsets.only(left: 10)),
+                        SafeWebImage(
+                          url:
+                              "${Globaldata.domainName}${Globaldata.reactionServicesIcons[Globaldata.secondService]}",
+                          width: 30,
+                          height: 30,
+                        ),
+                      ],
+                    )),
                     Padding(padding: EdgeInsets.only(top: 5)),
-                    LeftWidget(child: AutoSizeText("Workflow title", style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),),
-                    WidgetCard (
+                    LeftWidget(
+                      child: AutoSizeText(
+                        "Workflow title",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
+                    WidgetCard(
                       backgroundColor: Colors.white,
                       borderRadius: 10,
                       child: CustomClassicForm(
                         controller: workflowTitleController,
                         maxLines: 5,
-                        hint:'Email',
-                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        hint: 'Email',
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         focusedBorderColor: Colors.white,
                         borderWidth: 0,
                       ),
                     ),
-                    LeftWidget(child: AutoSizeText("By {email/pseudo}", style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white,), maxLines: 1,),),
+                    LeftWidget(
+                      child: AutoSizeText(
+                        "By {email/pseudo}",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
                     Padding(padding: EdgeInsets.only(top: 10)),
                   ],
                 ),
               ),
             ),
-
             Padding(padding: EdgeInsets.only(top: 30)),
-            CustomButton (
-              backgroundColor:Color.fromARGB(255, 34, 34, 34),
-              text: AutoSizeText("Finish", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              onPressed: () {postCreateWorkflows();},
+            CustomButton(
+              backgroundColor: Color.fromARGB(255, 34, 34, 34),
+              text: AutoSizeText(
+                "Finish",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              onPressed: () {
+                postCreateWorkflows();
+              },
               size: Size(double.infinity, 60),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
@@ -190,12 +228,26 @@ class SelectServiceTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.pop(Globaldata.myContext);},
-            icon: Icon(Icons.arrow_back, size: 32, color: color,),
+            onPressed: () {
+              Navigator.pop(Globaldata.myContext);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              size: 32,
+              color: color,
+            ),
           ),
         ),
         Center(
-          child: AutoSizeText(title, style: TextStyle( fontSize: 30, fontWeight: FontWeight.bold, color: color,), maxLines: 1,),
+          child: AutoSizeText(
+            title,
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+            maxLines: 1,
+          ),
         ),
       ],
     );

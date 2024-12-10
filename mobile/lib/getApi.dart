@@ -17,7 +17,8 @@ class GetApiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: GetAPICall(apiRoute: apiRoute),
     );
   }
@@ -38,7 +39,8 @@ class GetApi extends State<GetAPICall> {
     required this.apiRoute,
   });
   final String apiRoute;
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String result = '';
   String title = "Select action service";
   String actionsServices = "actions-services";
@@ -65,7 +67,8 @@ class GetApi extends State<GetAPICall> {
         });
       } else {
         final responseData = jsonDecode(response.body);
-        developer.log("getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+        developer.log(
+            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
         setState(() {
           result = '${responseData['error']}';
         });
@@ -76,7 +79,8 @@ class GetApi extends State<GetAPICall> {
         result = '$e';
         developer.log(result);
         if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+            (result.split(' ').contains("Invalid") == true &&
+                result.split(' ').contains("argument(s):") == true)) {
           result = Globaldata.ErrorServerConnection;
         }
       });
