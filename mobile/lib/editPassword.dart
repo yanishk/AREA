@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import "custom_widget.dart";
-import "edit_account.dart";
 import "globalData.dart";
 
 class EditPasswordPage extends StatelessWidget {
@@ -71,10 +70,7 @@ class EditPassword extends State<APICall> {
             result = "";
             developer.log("Password putData succes");
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditAccountPage()),
-            );
+            Navigator.pop(Globaldata.myContext);
           });
         } else {
           final responseData = jsonDecode(response.body);
@@ -150,7 +146,7 @@ class EditPasswordTopBar extends StatelessWidget {
         Positioned(
           left: 0,
           child: IconButton(
-            onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => EditAccountPage()),);},
+            onPressed: () {Navigator.pop(Globaldata.myContext);},
             icon: Icon(Icons.arrow_back, size: 32),
           ),
         ),
