@@ -110,7 +110,7 @@ const ServicePage = () => {
             </div>
 
             <div style={{ backgroundColor: serviceColor }} className="flex flex-col items-center justify-center">
-                <img src={serviceIcon} className="w-[122px] h-[122px] mt-14" />
+                <img alt="icon" src={serviceIcon} className="w-[122px] h-[122px] mt-14" />
                 <h2 className="text-white text-[52px] font-bold mt-6 mb-14">{serviceName}</h2>
             </div>
 

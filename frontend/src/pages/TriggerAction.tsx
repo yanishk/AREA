@@ -84,6 +84,7 @@ const TriggerActionPage = () => {
                     className="flex flex-col items-center justify-center"
                 >
                     <img
+                        alt="icon"
                         src={serviceIcon}
                         className="w-[122px] h-[122px] mt-14"
                     />

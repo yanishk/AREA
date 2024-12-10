@@ -18,7 +18,7 @@ const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, iconPath, 
                 className="w-[600px] flex justify-center items-center text-white rounded-lg font-[900]"
             >
                 <p className="pr-10 text-[5.2rem]">If</p>
-                <img src={iconPath} className="size-10" />
+                <img alt="icon" src={iconPath} className="size-10" />
                 <p className="text-[1.2rem] ml-4">{text}</p>
             </button>
 

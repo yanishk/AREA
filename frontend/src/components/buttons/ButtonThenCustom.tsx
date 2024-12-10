@@ -23,6 +23,7 @@ const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, iconPa
                     Then
                 </p>
                 <img
+                    alt="icon"
                     src={iconPath}
                     className="size-10"
                 />

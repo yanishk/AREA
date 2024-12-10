@@ -89,7 +89,7 @@ const SelectServicePage = () => {
                                 `${import.meta.env.VITE_HOST_URL}${service.iconPath}`)
                             }
                         >
-                            <img src={`${import.meta.env.VITE_HOST_URL}${service.iconPath}`} className="size-28 mt-9" />
+                            <img alt="icon" src={`${import.meta.env.VITE_HOST_URL}${service.iconPath}`} className="size-28 mt-9" />
                             <h2 className="text-white text-lg text-[20.5px] font-bold mt-6">{service.name}</h2>
                         </div>
                     ))}
