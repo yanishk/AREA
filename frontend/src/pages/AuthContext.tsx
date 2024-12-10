@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useMemo } from "react";
 
 type AuthContextType = {
     isAuthenticated: boolean;
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated, login, logout])}>
             {children}
         </AuthContext.Provider>
     );
