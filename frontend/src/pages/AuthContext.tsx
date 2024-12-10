@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 
 type AuthContextType = {
     isAuthenticated: boolean;
@@ -18,6 +18,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = () => {
         setIsAuthenticated(false);
     };
+
+    const checkAuthStatus = async () => {
+        setIsAuthenticated(true);
+    };
+
+    useEffect(() => {
+        checkAuthStatus();
+    }, []);
 
     return (
         <AuthContext.Provider value={useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated, login, logout])}>
