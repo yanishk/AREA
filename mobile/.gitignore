@@ -4,3 +4,4 @@ build
 *.yaml
 pubspec.lock
 !pubspec.yaml
+.flutter-plugins*
