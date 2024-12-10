@@ -83,19 +83,19 @@ const SelectServicePage = () => {
             <div className="mt-10 px-[140px]">
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {services.map((service: any) => (
-                        <div
+                        <button
                             key={service.name}
                             style={{ backgroundColor: service.color }}
                             className="h-[240px] flex flex-col items-center cursor-pointer"
                             onClick={() => handleSelect(
                                 service.name,
                                 service.color,
-                                `${import.meta.env.VITE_HOST_URL}${service.iconPath}`)
-                            }
+                                `${import.meta.env.VITE_HOST_URL}${service.iconPath}`
+                            )}
                         >
-                            <img alt="icon" src={`${import.meta.env.VITE_HOST_URL}${service.iconPath}`} className="size-28 mt-9" />
+                            <img alt="icon" src={`${import.meta.env.VITE_HOST_URL}${service.iconPath}`} className="size-28 mt-9"/>
                             <h2 className="text-white text-lg text-[20.5px] font-bold mt-6">{service.name}</h2>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </div>

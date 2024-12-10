@@ -121,10 +121,10 @@ const ServicePage = () => {
             <div className="mt-16 ml-[35px]">
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {elements.map((element) => (
-                        <div
+                        <button
                             key={element.name}
                             style={{ backgroundColor: serviceColor }}
-                            className="h-[240px] flex flex-col items-start pl-[30px] pt-2 cursor-pointer rounded-[10px]"
+                            className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px]"
                             onClick={() => handleSelect(
                                 type,
                                 serviceName,
@@ -136,12 +136,16 @@ const ServicePage = () => {
                                 serviceIcon,
                             )}
                         >
-                            <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6">{element.name}</h2>
-                            <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6">{element.description}</h2>
-                        </div>
+                            <div className="text-left w-full pl-[30px]">
+                                <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">{element.name}</h2>
+                                <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 m-0">{element.description}</h2>
+                            </div>
+                        </button>
                     ))}
                 </div>
             </div>
+
+
 
         </div>
     );
