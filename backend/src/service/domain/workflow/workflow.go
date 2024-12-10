@@ -34,3 +34,11 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, newWorkflow entiti
 func (self *WorkflowService) FindWorkflowByUserId(userId string) ([]entities.Workflow, error) {
 	return self.WorkflowRepository.FindWorkflowByUserId(userId)
 }
+
+func (self *WorkflowService) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
+	return self.WorkflowRepository.ActivateDeactivateWorkflow(workflowId, isActivated)
+}
+
+func (self *WorkflowService) FindWorkflowById(workflowId string) (entities.Workflow, error) {
+	return self.WorkflowRepository.FindWorkflowById(workflowId)
+}

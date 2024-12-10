@@ -132,3 +132,42 @@ func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.
 
 	return retrievedWorkflows, nil
 }
+
+func (self *WorkflowRepository) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
+	sqlStatement := `UPDATE workflows SET isactivated = ($1) WHERE id = ($2)`
+
+	_, err := self.db.Exec(sqlStatement, !isActivated, workflowId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Workflow, error) {
+	sqlStatement := `SELECT * FROM workflows where id = ($1)`
+	var retrievedWorkflow entities.Workflow
+	var actionParamByte []byte
+	var reactionParamByte []byte
+
+	row := self.db.QueryRow(sqlStatement, workflowId)
+	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ReactionId,
+		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &actionParamByte, &reactionParamByte)
+
+	if len(actionParamByte) > 0 {
+		errActionByte := json.Unmarshal(actionParamByte, &retrievedWorkflow.ActionParam)
+		if errActionByte != nil {
+			return retrievedWorkflow, errActionByte
+		}
+	}
+	if len(reactionParamByte) > 0 {
+		errReactionByte := json.Unmarshal(reactionParamByte, &retrievedWorkflow.ReactionParam)
+		if errReactionByte != nil {
+			return retrievedWorkflow, errReactionByte
+		}
+	}
+
+	if err != nil {
+		return retrievedWorkflow, err
+	}
+	return retrievedWorkflow, nil
+}

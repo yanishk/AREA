@@ -41,3 +41,16 @@ type WorkflowRetrieveUserWorkflowsUnauthorizedResponse struct {
 type WorkflowRetrieveUserWorkflowsInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve user-Could not retrieve user's workflows"`
 }
+
+// Modify Workflow Activation Status Responses
+type WorkflowModifyWorkflowActivationStatusSuccessResponse struct {
+	Msg string `json:"success"example:"Successfully updates workflow's activation status"`
+}
+
+type WorkflowModifyWorkflowActivationStatusBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Could not find specified workflow"`
+}
+
+type WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not update workflow's activation status"`
+}
