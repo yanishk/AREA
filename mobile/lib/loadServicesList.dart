@@ -12,7 +12,8 @@ class LoadServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
       home: APICall(),
     );
   }
@@ -24,7 +25,8 @@ class APICall extends StatefulWidget {
 }
 
 class LoadService extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+  final String apiUrl = dotenv.get('SERVER_LINK',
+      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String result = '';
   String apiRoute = 'actions-services';
   String title = "Select action service";
@@ -32,7 +34,8 @@ class LoadService extends State<APICall> {
   String reactionsServices = "reactions-services";
   bool isInit = true;
 
-  void storeData(List<String> servicesName, List<String> servicesColor, List<String> servicesIcons, dynamic service) {
+  void storeData(List<String> servicesName, List<String> servicesColor,
+      List<String> servicesIcons, dynamic service) {
     servicesName.add(service['Name']);
     servicesColor.add(service['Color']);
     servicesIcons.add(service['Logo']);
@@ -44,12 +47,17 @@ class LoadService extends State<APICall> {
       result = firstService['Name'] ?? 'No Name';
       developer.log("getServices OK :\n$result");
       if (apiRoute == actionsServices) {
-        storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor, Globaldata.actionServicesIcons, firstService);
+        storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
+            Globaldata.actionServicesIcons, firstService);
         developer.log("getServices $actionsServices");
         apiRoute = reactionsServices;
         getServices();
       } else {
-        storeData(Globaldata.reactionServicesName, Globaldata.reactionServicesColor, Globaldata.reactionServicesIcons, firstService);
+        storeData(
+            Globaldata.reactionServicesName,
+            Globaldata.reactionServicesColor,
+            Globaldata.reactionServicesIcons,
+            firstService);
         developer.log("getServices $reactionsServices");
         Navigator.push(
           Globaldata.myContext,
@@ -81,7 +89,8 @@ class LoadService extends State<APICall> {
           }
         });
       } else {
-        developer.log("getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+        developer.log(
+            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
         setState(() {
           result = '${responseData['error']}';
         });
@@ -92,7 +101,8 @@ class LoadService extends State<APICall> {
         result = '$e';
         developer.log(result);
         if (result.split(' ').contains("SocketException:") == true ||
-           (result.split(' ').contains("Invalid") == true && result.split(' ').contains("argument(s):") == true)) {
+            (result.split(' ').contains("Invalid") == true &&
+                result.split(' ').contains("argument(s):") == true)) {
           result = Globaldata.ErrorServerConnection;
         }
       });
