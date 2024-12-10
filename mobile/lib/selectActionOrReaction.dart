@@ -73,15 +73,15 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       final actions = responseData[apiRoute];
       int i = 0;
       while (actions.isNotEmpty) {
-        final actionResponce = actions[i];
-        if (actionResponce is Map<String, dynamic>) {
-          actionDescription = actionResponce['Description'] ?? 'No Description';
+        final actionResponse = actions[i];
+        if (actionResponse is Map<String, dynamic>) {
+          actionDescription = actionResponse['Description'] ?? 'No Description';
           actionOrReactionList.add(ActionOrReactionData.optional(
-            actionResponce['Id'] ?? '',
-            actionResponce['Name'] ?? '',
-            actionResponce['Description'] ?? '',
-            actionResponce['ServiceId'] ?? '',
-            actionResponce['NbParam'] ?? 0,
+            actionResponse['Id'] ?? '',
+            actionResponse['Name'] ?? '',
+            actionResponse['Description'] ?? '',
+            actionResponse['ServiceId'] ?? '',
+            actionResponse['NbParam'] ?? 0,
           ));
           developer.log("pass");
           ActionOrReactionButtonsList.add(
@@ -146,7 +146,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     final AuthLink = await GetApi.get("authentication/Spotify");
     Globaldata.spotifyConnectionLink = AuthLink["auth-url"];
     developer.log(
-        "getSpotifyAuthLink responce : ${Globaldata.spotifyConnectionLink}");
+        "getSpotifyAuthLink response : ${Globaldata.spotifyConnectionLink}");
     await Navigator.push(Globaldata.myContext,
         MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
   }

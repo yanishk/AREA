@@ -109,8 +109,8 @@ class SaveNewWorkflows extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    final responce = await GetApi.get("user/email");
-    email = responce["email"];
+    final response = await GetApi.get("user/email");
+    email = response["email"];
   }
 
   @override

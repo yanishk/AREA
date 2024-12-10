@@ -172,8 +172,8 @@ class EditAccount extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    final responce = await GetApi.get("user/email");
-    emailController.text = responce["email"];
+    final response = await GetApi.get("user/email");
+    emailController.text = response["email"];
   }
 
   @override
