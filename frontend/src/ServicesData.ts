@@ -25,8 +25,8 @@ export const servicesData: ServiceDataType = {
     "Time & Date": {
         actions: {
             "Every day at": [
-                { id: "time", label: "Time", type: "select", options: ["12 AM", "01 AM", "02 AM", "03 AM", "04 AM", "05 AM", "06 AM", "07 AM", "08 AM", "09 AM", "10 AM", "11 AM", "12 PM", "01 PM", "02 PM", "03 PM", "04 PM", "05 PM", "06 PM", "07 PM", "08 PM", "09 PM", "10 PM", "11 PM",]},
-                { id: "quarter", label: "Quarter Hour", type: "select", options: ["00 minutes", "15 mintues", "30 mintues", "45 minutes"] },
+                { id: "time", label: "Time", type: "select", options: ["0 h", "1 h", "2 h", "3 h", "4 h", "5 h", "6 h", "7 h", "8 h", "9 h", "10 h", "11 h", "12 h", "13 h", "14 h", "15 h", "16 h", "17 h", "18 h", "19 h", "20 h", "21 h", "22 h", "23 h",]},
+                { id: "quarter", label: "Quarter Hour", type: "select", options: ["0 minutes", "15 mintues", "30 mintues", "45 minutes"] },
             ],
         },
     },
