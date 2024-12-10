@@ -36,7 +36,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config --local user.email "actions@github.com"
             git config --local user.name "GitHub Actions"
-            git add mobile
+            git add mobile/lib
             git commit -m "style(mobile): :art: format code"
             git push -f origin "HEAD:${{ github.head_ref }}"
           fi
