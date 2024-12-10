@@ -60,7 +60,7 @@ class _APICallState extends State<APICall> {
           developer.log("HEADER : ${response.headers}");
 
           Navigator.push(
-            context,
+            Globaldata.myContext,
             MaterialPageRoute(builder: (context) => LoginPage()),
           );
         });
@@ -153,7 +153,7 @@ class _APICallState extends State<APICall> {
                 text: AutoSizeText("Continue with Apple", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1,),
                 onPressed: () {
                   Navigator.push(
-                    context,
+                    Globaldata.myContext,
                     MaterialPageRoute(builder: (context) => ExplorePageAll()),
                   );
                 },
@@ -167,7 +167,7 @@ class _APICallState extends State<APICall> {
 
               CustomTextButton(
                 text: Text("Already on AREA? Log in here",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold,color: Colors.black,),),
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()),);},
+                onPressed: () {Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => LoginPage()),);},
               ),
 
             ],
