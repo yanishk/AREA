@@ -57,7 +57,8 @@ class ActionOrReactionData {
 
 class GetApi {
   static Future<dynamic> get(String apiRoute) async {
-    String apiUrl = dotenv.get('SERVER_LINK', fallback: 'Cannot find .env variable "SERVER_LINK"');
+    String apiUrl = dotenv.get('SERVER_LINK',
+        fallback: 'Cannot find .env variable "SERVER_LINK"');
     String result = "";
     developer.log('SERVER_LINK : $apiUrl');
     try {

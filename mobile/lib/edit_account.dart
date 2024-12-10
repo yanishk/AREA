@@ -33,7 +33,9 @@ class EditAccount extends State<APICall> {
       fallback: 'Cannot find .env variable "SERVER_LINK"');
   String apiRoute = 'user/delete-account';
   bool isInit = true;
-  final TextEditingController emailController = new TextEditingController(text: "",);
+  final TextEditingController emailController = new TextEditingController(
+    text: "",
+  );
 
   Future<void> _deleteAccount() async {
     developer.log('SERVER_LINK : $apiUrl');
@@ -182,7 +184,7 @@ class EditAccount extends State<APICall> {
     }
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column (
+        child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             AutoSizeText(
