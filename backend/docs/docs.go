@@ -294,6 +294,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/email": {
+            "get": {
+                "description": "Get the email of user connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get User Email",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.GetUserEmailSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.GetUserEmailUnauthorizedResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/modify-password": {
             "put": {
                 "description": "Modify the user password",
@@ -675,6 +701,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Invalid request body"
+                }
+            }
+        },
+        "docs_user.GetUserEmailSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "email@example.com"
+                }
+            }
+        },
+        "docs_user.GetUserEmailUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string"
                 }
             }
         },
