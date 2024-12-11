@@ -83,39 +83,39 @@ const AccountPage = () => {
                     />
                 </div>
             </div>
-        <div className="flex flex-col justify-center items-center">
-            <p className="text-black text-xl font-[800]">
-                {userEmail}
-            </p>
-            <div className="max-w-96 mt-10">
-                <InputField
-                    type="password"
-                    placeholder="Current password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <InputField
-                    type="password"
-                    placeholder="New password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                />
-                <ButtonValidation
-                    text="Submit"
-                    onClick={handleSubmit}
-                />
-                <ButtonValidation
-                    text="Logut"
-                    onClick={handleLogout}
+            <div className="flex flex-col justify-center items-center">
+                <p className="text-black text-xl font-[800]">
+                    {userEmail}
+                </p>
+                <div className="max-w-96 mt-10">
+                    <InputField
+                        type="password"
+                        placeholder="Current password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
-                <TriggerButton
-                    text="Delete my account"
-                    textColor="text-[#D0001D]"
-                    bgColor="bg-[#F9FAFB]"
-                    hoverColor="hover:bg-[#D0001D] hover:text-white"
-                    onClick={handleDelete}
+                    <InputField
+                        type="password"
+                        placeholder="New password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
                     />
-                    </div>
+                    <ButtonValidation
+                        text="Submit"
+                        onClick={handleSubmit}
+                    />
+                    <ButtonValidation
+                        text="Logout"
+                        onClick={handleLogout}
+                        />
+                    <TriggerButton
+                        text="Delete my account"
+                        textColor="text-[#D0001D]"
+                        bgColor="bg-[#F9FAFB]"
+                        hoverColor="hover:bg-[#D0001D] hover:text-white"
+                        onClick={handleDelete}
+                        />
+                </div>
             </div>
         </>
     )
