@@ -1,3 +1,4 @@
+import axios from "axios";
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 
 type AuthContextType = {
@@ -20,9 +21,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const checkAuthStatus = async () => {
-        if (!isAuthenticated)
-            return;
-        setIsAuthenticated(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}user/email`, {
+                withCredentials: true,
+            });
+
+            if (response.status === 200) {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+            }
+        } catch (error) {
+            console.error("error: ", error);
+            setIsAuthenticated(false);
+        }
     };
 
     useEffect(() => {
