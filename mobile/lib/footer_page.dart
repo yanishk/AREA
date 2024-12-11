@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import "login_page.dart";
-import "sign_up.dart";
 import "exploreAll.dart";
 import "edit_account.dart";
+import "create.dart";
+import 'globalData.dart';
 
 class FooterNavigationBar extends StatelessWidget {
   FooterNavigationBar({
@@ -15,26 +16,28 @@ class FooterNavigationBar extends StatelessWidget {
   final List<Widget> _pages = [
     LoginPage(),
     ExplorePageAll(),
-    SignUp(),
+    CreateWorkflowsPage(),
     LoginPage(),
     EditAccountPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar (
+    return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
       backgroundColor: Colors.white,
-      selectedLabelStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-      unselectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      selectedLabelStyle:
+          const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+      unselectedLabelStyle:
+          const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
       onTap: (int index) {
         if (index != currentIndex) {
           Navigator.push(
-            context,
+            Globaldata.myContext,
             MaterialPageRoute(builder: (context) => _pages[index]),
           );
         }

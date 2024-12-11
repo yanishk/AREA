@@ -1,0 +1,39 @@
+name: mobile
+
+on:
+  pull_request:
+    branches: ["main", "dev"]
+
+jobs:
+  check-compilation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: "temurin"
+
+      - name: Install dependencies
+        run: |
+          cd mobile
+          touch .env
+          flutter pub get
+
+      - name: Build apk
+        run: |
+          cd mobile
+          flutter build apk
+          if [ $? -ne 0 ]; then
+            echo "Compilation failed."
+            exit 1
+          else
+            echo "Compilation succeed."
+            exit 0
+          fi

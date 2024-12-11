@@ -63,3 +63,12 @@ type DeleteAccountFailureUnauthorizedResponse struct {
 type DeleteAccountFailureInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not delete account"`
 }
+
+// Get User Email Responses
+type GetUserEmailSuccessResponse struct {
+	Msg string `json:"email"example:"email@example.com"`
+}
+
+type GetUserEmailUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}

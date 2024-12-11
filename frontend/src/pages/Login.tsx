@@ -9,9 +9,10 @@ import CallToActionLink from "../components/CallToActionLink";
 import SocialButton from "../components/buttons/SocialButton";
 import ErrorMessage from "../components/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "./AuthContext";
 
 const LoginForm = () => {
-
+    const { login } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -45,6 +46,7 @@ const LoginForm = () => {
             });
 
             if (result.data.success) {
+                login();
                 goToHome();
             } else {
                 setEmail("");

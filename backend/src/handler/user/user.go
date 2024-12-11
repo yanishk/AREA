@@ -16,6 +16,8 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
+const EmailNotFoundInTokenMessage = "Email not found in token"
+const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -38,6 +40,7 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 	{
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
+		user.GET("/email", self.GetUserEmail)
 	}
 }
 
@@ -141,7 +144,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
+			"error": EmailNotFoundInTokenMessage,
 		})
 		return
 	}
@@ -149,7 +152,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
+			"error": EmailNotValidMessage,
 		})
 		return
 	}
@@ -200,7 +203,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email not found in token",
+			"error": EmailNotFoundInTokenMessage,
 		})
 		return
 	}
@@ -208,7 +211,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": "Email is not a valid string",
+			"error": EmailNotValidMessage,
 		})
 		return
 	}
@@ -218,9 +221,38 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",
 		})
-	} else {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "Account deleted",
-		})
+		return
 	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Account deleted",
+	})
+}
+
+// @Summary		Get User Email
+// @Description	Get the email of user connected
+// @Tags			Users
+// @Produce		json
+// @Success		200		{object}	docs_user.GetUserEmailSuccessResponse
+// @Failure		401		{object}	docs_user.GetUserEmailUnauthorizedResponse
+// @Router			/user/email [get]
+func (self *UserHandler) GetUserEmail(context *gin.Context) {
+	email, err := context.Get("email")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": EmailNotFoundInTokenMessage,
+		})
+		return
+	}
+
+	emailStr, ok := email.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": EmailNotValidMessage,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"email": emailStr,
+	})
 }
