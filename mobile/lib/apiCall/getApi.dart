@@ -9,9 +9,8 @@ class GetApi {
     String apiUrl = dotenv.get('SERVER_LINK',
         fallback: 'Cannot find .env variable "SERVER_LINK"');
     String result = "";
-    developer.log('SERVER_LINK : $apiUrl');
+    developer.log('GetApi route : $apiRoute');
     try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
       final response = await http.get(
         Uri.parse(apiUrl + apiRoute),
         headers: <String, String>{
@@ -20,11 +19,12 @@ class GetApi {
         },
       );
       final responseData = jsonDecode(response.body);
+
+      developer.log("GetApi responce :$responseData");
       return responseData;
     } catch (e) {
       developer.log("GetApi ERROR: $e", level: 1);
       result = '$e';
-      developer.log(result);
       if (result.split(' ').contains("SocketException:") == true ||
           (result.split(' ').contains("Invalid") == true &&
               result.split(' ').contains("argument(s):") == true)) {

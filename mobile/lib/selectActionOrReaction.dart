@@ -66,7 +66,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   List<Widget> ActionOrReactionButtonsList = [];
 
   void storeServiceDescription(dynamic responseData) {
-    developer.log("storeServiceDescription, service $apiRoute :\n$responseData");
+    developer.log("storeServiceDescription, service '$apiRoute' :\n$responseData");
     if (responseData is Map<String, dynamic> &&
         responseData[apiRoute] is List) {
       List<dynamic> actions = responseData[apiRoute];
