@@ -30,8 +30,8 @@ class APICall extends StatefulWidget {
 class _APICallState extends State<APICall> {
   final String apiUrl = dotenv.get('SERVER_LINK',
       fallback: 'Cannot find .env variable "SERVER_LINK"');
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = new TextEditingController(text: "test@test.com");
+  final TextEditingController passwordController = new TextEditingController(text: "test");
   String result = '';
   String apiRoute = 'login';
 

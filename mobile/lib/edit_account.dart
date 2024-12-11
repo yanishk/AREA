@@ -11,6 +11,7 @@ import "custom_widget.dart";
 import "footer_page.dart";
 import "editPassword.dart";
 import "globalData.dart";
+import 'apiCall/getApi.dart';
 
 class EditAccountPage extends StatelessWidget {
   @override

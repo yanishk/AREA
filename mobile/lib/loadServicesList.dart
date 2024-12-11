@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:developer' as developer;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
 import "exploreAll.dart";
+import 'apiCall/getApi.dart';
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -41,24 +39,20 @@ class LoadService extends State<APICall> {
     servicesIcons.add(service['Logo']);
   }
 
-  void setStoreData(dynamic responseData) {
+  void setStoreData(dynamic responseData, String route) {
     final firstService = responseData[0];
     if (firstService is Map<String, dynamic>) {
       result = firstService['Name'] ?? 'No Name';
-      developer.log("getServices OK :\n$result");
-      if (apiRoute == actionsServices) {
+      if (route == actionsServices) {
         storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, firstService);
-        developer.log("getServices $actionsServices");
-        apiRoute = reactionsServices;
-        getServices();
+          Globaldata.actionServicesIcons, firstService);
       } else {
         storeData(
-            Globaldata.reactionServicesName,
-            Globaldata.reactionServicesColor,
-            Globaldata.reactionServicesIcons,
-            firstService);
-        developer.log("getServices $reactionsServices");
+          Globaldata.reactionServicesName,
+          Globaldata.reactionServicesColor,
+          Globaldata.reactionServicesIcons,
+          firstService
+        );
         Navigator.push(
           Globaldata.myContext,
           MaterialPageRoute(builder: (context) => ExplorePageAll()),
@@ -68,45 +62,10 @@ class LoadService extends State<APICall> {
   }
 
   Future<void> getServices() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.get(
-        Uri.parse(apiUrl + apiRoute),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': Globaldata.JWToken,
-        },
-      );
-      final responseData = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        setState(() {
-          developer.log("getServices OK :\n$responseData");
-          if (responseData is List && responseData.isNotEmpty) {
-            setStoreData(responseData);
-          } else {
-            result = 'No data available';
-          }
-        });
-      } else {
-        developer.log(
-            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-        setState(() {
-          result = '${responseData['error']}';
-        });
-      }
-    } catch (e) {
-      developer.log("getServices ERROR: $e", level: 1);
-      setState(() {
-        result = '$e';
-        developer.log(result);
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          result = Globaldata.ErrorServerConnection;
-        }
-      });
-    }
+    final response = await GetApi.get(actionsServices);
+    setStoreData(response, actionsServices);
+    final responseReaction = await GetApi.get(reactionsServices);
+    setStoreData(responseReaction, reactionsServices);
   }
 
   @override

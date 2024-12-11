@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
 import "spotifyAuth.dart";
+import 'apiCall/getApi.dart';
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -67,13 +66,12 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   List<Widget> ActionOrReactionButtonsList = [];
 
   void storeServiceDescription(dynamic responseData) {
-    developer.log("getServices OK :\n$responseData");
+    developer.log("storeServiceDescription, service $apiRoute :\n$responseData");
     if (responseData is Map<String, dynamic> &&
         responseData[apiRoute] is List) {
-      final actions = responseData[apiRoute];
-      int i = 0;
-      while (actions.isNotEmpty) {
-        final actionResponse = actions[i];
+      List<dynamic> actions = responseData[apiRoute];
+      while (!actions.isEmpty) {
+        final actionResponse = actions.removeLast();
         if (actionResponse is Map<String, dynamic>) {
           actionDescription = actionResponse['Description'] ?? 'No Description';
           actionOrReactionList.add(ActionOrReactionData.optional(
@@ -83,53 +81,13 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
             actionResponse['ServiceId'] ?? '',
             actionResponse['NbParam'] ?? 0,
           ));
-          developer.log("pass");
           ActionOrReactionButtonsList.add(
             actionOrReactionButtons(actionOrReactionList.length - 1),
           );
         }
-        i++;
       }
     } else {
       result = 'Invalid response structure';
-    }
-  }
-
-  Future<void> getServices() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log(
-          'SERVER_LINK + redirection : ${apiUrl + serviceNameList[serviceIndex]}/$apiRoute');
-      final response = await http.get(
-        Uri.parse('${apiUrl + serviceNameList[serviceIndex]}/$apiRoute'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': Globaldata.JWToken,
-        },
-      );
-      final responseData = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        setState(() {
-          storeServiceDescription(responseData);
-        });
-      } else {
-        developer.log(
-            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-        setState(() {
-          result = '${responseData['error']}';
-        });
-      }
-    } catch (e) {
-      developer.log("getServices ERROR: $e", level: 1);
-      setState(() {
-        result = '$e';
-        developer.log(result);
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          result = Globaldata.ErrorServerConnection;
-        }
-      });
     }
   }
 
@@ -249,6 +207,13 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     return selectDateTime(index);
   }
 
+  Future<void> getActionsOrReactions() async {
+    final response = await GetApi.get("${serviceNameList[serviceIndex]}/$apiRoute");
+    setState(() {
+      storeServiceDescription(response);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     serviceName = serviceNameList[serviceIndex];
@@ -258,7 +223,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         setReactionService();
       }
       isInit = true;
-      getServices();
+      getActionsOrReactions();
     }
     return Scaffold(
       body: SingleChildScrollView(
