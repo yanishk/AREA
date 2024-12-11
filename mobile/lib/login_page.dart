@@ -89,7 +89,7 @@ class _APICallState extends State<APICall> {
     final responseData = jsonDecode(response.body);
     if (response.statusCode != 200) {
       developer.log(
-          "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          "postLoginData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       setState(() {
         result = '${responseData['error']}';
       });

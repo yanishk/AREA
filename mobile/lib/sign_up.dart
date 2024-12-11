@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "login_page.dart";
@@ -27,8 +26,6 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String result = '';
@@ -52,7 +49,7 @@ class _APICallState extends State<APICall> {
     final responseData = jsonDecode(response.body);
     if (response.statusCode != 200) {
       developer.log(
-          "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          "postRegisterData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       setState(() {
         result = '${responseData['error']}';
       });
