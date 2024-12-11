@@ -4,6 +4,7 @@ class Globaldata {
   static String JWToken = "";
   static String ErrorServerConnection =
       "Could not find the server\nPlease try again later";
+  static String ErrorBackendDown = "Gateway Time-out\nPlease try again later";
   static BuildContext myContext = myContext;
   static int firstService = -1;
   static int secondService = -1;

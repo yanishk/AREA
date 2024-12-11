@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import "package:http/src/response.dart";
+import 'dart:convert';
+import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "globalData.dart";
@@ -61,10 +64,35 @@ class LoadService extends State<APICall> {
     }
   }
 
+  Future<dynamic> getServiceResponse(String route) async {
+    Response response = await GetApi.get(route);
+    if (response.statusCode == 504) {
+      setState(() {
+        developer.log('${response.body}');
+      });
+      return null;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getServiceResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return null;
+    }
+    developer.log('pass');
+    return responseData;
+  }
+
   Future<void> getServices() async {
-    final response = await GetApi.get(actionsServices);
+
+    final response = await getServiceResponse(actionsServices);
+    if (response == null) {
+      return;
+    }
     setStoreData(response, actionsServices);
-    final responseReaction = await GetApi.get(reactionsServices);
+    final responseReaction = await getServiceResponse(reactionsServices);
+    if (responseReaction == null) {
+      return;
+    }
     setStoreData(responseReaction, reactionsServices);
   }
 

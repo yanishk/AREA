@@ -31,8 +31,10 @@ class PostApi {
           (result.split(' ').contains("Invalid") == true &&
               result.split(' ').contains("argument(s):") == true)) {
         result = Globaldata.ErrorServerConnection;
+      } else {
+        result = Globaldata.ErrorBackendDown;
       }
-      Response response = http.Response(result, 0);
+      Response response = http.Response(result, 504);
       return response;
     }
   }

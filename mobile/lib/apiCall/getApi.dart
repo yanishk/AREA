@@ -2,10 +2,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import "package:http/src/response.dart";
+
 import '../globalData.dart';
 
 class GetApi {
-  static Future<dynamic> get(String apiRoute) async {
+  static Future<Response> get(String apiRoute) async {
     String apiUrl = dotenv.get('SERVER_LINK',
         fallback: 'Cannot find .env variable "SERVER_LINK"');
     String result = "";
@@ -18,10 +20,9 @@ class GetApi {
           'Cookie': Globaldata.JWToken,
         },
       );
-      final responseData = jsonDecode(response.body);
 
-      developer.log("GetApi responce :$responseData");
-      return responseData;
+      developer.log("GetApi responce :${jsonDecode(response.body)}\nstatusCode : ${response.statusCode}");
+      return response;
     } catch (e) {
       developer.log("GetApi ERROR: $e", level: 1);
       result = '$e';
@@ -29,8 +30,11 @@ class GetApi {
           (result.split(' ').contains("Invalid") == true &&
               result.split(' ').contains("argument(s):") == true)) {
         result = Globaldata.ErrorServerConnection;
+      } else {
+        result = Globaldata.ErrorBackendDown;
       }
-      return result;
+      Response response = http.Response(result, 504);
+      return response;
     }
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import "package:http/src/response.dart";
+import 'dart:convert';
 
 import "custom_widget.dart";
 import "globalData.dart";
@@ -49,8 +50,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   });
   final bool isAnAction;
   final int serviceIndex;
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   List<String> serviceNameList = Globaldata.actionServicesName;
   List<String> serviceColorList = Globaldata.actionServicesColor;
   List<String> serviceIconsList = Globaldata.actionServicesIcons;
@@ -101,8 +100,20 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getSpotifyAuthLink() async {
-    final AuthLink = await GetApi.get("authentication/Spotify");
-    Globaldata.spotifyConnectionLink = AuthLink["auth-url"];
+    Response response = await GetApi.get("authentication/Spotify");
+    if (response.statusCode == 504) {
+      setState(() {
+        developer.log('${response.body}');
+      });
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getSpotifyAuthLink FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    Globaldata.spotifyConnectionLink = responseData["auth-url"];
     developer.log(
         "getSpotifyAuthLink response : ${Globaldata.spotifyConnectionLink}");
     await Navigator.push(Globaldata.myContext,
@@ -210,9 +221,21 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getActionsOrReactions() async {
-    final response = await GetApi.get("${serviceNameList[serviceIndex]}/$apiRoute");
+    Response response = await GetApi.get("${serviceNameList[serviceIndex]}/$apiRoute");
+    if (response.statusCode == 504) {
+      setState(() {
+        developer.log('${response.body}');
+      });
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getSpotifyAuthLink FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
     setState(() {
-      storeServiceDescription(response);
+      storeServiceDescription(responseData);
     });
   }
 

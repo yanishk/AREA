@@ -68,7 +68,7 @@ class EditPassword extends State<APICall> {
         'password': newPasswordController.text,
       }),
     );
-    if (response.statusCode == 0) {
+    if (response.statusCode == 504) {
       setState(() {
         result = response.body;
       });

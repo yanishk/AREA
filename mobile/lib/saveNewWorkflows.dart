@@ -62,7 +62,10 @@ class SaveNewWorkflows extends State<APICall> {
         'reactionparam': Globaldata.serviceReaction.parameterList,
       }),
     );
-    if (response.statusCode == 0) {
+    if (response.statusCode == 504) {
+      setState(() {
+        developer.log('${response.body}');
+      });
       return;
     }
     final responseData = jsonDecode(response.body);
@@ -87,8 +90,22 @@ class SaveNewWorkflows extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    final response = await GetApi.get("user/email");
-    email = response["email"];
+    Response response = await GetApi.get("user/email");
+    if (response.statusCode == 504) {
+      setState(() {
+        developer.log('${response.body}');
+      });
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getEmail FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    setState(() {
+      email = responseData["email"];
+    });
   }
 
   @override
