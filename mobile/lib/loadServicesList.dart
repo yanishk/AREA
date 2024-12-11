@@ -3,6 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import "package:http/src/response.dart";
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
@@ -34,6 +36,7 @@ class LoadService extends State<APICall> {
   String actionsServices = "actions-services";
   String reactionsServices = "reactions-services";
   bool isInit = true;
+  bool hasToRetry = false;
 
   void storeData(List<String> servicesName, List<String> servicesColor,
       List<String> servicesIcons, dynamic service) {
@@ -86,11 +89,13 @@ class LoadService extends State<APICall> {
 
     final response = await getServiceResponse(actionsServices);
     if (response == null) {
+      hasToRetry = true;
       return;
     }
     setStoreData(response, actionsServices);
     final responseReaction = await getServiceResponse(reactionsServices);
     if (responseReaction == null) {
+      hasToRetry = true;
       return;
     }
     setStoreData(responseReaction, reactionsServices);
@@ -103,10 +108,50 @@ class LoadService extends State<APICall> {
       getServices();
     }
 
-    return Column(
-      children: const [
-        MyDivider(),
-      ],
-    );
+    if (hasToRetry) {
+      return Scaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding (
+                padding: EdgeInsets.only (
+                  top: MediaQuery.sizeOf(Globaldata.myContext).height / 3
+                ),
+              ),
+              AutoSizeText(
+                "Error during connection",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 0, 0, 0)),
+              ),
+              Padding (padding: EdgeInsets.only (top: 50),),
+              CustomButton(
+                backgroundColor: Color.fromARGB(255, 34, 34, 34),
+                text: AutoSizeText(
+                  "Retry",
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                onPressed: () {getServices();},
+                size: Size(double.infinity, 55),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        body: Center(
+          child: LoadingAnimationWidget.dotsTriangle(
+            color: Color.fromARGB(255, 34, 34, 34),
+            size: 200,
+          ),
+        ),
+      );
+    }
   }
 }
