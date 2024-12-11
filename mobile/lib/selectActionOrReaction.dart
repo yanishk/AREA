@@ -204,11 +204,13 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         );
       },
     );
-    actionOrReactionList[index].parameter =
-        "${selectedTime!.hour.toString()}:${selectedTime.minute.toString()}";
-    setParameter(index, "hour", selectedTime.hour);
-    setParameter(index, "minute", selectedTime.minute);
-    saveSelectedActionOrReaction(index);
+    if (selectedTime != null) {
+      actionOrReactionList[index].parameter =
+        "${selectedTime.hour.toString()}:${selectedTime.minute.toString()}";
+      setParameter(index, "hour", selectedTime.hour);
+      setParameter(index, "minute", selectedTime.minute);
+      saveSelectedActionOrReaction(index);
+    }
   }
 
   Widget selectDateTime(int index) {
