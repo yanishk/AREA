@@ -157,6 +157,7 @@ class EditAccount extends State<APICall> {
             ),
           ),
           firstChoiceonPressed: () {
+            Globaldata.resetActionReactionServicesList();
             Globaldata.JWToken = "";
             Navigator.of(context).pop();
             Navigator.push(

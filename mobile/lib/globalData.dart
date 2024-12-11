@@ -22,6 +22,15 @@ class Globaldata {
   static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
   static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
 
+  static void resetActionReactionServicesList() {
+    Globaldata.actionServicesName = [];
+    Globaldata.actionServicesColor = [];
+    Globaldata.actionServicesIcons = [];
+    Globaldata.reactionServicesName = [];
+    Globaldata.reactionServicesColor = [];
+    Globaldata.reactionServicesIcons = [];
+  }
+
   static int getActionServicesSize() {
     return actionServicesName.length;
   }
