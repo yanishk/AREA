@@ -4,16 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
 
 const Navbar = () => {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
         navigate("/register");
     }
 
-    const handleLogout = () => {
-        logout();
-        navigate("/");
+    const handleAccount = () => {
+        navigate("/account");
     };
     const handleCreate = () => {
         navigate("/create");
@@ -83,10 +82,12 @@ const Navbar = () => {
                                 />
                             </li>
                             <li>
-                                <NavbarButton
-                                    onClick={handleLogout}
-                                    text="Log out"
-                                />
+                                <div
+                                    className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center cursor-pointer"
+                                    onClick={handleAccount}
+                                >
+                                    <p className="text-white font-[900]">W</p>
+                                </div>
                             </li>
                         </>
                     )}
