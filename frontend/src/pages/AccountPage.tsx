@@ -5,6 +5,7 @@ import ButtonValidation from "../components/buttons/ButtonValidation";
 import TriggerButton from "../components/buttons/TriggerButton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import CancelButton from "../components/buttons/CancelButton";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
@@ -65,7 +66,23 @@ const AccountPage = () => {
         }
     }
 
+    const goBack = () => {
+        navigate(-1);
+    };
+
     return (
+        <>
+            <div className="flex items-center justify-between px-10 py-5">
+                <div>
+                    <CancelButton
+                        text="Cancel"
+                        textColor="text-white"
+                        borderColor="border-[#222222]"
+                        bgColor="bg-[#222222]"
+                        onClick={goBack}
+                    />
+                </div>
+            </div>
         <div className="flex flex-col justify-center items-center">
             <p className="text-black text-xl font-[800]">
                 {userEmail}
@@ -100,7 +117,7 @@ const AccountPage = () => {
                     />
                     </div>
             </div>
-
+        </>
     )
 }
 
