@@ -42,3 +42,16 @@ func (self *WorkflowService) ActivateDeactivateWorkflow(workflowId string, isAct
 func (self *WorkflowService) FindWorkflowById(workflowId string) (entities.Workflow, error) {
 	return self.WorkflowRepository.FindWorkflowById(workflowId)
 }
+
+func (self *WorkflowService) GetUserWorkflows(email string) ([]entities.Workflow, error) {
+	userFound, errUserFound := self.UserRepository.FindUserByEmail(email)
+	if errUserFound != nil {
+		return nil, errUserFound
+	}
+
+	retrievedWorkflow, err := self.WorkflowRepository.FindWorkflowByUserId(userFound.Id)
+	if err != nil {
+		return nil, err
+	}
+	return retrievedWorkflow, nil
+}

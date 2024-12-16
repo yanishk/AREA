@@ -42,6 +42,7 @@ type WorkflowService interface {
 	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
 	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
+	GetUserWorkflows(email string) ([]entities.Workflow, error)
 }
 
 type Service struct {

@@ -114,20 +114,14 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
-	userFound, errUserFound := self.UserService.FindUserByEmail(emailStr)
-	if errUserFound != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve user",
-		})
-		return
-	}
-	retrievedWorkflow, err := self.WorkflowService.FindWorkflowByUserId(userFound.Id)
-	if err != nil {
+	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr)
+	if errRetrievedWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve user's workflows",
 		})
 		return
 	}
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"workflows": retrievedWorkflow,
 	})
