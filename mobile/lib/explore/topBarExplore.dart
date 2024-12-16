@@ -21,38 +21,57 @@ class TopBarExplore extends StatelessWidget {
             SelectedCardList.index = 0;
             onPressed();
           },
-          child: AutoSizeText(
-            "All",
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-            maxLines: 1,
-          ),
+          child: TextTopBar(text: "All", index: 0),
         ),
         TextButton(
           onPressed: () {
             SelectedCardList.index = 1;
             onPressed();
           },
-          child: AutoSizeText(
-            "Workflows",
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-            maxLines: 1,
-          ),
+          child: TextTopBar(text: "Workflows", index: 1,),
         ),
         TextButton(
           onPressed: () {
             SelectedCardList.index = 2;
             onPressed();
           },
-          child: AutoSizeText(
-            "Services",
-            style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-            maxLines: 1,
-          ),
+          child: TextTopBar(text: "Services", index: 2,),
         ),
       ],
     );
+  }
+}
+
+class TextTopBar extends StatelessWidget {
+  const TextTopBar({
+    super.key,
+    required this.text,
+    this.index = 0,
+  });
+
+  final String text;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    if (index != SelectedCardList.index) {
+      return AutoSizeText(
+        text,
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+        maxLines: 1,
+      );
+    }
+    return AutoSizeText(
+        text,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w900,
+          color: Colors.black,
+          decoration: TextDecoration.underline,
+          decorationThickness: 2,
+        ),
+        maxLines: 1,
+      );
   }
 }
