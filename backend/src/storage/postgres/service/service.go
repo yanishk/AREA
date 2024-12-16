@@ -20,7 +20,7 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 
 	_, err := self.FindServiceByName(name)
 	if err == nil {
-		return fmt.Errorf("service already exist")
+		return fmt.Errorf("Service already exist")
 	}
 
 	_, err = self.db.Exec(sqlStatement, name, color, logo)

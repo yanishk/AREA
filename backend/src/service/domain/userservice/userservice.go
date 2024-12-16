@@ -38,7 +38,7 @@ func (self *UserServiceService) FindServiceByName(name string) (entities.Service
 func (self *UserServiceService) GetUser(emailStr string) (entities.User, error) {
 	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(emailStr)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
-		return foundUser, fmt.Errorf("could not find requested user")
+		return foundUser, fmt.Errorf("Could not find requested user")
 	}
 	return foundUser, nil
 }
