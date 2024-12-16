@@ -21,6 +21,7 @@ const InternalServerErrorMessage = "Internal server error"
 const Bearer = "Bearer"
 const ContentType = "Content-Type"
 const JsonApp = "application/json"
+const APICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -73,7 +74,7 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
@@ -105,7 +106,7 @@ func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
@@ -137,7 +138,7 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
