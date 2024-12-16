@@ -6,11 +6,13 @@ import TriggerButton from "../components/buttons/TriggerButton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import CancelButton from "../components/buttons/CancelButton";
+import Modal from "../components/modals/Modal";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
 
@@ -78,8 +80,23 @@ const AccountPage = () => {
         navigate("/");
     };
 
+    const handleShowModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+    };
+
     return (
         <>
+            {isModalVisible && (
+                <Modal
+                    message={"Do you want to delete you'r account ?"}
+                    onClickYes={handleDelete}
+                    onClickNo={handleCloseModal}
+                />
+            )}
             <div className="flex items-center justify-between px-10 py-5">
                 <div>
                     <CancelButton
@@ -121,7 +138,7 @@ const AccountPage = () => {
                         textColor="text-[#D0001D]"
                         bgColor="bg-[#F9FAFB]"
                         hoverColor="hover:bg-[#D0001D] hover:text-white"
-                        onClick={handleDelete}
+                        onClick={handleShowModal}
                         />
                 </div>
             </div>
