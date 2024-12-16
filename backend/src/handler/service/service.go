@@ -47,43 +47,30 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(reactionName string, accessToken string) error {
+func (self *ServiceHandler) ReactionStartPlayback(accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
-	if reactionName != "Start playback" {
-		return nil
-	}
 
 	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
-func (self *ServiceHandler) ReactionPausePlayback(reactionName string, accessToken string) error {
+func (self *ServiceHandler) ReactionPausePlayback(accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/pause"
-	if reactionName != "Pause playback" {
-		return nil
-	}
 
 	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
-func (self *ServiceHandler) ReactionSkipTrack(reactionName string, accessToken string) error {
+func (self *ServiceHandler) ReactionSkipTrack(accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/next"
-	if reactionName != "Skip track" {
-		return nil
-	}
 
 	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
 }
 
-func (self *ServiceHandler) AddToQueue(reactionName string, ReactionParam map[string]interface{}, accessToken string) error {
+func (self *ServiceHandler) AddToQueue(ReactionParam map[string]interface{}, accessToken string) error {
 	uri, uriErr := ReactionParam["uri"]
 	if !uriErr {
 		return fmt.Errorf("Incorrect URI")
 	}
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-
-	if reactionName != "Add track to playback queue" {
-		return nil
-	}
 
 	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
 }
@@ -111,6 +98,29 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 
 }
 
+func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEmail string, workflow entities.Workflow) error {
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(userEmail, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	if reactionTitle == "Start playback" {
+		return self.ReactionStartPlayback(accessToken)
+	}
+	if reactionTitle == "Pause playback" {
+		return self.ReactionPausePlayback(accessToken)
+	}
+	if reactionTitle == "Skip track" {
+		return self.ReactionSkipTrack(accessToken)
+	}
+	if reactionTitle == "Add track to playback queue" {
+		return self.AddToQueue(workflow.ReactionParam, accessToken)
+	}
+
+	return nil
+}
+
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
 	for _, workflow := range AllworkflowFound {
 		hour, hourExists := workflow.ActionParam["hour"]
@@ -126,15 +136,7 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 				continue
 			}
 
-			accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Spotify")
-			if errRefreshing != nil {
-				return errRefreshing
-			}
-
-			self.ReactionStartPlayback(reactionFound.Name, accessToken)
-			self.ReactionPausePlayback(reactionFound.Name, accessToken)
-			self.ReactionSkipTrack(reactionFound.Name, accessToken)
-			self.AddToQueue(reactionFound.Name, workflow.ReactionParam, accessToken)
+			self.executeSpotifyReactions(reactionFound.Name, foundUser.Email, workflow)
 		}
 	}
 	return nil
