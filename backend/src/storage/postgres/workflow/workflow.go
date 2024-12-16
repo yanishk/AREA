@@ -75,17 +75,9 @@ func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entit
 			return nil, err
 		}
 
-		if len(actionParamByte) > 0 {
-			errActionByte := json.Unmarshal(actionParamByte, &workflow.ActionParam)
-			if errActionByte != nil {
-				return nil, errActionByte
-			}
-		}
-		if len(reactionParamByte) > 0 {
-			errReactionByte := json.Unmarshal(reactionParamByte, &workflow.ReactionParam)
-			if errReactionByte != nil {
-				return nil, errReactionByte
-			}
+		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, workflow)
+		if errUnmarshal != nil {
+			return retrievedWorkflows, errUnmarshal
 		}
 
 		retrievedWorkflows = append(retrievedWorkflows, workflow)
@@ -114,17 +106,9 @@ func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.
 			return nil, err
 		}
 
-		if len(actionParamByte) > 0 {
-			errActionByte := json.Unmarshal(actionParamByte, &workflow.ActionParam)
-			if errActionByte != nil {
-				return nil, errActionByte
-			}
-		}
-		if len(reactionParamByte) > 0 {
-			errReactionByte := json.Unmarshal(reactionParamByte, &workflow.ReactionParam)
-			if errReactionByte != nil {
-				return nil, errReactionByte
-			}
+		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, workflow)
+		if errUnmarshal != nil {
+			return retrievedWorkflows, errUnmarshal
 		}
 
 		retrievedWorkflows = append(retrievedWorkflows, workflow)
@@ -150,9 +134,21 @@ func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Wo
 	var reactionParamByte []byte
 
 	row := self.db.QueryRow(sqlStatement, workflowId)
+
 	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ReactionId,
 		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &actionParamByte, &reactionParamByte)
+	if err != nil {
+		return retrievedWorkflow, err
+	}
 
+	retrievedWorkflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, retrievedWorkflow)
+	if errUnmarshal != nil {
+		return retrievedWorkflow, errUnmarshal
+	}
+	return retrievedWorkflow, nil
+}
+
+func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamByte []byte, reactionParamByte []byte, retrievedWorkflow entities.Workflow) (entities.Workflow, error) {
 	if len(actionParamByte) > 0 {
 		errActionByte := json.Unmarshal(actionParamByte, &retrievedWorkflow.ActionParam)
 		if errActionByte != nil {
@@ -164,10 +160,6 @@ func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Wo
 		if errReactionByte != nil {
 			return retrievedWorkflow, errReactionByte
 		}
-	}
-
-	if err != nil {
-		return retrievedWorkflow, err
 	}
 	return retrievedWorkflow, nil
 }
