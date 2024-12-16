@@ -238,23 +238,13 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
-	//into service
-	foundService, errFoundService := self.ServiceService.FindServiceByName(serviceName)
-	if errFoundService != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested service",
-		})
-		return
-	}
-
-	reactions, errFindReactions := self.ServiceService.FindReactionByServiceId(foundService.Id)
-	if errFindReactions != nil {
+	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
+	if errReactions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
 		return
 	}
-	//until here
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"reactions": reactions,

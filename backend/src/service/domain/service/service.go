@@ -42,6 +42,19 @@ func (self *ServiceService) FindActionByServiceId(serviceName string) ([]entitie
 	return actions, nil
 }
 
+func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error) {
+	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		return nil, errFoundService
+	}
+
+	reactions, errFindReactions := self.ReactionRepository.FindReactionByServiceId(foundService.Id)
+	if errFindReactions != nil {
+		return nil, errFindReactions
+	}
+	return reactions, errFindReactions
+}
+
 func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
 	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
 }
