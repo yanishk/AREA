@@ -90,7 +90,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 }
 
 // @Summary		Retrieve User's Workflows
-// @Description	Retrieve the workflows of the user actually connected.
+// @Description	Retrieve the workflows of the user actually connected
 // @Tags			Workflow
 // @Produce		json
 // @Success		200		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse

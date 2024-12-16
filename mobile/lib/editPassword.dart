@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import "package:http/src/response.dart";
+import 'package:fluttertoast/fluttertoast.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
+import 'apiCall/apiRequest.dart';
 
 class EditPasswordPage extends StatelessWidget {
   @override
@@ -26,12 +27,9 @@ class APICall extends StatefulWidget {
 }
 
 class EditPassword extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController repeatNewPasswordController =
-      TextEditingController();
+  final TextEditingController repeatNewPasswordController = TextEditingController();
   String result = '';
   String notSamePasswd = "";
   String apiRoute = 'user/modify-password';
@@ -43,60 +41,57 @@ class EditPassword extends State<APICall> {
     super.dispose();
   }
 
-  Future<void> putData() async {
-    developer.log('SERVER_LINK : $apiUrl');
+  bool checkSamePassword() {
     if (repeatNewPasswordController.text != newPasswordController.text) {
       setState(() {
         notSamePasswd = "Password doesn't match";
+        result = "";
       });
       developer.log(
-          'USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
-    } else {
-      setState(() {
-        notSamePasswd = "";
-      });
-      try {
-        developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-        final response = await http.put(
-          Uri.parse(apiUrl + apiRoute),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Cookie': Globaldata.JWToken,
-          },
-          body: jsonEncode(<String, dynamic>{
-            'oldpassword': oldPasswordController.text,
-            'password': newPasswordController.text,
-          }),
-        );
-
-        if (response.statusCode == 200) {
-          setState(() {
-            result = "";
-            developer.log("Password putData succes");
-
-            Navigator.pop(Globaldata.myContext);
-          });
-        } else {
-          final responseData = jsonDecode(response.body);
-          developer.log(
-              "Password putData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-          setState(() {
-            result = '${responseData['error']}';
-          });
-        }
-      } catch (e) {
-        developer.log("Password putData ERROR: $e", level: 1);
-        setState(() {
-          result = '$e';
-          developer.log(result);
-          if (result.split(' ').contains("SocketException:") == true ||
-              (result.split(' ').contains("Invalid") == true &&
-                  result.split(' ').contains("argument(s):") == true)) {
-            result = Globaldata.ErrorServerConnection;
-          }
-        });
-      }
+          'checkSamePassword USER ERROR : $notSamePasswd : ${newPasswordController.text} ${repeatNewPasswordController.text}');
+      return false;
     }
+    setState(() {
+      notSamePasswd = "";
+      result = "";
+    });
+    return true;
+  }
+
+  Future<void> putModifyPassword() async {
+    if (!checkSamePassword()) {
+      return;
+    }
+    Response response = await ApiRequest.put(
+      apiRoute, jsonEncode(<String, dynamic>{
+        'oldpassword': oldPasswordController.text,
+        'password': newPasswordController.text,
+      }),
+    );
+    if (response.statusCode == 504) {
+      setState(() {
+        result = response.body;
+      });
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "putModifyPassword FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      setState(() {
+        result = '${responseData['error']}';
+      });
+      return;
+    }
+    Fluttertoast.showToast(
+      msg: responseData['success'],
+      toastLength: Toast.LENGTH_SHORT,
+      timeInSecForIosWeb: 1,
+      backgroundColor: const Color.fromARGB(255, 71, 71, 71),
+      textColor: Colors.white,
+      fontSize: 24.0
+    );
+    Navigator.pop(Globaldata.myContext);
   }
 
   @override
@@ -185,7 +180,7 @@ class EditPassword extends State<APICall> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
-              onPressed: putData,
+              onPressed: putModifyPassword,
               size: Size(double.infinity, 55),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
