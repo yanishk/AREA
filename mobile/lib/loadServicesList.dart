@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import "package:http/src/response.dart";
 import 'dart:convert';
 import 'dart:developer' as developer;
@@ -9,7 +8,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import "custom_widget.dart";
 import "globalData.dart";
 import "exploreAll.dart";
-import 'apiCall/getApi.dart';
+import "apiCall/apiRequest.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -28,8 +27,6 @@ class APICall extends StatefulWidget {
 }
 
 class LoadService extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String result = '';
   String apiRoute = 'actions-services';
   String title = "Select action service";
@@ -68,11 +65,10 @@ class LoadService extends State<APICall> {
   }
 
   Future<dynamic> getServiceResponse(String route) async {
-    Response response = await GetApi.get(route);
+    Response response = await ApiRequest.get(route);
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
+      developer.log('${response.body}');
       return null;
     }
     final responseData = jsonDecode(response.body);

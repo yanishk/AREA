@@ -7,7 +7,7 @@ import "custom_widget.dart";
 import "login_page.dart";
 import "exploreAll.dart";
 import "globalData.dart";
-import 'apiCall/postApi.dart';
+import 'apiCall/apiRequest.dart';
 
 class SignUp extends StatelessWidget {
   @override
@@ -39,7 +39,7 @@ class _APICallState extends State<APICall> {
   }
 
   Future<void> postRegisterData() async {
-    final response = await PostApi.post(apiRoute, jsonEncode(<String, dynamic>{'email': emailController.text,'password': passwordController.text,}),);
+    final response = await ApiRequest.post(apiRoute, jsonEncode(<String, dynamic>{'email': emailController.text,'password': passwordController.text,}),);
     if (response.statusCode == 504) {
       setState(() {
         result = response.body;

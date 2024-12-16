@@ -8,8 +8,7 @@ import "package:http/src/response.dart";
 import "custom_widget.dart";
 import "globalData.dart";
 import "exploreAll.dart";
-import 'apiCall/getApi.dart';
-import 'apiCall/postApi.dart';
+import "apiCall/apiRequest.dart";
 
 class SaveNewWorkflowsPage extends StatelessWidget {
   const SaveNewWorkflowsPage({
@@ -52,7 +51,7 @@ class SaveNewWorkflows extends State<APICall> {
   bool isInit = true;
 
   Future<void> postCreateWorkflows() async {
-    Response response = await PostApi.post(
+    Response response = await ApiRequest.post(
       apiRoute,
       jsonEncode(<String, dynamic>{
         'actionid': Globaldata.serviceAction.id,
@@ -63,9 +62,7 @@ class SaveNewWorkflows extends State<APICall> {
       }),
     );
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
       return;
     }
     final responseData = jsonDecode(response.body);
@@ -90,11 +87,9 @@ class SaveNewWorkflows extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    Response response = await GetApi.get("user/email");
+    Response response = await ApiRequest.get("user/email");
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
       return;
     }
     final responseData = jsonDecode(response.body);
