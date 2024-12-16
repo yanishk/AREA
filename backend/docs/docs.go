@@ -528,12 +528,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -567,12 +561,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse"
                         }
                     },
                     "500": {
@@ -668,15 +656,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/docs_service.ActionExample"
                     }
-                }
-            }
-        },
-        "docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not find requested service"
                 }
             }
         },
@@ -869,7 +848,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization-Could not find requested user-Could not find requested service"
+                    "example": "Invalid code authorization"
                 }
             }
         },
@@ -878,7 +857,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Failed to exchange token-Failed to get email"
+                    "example": "Failed to get email-Failed to update token"
                 }
             }
         },
@@ -966,7 +945,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid request body-Could not find specified workflow"
+                    "example": "Invalid request body"
                 }
             }
         },
@@ -993,7 +972,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Could not retrieve user-Could not retrieve user's workflows"
+                    "example": "Could not retrieve user's workflows"
                 }
             }
         },
