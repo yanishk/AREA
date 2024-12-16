@@ -212,21 +212,15 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 // @Router			/{service}/actions [get]
 func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
-	foundService, errFoundService := self.ServiceService.FindServiceByName(serviceName)
-	if errFoundService != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested service",
-		})
-		return
-	}
 
-	actions, errFindActions := self.ServiceService.FindActionByServiceId(foundService.Id)
-	if errFindActions != nil {
+	actions, errActions := self.ServiceService.FindActionByServiceId(serviceName)
+	if errActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
 		})
 		return
 	}
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"actions": actions,
 	})
@@ -243,6 +237,8 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Router			/{service}/reactions [get]
 func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
+
+	//into service
 	foundService, errFoundService := self.ServiceService.FindServiceByName(serviceName)
 	if errFoundService != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -258,6 +254,8 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 		})
 		return
 	}
+	//until here
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"reactions": reactions,
 	})
