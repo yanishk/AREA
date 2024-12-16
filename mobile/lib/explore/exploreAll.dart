@@ -32,7 +32,7 @@ class ExplorePageAllMain extends State<ExplorePageAllStateful> {
   Widget serviceTiles(int index) {
     if (index % 2 == 0) {
       if (serviceIndex < serviceNameList.length) {
-        return ServicesCardParam(
+        return ServicesCard(
           name: serviceNameList[serviceIndex],
           color: HexColor(serviceColorList[serviceIndex]),
           imageUrl: serviceIconsList[serviceIndex],

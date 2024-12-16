@@ -29,7 +29,7 @@ class ExplorePageServicesMain extends State<ExplorePageServicesStateful> {
   List<String> serviceIconsList = Globaldata.actionServicesIcons + Globaldata.reactionServicesIcons;
 
   Widget serviceTiles(int index) {
-    return ServicesCardParam(
+    return ServicesCard(
       name: serviceNameList[index],
       color: HexColor(serviceColorList[index]),
       imageUrl: serviceIconsList[index],
