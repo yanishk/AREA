@@ -6,6 +6,7 @@ type User struct {
 	Password  string
 	CreatedAt string
 	Timezone  string
+	ConnectionType string
 }
 
 type UserCredentials struct {
