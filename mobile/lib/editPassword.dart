@@ -7,7 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import 'apiCall/putApi.dart';
+import 'apiCall/apiRequest.dart';
 
 class EditPasswordPage extends StatelessWidget {
   @override
@@ -62,7 +62,7 @@ class EditPassword extends State<APICall> {
     if (!checkSamePassword()) {
       return;
     }
-    Response response = await PutApi.put(
+    Response response = await ApiRequest.put(
       apiRoute, jsonEncode(<String, dynamic>{
         'oldpassword': oldPasswordController.text,
         'password': newPasswordController.text,

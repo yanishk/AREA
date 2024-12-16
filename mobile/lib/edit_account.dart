@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:namer_app/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,8 +10,7 @@ import "custom_widget.dart";
 import "footer_page.dart";
 import "editPassword.dart";
 import "globalData.dart";
-import 'apiCall/getApi.dart';
-import 'apiCall/deleteApi.dart';
+import "apiCall/apiRequest.dart";
 
 class EditAccountPage extends StatelessWidget {
   @override
@@ -31,8 +29,6 @@ class APICall extends StatefulWidget {
 }
 
 class EditAccount extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String apiRoute = 'user/delete-account';
   bool isInit = true;
   final TextEditingController emailController = new TextEditingController(
@@ -51,7 +47,7 @@ class EditAccount extends State<APICall> {
   }
 
   Future<void> deletePassword() async {
-    Response response = await DeleteApi.delete(apiRoute);
+    Response response = await ApiRequest.delete(apiRoute);
     if (response.statusCode == 504) {
       displayToastError(response.body);
       return;
@@ -148,11 +144,9 @@ class EditAccount extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    Response response = await GetApi.get("user/email");
+    Response response = await ApiRequest.get("user/email");
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
       return;
     }
     final responseData = jsonDecode(response.body);

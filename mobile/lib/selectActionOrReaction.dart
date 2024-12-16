@@ -7,7 +7,7 @@ import 'dart:convert';
 import "custom_widget.dart";
 import "globalData.dart";
 import "spotifyAuth.dart";
-import 'apiCall/getApi.dart';
+import "apiCall/apiRequest.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -100,11 +100,9 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getSpotifyAuthLink() async {
-    Response response = await GetApi.get("authentication/Spotify");
+    Response response = await ApiRequest.get("authentication/Spotify");
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
       return;
     }
     final responseData = jsonDecode(response.body);
@@ -221,11 +219,9 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getActionsOrReactions() async {
-    Response response = await GetApi.get("${serviceNameList[serviceIndex]}/$apiRoute");
+    Response response = await ApiRequest.get("${serviceNameList[serviceIndex]}/$apiRoute");
     if (response.statusCode == 504) {
-      setState(() {
-        developer.log('${response.body}');
-      });
+      developer.log('${response.body}');
       return;
     }
     final responseData = jsonDecode(response.body);
