@@ -26,11 +26,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 withCredentials: true,
             });
 
-            if (response.status === 200) {
-                setIsAuthenticated(true);
-            } else {
+            if (response.status != 200) {
                 setIsAuthenticated(false);
+                return;
             }
+            setIsAuthenticated(true);
         } catch (error) {
             console.error("error: ", error);
             setIsAuthenticated(false);

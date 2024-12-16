@@ -54,7 +54,7 @@ const AccountPage = () => {
 
     const handleLogout = () => {
         logout();
-        navigate("/");
+        goHome();
     }
 
     const handleDelete = async () => {
@@ -64,8 +64,7 @@ const AccountPage = () => {
                     withCredentials: true,
                 }
             );
-            logout();
-            navigate("/");
+            handleLogout();
         } catch (error) {
             console.error("Failed to delete account : ", error);
         }
