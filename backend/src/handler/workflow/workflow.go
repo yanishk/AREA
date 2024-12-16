@@ -148,16 +148,8 @@ func (self *WorkflowHandler) ActivateDeactivateWorkflow(context *gin.Context) {
 		return
 	}
 
-	foundWorkflow, errFetchWorkflow := self.WorkflowService.FindWorkflowById(workflowActivation.WorkflowId)
-	if errFetchWorkflow != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find specified workflow",
-		})
-		return
-	}
-
-	errUpdate := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
-	if errUpdate != nil {
+	errUpdateworkflow := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation)
+	if errUpdateworkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not update workflow's activation status",
 		})

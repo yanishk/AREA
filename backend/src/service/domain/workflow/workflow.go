@@ -35,10 +35,6 @@ func (self *WorkflowService) FindWorkflowByUserId(userId string) ([]entities.Wor
 	return self.WorkflowRepository.FindWorkflowByUserId(userId)
 }
 
-func (self *WorkflowService) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
-	return self.WorkflowRepository.ActivateDeactivateWorkflow(workflowId, isActivated)
-}
-
 func (self *WorkflowService) FindWorkflowById(workflowId string) (entities.Workflow, error) {
 	return self.WorkflowRepository.FindWorkflowById(workflowId)
 }
@@ -54,4 +50,17 @@ func (self *WorkflowService) GetUserWorkflows(email string) ([]entities.Workflow
 		return nil, err
 	}
 	return retrievedWorkflow, nil
+}
+
+func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error {
+	foundWorkflow, errFetchWorkflow := self.WorkflowRepository.FindWorkflowById(workflowActivation.WorkflowId)
+	if errFetchWorkflow != nil {
+		return errFetchWorkflow
+	}
+
+	errUpdate := self.WorkflowRepository.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
+	if errUpdate != nil {
+		return errUpdate
+	}
+	return nil
 }
