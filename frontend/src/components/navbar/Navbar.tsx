@@ -82,12 +82,12 @@ const Navbar = () => {
                                 />
                             </li>
                             <li>
-                                <div
+                                <button
                                     className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center cursor-pointer"
                                     onClick={handleAccount}
                                 >
                                     <p className="text-white font-[900]">W</p>
-                                </div>
+                                </button>
                             </li>
                         </>
                     )}
