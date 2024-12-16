@@ -1,60 +1,50 @@
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
 import "../footer_page.dart";
 import "exploreCardListFiller.dart";
 import "topBarExplore.dart";
 import "exploreWidget.dart";
+import "explorePageData.dart";
 
 class ExplorePage extends StatelessWidget {
-  const ExplorePage({
-    super.key,
-    this.explorePageIndex = 0,
-  });
-  final int explorePageIndex;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: new ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: ExplorePageStateful(explorePageIndex: explorePageIndex),
+      home: ExplorePageStateful(),
     );
   }
 }
 
 class ExplorePageStateful extends StatefulWidget {
-  const ExplorePageStateful({
-    super.key,
-    this.explorePageIndex = 0,
-  });
-  final int explorePageIndex;
   @override
-  ExplorePageMain createState() => ExplorePageMain(explorePageIndex: explorePageIndex);
+  ExplorePageMain createState() => ExplorePageMain();
 }
 
 class ExplorePageMain extends State<ExplorePageStateful> {
-  ExplorePageMain({
-    required this.explorePageIndex,
-  });
-  final int explorePageIndex;
-
-  List<Widget> cardList = [];
-
   @override
   void initState() {
     super.initState();
-    developer.log("explorePageIndex : $explorePageIndex");
-    if (explorePageIndex == 0) {
-      FillServicesAndWorkflow.fillServicesAndWorkflowList();
-      cardList = FillServicesAndWorkflow.servicesAndWorkflow;
-    } else if (explorePageIndex == 1) {
-      FillWorkflowsCard.fillWorkflowsCardList();
-      cardList = FillWorkflowsCard.workflowsCardList;
-    } else {
-      FillServicesCard.fillServicesCardList();
-      cardList = FillServicesCard.serviceCardList;
+    if (SelectedCardList.cardList.isEmpty) {
+      updateCardList();
     }
+  }
+
+  Future<void> updateCardList() async {
+    setState(() {
+      if (SelectedCardList.index == 0) {
+        FillServicesAndWorkflow.fillServicesAndWorkflowList();
+        SelectedCardList.cardList = FillServicesAndWorkflow.servicesAndWorkflow;
+      } else if (SelectedCardList.index == 1) {
+        FillWorkflowsCard.fillWorkflowsCardList();
+        SelectedCardList.cardList = FillWorkflowsCard.workflowsCardList;
+      } else {
+        FillServicesCard.fillServicesCardList();
+        SelectedCardList.cardList = FillServicesCard.serviceCardList;
+      }
+    });
   }
 
   @override
@@ -65,12 +55,12 @@ class ExplorePageMain extends State<ExplorePageStateful> {
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             TopBarExplore(
-              currentIndex: explorePageIndex,
+              onPressed: updateCardList,
             ),
             MyDivider(),
             MySearchBar(),
             Column(
-              children: cardList,
+              children: SelectedCardList.cardList,
             ),
           ],
         ),

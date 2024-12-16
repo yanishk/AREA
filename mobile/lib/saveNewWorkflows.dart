@@ -81,7 +81,7 @@ class SaveNewWorkflows extends State<APICall> {
           fontSize: 24.0);
       Navigator.push(
         Globaldata.myContext,
-        MaterialPageRoute(builder: (context) => ExplorePage(explorePageIndex: 0,),),
+        MaterialPageRoute(builder: (context) => ExplorePage(),),
       );
     });
   }

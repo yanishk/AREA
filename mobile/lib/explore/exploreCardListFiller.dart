@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 
 import "exploreWidget.dart";
 import "../custom_widget.dart";
-import "../globalData.dart";
-
-class AllServicesList {
-  static List<String> allServiceNameList = Globaldata.actionServicesName + Globaldata.reactionServicesName;
-  static List<String> allServiceColorList = Globaldata.actionServicesColor + Globaldata.reactionServicesColor;
-  static List<String> allServiceIconsList = Globaldata.actionServicesIcons + Globaldata.reactionServicesIcons;
-}
+import "explorePageData.dart";
 
 class FillServicesAndWorkflow {
   static List<Widget> servicesAndWorkflow = [];

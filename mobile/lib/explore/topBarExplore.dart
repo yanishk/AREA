@@ -1,32 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-import "explorePage.dart";
-import '../globalData.dart';
+import "explorePageData.dart";
 
 class TopBarExplore extends StatelessWidget {
   TopBarExplore({
     super.key,
-    required this.currentIndex,
+    required this.onPressed,
   });
 
-  final int currentIndex;
-  final List<Widget> _pages = [
-    ExplorePage(explorePageIndex: 0,),
-    ExplorePage(explorePageIndex: 1,),
-    ExplorePage(explorePageIndex: 2,),
-  ];
-
-  Future<void> changePage(int index, BuildContext context) async {
-    if (index != currentIndex) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.push(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => _pages[index]),
-        );
-      });
-    }
-  }
+  final Function onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +18,8 @@ class TopBarExplore extends StatelessWidget {
       children: [
         TextButton(
           onPressed: () {
-            changePage(0, Globaldata.myContext);
+            SelectedCardList.index = 0;
+            onPressed();
           },
           child: AutoSizeText(
             "All",
@@ -46,7 +30,8 @@ class TopBarExplore extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            changePage(1, Globaldata.myContext);
+            SelectedCardList.index = 1;
+            onPressed();
           },
           child: AutoSizeText(
             "Workflows",
@@ -57,7 +42,8 @@ class TopBarExplore extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            changePage(2, Globaldata.myContext);
+            SelectedCardList.index = 2;
+            onPressed();
           },
           child: AutoSizeText(
             "Services",

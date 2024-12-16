@@ -56,9 +56,9 @@ class LoadService extends State<APICall> {
           Globaldata.reactionServicesIcons,
           firstService
         );
-        Navigator.push(
+        Navigator.pushReplacement(
           Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePage(explorePageIndex: 0,),),
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
         );
       }
     }
@@ -82,7 +82,6 @@ class LoadService extends State<APICall> {
   }
 
   Future<void> getServices() async {
-
     final response = await getServiceResponse(actionsServices);
     final responseReaction = await getServiceResponse(reactionsServices);
     if (response == null || responseReaction == null) {

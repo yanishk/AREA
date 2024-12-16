@@ -13,10 +13,10 @@ class FooterNavigationBar extends StatelessWidget {
 
   final int currentIndex;
   final List<Widget> _pages = [
-    ExplorePage(explorePageIndex: 0,),
-    ExplorePage(explorePageIndex: 0,),
+    ExplorePage(),
+    ExplorePage(),
     CreateWorkflowsPage(),
-    ExplorePage(explorePageIndex: 0,),
+    ExplorePage(),
     EditAccountPage(),
   ];
 

@@ -51,7 +51,7 @@ class _APICallState extends State<APICall> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ExplorePage(explorePageIndex: 0,),),
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
         );
       });
     }
