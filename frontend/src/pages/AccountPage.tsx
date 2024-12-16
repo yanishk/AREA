@@ -33,7 +33,7 @@ const AccountPage = () => {
         if (!password || !newPassword)
             return;
         try {
-            await axios.put(
+            const result = await axios.put(
                 `${import.meta.env.VITE_API_URL}user/modify-password`,
                 {
                     oldpassword: password,
@@ -43,6 +43,10 @@ const AccountPage = () => {
                     withCredentials: true,
                 }
             );
+
+            if (result.data.success) {
+                goHome();
+            }
         } catch (error) {
             console.error("Failed to modify password : ", error);
         }
@@ -60,6 +64,7 @@ const AccountPage = () => {
                     withCredentials: true,
                 }
             );
+            logout();
             navigate("/");
         } catch (error) {
             console.error("Failed to delete account : ", error);
@@ -68,6 +73,10 @@ const AccountPage = () => {
 
     const goBack = () => {
         navigate(-1);
+    };
+
+    const goHome = () => {
+        navigate("/");
     };
 
     return (
