@@ -71,11 +71,11 @@ class _APICallState extends State<APICall> {
           MaterialPageRoute(builder: (context) => LoadServicePage()),
         );
       });
-    } else {
-      setState(() {
-        result = 'Failed to get the token';
-      });
+      return;
     }
+    setState(() {
+      result = 'Failed to get the token';
+    });
   }
 
   Future<void> postLoginData() async {
