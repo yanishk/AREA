@@ -35,7 +35,7 @@ func (self *UserRepository) FindUserByEmail(email string) (entities.User, error)
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, email)
-	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone)
+	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone, &retrievedUser.ConnectionType)
 	if err != nil {
 		return retrievedUser, err
 	}
@@ -47,7 +47,7 @@ func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, userId)
-	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone)
+	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone, &retrievedUser.ConnectionType)
 	if err != nil {
 		return retrievedUser, err
 	}
