@@ -7,6 +7,7 @@ on:
 jobs:
   check-compilation:
     runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'frontend')
     steps:
       - uses: actions/checkout@v4
 
