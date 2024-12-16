@@ -23,7 +23,7 @@ func VerifyJWTCookie(context *gin.Context) {
 	token, errParse := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
 		_, isCorrectMethod := token.Method.(*jwt.SigningMethodHMAC)
 		if !isCorrectMethod {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})

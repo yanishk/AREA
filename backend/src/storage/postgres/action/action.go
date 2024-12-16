@@ -20,7 +20,7 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 
 	_, err := self.FindActionByName(name)
 	if err == nil {
-		return fmt.Errorf("action already exist")
+		return fmt.Errorf("Action already exist")
 	}
 
 	_, err = self.db.Exec(sqlStatement, name, description, serviceId, nbParam)
