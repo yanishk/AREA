@@ -58,25 +58,7 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 		return errRefreshing
 	}
 
-	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
-	}
-	return nil
+	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
 func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser string) error {
@@ -90,25 +72,7 @@ func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser
 		return errRefreshing
 	}
 
-	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
-	}
-	return nil
+	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
 func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser string) error {
@@ -122,25 +86,7 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 		return errRefreshing
 	}
 
-	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
-	}
-	return nil
+	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
 }
 
 func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, ReactionParam map[string]interface{}) error {
@@ -159,7 +105,11 @@ func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, Re
 		return errRefreshing
 	}
 
-	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
+	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
+}
+
+func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
+	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
 	}
@@ -178,6 +128,7 @@ func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, Re
 		return fmt.Errorf(APICallFailed)
 	}
 	return nil
+
 }
 
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
