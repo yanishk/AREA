@@ -1,11 +1,11 @@
 package entities
 
 type User struct {
-	Id        string
-	Email     string
-	Password  string
-	CreatedAt string
-	Timezone  string
+	Id             string
+	Email          string
+	Password       string
+	CreatedAt      string
+	Timezone       string
 	ConnectionType string
 }
 
