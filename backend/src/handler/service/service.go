@@ -164,8 +164,8 @@ func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, Re
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -175,7 +175,7 @@ func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, Re
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
