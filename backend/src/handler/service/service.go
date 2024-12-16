@@ -47,49 +47,34 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
+func (self *ServiceHandler) ReactionStartPlayback(reactionName string, accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
 	if reactionName != "Start playback" {
 		return nil
 	}
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
 	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
-func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser string) error {
+func (self *ServiceHandler) ReactionPausePlayback(reactionName string, accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/pause"
 	if reactionName != "Pause playback" {
 		return nil
 	}
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
 	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
 }
 
-func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser string) error {
+func (self *ServiceHandler) ReactionSkipTrack(reactionName string, accessToken string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/next"
 	if reactionName != "Skip track" {
 		return nil
 	}
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
 	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
 }
 
-func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, ReactionParam map[string]interface{}) error {
+func (self *ServiceHandler) AddToQueue(reactionName string, ReactionParam map[string]interface{}, accessToken string) error {
 	uri, uriErr := ReactionParam["uri"]
 	if !uriErr {
 		return fmt.Errorf("Incorrect URI")
@@ -98,11 +83,6 @@ func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, Re
 
 	if reactionName != "Add track to playback queue" {
 		return nil
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
 	}
 
 	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
@@ -146,10 +126,15 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 				continue
 			}
 
-			self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
-			self.ReactionPausePlayback(reactionFound.Name, foundUser.Email)
-			self.ReactionSkipTrack(reactionFound.Name, foundUser.Email)
-			self.AddToQueue(reactionFound.Name, foundUser.Email, workflow.ReactionParam)
+			accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Spotify")
+			if errRefreshing != nil {
+				return errRefreshing
+			}
+
+			self.ReactionStartPlayback(reactionFound.Name, accessToken)
+			self.ReactionPausePlayback(reactionFound.Name, accessToken)
+			self.ReactionSkipTrack(reactionFound.Name, accessToken)
+			self.AddToQueue(reactionFound.Name, workflow.ReactionParam, accessToken)
 		}
 	}
 	return nil
