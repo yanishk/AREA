@@ -472,7 +472,7 @@ const docTemplate = `{
         },
         "/workflow/retrieve": {
             "get": {
-                "description": "Retrieve the workflows of the user actually connected.",
+                "description": "Retrieve the workflows of the user actually connected",
                 "produces": [
                     "application/json"
                 ],
