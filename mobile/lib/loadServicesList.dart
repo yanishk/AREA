@@ -7,7 +7,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "explore/exploreAll.dart";
+import "explore/explorePage.dart";
 import "apiCall/apiRequest.dart";
 
 class LoadServicePage extends StatelessWidget {
@@ -58,7 +58,7 @@ class LoadService extends State<APICall> {
         );
         Navigator.push(
           Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePageAll()),
+          MaterialPageRoute(builder: (context) => ExplorePage(explorePageIndex: 0,),),
         );
       }
     }

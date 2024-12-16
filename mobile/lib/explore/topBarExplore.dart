@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-import "exploreAll.dart";
-import "exploreWorkflow.dart";
-import "exploreServices.dart";
+import "explorePage.dart";
 import '../globalData.dart';
 
 class TopBarExplore extends StatelessWidget {
@@ -14,9 +12,9 @@ class TopBarExplore extends StatelessWidget {
 
   final int currentIndex;
   final List<Widget> _pages = [
-    ExplorePageAll(),
-    ExplorePageWorkflow(),
-    ExplorePageServices(),
+    ExplorePage(explorePageIndex: 0,),
+    ExplorePage(explorePageIndex: 1,),
+    ExplorePage(explorePageIndex: 2,),
   ];
 
   Future<void> changePage(int index, BuildContext context) async {

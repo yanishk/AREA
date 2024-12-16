@@ -5,7 +5,6 @@ import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "login_page.dart";
-import "explore/exploreAll.dart";
 import "globalData.dart";
 import 'apiCall/apiRequest.dart';
 
@@ -181,12 +180,7 @@ class _APICallState extends State<APICall> {
                       color: Colors.white),
                   maxLines: 1,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
-                  );
-                },
+                onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,

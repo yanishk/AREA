@@ -7,7 +7,7 @@ import "package:http/src/response.dart";
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "explore/exploreAll.dart";
+import "explore/explorePage.dart";
 import "apiCall/apiRequest.dart";
 
 class SaveNewWorkflowsPage extends StatelessWidget {
@@ -81,7 +81,7 @@ class SaveNewWorkflows extends State<APICall> {
           fontSize: 24.0);
       Navigator.push(
         Globaldata.myContext,
-        MaterialPageRoute(builder: (context) => ExplorePageAll()),
+        MaterialPageRoute(builder: (context) => ExplorePage(explorePageIndex: 0,),),
       );
     });
   }
