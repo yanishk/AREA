@@ -75,6 +75,38 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	return nil
 }
 
+func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser string) error {
+	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/next"
+	if reactionName != "Skip track" {
+		return nil
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Spotify API call failed")
+	}
+	return nil
+}
+
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
 	for _, workflow := range AllworkflowFound {
 		hour, hourExists := workflow.ActionParam["hour"]
@@ -90,10 +122,8 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 				continue
 			}
 
-			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
-			if errPlayback != nil {
-				continue
-			}
+			self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			self.ReactionSkipTrack(reactionFound.Name, foundUser.Email)
 		}
 	}
 	return nil
@@ -212,7 +242,7 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
-	actions, errActions := self.ServiceService.FindActionByServiceId(serviceName)
+	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
