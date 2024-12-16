@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:math';
 
+import "../custom_widget.dart";
+import "../globalData.dart";
+
 class ServicesCard extends StatelessWidget {
   const ServicesCard({super.key});
 
@@ -57,6 +60,71 @@ class ServicesCard extends StatelessWidget {
                           width: 75, height: 75),
                       AutoSizeText(
                         nameList[serviceIndex],
+                        style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                        maxLines: 1,
+                      )
+                    ]),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ServicesCardParam extends StatelessWidget {
+  const ServicesCardParam({
+    super.key,
+    required this.name,
+    required this.color,
+    this.imageUrl = "",
+  });
+
+  final String name;
+  final Color color;
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            decoration: BoxDecoration(
+              color: color,
+              border: Border.all(
+                color: color,
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.circular(4.0),
+            ),
+            child: InkWell(
+              onTap: () {
+                debugPrint('Card tapped.');
+              },
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                    child: Column(children: [
+                      SafeWebImage(
+                        url: "${Globaldata.domainName}$imageUrl",
+                        width: 75,
+                        height: 75,
+                      ),
+                      AutoSizeText(
+                        name,
                         style: const TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,

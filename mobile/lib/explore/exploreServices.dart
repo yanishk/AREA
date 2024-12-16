@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import "../custom_widget.dart";
 import "../footer_page.dart";
+import "../globalData.dart";
 import "topBarExplore.dart";
 import "exploreWidget.dart";
 
@@ -11,14 +12,38 @@ class ExplorePageServices extends StatelessWidget {
     return MaterialApp(
       theme: new ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: ExplorePageServicesMain(),
+      home: ExplorePageServicesStateful(),
     );
   }
 }
 
-class ExplorePageServicesMain extends StatelessWidget {
+class ExplorePageServicesStateful extends StatefulWidget {
+  @override
+  ExplorePageServicesMain createState() => ExplorePageServicesMain();
+}
+
+class ExplorePageServicesMain extends State<ExplorePageServicesStateful> {
+  int serviceIndex = 0;
+  List<String> serviceNameList = Globaldata.actionServicesName + Globaldata.reactionServicesName;
+  List<String> serviceColorList = Globaldata.actionServicesColor + Globaldata.reactionServicesColor;
+  List<String> serviceIconsList = Globaldata.actionServicesIcons + Globaldata.reactionServicesIcons;
+
+  Widget serviceTiles(int index) {
+    return ServicesCardParam(
+      name: serviceNameList[index],
+      color: HexColor(serviceColorList[index]),
+      imageUrl: serviceIconsList[index],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> services = [];
+    for (serviceIndex = 0;
+        serviceIndex < serviceNameList.length;
+        serviceIndex++) {
+      services.add(serviceTiles(serviceIndex));
+    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -29,11 +54,9 @@ class ExplorePageServicesMain extends StatelessWidget {
             ),
             MyDivider(),
             MySearchBar(),
-            ServicesCard(),
-            Padding(padding: EdgeInsets.only(top: 10)),
-            ServicesCard(),
-            Padding(padding: EdgeInsets.only(top: 10)),
-            ServicesCard(),
+            Column(
+              children: services,
+            ),
           ],
         ),
       ),
