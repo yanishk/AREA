@@ -257,3 +257,28 @@ func (self *UserServiceService) CallApiAndRefresh(email string, serviceName stri
 	}
 	return token, nil
 }
+
+func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, email string) error {
+	_, errorServcie := self.ServiceRepository.FindServiceByName(serviceName)
+	if errorServcie != nil {
+		return errorServcie
+	}
+
+	token, errToken := self.GetAccessTokenFromCode(code, serviceName)
+	if errToken != nil {
+		return errToken
+	}
+
+	foundUser, errGetUser := self.GetUser(email)
+	if errGetUser != nil || len(foundUser.Email) <= 0 {
+		return errGetUser
+	}
+
+	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		return errFoundService
+	}
+
+	self.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
+	return nil
+}

@@ -34,6 +34,7 @@ type UserServiceService interface {
 	CreateOrUpdateUserService(userId string, serviceId string, token entities.ResultToken)
 	GetEmailFromContext(context *gin.Context) (string, bool)
 	CallApiAndRefresh(email string, serviceName string) (string, error)
+	UpdateTokenForService(code string, serviceName string, email string) error
 }
 
 type WorkflowService interface {
