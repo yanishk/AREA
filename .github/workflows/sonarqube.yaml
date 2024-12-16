@@ -8,7 +8,7 @@ jobs:
   run-sonarqube:
     name: Analyze with sonarqube
     runs-on: ubuntu-latest
-    if: contains(github.head_ref, 'backend') || contains(github.head_ref, 'frontend') || contains(github.head_ref, 'mobile')
+    if: contains(github.head_ref, 'backend') || contains(github.head_ref, 'frontend')
     steps:
       - uses: actions/checkout@v4
         with:
