@@ -21,6 +21,12 @@ services:
     networks:
       - app-network
 
+  client_mobile:
+    build:
+      context: ./mobile
+    depends_on:
+      - server
+
 volumes:
   shared:
 

@@ -34,6 +34,8 @@ RUN flutter doctor
 WORKDIR /app
 COPY . .
 
+COPY .env .env
+
 RUN flutter pub get
 
 RUN flutter build apk --release

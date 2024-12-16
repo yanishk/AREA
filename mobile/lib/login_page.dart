@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import "package:http/src/response.dart";
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "sign_up.dart";
 import "exploreAll.dart";
 import "globalData.dart";
 import "loadServicesList.dart";
+import 'apiCall/apiRequest.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -28,10 +28,8 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = new TextEditingController(text: "");
+  final TextEditingController passwordController = new TextEditingController(text: "");
   String result = '';
   String apiRoute = 'login';
 
@@ -40,63 +38,6 @@ class _APICallState extends State<APICall> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _postData() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.post(
-        Uri.parse('${apiUrl + apiRoute}'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'email': emailController.text,
-          'password': passwordController.text,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        String? cookiesBrute = response.headers["set-cookie"];
-        String cookie = "";
-        String JWToken = "";
-        if (cookiesBrute != null) {
-          cookie = cookiesBrute;
-          JWToken = cookie.split(';').first;
-          setState(() {
-            result = "";
-            developer.log("HEADER : ${response.headers}");
-            developer.log("JWToken : {${JWToken}}");
-            Globaldata.JWToken = JWToken;
-
-            Navigator.push(
-              Globaldata.myContext,
-              MaterialPageRoute(builder: (context) => LoadServicePage()),
-            );
-          });
-        } else {
-          setState(() {
-            result = 'Failed to get the token';
-          });
-        }
-      } else {
-        final responseData = jsonDecode(response.body);
-        setState(() {
-          result = '${responseData['error']}';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        result = '$e';
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          debugPrint(result);
-          result = Globaldata.ErrorServerConnection;
-        }
-      });
-    }
   }
 
   @override
@@ -114,6 +55,47 @@ class _APICallState extends State<APICall> {
         );
       });
     }
+  }
+
+  Future<void> saveJWToken(Response response) async {
+    String? cookiesBrute = response.headers["set-cookie"];
+    String JWToken = "";
+    if (cookiesBrute != null) {
+      JWToken = cookiesBrute.split(';').first;
+      setState(() {
+        result = "";
+        developer.log("JWToken : {${JWToken}}");
+        Globaldata.JWToken = JWToken;
+        Navigator.push(
+          Globaldata.myContext,
+          MaterialPageRoute(builder: (context) => LoadServicePage()),
+        );
+      });
+      return;
+    }
+    setState(() {
+      result = 'Failed to get the token';
+    });
+  }
+
+  Future<void> postLoginData() async {
+    final response = await ApiRequest.post(apiRoute, jsonEncode(<String, dynamic>{'email': emailController.text,'password': passwordController.text,}),);
+    if (response.statusCode == 504) {
+      setState(() {
+        result = response.body;
+      });
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "postLoginData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      setState(() {
+        result = '${responseData['error']}';
+      });
+      return;
+    }
+    saveJWToken(response);
   }
 
   @override
@@ -162,7 +144,7 @@ class _APICallState extends State<APICall> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
-                onPressed: _postData,
+                onPressed: postLoginData,
                 size: Size(double.infinity, 70),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
               ),
