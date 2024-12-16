@@ -18,6 +18,9 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
+const Bearer = "Bearer"
+const ContentType = "Content-Type"
+const JsonApp = "application/json"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -59,8 +62,8 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -91,8 +94,8 @@ func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -123,8 +126,8 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
