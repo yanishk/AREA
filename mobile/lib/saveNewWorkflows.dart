@@ -7,7 +7,7 @@ import "package:http/src/response.dart";
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "exploreAll.dart";
+import "explore/exploreAll.dart";
 import 'apiCall/getApi.dart';
 import 'apiCall/postApi.dart';
 

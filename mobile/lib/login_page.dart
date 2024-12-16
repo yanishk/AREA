@@ -6,7 +6,7 @@ import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "sign_up.dart";
-import "exploreAll.dart";
+import "explore/exploreAll.dart";
 import "globalData.dart";
 import "loadServicesList.dart";
 import 'apiCall/postApi.dart';

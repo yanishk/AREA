@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 
-import "custom_widget.dart";
-import "footer_page.dart";
+import "../custom_widget.dart";
+import "../footer_page.dart";
 import "topBarExplore.dart";
+import "exploreWidget.dart";
 
-class ExplorePageServices extends StatelessWidget {
+class ExplorePageAll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: new ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: ExplorePageServicesMain(),
+      home: ExplorePageAllMain(),
     );
   }
 }
 
-class ExplorePageServicesMain extends StatelessWidget {
+class ExplorePageAllMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,15 +25,15 @@ class ExplorePageServicesMain extends StatelessWidget {
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             TopBarExplore(
-              currentIndex: 2,
+              currentIndex: 0,
             ),
             MyDivider(),
-            SearchBar(),
-            ServicesCard(),
+            MySearchBar(),
+            WorkflowCard(),
             Padding(padding: EdgeInsets.only(top: 10)),
             ServicesCard(),
             Padding(padding: EdgeInsets.only(top: 10)),
-            ServicesCard(),
+            WorkflowCard(),
           ],
         ),
       ),

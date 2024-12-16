@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import "exploreAll.dart";
+import "explore/exploreAll.dart";
 import "edit_account.dart";
 import "create.dart";
 import 'globalData.dart';

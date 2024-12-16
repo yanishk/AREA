@@ -8,7 +8,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "exploreAll.dart";
+import "explore/exploreAll.dart";
 import 'apiCall/getApi.dart';
 
 class LoadServicePage extends StatelessWidget {

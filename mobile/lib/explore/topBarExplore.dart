@@ -4,7 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "exploreAll.dart";
 import "exploreWorkflow.dart";
 import "exploreServices.dart";
-import 'globalData.dart';
+import '../globalData.dart';
 
 class TopBarExplore extends StatelessWidget {
   TopBarExplore({
