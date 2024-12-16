@@ -207,7 +207,6 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/{service}/actions [get]
 func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
@@ -232,7 +231,6 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/{service}/reactions [get]
 func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {

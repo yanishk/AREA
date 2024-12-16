@@ -26,10 +26,6 @@ type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
 	Services []ServiceExample
 }
 
-type ServiceRetrieveActionsReactionsFromServiceBadRequestResponse struct {
-	Msg string `json:"error"example:"Could not find requested service"`
-}
-
 type ServiceRetrieveActionsFromServiceSuccessResponse struct {
 	Actions []ActionExample
 }
