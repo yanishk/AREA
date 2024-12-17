@@ -360,7 +360,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureUnauthorizedResponse"
                         }
                     },
                     "403": {
@@ -716,7 +716,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -801,15 +801,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.ModifyPasswordFailureEmailNotValidResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email is not a valid string"
-                }
-            }
-        },
         "docs_user.ModifyPasswordFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -825,6 +816,15 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Old password is incorrect"
+                }
+            }
+        },
+        "docs_user.ModifyPasswordFailureUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -932,7 +932,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -1022,7 +1022,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },

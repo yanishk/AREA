@@ -39,8 +39,8 @@ type ModifyPasswordSuccessResponse struct {
 	Msg string `json:"success"example:"Password modified"`
 }
 
-type ModifyPasswordFailureEmailNotValidResponse struct {
-	Msg string `json:"error"example:"Email is not a valid string"`
+type ModifyPasswordFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type ModifyPasswordFailureOldPasswordNotValidResponse struct {
@@ -61,7 +61,7 @@ type DeleteAccountSuccessResponse struct {
 }
 
 type DeleteAccountFailureUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type DeleteAccountFailureInternalServerErrorResponse struct {

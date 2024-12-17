@@ -141,7 +141,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Param			user	body		entities.UserModifyPassword true	"New password of the user"
 // @Success		200		{object}	docs_user.ModifyPasswordSuccessResponse
 // @Failure		400		{object}	docs_user.ModifyPasswordBadRequestResponse
-// @Failure		401		{object}	docs_user.ModifyPasswordFailureEmailNotValidResponse
+// @Failure		401		{object}	docs_user.ModifyPasswordFailureUnauthorizedResponse
 // @Failure		403		{object}	docs_user.ModifyPasswordFailureOldPasswordNotValidResponse
 // @Failure		500		{object}	docs_user.ModifyPasswordFailureInternalServerErrorResponse
 // @Router			/user/modify-password [put]

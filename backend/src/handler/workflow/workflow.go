@@ -37,7 +37,6 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 		workflow.GET("/retrieve", self.GetUserWorkflows)
 		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
 	}
-
 }
 
 // @Summary		Create Workflow
