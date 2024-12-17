@@ -126,7 +126,7 @@ class CreateWorkflows extends State<APICall> {
       if (firstButtonComplete == false && result != null) {
         firstButtonComplete = true;
         secondButtonState++;
-        firstButtonColor = Color.fromARGB(255, 57, 61, 62);
+        firstButtonColor = HexColor(CreateData.serviceColorList[Globaldata.firstService]);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
       }
@@ -145,6 +145,7 @@ class CreateWorkflows extends State<APICall> {
             builder: (context) => SelectServicePage()),
       );
       setState(() {
+        secondButtonColor = HexColor(CreateData.serviceColorList[Globaldata.secondService]);
         if (result != null) {
           secondButtonState = 2;
           secondSelectedService = "$result";
