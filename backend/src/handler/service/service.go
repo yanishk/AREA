@@ -50,7 +50,7 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer"+accessToken)
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
