@@ -3,9 +3,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 
 import "package:namer_app/custom_widget.dart";
 import "package:namer_app/footer_page.dart";
-import "package:namer_app/selectService.dart";
-import "globalData.dart";
+import "package:namer_app/createWorkflows/selectService.dart";
+import "../globalData.dart";
 import "saveNewWorkflows.dart";
+import "createWorkflowsData.dart";
 
 class CreateWorkflowsPage extends StatelessWidget {
   const CreateWorkflowsPage({super.key});
@@ -113,12 +114,13 @@ class CreateWorkflows extends State<APICall> {
   }
 
   Future<void> firstButtonNextState() async {
+    setState(() {
+      isAnAction = true;
+    });
     final result = await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
-          builder: (context) => SelectServicePage(
-                isAnAction: true,
-              )),
+          builder: (context) => SelectServicePage()),
     );
     setState(() {
       if (firstButtonComplete == false && result != null) {
@@ -136,10 +138,11 @@ class CreateWorkflows extends State<APICall> {
 
   Future<void> secondButtonNextState() async {
     if (secondButtonState != 0) {
+      isAnAction = false;
       final result = await Navigator.push(
         Globaldata.myContext,
         MaterialPageRoute(
-            builder: (context) => SelectServicePage(isAnAction: false)),
+            builder: (context) => SelectServicePage()),
       );
       setState(() {
         if (result != null) {

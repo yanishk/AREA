@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:namer_app/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
+import "../apiCall/apiErrorHandling.dart";
 
 import "custom_widget.dart";
 import "footer_page.dart";
@@ -145,17 +146,13 @@ class EditAccount extends State<APICall> {
 
   Future<void> getEmail() async {
     Response response = await ApiRequest.get("user/email");
-    if (response.statusCode == 504) {
-      developer.log('${response.body}');
+    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
+    if (responseData == null) {
       return;
     }
-    final responseData = jsonDecode(response.body);
-    if (response.statusCode != 200) {
-      developer.log(
-          "getEmail FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-      return;
-    }
-    emailController.text = responseData["email"];
+    setState(() {
+      emailController.text = responseData["email"];
+    });
   }
 
   @override
