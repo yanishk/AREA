@@ -12,12 +12,12 @@ class CreateData {
 }
 
 class ActionOrReactionData {
-  String id = "";
-  String name = "";
-  String description = "";
-  String serviceId = "";
-  int nbParam = 0;
-  String parameter = "";
+  String id;
+  String name;
+  String description;
+  String serviceId;
+  int nbParam;
+  String parameter;
   Map<String, dynamic> parameterList = {};
 
   ActionOrReactionData.optional([

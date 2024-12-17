@@ -56,7 +56,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   @override
   void initState() {
     super.initState();
-    if (isAnAction != true) {
+    if (!isAnAction) {
       setState(() {
         apiRoute = "reactions";
       });
@@ -148,11 +148,10 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   Future<void> saveSelectedActionOrReaction(int index) async {
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];
-      Navigator.pop(Globaldata.myContext);
     } else {
       CreateData.serviceReaction = actionOrReactionList[index];
-      Navigator.pop(Globaldata.myContext);
     }
+    Navigator.pop(Globaldata.myContext);
   }
 
   Widget connectButton() {
