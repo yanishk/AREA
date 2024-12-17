@@ -18,6 +18,10 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
+const Bearer = "Bearer"
+const ContentType = "Content-Type"
+const JsonApp = "application/json"
+const APICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -59,8 +63,8 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -70,7 +74,39 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
+	}
+	return nil
+}
+
+func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser string) error {
+	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/pause"
+	if reactionName != "Pause playback" {
+		return nil
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
@@ -91,8 +127,8 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 		return err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -102,7 +138,7 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(APICallFailed)
 	}
 	return nil
 }
@@ -123,6 +159,7 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 			}
 
 			self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			self.ReactionPausePlayback(reactionFound.Name, foundUser.Email)
 			self.ReactionSkipTrack(reactionFound.Name, foundUser.Email)
 		}
 	}
