@@ -66,23 +66,28 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 	return nil
 }
 
-func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEmail string, userConnectionType string, workflow entities.Workflow) error {
+func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) error {
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(userEmail, userConnectionType, "Spotify")
+	reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+	foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+	if errReaction != nil || errUser != nil {
+		return fmt.Errorf("Error finding reaction")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Spotify")
 	if errRefreshing != nil {
 		return errRefreshing
 	}
 
-	if reactionTitle == "Start playback" {
+	if reactionFound.Name == "Start playback" {
 		return self.spotifyRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessToken)
 	}
-	if reactionTitle == "Pause playback" {
+	if reactionFound.Name == "Pause playback" {
 		return self.spotifyRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessToken)
 	}
-	if reactionTitle == "Skip track" {
+	if reactionFound.Name == "Skip track" {
 		return self.spotifyRequest("https://api.spotify.com/v1/me/player/next", "POST", accessToken)
 	}
-	if reactionTitle == "Add track to playback queue" {
+	if reactionFound.Name == "Add track to playback queue" {
 		uri, uriErr := workflow.ReactionParam["uri"]
 		if !uriErr {
 			return fmt.Errorf("Incorrect URI")
@@ -90,7 +95,7 @@ func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEm
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		return self.spotifyRequest(urlQueue, "POST", accessToken)
 	}
-	if reactionTitle == "Save a track" {
+	if reactionFound.Name == "Save a track" {
 		id, idErr := workflow.ReactionParam["id"]
 		if !idErr {
 			return fmt.Errorf("Incorrect ID")
@@ -101,35 +106,44 @@ func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEm
 	return fmt.Errorf("Unknown reaction")
 }
 
-func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
-	for _, workflow := range AllworkflowFound {
-		hour, hourExists := workflow.ActionParam["hour"]
-		minute, minuteExists := workflow.ActionParam["minute"]
-		if !hourExists || !minuteExists {
-			continue
-		}
+func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !hourExists || !minuteExists {
+		return fmt.Errorf("Error in the hour and minute sent")
+	}
 
-		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-			if errReaction != nil || errUser != nil {
-				continue
-			}
+	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
+	}
+	return nil
+}
 
-			self.executeSpotifyReactions(reactionFound.Name, foundUser.Email, foundUser.ConnectionType, workflow)
-		}
+func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists {
+		return fmt.Errorf("Error in the minute sent")
+	}
+
+	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
 	}
 	return nil
 }
 
 func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
-	if action.Name == "Every day at" {
+	AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
 
-		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
-		if errWorkflow != nil {
-			return errWorkflow
+	for _, workflow := range AllworkflowFound {
+		if action.Name == "Every day at" {
+			self.executeActiveActionsEveryDay(timeRes, workflow)
 		}
-		return self.executeActiveActionsEveryDay(timeRes, AllworkflowFound)
+		if action.Name == "Every hour at" {
+			self.executeActiveActionsEveryHour(timeRes, workflow)
+		}
 	}
 	return nil
 }
