@@ -18,10 +18,7 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
-const Bearer = "Bearer"
-const ContentType = "Content-Type"
-const JsonApp = "application/json"
-const APICallFailed = "Spotify API call failed"
+const SpotifyAPICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -47,24 +44,14 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
-	if reactionName != "Start playback" {
-		return nil
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
+func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
+	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -74,144 +61,89 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
+		return fmt.Errorf(SpotifyAPICallFailed)
 	}
 	return nil
 }
 
-func (self *ServiceHandler) ReactionPausePlayback(reactionName string, emailUser string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/pause"
-	if reactionName != "Pause playback" {
-		return nil
-	}
+func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) error {
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+	foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+	if errReaction != nil || errUser != nil {
+		return fmt.Errorf("Error finding reaction")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Spotify")
 	if errRefreshing != nil {
 		return errRefreshing
 	}
 
-	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
+	if reactionFound.Name == "Start playback" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessToken)
 	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
+	if reactionFound.Name == "Pause playback" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessToken)
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
+	if reactionFound.Name == "Skip track" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/next", "POST", accessToken)
 	}
-	return nil
-}
-
-func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/next"
-	if reactionName != "Skip track" {
-		return nil
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, ReactionParam map[string]interface{}) error {
-	uri, uriErr := ReactionParam["uri"]
-	if !uriErr {
-		return fmt.Errorf("Incorrect URI")
-	}
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-
-	if reactionName != "Add track to playback queue" {
-		return nil
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
-	for _, workflow := range AllworkflowFound {
-		hour, hourExists := workflow.ActionParam["hour"]
-		minute, minuteExists := workflow.ActionParam["minute"]
-		if !hourExists || !minuteExists {
-			continue
+	if reactionFound.Name == "Add track to playback queue" {
+		uri, uriErr := workflow.ReactionParam["uri"]
+		if !uriErr {
+			return fmt.Errorf("Incorrect URI")
 		}
-
-		if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-			if errReaction != nil || errUser != nil {
-				continue
-			}
-
-			self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
-			self.ReactionPausePlayback(reactionFound.Name, foundUser.Email)
-			self.ReactionSkipTrack(reactionFound.Name, foundUser.Email)
-			self.AddToQueue(reactionFound.Name, foundUser.Email, workflow.ReactionParam)
+		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
+		return self.spotifyRequest(urlQueue, "POST", accessToken)
+	}
+	if reactionFound.Name == "Save a track" {
+		id, idErr := workflow.ReactionParam["id"]
+		if !idErr {
+			return fmt.Errorf("Incorrect ID")
 		}
+		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
+		return self.spotifyRequest(urlSave, "PUT", accessToken)
+	}
+	return fmt.Errorf("Unknown reaction")
+}
+
+func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !hourExists || !minuteExists {
+		return fmt.Errorf("Error in the hour and minute sent")
+	}
+
+	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
+	}
+	return nil
+}
+
+func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists {
+		return fmt.Errorf("Error in the minute sent")
+	}
+
+	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
 	}
 	return nil
 }
 
 func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
-	if action.Name == "Every day at" {
+	AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
 
-		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
-		if errWorkflow != nil {
-			return errWorkflow
+	for _, workflow := range AllworkflowFound {
+		if action.Name == "Every day at" {
+			self.executeActiveActionsEveryDay(timeRes, workflow)
 		}
-		return self.executeActiveActionsEveryDay(timeRes, AllworkflowFound)
+		if action.Name == "Every hour at" {
+			self.executeActiveActionsEveryHour(timeRes, workflow)
+		}
 	}
 	return nil
 }
