@@ -145,7 +145,8 @@ func (self *ServiceHandler) executeActiveActionsEveryWeekAt(timeRes entities.Tim
 	}
 
 	for _, day := range dayArray {
-		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
+			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 			return self.executeSpotifyReactions(workflow)
 		}
 	}
@@ -161,7 +162,8 @@ func (self *ServiceHandler) executeActiveActionsEveryMonthOnThe(timeRes entities
 		return fmt.Errorf("Error in the minute, hour or day sent")
 	}
 
-	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 		return self.executeSpotifyReactions(workflow)
 	}
 	return nil
@@ -176,7 +178,8 @@ func (self *ServiceHandler) executeActiveActionsEveryYearOn(timeRes entities.Tim
 		return fmt.Errorf("Error in the minute, hour, day or month sent")
 	}
 
-	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 		return self.executeSpotifyReactions(workflow)
 	}
 	return nil
