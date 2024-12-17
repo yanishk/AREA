@@ -26,6 +26,7 @@ type ServiceService interface {
 
 type UserServiceService interface {
 	GetEmailFromContext(context *gin.Context) (string, bool)
+	GetConnectionTypeFromContext(context *gin.Context) (string, bool)
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
 	UpdateTokenForService(code string, serviceName string, email string, connectionType string) error
 }

@@ -70,7 +70,6 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		return
 	}
 
-	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -78,6 +77,23 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		})
 		return
 	}
+
+	connectionType, errGetConnectionType := context.Get("connectionType")
+	if !errGetConnectionType {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type not found in token",
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type is not a valid string",
+		})
+		return
+	}
+
 	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, connectionTypeStr, newWorkflow)
 	if errCreationWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -107,11 +123,26 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
-	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Email is not a valid string",
+		})
+		return
+	}
+
+	connectionType, errGetConnectionType := context.Get("connectionType")
+	if !errGetConnectionType {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type not found in token",
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type is not a valid string",
 		})
 		return
 	}

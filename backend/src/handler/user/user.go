@@ -148,7 +148,6 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
-
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": EmailNotFoundInTokenMessage,

@@ -93,11 +93,18 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
-	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, err := self.UserServiceService.GetEmailFromContext(context)
 	if !err {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to get email",
+		})
+		return
+	}
+
+	connectionTypeStr, err := self.UserServiceService.GetConnectionTypeFromContext(context)
+	if !err {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get connection type",
 		})
 		return
 	}

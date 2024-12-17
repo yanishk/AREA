@@ -222,6 +222,20 @@ func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (strin
 	return emailStr, true
 }
 
+func (self *UserServiceService) GetConnectionTypeFromContext(context *gin.Context) (string, bool) {
+	connectionType, err := context.Get("connectionType")
+
+	if !err {
+		return "", err
+	}
+
+	connectionTypeStr, errConnectionType := connectionType.(string)
+	if !errConnectionType {
+		return "", errConnectionType
+	}
+	return connectionTypeStr, true
+}
+
 func (self *UserServiceService) CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error) {
 	foundUser, errGetUser := self.GetUser(email, connectionType)
 	if errGetUser != nil || len(foundUser.Email) <= 0 {
