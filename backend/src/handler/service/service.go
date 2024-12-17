@@ -122,14 +122,37 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 	return nil
 }
 
-func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
-	if action.Name == "Every day at" {
-
-		AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
-		if errWorkflow != nil {
-			return errWorkflow
+func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
+	for _, workflow := range AllworkflowFound {
+		minute, minuteExists := workflow.ActionParam["minute"]
+		if !minuteExists {
+			continue
 		}
+
+		if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+			reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+			foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+			if errReaction != nil || errUser != nil {
+				continue
+			}
+
+			self.executeSpotifyReactions(reactionFound.Name, foundUser.Email, workflow)
+		}
+	}
+	return nil
+}
+
+func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
+	AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
+
+	if action.Name == "Every day at" {
 		return self.executeActiveActionsEveryDay(timeRes, AllworkflowFound)
+	}
+	if action.Name == "Every hour at" {
+		return self.executeActiveActionsEveryHour(timeRes, AllworkflowFound)
 	}
 	return nil
 }
