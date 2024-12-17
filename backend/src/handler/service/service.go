@@ -18,7 +18,7 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
-const APICallFailed = "Spotify API call failed"
+const SpotifyAPICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -61,7 +61,7 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf(APICallFailed)
+		return fmt.Errorf(SpotifyAPICallFailed)
 	}
 	return nil
 }
