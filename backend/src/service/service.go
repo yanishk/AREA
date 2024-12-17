@@ -21,8 +21,9 @@ type ServiceService interface {
 	FindServiceByName(name string) (entities.Service, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindReactionByID(id string) (entities.Reaction, error)
-	FindActionByServiceId(serviceName string) ([]entities.Action, error)
+	RetrieveActionsFromService(serviceName string) ([]entities.Action, error)
 	RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error)
+	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 }
 
 type UserServiceService interface {

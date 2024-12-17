@@ -18,6 +18,7 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
+const SpotifyAPICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -43,18 +44,8 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string, connectionTypeUser string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
-	if reactionName != "Start playback" {
-		return nil
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, connectionTypeUser, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	req, err := http.NewRequest("PUT", spotifyResumePlayURL, nil)
+func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
+	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
 	}
@@ -70,9 +61,44 @@ func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Spotify API call failed")
+		return fmt.Errorf(SpotifyAPICallFailed)
 	}
 	return nil
+}
+
+func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEmail string, userConnectionType string, workflow entities.Workflow) error {
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(userEmail, userConnectionType, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	if reactionTitle == "Start playback" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessToken)
+	}
+	if reactionTitle == "Pause playback" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessToken)
+	}
+	if reactionTitle == "Skip track" {
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/next", "POST", accessToken)
+	}
+	if reactionTitle == "Add track to playback queue" {
+		uri, uriErr := workflow.ReactionParam["uri"]
+		if !uriErr {
+			return fmt.Errorf("Incorrect URI")
+		}
+		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
+		return self.spotifyRequest(urlQueue, "POST", accessToken)
+	}
+	if reactionTitle == "Save a track" {
+		id, idErr := workflow.ReactionParam["id"]
+		if !idErr {
+			return fmt.Errorf("Incorrect ID")
+		}
+		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
+		return self.spotifyRequest(urlSave, "PUT", accessToken)
+	}
+	return fmt.Errorf("Unknown reaction")
 }
 
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
@@ -90,10 +116,7 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 				continue
 			}
 
-			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email, foundUser.ConnectionType)
-			if errPlayback != nil {
-				continue
-			}
+			self.executeSpotifyReactions(reactionFound.Name, foundUser.Email, foundUser.ConnectionType, workflow)
 		}
 	}
 	return nil
@@ -207,13 +230,12 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/{service}/actions [get]
 func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
-	actions, errActions := self.ServiceService.FindActionByServiceId(serviceName)
+	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": InternalServerErrorMessage,
@@ -232,7 +254,6 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/{service}/reactions [get]
 func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {

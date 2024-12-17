@@ -59,12 +59,6 @@ definitions:
           $ref: '#/definitions/docs_service.ActionExample'
         type: array
     type: object
-  docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse:
-    properties:
-      error:
-        example: Could not find requested service
-        type: string
-    type: object
   docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
     properties:
       services:
@@ -204,14 +198,13 @@ definitions:
   docs_userservice.ServiceCallBackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization-Could not find requested user-Could not
-          find requested service
+        example: Invalid code authorization
         type: string
     type: object
   docs_userservice.ServiceCallBackInternalServerErrorResponse:
     properties:
       error:
-        example: Failed to exchange token-Failed to get email
+        example: Failed to get email-Failed to update token
         type: string
     type: object
   docs_userservice.ServiceCallBackSuccessResponse:
@@ -271,7 +264,7 @@ definitions:
   docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse:
     properties:
       error:
-        example: Invalid request body-Could not find specified workflow
+        example: Invalid request body
         type: string
     type: object
   docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse:
@@ -289,7 +282,7 @@ definitions:
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
     properties:
       error:
-        example: Could not retrieve user-Could not retrieve user's workflows
+        example: Could not retrieve user's workflows
         type: string
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse:
@@ -363,10 +356,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -390,10 +379,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsFromServiceBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:

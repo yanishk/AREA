@@ -97,7 +97,7 @@ func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state"
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"auth-url": spotifyAuthUrl,
