@@ -16,7 +16,9 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
+const ConnectionTypeNotFoundInTokenMessage = "Connection type not found in token"
 const EmailNotFoundInTokenMessage = "Email not found in token"
+const ConnectionTypeNotValidMessage = "Connection type is not a valid string"
 const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
@@ -146,6 +148,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	email, err := context.Get("email")
 
+
 	if !err {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": EmailNotFoundInTokenMessage,
@@ -161,6 +164,23 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
+	connectionType, err := context.Get("connectionType")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotFoundInTokenMessage,
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotValidMessage,
+		})
+		return
+	}
+
 	var newPassword entities.UserModifyPassword
 
 	errorBody := context.ShouldBindJSON(&newPassword)
@@ -171,7 +191,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	errorModifyPassword := self.UserService.ModifyPassword(emailStr, newPassword)
+	errorModifyPassword := self.UserService.ModifyPassword(emailStr, connectionTypeStr, newPassword)
 	if errorModifyPassword != nil {
 		if errorModifyPassword.Error() == "Could not find requested user" {
 			context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -212,11 +232,27 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		return
 	}
 
-	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": EmailNotValidMessage,
+		})
+		return
+	}
+
+	connectionType, err := context.Get("connectionType")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotFoundInTokenMessage,
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotValidMessage,
 		})
 		return
 	}

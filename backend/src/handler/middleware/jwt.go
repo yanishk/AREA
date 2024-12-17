@@ -44,5 +44,6 @@ func VerifyJWTCookie(context *gin.Context) {
 	}
 
 	context.Set("email", claims["email"])
+	context.Set("connectionType", claims["connectionType"])
 	context.Next()
 }

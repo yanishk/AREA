@@ -24,6 +24,8 @@ func NewUserService(UserRepository storage.UserRepository, ServiceRepository sto
 	}
 }
 
+const basicConnectionType = "basic"
+
 func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
 	var errorUser error
 
@@ -46,10 +48,11 @@ func (self *UserService) CreateUser(userEmail string, userPassword string, userC
 	return nil
 }
 
-func createToken(email string) (string, error) {
+func createToken(email string, connectionType string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"email": email,
+			"connectionType": connectionType,
 			"exp":   time.Now().Add(time.Hour * 24).Unix(),
 		})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
@@ -60,26 +63,33 @@ func createToken(email string) (string, error) {
 }
 
 func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
+	if (userConnectionType != basicConnectionType && userPassword != "") {
+		return "", fmt.Errorf("Wrong password")
+	}
+
 	foundUser, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if err != nil || len(foundUser.Email) <= 0 {
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	if (userConnectionType == "basic") {
+	if (userConnectionType == basicConnectionType) {
 		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
 		if resBcrypt != nil {
 			return "", fmt.Errorf("Wrong password")
 		}
 	}
-	tokenString, errToken := createToken(foundUser.Email)
+	tokenString, errToken := createToken(foundUser.Email, foundUser.ConnectionType)
 	if errToken != nil {
 		return "", fmt.Errorf("Error creating token")
 	}
 	return tokenString, nil
 }
 
-func (self *UserService) ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error {
-	const userConnectionType = "basic"
+func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
+	if (userConnectionType != basicConnectionType) {
+		return fmt.Errorf("Could not modify the password")
+	}
+
 	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return fmt.Errorf("Could not find requested user")
