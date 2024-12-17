@@ -29,7 +29,11 @@ func (self *ServiceService) FindServiceByName(name string) (entities.Service, er
 	return self.ServiceRepository.FindServiceByName(name)
 }
 
-func (self *ServiceService) FindActionByServiceId(serviceName string) ([]entities.Action, error) {
+func (self *ServiceService) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+	return self.ActionRepository.FindActionByServiceId(serviceId)
+}
+
+func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
 	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errFoundService != nil {
 		return nil, errFoundService
