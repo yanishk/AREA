@@ -51,8 +51,8 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 // @Produce		json
 // @Param			user	body		entities.UserCredentials	true	"User credentials"
 // @Success		200		{object}	docs_user.RegisterSuccessResponse
-// @Failure		400		{object}	docs_user.FailureInvalidBodyResponse
-// @Failure		409		{object}	docs_user.RegisterFailureEmailAlreadyUsedResponse
+// @Failure		400		{object}	docs_user.RegisterFailureBadRequestResponse
+// @Failure		409		{object}	docs_user.RegisterFailureConflictResponse
 // @Failure		500		{object}	docs_user.FailureInternalServerErrorResponse
 // @Router			/register [post]
 func (self *UserHandler) CreateUser(context *gin.Context) {
@@ -69,7 +69,11 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 	err = self.UserService.CreateUser(newUser.Email, newUser.Password, newUser.ConnectionType)
 
 	if err != nil {
-		if err.Error() == "Email address already used" {
+		if err.Error() == "Connection type doesn't exist" {
+			context.IndentedJSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+		} else if err.Error() == "Email address already used" {
 			context.IndentedJSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
 			})

@@ -169,7 +169,13 @@ definitions:
         example: Password modified
         type: string
     type: object
-  docs_user.RegisterFailureEmailAlreadyUsedResponse:
+  docs_user.RegisterFailureBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Connection type doesn't exist
+        type: string
+    type: object
+  docs_user.RegisterFailureConflictResponse:
     properties:
       error:
         example: Email address already used
@@ -533,11 +539,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.FailureInvalidBodyResponse'
+            $ref: '#/definitions/docs_user.RegisterFailureBadRequestResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse'
+            $ref: '#/definitions/docs_user.RegisterFailureConflictResponse'
         "500":
           description: Internal Server Error
           schema:

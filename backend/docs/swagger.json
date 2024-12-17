@@ -232,13 +232,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.RegisterFailureBadRequestResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/docs_user.RegisterFailureConflictResponse"
                         }
                     },
                     "500": {
@@ -828,7 +828,16 @@
                 }
             }
         },
-        "docs_user.RegisterFailureEmailAlreadyUsedResponse": {
+        "docs_user.RegisterFailureBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Connection type doesn't exist"
+                }
+            }
+        },
+        "docs_user.RegisterFailureConflictResponse": {
             "type": "object",
             "properties": {
                 "error": {

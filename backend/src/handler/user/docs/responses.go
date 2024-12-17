@@ -14,8 +14,12 @@ type RegisterSuccessResponse struct {
 	Msg string `json:"success"example:"New user created"`
 }
 
-type RegisterFailureEmailAlreadyUsedResponse struct {
+type RegisterFailureConflictResponse struct {
 	Msg string `json:"error"example:"Email address already used"`
+}
+
+type RegisterFailureBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Connection type doesn't exist"`
 }
 
 // Login Responses
