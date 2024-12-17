@@ -28,8 +28,8 @@ func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) PublicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/Spotify", self.Auth02Spotify)
-		authentication.GET("/Google", self.Auth02Google)
+		authentication.GET("/Spotify/:callback-type", self.Auth02Spotify) // faire pareil ici
+		authentication.GET("/Google/:callback-type", self.Auth02Google)
 	}
 }
 
@@ -44,12 +44,28 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Description	Get Google OAuth2 URL
 // @Tags			Authentication
 // @Produce		json
-// @Success		200		{object}	docs_userservice.OAuth2Response
-// @Router			/authentication/Google [get]
+// @Param        callback-type  path      string  true  "Callback type (login or classic)"
+// @Success		200		{object}	docs_userservice.OAuth2SuccessResponse
+// @Failure		400		{object}	docs_userservice.OAuth2BadRequestResponse
+// @Router			/authentication/Google/{callback-type} [get]
 func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param("callback-type")
+
+	if (callbackType == "login") {
+		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
+	} else if (callbackType == "classic") {
+		callbackLink = os.Getenv("GOOGLE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+		return
+	}
+
 	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
 		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
-		os.Getenv("GOOGLE_CALLBACK") + "&scope=email"
+		callbackLink + "&scope=email"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"auth-url": googleAuthUrl,
@@ -60,12 +76,28 @@ func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 // @Description	Get Spotify OAuth2 URL
 // @Tags			Authentication
 // @Produce		json
-// @Success		200		{object}	docs_userservice.OAuth2Response
-// @Router			/authentication/Spotify [get]
+// @Param        callback-type  path      string  true  "Callback type (login or classic)"
+// @Success		200		{object}	docs_userservice.OAuth2SuccessResponse
+// @Failure		400		{object}	docs_userservice.OAuth2BadRequestResponse
+// @Router			/authentication/Spotify/callback-type} [get]
 func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param("callback-type")
+
+	if (callbackType == "login") {
+		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
+	} else if (callbackType == "classic") {
+		callbackLink = os.Getenv("SPOTIFY_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+		return
+	}
+
 	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		os.Getenv("SPOTIFY_CALLBACK") + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state"
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"auth-url": spotifyAuthUrl,

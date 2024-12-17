@@ -1,7 +1,11 @@
 package docs_userservice
 
-type OAuth2Response struct {
+type OAuth2SuccessResponse struct {
 	Msg string `json:"auth-url"example:"url-example.com"`
+}
+
+type OAuth2BadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid callback type"`
 }
 
 type ServiceCallBackSuccessResponse struct {

@@ -85,6 +85,14 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
+func (self *UserService) LoginWithService(code string, serviceName string) error {
+
+	// get user service email
+	// CreateUser
+	// LoginAuthentication
+
+}
+
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
 	if (userConnectionType != basicConnectionType) {
 		return fmt.Errorf("Could not modify the password")

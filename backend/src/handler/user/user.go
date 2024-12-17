@@ -43,6 +43,7 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
 		user.GET("/email", self.GetUserEmail)
+		user.GET("/callback/:service", self.ServiceCallBack) // get?
 	}
 }
 
@@ -294,5 +295,29 @@ func (self *UserHandler) GetUserEmail(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"email": emailStr,
+	})
+}
+
+func (self *UserHandler) ServiceCallBack(context *gin.Context) {
+	code := context.Query("code")
+	serviceName := context.Param("service")
+
+	if code == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid code authorization",
+		})
+		return
+	}
+
+	err := self.UserService.LoginWithService(code, serviceName)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to connect with requested service",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Connection successful",
 	})
 }

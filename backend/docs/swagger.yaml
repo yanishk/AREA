@@ -189,7 +189,13 @@ definitions:
         example: New user created
         type: string
     type: object
-  docs_userservice.OAuth2Response:
+  docs_userservice.OAuth2BadRequestResponse:
+    properties:
+      error:
+        example: Invalid callback type
+        type: string
+    type: object
+  docs_userservice.OAuth2SuccessResponse:
     properties:
       auth-url:
         example: url-example.com
@@ -412,29 +418,49 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Google:
+  /authentication/Google/{callback-type}:
     get:
       description: Get Google OAuth2 URL
+      parameters:
+      - description: Callback type (login or classic)
+        in: path
+        name: callback-type
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2Response'
+            $ref: '#/definitions/docs_userservice.OAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2BadRequestResponse'
       summary: Google OAuth2
       tags:
       - Authentication
-  /authentication/Spotify:
+  /authentication/Spotify/callback-type}:
     get:
       description: Get Spotify OAuth2 URL
+      parameters:
+      - description: Callback type (login or classic)
+        in: path
+        name: callback-type
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2Response'
+            $ref: '#/definitions/docs_userservice.OAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2BadRequestResponse'
       summary: Spotify OAuth2
       tags:
       - Authentication

@@ -41,7 +41,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Google": {
+        "/authentication/Google/{callback-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
                 "produces": [
@@ -51,17 +51,32 @@ const docTemplate = `{
                     "Authentication"
                 ],
                 "summary": "Google OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or classic)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                            "$ref": "#/definitions/docs_userservice.OAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2BadRequestResponse"
                         }
                     }
                 }
             }
         },
-        "/authentication/Spotify": {
+        "/authentication/Spotify/callback-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
@@ -71,11 +86,26 @@ const docTemplate = `{
                     "Authentication"
                 ],
                 "summary": "Spotify OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or classic)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                            "$ref": "#/definitions/docs_userservice.OAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2BadRequestResponse"
                         }
                     }
                 }
@@ -864,7 +894,16 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.OAuth2Response": {
+        "docs_userservice.OAuth2BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid callback type"
+                }
+            }
+        },
+        "docs_userservice.OAuth2SuccessResponse": {
             "type": "object",
             "properties": {
                 "auth-url": {
