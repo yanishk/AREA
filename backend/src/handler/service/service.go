@@ -43,13 +43,13 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string) error {
+func (self *ServiceHandler) ReactionStartPlayback(reactionName string, emailUser string, connectionTypeUser string) error {
 	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
 	if reactionName != "Start playback" {
 		return nil
 	}
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, connectionTypeUser, "Spotify")
 	if errRefreshing != nil {
 		return errRefreshing
 	}
@@ -90,7 +90,7 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 				continue
 			}
 
-			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
+			errPlayback := self.ReactionStartPlayback(reactionFound.Name, foundUser.Email, foundUser.ConnectionType)
 			if errPlayback != nil {
 				continue
 			}

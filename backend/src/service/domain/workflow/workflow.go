@@ -17,8 +17,8 @@ func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepos
 	}
 }
 
-func (self *WorkflowService) CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error {
-	userFound, errFindingUser := self.UserRepository.FindUserByEmail(userEmail)
+func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error {
+	userFound, errFindingUser := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errFindingUser != nil {
 		return errFindingUser
 	}
@@ -31,8 +31,8 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, newWorkflow entiti
 	return nil
 }
 
-func (self *WorkflowService) GetUserWorkflows(email string) ([]entities.Workflow, error) {
-	userFound, errUserFound := self.UserRepository.FindUserByEmail(email)
+func (self *WorkflowService) GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error) {
+	userFound, errUserFound := self.UserRepository.FindUserByEmail(email, connectionType)
 	if errUserFound != nil {
 		return nil, errUserFound
 	}

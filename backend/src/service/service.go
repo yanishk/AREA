@@ -8,9 +8,9 @@ import (
 
 type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
-	LoginAuthentication(userEmail string, userPassword string) (string, error)
+	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
 	ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error
-	DeleteAccount(userEmail string) error
+	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
 }
 
@@ -26,14 +26,14 @@ type ServiceService interface {
 
 type UserServiceService interface {
 	GetEmailFromContext(context *gin.Context) (string, bool)
-	CallApiAndRefresh(email string, serviceName string) (string, error)
-	UpdateTokenForService(code string, serviceName string, email string) error
+	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
+	UpdateTokenForService(code string, serviceName string, email string, connectionType string) error
 }
 
 type WorkflowService interface {
-	CreateWorkflow(userEmail string, newWorkflow entities.NewWorkflow) error
+	CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error
 	ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error
-	GetUserWorkflows(email string) ([]entities.Workflow, error)
+	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
 }
 
 type Service struct {

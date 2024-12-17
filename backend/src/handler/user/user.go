@@ -107,7 +107,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 		return
 	}
 
-	token, err := self.UserService.LoginAuthentication(user.Email, user.Password)
+	token, err := self.UserService.LoginAuthentication(user.Email, user.Password, user.ConnectionType)
 	if err != nil {
 		if err.Error() == "Could not find requested user" || err.Error() == "Wrong password" {
 			context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -208,6 +208,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		return
 	}
 
+	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -216,7 +217,7 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		return
 	}
 
-	errDelete := self.UserService.DeleteAccount(emailStr)
+	errDelete := self.UserService.DeleteAccount(emailStr, connectionTypeStr)
 	if errDelete != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",

@@ -59,25 +59,28 @@ func createToken(email string) (string, error) {
 	return tokenString, nil
 }
 
-func (self *UserService) LoginAuthentication(userEmail string, userPassword string) (string, error) {
-	foundUser, err := self.UserRepository.FindUserByEmail(userEmail)
+func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
+	foundUser, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if err != nil || len(foundUser.Email) <= 0 {
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
-	if resBcrypt == nil {
-		tokenString, errToken := createToken(foundUser.Email)
-		if errToken != nil {
-			return "", fmt.Errorf("Error creating token")
+	if (userConnectionType == "basic") {
+		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
+		if resBcrypt != nil {
+			return "", fmt.Errorf("Wrong password")
 		}
-		return tokenString, nil
 	}
-	return "", fmt.Errorf("Wrong password")
+	tokenString, errToken := createToken(foundUser.Email)
+	if errToken != nil {
+		return "", fmt.Errorf("Error creating token")
+	}
+	return tokenString, nil
 }
 
 func (self *UserService) ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error {
-	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(userEmail)
+	const userConnectionType = "basic"
+	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return fmt.Errorf("Could not find requested user")
 	}
@@ -92,15 +95,15 @@ func (self *UserService) ModifyPassword(userEmail string, newPassword entities.U
 		return fmt.Errorf("Failed to hash password")
 	}
 
-	errUpdate := self.UserRepository.UpdateUser(userEmail, string(hash))
+	errUpdate := self.UserRepository.UpdateUser(userEmail, string(hash), userConnectionType)
 	if errUpdate != nil {
 		return fmt.Errorf("Could not modify the password")
 	}
 	return nil
 }
 
-func (self *UserService) DeleteAccount(userEmail string) error {
-	err := self.UserRepository.DeleteUser(userEmail)
+func (self *UserService) DeleteAccount(userEmail string, userConnectionType string) error {
+	err := self.UserRepository.DeleteUser(userEmail, userConnectionType)
 	if err != nil {
 		return fmt.Errorf("Could not delete account")
 	}

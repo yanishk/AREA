@@ -70,6 +70,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		return
 	}
 
+	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -77,7 +78,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		})
 		return
 	}
-	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, newWorkflow)
+	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, connectionTypeStr, newWorkflow)
 	if errCreationWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create workflow",
@@ -106,6 +107,7 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
+	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, ok := email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -114,7 +116,7 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
-	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr)
+	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr, connectionTypeStr)
 	if errRetrievedWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve user's workflows",

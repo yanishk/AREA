@@ -93,6 +93,7 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
+	connectionTypeStr := "basic" // en attendant de générer le token
 	emailStr, err := self.UserServiceService.GetEmailFromContext(context)
 	if !err {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -101,7 +102,7 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, emailStr)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, emailStr, connectionTypeStr)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",
