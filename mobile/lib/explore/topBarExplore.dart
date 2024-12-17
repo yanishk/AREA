@@ -18,24 +18,24 @@ class TopBarExplore extends StatelessWidget {
       children: [
         TextButton(
           onPressed: () {
-            SelectedCardList.index = 0;
+            SelectedCardList.cardType = SelectedCardListEnum.All;
             onPressed();
           },
-          child: TextTopBar(text: "All", index: 0),
+          child: TextTopBar(text: "All", cardType: SelectedCardListEnum.All),
         ),
         TextButton(
           onPressed: () {
-            SelectedCardList.index = 1;
+            SelectedCardList.cardType = SelectedCardListEnum.Workflows;
             onPressed();
           },
-          child: TextTopBar(text: "Workflows", index: 1,),
+          child: TextTopBar(text: "Workflows", cardType: SelectedCardListEnum.Workflows,),
         ),
         TextButton(
           onPressed: () {
-            SelectedCardList.index = 2;
+            SelectedCardList.cardType = SelectedCardListEnum.Services;
             onPressed();
           },
-          child: TextTopBar(text: "Services", index: 2,),
+          child: TextTopBar(text: "Services", cardType: SelectedCardListEnum.Services,),
         ),
       ],
     );
@@ -46,15 +46,15 @@ class TextTopBar extends StatelessWidget {
   const TextTopBar({
     super.key,
     required this.text,
-    this.index = 0,
+    this.cardType = SelectedCardListEnum.All,
   });
 
   final String text;
-  final int index;
+  final SelectedCardListEnum cardType;
 
   @override
   Widget build(BuildContext context) {
-    if (index != SelectedCardList.index) {
+    if (cardType != SelectedCardList.cardType) {
       return AutoSizeText(
         text,
         style: TextStyle(

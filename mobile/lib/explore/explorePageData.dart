@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 import "../globalData.dart";
 
+enum SelectedCardListEnum {
+    All,
+    Workflows,
+    Services,
+}
+
 class AllServicesList {
   static List<String> allServiceNameList = Globaldata.actionServicesName + Globaldata.reactionServicesName;
   static List<String> allServiceColorList = Globaldata.actionServicesColor + Globaldata.reactionServicesColor;
@@ -9,6 +15,6 @@ class AllServicesList {
 }
 
 class SelectedCardList {
-  static int index = 0;
+  static SelectedCardListEnum cardType = SelectedCardListEnum.All;
   static List<Widget> cardList = [];
 }

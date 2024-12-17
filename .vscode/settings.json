@@ -1,5 +1,6 @@
 {
     "conventionalCommits.scopes": [
-        "back-end"
+        "back-end",
+        "mobile"
     ]
 }
