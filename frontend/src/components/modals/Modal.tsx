@@ -6,7 +6,6 @@ interface ModalProps {
     onClickNo: () => void;
 }
 
-
 const Modal: React.FC<ModalProps> = ({message, onClickYes, onClickNo}) => {
 
     return (
