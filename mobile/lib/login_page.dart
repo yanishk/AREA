@@ -6,7 +6,7 @@ import 'dart:developer' as developer;
 
 import "custom_widget.dart";
 import "sign_up.dart";
-import "exploreAll.dart";
+import "explore/explorePage.dart";
 import "globalData.dart";
 import "loadServicesList.dart";
 import 'apiCall/apiRequest.dart';
@@ -51,7 +51,7 @@ class _APICallState extends State<APICall> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ExplorePageAll()),
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
         );
       });
     }

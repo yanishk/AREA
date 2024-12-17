@@ -7,7 +7,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "exploreAll.dart";
+import "explore/explorePage.dart";
 import "apiCall/apiRequest.dart";
 
 class LoadServicePage extends StatelessWidget {
@@ -56,9 +56,9 @@ class LoadService extends State<APICall> {
           Globaldata.reactionServicesIcons,
           firstService
         );
-        Navigator.push(
+        Navigator.pushReplacement(
           Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePageAll()),
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
         );
       }
     }
@@ -82,7 +82,6 @@ class LoadService extends State<APICall> {
   }
 
   Future<void> getServices() async {
-
     final response = await getServiceResponse(actionsServices);
     final responseReaction = await getServiceResponse(reactionsServices);
     if (response == null || responseReaction == null) {
