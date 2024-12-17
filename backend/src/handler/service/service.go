@@ -143,6 +143,43 @@ func (self *ServiceHandler) ReactionSkipTrack(reactionName string, emailUser str
 	return nil
 }
 
+func (self *ServiceHandler) AddToQueue(reactionName string, emailUser string, ReactionParam map[string]interface{}) error {
+	uri, uriErr := ReactionParam["uri"]
+	if !uriErr {
+		return fmt.Errorf("Incorrect URI")
+	}
+	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
+
+	if reactionName != "Add track to playback queue" {
+		return nil
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser, "Spotify")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	req, err := http.NewRequest("POST", spotifyResumePlayURL, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", Bearer+accessToken)
+	req.Header.Set(ContentType, JsonApp)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(APICallFailed)
+	}
+	return nil
+}
+
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
 	for _, workflow := range AllworkflowFound {
 		hour, hourExists := workflow.ActionParam["hour"]
@@ -161,6 +198,7 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 			self.ReactionStartPlayback(reactionFound.Name, foundUser.Email)
 			self.ReactionPausePlayback(reactionFound.Name, foundUser.Email)
 			self.ReactionSkipTrack(reactionFound.Name, foundUser.Email)
+			self.AddToQueue(reactionFound.Name, foundUser.Email, workflow.ReactionParam)
 		}
 	}
 	return nil
