@@ -9,9 +9,9 @@ type ServiceCallBackSuccessResponse struct {
 }
 
 type ServiceCallBackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization-Could not find requested user-Could not find requested service"`
+	Msg string `json:"error"example:"Invalid code authorization"`
 }
 
 type ServiceCallBackInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Failed to exchange token-Failed to get email"`
+	Msg string `json:"error"example:"Failed to get email-Failed to update token"`
 }

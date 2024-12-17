@@ -90,7 +90,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 }
 
 // @Summary		Retrieve User's Workflows
-// @Description	Retrieve the workflows of the user actually connected.
+// @Description	Retrieve the workflows of the user actually connected
 // @Tags			Workflow
 // @Produce		json
 // @Success		200		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse
@@ -114,20 +114,14 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
-	userFound, errUserFound := self.UserService.FindUserByEmail(emailStr)
-	if errUserFound != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve user",
-		})
-		return
-	}
-	retrievedWorkflow, err := self.WorkflowService.FindWorkflowByUserId(userFound.Id)
-	if err != nil {
+	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr)
+	if errRetrievedWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve user's workflows",
 		})
 		return
 	}
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"workflows": retrievedWorkflow,
 	})
@@ -154,16 +148,8 @@ func (self *WorkflowHandler) ActivateDeactivateWorkflow(context *gin.Context) {
 		return
 	}
 
-	foundWorkflow, errFetchWorkflow := self.WorkflowService.FindWorkflowById(workflowActivation.WorkflowId)
-	if errFetchWorkflow != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find specified workflow",
-		})
-		return
-	}
-
-	errUpdate := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
-	if errUpdate != nil {
+	errUpdateworkflow := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation)
+	if errUpdateworkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not update workflow's activation status",
 		})

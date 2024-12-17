@@ -31,14 +31,28 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, newWorkflow entiti
 	return nil
 }
 
-func (self *WorkflowService) FindWorkflowByUserId(userId string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByUserId(userId)
+func (self *WorkflowService) GetUserWorkflows(email string) ([]entities.Workflow, error) {
+	userFound, errUserFound := self.UserRepository.FindUserByEmail(email)
+	if errUserFound != nil {
+		return nil, errUserFound
+	}
+
+	retrievedWorkflow, err := self.WorkflowRepository.FindWorkflowByUserId(userFound.Id)
+	if err != nil {
+		return nil, err
+	}
+	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowService) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
-	return self.WorkflowRepository.ActivateDeactivateWorkflow(workflowId, isActivated)
-}
+func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error {
+	foundWorkflow, errFetchWorkflow := self.WorkflowRepository.FindWorkflowById(workflowActivation.WorkflowId)
+	if errFetchWorkflow != nil {
+		return errFetchWorkflow
+	}
 
-func (self *WorkflowService) FindWorkflowById(workflowId string) (entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowById(workflowId)
+	errUpdate := self.WorkflowRepository.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
+	if errUpdate != nil {
+		return errUpdate
+	}
+	return nil
 }
