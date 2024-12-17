@@ -9,6 +9,7 @@ import (
 type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
 	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
+	LoginWithService(code string, serviceName string) error
 	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)

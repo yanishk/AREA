@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"net/http"
+	"bytes"
+	"encoding/json"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -17,6 +20,11 @@ type UserService struct {
 	ServiceRepository  storage.ServiceRepository
 }
 
+const ContentType = "Content-Type"
+const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+const FormattingDate = "2006-01-02 15:04:05-07:00"
+const BasicConnectionType = "basic"
+
 func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository) *UserService {
 	return &UserService{
 		UserRepository: UserRepository,
@@ -24,12 +32,11 @@ func NewUserService(UserRepository storage.UserRepository, ServiceRepository sto
 	}
 }
 
-const basicConnectionType = "basic"
 
 func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
 	var errorUser error
 
-	if (userConnectionType == "basic") {
+	if (userConnectionType == BasicConnectionType) {
 		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("Internal server error")
@@ -63,7 +70,7 @@ func createToken(email string, connectionType string) (string, error) {
 }
 
 func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
-	if (userConnectionType != basicConnectionType && userPassword != "") {
+	if (userConnectionType != BasicConnectionType && userPassword != "") {
 		return "", fmt.Errorf("Wrong password")
 	}
 
@@ -72,7 +79,7 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	if (userConnectionType == basicConnectionType) {
+	if (userConnectionType == BasicConnectionType) {
 		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
 		if resBcrypt != nil {
 			return "", fmt.Errorf("Wrong password")
@@ -85,16 +92,98 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
+
+func GetGoogleOAuth2Request(code string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
+	jsonBody := fmt.Sprintf(
+		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
+		code,
+		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		os.Getenv("GOOGLE_CALLBACK"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+	return request, nil
+}
+
+func GetSpotifyOAuth2Request(code string) (*http.Request, error) {
+	tokenUrl := "https://accounts.spotify.com/api/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		code,
+		os.Getenv("SPOTIFY_CALLBACK"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
+	var tokenRes entities.ResultToken
+	var request *http.Request
+	var errRequest error
+
+	if serviceName == "Google" {
+		request, errRequest = GetGoogleOAuth2Request(code)
+	} else if serviceName == "Spotify" {
+		request, errRequest = GetSpotifyOAuth2Request(code)
+	}
+
+	if errRequest != nil {
+		return tokenRes, errRequest
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return tokenRes, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return tokenRes, err
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
+	if errDecoder != nil {
+		return tokenRes, errDecoder
+	}
+	return tokenRes, nil
+}
+
 func (self *UserService) LoginWithService(code string, serviceName string) error {
+	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errorService != nil {
+		return errorService
+	}
 
-	// get user service email
-	// CreateUser
-	// LoginAuthentication
+	_, errToken := GetAccessTokenFromCode(code, serviceName)
+	if errToken != nil {
+		return errToken
+	}
+	if serviceName == "Google" {
 
+	} else if serviceName == "Spotify" {
+
+	}
+	return nil
 }
 
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
-	if (userConnectionType != basicConnectionType) {
+	if (userConnectionType != BasicConnectionType) {
 		return fmt.Errorf("Could not modify the password")
 	}
 

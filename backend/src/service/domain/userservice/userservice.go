@@ -127,7 +127,7 @@ func GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	return request, nil
 }
 
-func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
+func GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var request *http.Request
 	var errRequest error
@@ -269,12 +269,12 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 }
 
 func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, email string, connectionType string) error {
-	_, errorServcie := self.ServiceRepository.FindServiceByName(serviceName)
-	if errorServcie != nil {
-		return errorServcie
+	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errorService != nil {
+		return errorService
 	}
 
-	token, errToken := self.GetAccessTokenFromCode(code, serviceName)
+	token, errToken := GetAccessTokenFromCode(code, serviceName)
 	if errToken != nil {
 		return errToken
 	}
