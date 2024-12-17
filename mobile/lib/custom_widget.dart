@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     this.textPaddingLeft = 0,
     this.image,
     this.borderCircularRadius = 32.0,
+    this.shadowSize = 3,
   });
 
   final Color backgroundColor;
@@ -22,6 +23,7 @@ class CustomButton extends StatelessWidget {
   final double textPaddingLeft;
   final Image? image;
   final double borderCircularRadius;
+  final double shadowSize;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          elevation: 3,
+          elevation: shadowSize,
           minimumSize: size,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderCircularRadius),

@@ -20,9 +20,6 @@ class Globaldata {
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
 
-  static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
-  static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
-
   static void resetActionReactionServicesList() {
     Globaldata.actionServicesName = [];
     Globaldata.actionServicesColor = [];
@@ -34,27 +31,5 @@ class Globaldata {
 
   static int getActionServicesSize() {
     return actionServicesName.length;
-  }
-}
-
-class ActionOrReactionData {
-  String id = "";
-  String name = "";
-  String description = "";
-  String serviceId = "";
-  int nbParam = 0;
-  String parameter = "";
-  Map<String, dynamic> parameterList = {};
-
-  ActionOrReactionData.optional([
-    this.id = "",
-    this.name = "",
-    this.description = "",
-    this.serviceId = "",
-    this.nbParam = 0,
-    this.parameter = "",
-    Map<String, dynamic>? parameterList,
-  ]) {
-    this.parameterList = parameterList ?? {};
   }
 }
