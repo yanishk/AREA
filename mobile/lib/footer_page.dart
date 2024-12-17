@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import "explore/explorePage.dart";
-import "edit_account.dart";
+import "editAccount/editAccount.dart";
 import "createWorkflows/create.dart";
 import 'globalData.dart';
 

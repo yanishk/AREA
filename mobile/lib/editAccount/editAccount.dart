@@ -5,13 +5,13 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:namer_app/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
-import "../apiCall/apiErrorHandling.dart";
+import "../../apiCall/apiErrorHandling.dart";
 
-import "custom_widget.dart";
-import "footer_page.dart";
+import "../custom_widget.dart";
+import "../footer_page.dart";
 import "editPassword.dart";
-import "globalData.dart";
-import "apiCall/apiRequest.dart";
+import "../globalData.dart";
+import "../apiCall/apiRequest.dart";
 
 class EditAccountPage extends StatelessWidget {
   @override
@@ -31,23 +31,28 @@ class APICall extends StatefulWidget {
 
 class EditAccount extends State<APICall> {
   String apiRoute = 'user/delete-account';
-  bool isInit = true;
   final TextEditingController emailController = new TextEditingController(
     text: "",
   );
 
-  displayToastError(String text) {
-    Fluttertoast.showToast(
-        msg: text,
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 24.0
-      );
+  @override
+  void initState() {
+    super.initState();
+    getEmail();
   }
 
-  Future<void> deletePassword() async {
+  displayToastError(String text) {
+    Fluttertoast.showToast(
+      msg: text,
+      toastLength: Toast.LENGTH_SHORT,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 24.0
+    );
+  }
+
+  Future<void> deleteAccount() async {
     Response response = await ApiRequest.delete(apiRoute);
     if (response.statusCode == 504) {
       displayToastError(response.body);
@@ -57,7 +62,7 @@ class EditAccount extends State<APICall> {
     if (response.statusCode != 200) {
       displayToastError('${responseData['error']}');
       developer.log(
-          "deletePassword FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          "deleteAccount FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return;
     }
     setState(() {
@@ -97,7 +102,7 @@ class EditAccount extends State<APICall> {
             ),
           ),
           firstChoiceonPressed: () {
-            deletePassword();
+            deleteAccount();
             Navigator.of(context).pop();
           },
           secondChoiceonPressed: () {
@@ -157,22 +162,13 @@ class EditAccount extends State<APICall> {
 
   @override
   Widget build(BuildContext context) {
-    if (isInit == true) {
-      isInit = false;
-      getEmail();
-    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            AutoSizeText(
-              "Account",
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            AutoSizeText("Account",
+              style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.black,),
               maxLines: 1,
             ),
             SizedBox(width: 16),
@@ -181,11 +177,7 @@ class EditAccount extends State<APICall> {
             LeftWidget(
               child: AutoSizeText(
                 "Email",
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+                style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color: Colors.black,),
                 maxLines: 1,
               ),
             ),
