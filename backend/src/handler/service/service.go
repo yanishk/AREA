@@ -90,6 +90,14 @@ func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEm
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		return self.spotifyRequest(urlQueue, "POST", accessToken)
 	}
+	if reactionTitle == "Save a track" {
+		id, idErr := workflow.ReactionParam["id"]
+		if !idErr {
+			return fmt.Errorf("Incorrect ID")
+		}
+		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
+		return self.spotifyRequest(urlSave, "PUT", accessToken)
+	}
 	return fmt.Errorf("Unknown reaction")
 }
 
