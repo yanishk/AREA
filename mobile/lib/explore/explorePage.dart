@@ -34,10 +34,10 @@ class ExplorePageMain extends State<ExplorePageStateful> {
 
   Future<void> updateCardList() async {
     setState(() {
-      if (SelectedCardList.index == 0) {
+      if (SelectedCardList.cardType == SelectedCardListEnum.All) {
         FillServicesAndWorkflow.fillServicesAndWorkflowList();
         SelectedCardList.cardList = FillServicesAndWorkflow.servicesAndWorkflow;
-      } else if (SelectedCardList.index == 1) {
+      } else if (SelectedCardList.cardType == SelectedCardListEnum.Workflows) {
         FillWorkflowsCard.fillWorkflowsCardList();
         SelectedCardList.cardList = FillWorkflowsCard.workflowsCardList;
       } else {
