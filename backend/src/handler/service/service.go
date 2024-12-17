@@ -18,9 +18,6 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
-const Bearer = "Bearer"
-const ContentType = "Content-Type"
-const JsonApp = "application/json"
 const APICallFailed = "Spotify API call failed"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
@@ -47,42 +44,14 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 }
 
-func (self *ServiceHandler) ReactionStartPlayback(accessToken string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/play"
-
-	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
-}
-
-func (self *ServiceHandler) ReactionPausePlayback(accessToken string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/pause"
-
-	return self.spotifyRequest(spotifyResumePlayURL, "PUT", accessToken)
-}
-
-func (self *ServiceHandler) ReactionSkipTrack(accessToken string) error {
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/next"
-
-	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
-}
-
-func (self *ServiceHandler) AddToQueue(ReactionParam map[string]interface{}, accessToken string) error {
-	uri, uriErr := ReactionParam["uri"]
-	if !uriErr {
-		return fmt.Errorf("Incorrect URI")
-	}
-	spotifyResumePlayURL := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-
-	return self.spotifyRequest(spotifyResumePlayURL, "POST", accessToken)
-}
-
 func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Authorization", Bearer+accessToken)
-	req.Header.Set(ContentType, JsonApp)
+	req.Header.Set("Authorization", "Bearer"+accessToken)
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -95,7 +64,6 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 		return fmt.Errorf(APICallFailed)
 	}
 	return nil
-
 }
 
 func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEmail string, workflow entities.Workflow) error {
@@ -106,19 +74,23 @@ func (self *ServiceHandler) executeSpotifyReactions(reactionTitle string, userEm
 	}
 
 	if reactionTitle == "Start playback" {
-		return self.ReactionStartPlayback(accessToken)
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessToken)
 	}
 	if reactionTitle == "Pause playback" {
-		return self.ReactionPausePlayback(accessToken)
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessToken)
 	}
 	if reactionTitle == "Skip track" {
-		return self.ReactionSkipTrack(accessToken)
+		return self.spotifyRequest("https://api.spotify.com/v1/me/player/next", "POST", accessToken)
 	}
 	if reactionTitle == "Add track to playback queue" {
-		return self.AddToQueue(workflow.ReactionParam, accessToken)
+		uri, uriErr := workflow.ReactionParam["uri"]
+		if !uriErr {
+			return fmt.Errorf("Incorrect URI")
+		}
+		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
+		return self.spotifyRequest(urlQueue, "POST", accessToken)
 	}
-
-	return nil
+	return fmt.Errorf("Unknown reaction")
 }
 
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, AllworkflowFound []entities.Workflow) error {
