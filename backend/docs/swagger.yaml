@@ -312,6 +312,8 @@ definitions:
     type: object
   entities.UserCredentials:
     properties:
+      connectiontype:
+        type: string
       email:
         type: string
       password:

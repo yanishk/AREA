@@ -1050,6 +1050,9 @@ const docTemplate = `{
         "entities.UserCredentials": {
             "type": "object",
             "properties": {
+                "connectiontype": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
