@@ -2,77 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
 
-import "custom_widget.dart";
-import "globalData.dart";
+import "../custom_widget.dart";
+import "../globalData.dart";
 import "selectActionOrReaction.dart";
+import 'createWorkflowsData.dart';
+import "createWidget.dart";
 
 class SelectServicePage extends StatelessWidget {
-  const SelectServicePage({
-    super.key,
-    this.isAnAction = true,
-  });
-  final bool isAnAction;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: APICall(isAnAction: isAnAction),
+      home: APICall(),
     );
   }
 }
 
 class APICall extends StatefulWidget {
-  const APICall({
-    super.key,
-    this.isAnAction = true,
-  });
-  final bool isAnAction;
-
   @override
-  SelectService createState() => SelectService(isAnAction: isAnAction);
+  SelectService createState() => SelectService();
 }
 
 class SelectService extends State<APICall> {
-  SelectService({
-    required this.isAnAction,
-  });
-  final bool isAnAction;
   String title = "Select action service";
-  List<String> serviceNameList = Globaldata.actionServicesName;
-  List<String> serviceColorList = Globaldata.actionServicesColor;
-  List<String> serviceIconsList = Globaldata.actionServicesIcons;
   int serviceIndex = 0;
 
-  Future<void> setReactionService() async {
+  Future<void> setActionOrReactionServiceList() async {
+    if (isAnAction == true) {
+      title = "Select action service";
+      CreateData.serviceNameList = Globaldata.actionServicesName;
+      CreateData.serviceColorList = Globaldata.actionServicesColor;
+      CreateData.serviceIconsList = Globaldata.actionServicesIcons;
+      return;
+    }
     setState(() {
       title = "Select reaction service";
-      serviceNameList = Globaldata.reactionServicesName;
-      serviceColorList = Globaldata.reactionServicesColor;
-      serviceIconsList = Globaldata.reactionServicesIcons;
+      CreateData.serviceNameList = Globaldata.reactionServicesName;
+      CreateData.serviceColorList = Globaldata.reactionServicesColor;
+      CreateData.serviceIconsList = Globaldata.reactionServicesIcons;
     });
   }
 
   Widget serviceTiles(int index) {
-    if (index + 1 < serviceNameList.length && index % 2 == 0) {
+    if (index + 1 < CreateData.serviceNameList.length && index % 2 == 0) {
       serviceIndex++;
       developer.log("index : $index, index2 : ${index + 1}");
       return Row(
         children: [
           MySquareServicesCard(
             servicesIndex: index++,
-            isAnAction: isAnAction,
-            serviceColorList: serviceColorList,
-            serviceNameList: serviceNameList,
-            serviceIconsList: serviceIconsList,
           ),
           MySquareServicesCard(
             servicesIndex: index,
-            isAnAction: isAnAction,
-            serviceColorList: serviceColorList,
-            serviceNameList: serviceNameList,
-            serviceIconsList: serviceIconsList,
           ),
         ],
       );
@@ -82,10 +64,6 @@ class SelectService extends State<APICall> {
       children: [
         MySquareServicesCard(
           servicesIndex: index,
-          isAnAction: isAnAction,
-          serviceColorList: serviceColorList,
-          serviceNameList: serviceNameList,
-          serviceIconsList: serviceIconsList,
         ),
       ],
     );
@@ -93,15 +71,13 @@ class SelectService extends State<APICall> {
 
   @override
   Widget build(BuildContext context) {
-    if (isAnAction != true) {
-      setReactionService();
-    }
+    setActionOrReactionServiceList();
     List<Widget> services = [];
     for (serviceIndex = 0;
-        serviceIndex < serviceNameList.length;
+        serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
       developer.log(
-          "index : ${serviceIndex}, list size : ${serviceNameList.length}");
+          "index : ${serviceIndex}, list size : ${CreateData.serviceNameList.length}");
       services.add(serviceTiles(serviceIndex));
     }
 
@@ -122,71 +98,24 @@ class SelectService extends State<APICall> {
   }
 }
 
-class SelectServiceTopBar extends StatelessWidget {
-  const SelectServiceTopBar({
-    super.key,
-    required this.title,
-  });
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Positioned(
-          left: 0,
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(Globaldata.myContext);
-            },
-            icon: Icon(Icons.arrow_back, size: 32),
-          ),
-        ),
-        Center(
-          child: AutoSizeText(
-            title,
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            maxLines: 1,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class MySquareServicesCard extends StatelessWidget {
   const MySquareServicesCard({
     super.key,
     required this.servicesIndex,
-    this.isAnAction = true,
-    required this.serviceNameList,
-    required this.serviceColorList,
-    required this.serviceIconsList,
   });
 
   final int servicesIndex;
-  final bool isAnAction;
-  final List<String> serviceNameList;
-  final List<String> serviceColorList;
-  final List<String> serviceIconsList;
 
   Future<void> redirectToSelectActionOrReactionPage() async {
     await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
           builder: (context) => SelectActionOrReactionPage(
-            isAnAction: isAnAction,
             serviceIndex: servicesIndex,
           )),
     );
-    if (isAnAction && Globaldata.serviceAction.name.length != 0 || !isAnAction && Globaldata.serviceReaction.name.length != 0) {
-      Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
+    if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
+      Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
     }
   }
 
@@ -195,14 +124,14 @@ class MySquareServicesCard extends StatelessWidget {
     if (servicesIndex >= Globaldata.actionServicesName.length) {
       return MyDivider();
     }
-    developer.log("https://mathisbrehm.fr/${serviceIconsList[servicesIndex]}");
+    developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: HexColor(serviceColorList[servicesIndex]),
+          color: HexColor(CreateData.serviceColorList[servicesIndex]),
           border: Border.all(
-            color: HexColor(serviceColorList[servicesIndex]),
+            color: HexColor(CreateData.serviceColorList[servicesIndex]),
             width: 2.0,
           ),
           borderRadius: BorderRadius.circular(4.0),
@@ -228,9 +157,9 @@ class MySquareServicesCard extends StatelessWidget {
                 child: Column(children: [
                   SafeWebImage(
                       url:
-                          "${Globaldata.domainName}${serviceIconsList[servicesIndex]}"),
+                          "${Globaldata.domainName}${CreateData.serviceIconsList[servicesIndex]}"),
                   AutoSizeText(
-                    serviceNameList[servicesIndex],
+                    CreateData.serviceNameList[servicesIndex],
                     style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,

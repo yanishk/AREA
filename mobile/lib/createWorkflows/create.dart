@@ -3,9 +3,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 
 import "package:namer_app/custom_widget.dart";
 import "package:namer_app/footer_page.dart";
-import "package:namer_app/selectService.dart";
-import "globalData.dart";
+import "package:namer_app/createWorkflows/selectService.dart";
+import "../globalData.dart";
 import "saveNewWorkflows.dart";
+import "createWorkflowsData.dart";
 
 class CreateWorkflowsPage extends StatelessWidget {
   const CreateWorkflowsPage({super.key});
@@ -32,7 +33,7 @@ class CreateWorkflows extends State<APICall> {
   int secondButtonState = 0;
   Color enableButton = Color.fromARGB(255, 34, 34, 34);
   Color firstButtonColor = Color.fromARGB(255, 34, 34, 34);
-  Color secondButtonColor = Color.fromARGB(255, 182, 182, 182);
+  Color secondButtonColor = Color.fromARGB(255, 150, 150, 150);
   double firstButtonHight = 70;
   String firstSelectedService = "";
   String secondSelectedService = "";
@@ -55,7 +56,7 @@ class CreateWorkflows extends State<APICall> {
           style: TextStyle(
               fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        secondChild: TextWithBackground(text: "add"),
+        secondChild: TextWithBackground(text: "Add", fontSize: 25),
         padding: EdgeInsets.only(
             left: MediaQuery.sizeOf(Globaldata.myContext).width / 5),
       ),
@@ -72,7 +73,7 @@ class CreateWorkflows extends State<APICall> {
                 fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
-        secondChild: TextWithBackground(text: "add"),
+        secondChild: TextWithBackground(text: "Add", fontSize: 25),
         padding: EdgeInsets.only(
             left: MediaQuery.sizeOf(Globaldata.myContext).width / 10),
       );
@@ -96,6 +97,7 @@ class CreateWorkflows extends State<APICall> {
     if (secondButtonState == 2) {
       return CustomButton(
         backgroundColor: Color.fromARGB(255, 34, 34, 34),
+        shadowSize: 0,
         text: AutoSizeText(
           "Continue",
           style: TextStyle(
@@ -113,18 +115,19 @@ class CreateWorkflows extends State<APICall> {
   }
 
   Future<void> firstButtonNextState() async {
+    setState(() {
+      isAnAction = true;
+    });
     final result = await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
-          builder: (context) => SelectServicePage(
-                isAnAction: true,
-              )),
+          builder: (context) => SelectServicePage()),
     );
     setState(() {
       if (firstButtonComplete == false && result != null) {
         firstButtonComplete = true;
         secondButtonState++;
-        firstButtonColor = Color.fromARGB(255, 57, 61, 62);
+        firstButtonColor = HexColor(CreateData.serviceColorList[Globaldata.firstService]);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
       }
@@ -136,12 +139,14 @@ class CreateWorkflows extends State<APICall> {
 
   Future<void> secondButtonNextState() async {
     if (secondButtonState != 0) {
+      isAnAction = false;
       final result = await Navigator.push(
         Globaldata.myContext,
         MaterialPageRoute(
-            builder: (context) => SelectServicePage(isAnAction: false)),
+            builder: (context) => SelectServicePage()),
       );
       setState(() {
+        secondButtonColor = HexColor(CreateData.serviceColorList[Globaldata.secondService]);
         if (result != null) {
           secondButtonState = 2;
           secondSelectedService = "$result";
@@ -156,7 +161,7 @@ class CreateWorkflows extends State<APICall> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Padding(padding: EdgeInsets.only(top: 30)),
+            const Padding(padding: EdgeInsets.only(top: 46)),
             const AutoSizeText(
               "Create workflows",
               style: TextStyle(
@@ -166,11 +171,10 @@ class CreateWorkflows extends State<APICall> {
               ),
               maxLines: 1,
             ),
-            const SizedBox(width: 16),
-            const MyDivider(),
             const Padding(padding: EdgeInsets.only(top: 30)),
             CustomButton(
               backgroundColor: firstButtonColor,
+              shadowSize: 0,
               text: firstButton(),
               onPressed: () {
                 firstButtonNextState();
@@ -186,6 +190,7 @@ class CreateWorkflows extends State<APICall> {
             ),
             CustomButton(
               backgroundColor: secondButtonColor,
+              shadowSize: 0,
               text: secondButton(),
               onPressed: () {
                 secondButtonNextState();
