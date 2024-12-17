@@ -15,15 +15,15 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (self *UserRepository) CreateUser(email string, password string) error {
-	sqlStatement := `INSERT INTO users (email, password) VALUES ($1, $2);`
+func (self *UserRepository) CreateUser(email string, password string, connectionType string) error {
+	sqlStatement := `INSERT INTO users (email, password, connectiontype) VALUES ($1, $2, $3);`
 
 	_, err := self.FindUserByEmail(email)
 	if err == nil {
 		return fmt.Errorf("User already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, email, password)
+	_, err = self.db.Exec(sqlStatement, email, password, connectionType)
 	if err != nil {
 		return err
 	}

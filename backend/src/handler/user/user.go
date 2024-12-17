@@ -66,7 +66,7 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 		return
 	}
 
-	err = self.UserService.CreateUser(newUser.Email, newUser.Password)
+	err = self.UserService.CreateUser(newUser.Email, newUser.Password, newUser.ConnectionType)
 
 	if err != nil {
 		if err.Error() == "Email address already used" {

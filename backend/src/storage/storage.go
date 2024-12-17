@@ -5,7 +5,7 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(email string, password string) error
+	CreateUser(email string, password string, connectionType string) error
 	FindUserByEmail(email string) (entities.User, error)
 	UpdateUser(email string, password string) error
 	DeleteUser(email string) error

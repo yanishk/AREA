@@ -14,19 +14,32 @@ import (
 
 type UserService struct {
 	UserRepository storage.UserRepository
+	ServiceRepository  storage.ServiceRepository
 }
 
-func NewUserService(UserRepository storage.UserRepository) *UserService {
-	return &UserService{UserRepository: UserRepository}
-}
-
-func (self *UserService) CreateUser(newEmail string, newPassword string) error {
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("Internal server error")
+func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository) *UserService {
+	return &UserService{
+		UserRepository: UserRepository,
+		ServiceRepository: ServiceRepository,
 	}
+}
 
-	errorUser := self.UserRepository.CreateUser(newEmail, string(hash))
+func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
+	var errorUser error
+
+	if (userConnectionType == "basic") {
+		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
+		if err != nil {
+			return fmt.Errorf("Internal server error")
+		}
+		errorUser = self.UserRepository.CreateUser(userEmail, string(hash), userConnectionType)
+	} else {
+		_ , errorService := self.ServiceRepository.FindServiceByName(userConnectionType)
+		if errorService != nil {
+			return fmt.Errorf("Connection type doesn't exist")
+		}
+		errorUser = self.UserRepository.CreateUser(userEmail, "", userConnectionType)
+	}
 	if errorUser != nil {
 		return fmt.Errorf("Email address already used")
 	}
