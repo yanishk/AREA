@@ -10,6 +10,7 @@ import { AuthProvider } from './pages/AuthContext'
 import ConnectService from './pages/ConnectService'
 import TriggerActionPage from './pages/TriggerAction'
 import AccountPage from './pages/AccountPage'
+import { NoExistantRoute } from './pages/NoExistantRoute'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               <Route path="/select-service/:name" element={<ServicePage />} />
               <Route path="/select-action/:name" element={<TriggerActionPage />} />
               <Route path="/connect-service/:name" element={<ConnectService />} />
+              <Route path="*" element={<NoExistantRoute/>} />
           </Routes>
         </Router>
     </AuthProvider>
