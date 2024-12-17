@@ -31,14 +31,10 @@ func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepo
 	}
 }
 
-func (self *UserServiceService) FindServiceByName(name string) (entities.Service, error) {
-	return self.ServiceRepository.FindServiceByName(name)
-}
-
 func (self *UserServiceService) GetUser(emailStr string) (entities.User, error) {
 	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(emailStr)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
-		return foundUser, fmt.Errorf("could not find requested user")
+		return foundUser, fmt.Errorf("Could not find requested user")
 	}
 	return foundUser, nil
 }
@@ -232,7 +228,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, serviceName stri
 		return "", errGetUser
 	}
 
-	foundService, errServiceFound := self.FindServiceByName(serviceName)
+	foundService, errServiceFound := self.ServiceRepository.FindServiceByName(serviceName)
 	if errServiceFound != nil {
 		return "", errServiceFound
 	}
@@ -256,4 +252,29 @@ func (self *UserServiceService) CallApiAndRefresh(email string, serviceName stri
 		}
 	}
 	return token, nil
+}
+
+func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, email string) error {
+	_, errorServcie := self.ServiceRepository.FindServiceByName(serviceName)
+	if errorServcie != nil {
+		return errorServcie
+	}
+
+	token, errToken := self.GetAccessTokenFromCode(code, serviceName)
+	if errToken != nil {
+		return errToken
+	}
+
+	foundUser, errGetUser := self.GetUser(email)
+	if errGetUser != nil || len(foundUser.Email) <= 0 {
+		return errGetUser
+	}
+
+	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		return errFoundService
+	}
+
+	self.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
+	return nil
 }

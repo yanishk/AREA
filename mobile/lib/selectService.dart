@@ -181,11 +181,13 @@ class MySquareServicesCard extends StatelessWidget {
       Globaldata.myContext,
       MaterialPageRoute(
           builder: (context) => SelectActionOrReactionPage(
-                isAnAction: isAnAction,
-                serviceIndex: servicesIndex,
-              )),
+            isAnAction: isAnAction,
+            serviceIndex: servicesIndex,
+          )),
     );
-    Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
+    if (isAnAction && Globaldata.serviceAction.name.length != 0 || !isAnAction && Globaldata.serviceReaction.name.length != 0) {
+      Navigator.pop(Globaldata.myContext, serviceNameList[servicesIndex]);
+    }
   }
 
   @override
@@ -243,16 +245,4 @@ class MySquareServicesCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class HexColor extends Color {
-  static int _getColorFromHex(String hexColor) {
-    hexColor = hexColor.toUpperCase().replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF$hexColor";
-    }
-    return int.parse(hexColor, radix: 16);
-  }
-
-  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

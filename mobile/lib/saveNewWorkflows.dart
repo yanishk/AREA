@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import "package:http/src/response.dart";
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "exploreAll.dart";
+import "explore/explorePage.dart";
+import "apiCall/apiRequest.dart";
 
 class SaveNewWorkflowsPage extends StatelessWidget {
   const SaveNewWorkflowsPage({
@@ -46,71 +46,61 @@ class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
           "If ${Globaldata.serviceAction.name} ${Globaldata.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${Globaldata.serviceReaction.name}");
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final String apiRoute = "workflow/create";
-  String result = '';
   String email = "";
   bool isInit = true;
 
   Future<void> postCreateWorkflows() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.post(
-        Uri.parse('${apiUrl + apiRoute}'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': Globaldata.JWToken,
-        },
-        body: jsonEncode(<String, dynamic>{
-          'actionid': Globaldata.serviceAction.id,
-          'actionparam': Globaldata.serviceAction.parameterList,
-          'name': workflowTitleController.value.text.toString(),
-          'reactionid': Globaldata.serviceReaction.id,
-          'reactionparam': Globaldata.serviceReaction.parameterList,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        setState(() {
-          result = responseData.toString();
-          Fluttertoast.showToast(
-              msg: "Workflows successfully created",
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: const Color.fromARGB(255, 70, 70, 70),
-              textColor: Colors.white,
-              fontSize: 24.0);
-          Navigator.push(
-            Globaldata.myContext,
-            MaterialPageRoute(builder: (context) => ExplorePageAll()),
-          );
-        });
-      } else {
-        final responseData = jsonDecode(response.body);
-        setState(() {
-          result = '${responseData['error']}';
-          developer.log("Failed : $result");
-        });
-      }
-    } catch (e) {
-      setState(() {
-        result = '$e';
-        developer.log(result);
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          result = Globaldata.ErrorServerConnection;
-        }
-      });
+    Response response = await ApiRequest.post(
+      apiRoute,
+      jsonEncode(<String, dynamic>{
+        'actionid': Globaldata.serviceAction.id,
+        'actionparam': Globaldata.serviceAction.parameterList,
+        'name': workflowTitleController.value.text.toString(),
+        'reactionid': Globaldata.serviceReaction.id,
+        'reactionparam': Globaldata.serviceReaction.parameterList,
+      }),
+    );
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      return;
     }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "postCreateWorkflows FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    setState(() {
+      Fluttertoast.showToast(
+          msg: "Workflows successfully created",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: const Color.fromARGB(255, 70, 70, 70),
+          textColor: Colors.white,
+          fontSize: 24.0);
+      Navigator.push(
+        Globaldata.myContext,
+        MaterialPageRoute(builder: (context) => ExplorePage(),),
+      );
+    });
   }
 
   Future<void> getEmail() async {
-    final response = await GetApi.get("user/email");
-    email = response["email"];
+    Response response = await ApiRequest.get("user/email");
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getEmail FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    setState(() {
+      email = responseData["email"];
+    });
   }
 
   @override

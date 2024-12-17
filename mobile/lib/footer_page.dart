@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import "login_page.dart";
-import "exploreAll.dart";
+import "explore/explorePage.dart";
 import "edit_account.dart";
 import "create.dart";
 import 'globalData.dart';
@@ -14,10 +13,10 @@ class FooterNavigationBar extends StatelessWidget {
 
   final int currentIndex;
   final List<Widget> _pages = [
-    LoginPage(),
-    ExplorePageAll(),
+    ExplorePage(),
+    ExplorePage(),
     CreateWorkflowsPage(),
-    LoginPage(),
+    ExplorePage(),
     EditAccountPage(),
   ];
 

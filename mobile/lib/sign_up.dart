@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import "custom_widget.dart";
 import "login_page.dart";
-import "exploreAll.dart";
 import "globalData.dart";
+import 'apiCall/apiRequest.dart';
 
 class SignUp extends StatelessWidget {
   @override
@@ -27,8 +25,6 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String result = '';
@@ -41,48 +37,27 @@ class _APICallState extends State<APICall> {
     super.dispose();
   }
 
-  Future<void> _postData() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.post(
-        Uri.parse('${apiUrl + apiRoute}'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'email': emailController.text,
-          'password': passwordController.text,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          result = "";
-          developer.log("HEADER : ${response.headers}");
-
-          Navigator.push(
-            Globaldata.myContext,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        });
-      } else {
-        final responseData = jsonDecode(response.body);
-        setState(() {
-          result = '${responseData['error']}';
-        });
-      }
-    } catch (e) {
+  Future<void> postRegisterData() async {
+    final response = await ApiRequest.post(apiRoute, jsonEncode(<String, dynamic>{'email': emailController.text,'password': passwordController.text,}),);
+    if (response.statusCode == 504) {
       setState(() {
-        result = '$e';
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          debugPrint(result);
-          result = Globaldata.ErrorServerConnection;
-        }
+        result = response.body;
       });
+      return;
     }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "postRegisterData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      setState(() {
+        result = '${responseData['error']}';
+      });
+      return;
+    }
+    Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   }
 
   @override
@@ -127,7 +102,7 @@ class _APICallState extends State<APICall> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
-                onPressed: _postData,
+                onPressed: postRegisterData,
                 size: Size(double.infinity, 70),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
               ),
@@ -205,12 +180,7 @@ class _APICallState extends State<APICall> {
                       color: Colors.white),
                   maxLines: 1,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => ExplorePageAll()),
-                  );
-                },
+                onPressed: () {},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,

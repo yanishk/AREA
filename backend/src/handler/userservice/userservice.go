@@ -93,14 +93,6 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
-	token, errToken := self.UserServiceService.GetAccessTokenFromCode(code, serviceName)
-	if errToken != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to exchange token",
-		})
-		return
-	}
-
 	emailStr, err := self.UserServiceService.GetEmailFromContext(context)
 	if !err {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -109,23 +101,13 @@ func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 		return
 	}
 
-	foundUser, errGetUser := self.UserServiceService.GetUser(emailStr)
-	if errGetUser != nil || len(foundUser.Email) <= 0 {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested user",
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, emailStr)
+	if errUpdate != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update token",
 		})
 		return
 	}
-
-	foundService, errFoundService := self.UserServiceService.FindServiceByName(serviceName)
-	if errFoundService != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Could not find requested service",
-		})
-		return
-	}
-
-	self.UserServiceService.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Token generated",

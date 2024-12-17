@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:namer_app/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import "package:http/src/response.dart";
 
 import "custom_widget.dart";
 import "footer_page.dart";
 import "editPassword.dart";
 import "globalData.dart";
+import "apiCall/apiRequest.dart";
 
 class EditAccountPage extends StatelessWidget {
   @override
@@ -29,80 +29,51 @@ class APICall extends StatefulWidget {
 }
 
 class EditAccount extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String apiRoute = 'user/delete-account';
   bool isInit = true;
   final TextEditingController emailController = new TextEditingController(
     text: "",
   );
 
-  Future<void> _deleteAccount() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.delete(
-        Uri.parse(apiUrl + apiRoute),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': Globaldata.JWToken,
-        },
+  displayToastError(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 24.0
       );
+  }
 
-      if (response.statusCode == 200) {
-        developer
-            .log("Account deleted by user, JWToken : ${Globaldata.JWToken}");
-        setState(() {
-          Globaldata.JWToken = "";
-          Fluttertoast.showToast(
-              msg: "Account deleted",
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 24.0);
-
-          Navigator.push(
-            Globaldata.myContext,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        });
-      } else {
-        final responseData = jsonDecode(response.body);
-        setState(() {
-          Fluttertoast.showToast(
-              msg: '${responseData['error']}',
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 24.0);
-        });
-      }
-    } catch (e) {
-      setState(() {
-        developer.log('$e');
-        if ('$e'.split(' ').contains("SocketException:") == true ||
-            ('$e'.split(' ').contains("Invalid") == true &&
-                '$e'.split(' ').contains("argument(s):") == true)) {
-          Fluttertoast.showToast(
-              msg: Globaldata.ErrorServerConnection,
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 24.0);
-        } else {
-          Fluttertoast.showToast(
-              msg: '$e',
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 24.0);
-        }
-      });
+  Future<void> deletePassword() async {
+    Response response = await ApiRequest.delete(apiRoute);
+    if (response.statusCode == 504) {
+      displayToastError(response.body);
+      return;
     }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      displayToastError('${responseData['error']}');
+      developer.log(
+          "deletePassword FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    setState(() {
+      Globaldata.JWToken = "";
+      Fluttertoast.showToast(
+        msg: "Account deleted",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 24.0
+      );
+    });
+    Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   }
 
   Future<void> deleteAccountConfirmDialog() async {
@@ -125,7 +96,7 @@ class EditAccount extends State<APICall> {
             ),
           ),
           firstChoiceonPressed: () {
-            _deleteAccount();
+            deletePassword();
             Navigator.of(context).pop();
           },
           secondChoiceonPressed: () {
@@ -156,6 +127,7 @@ class EditAccount extends State<APICall> {
             ),
           ),
           firstChoiceonPressed: () {
+            Globaldata.resetActionReactionServicesList();
             Globaldata.JWToken = "";
             Navigator.of(context).pop();
             Navigator.push(
@@ -172,8 +144,18 @@ class EditAccount extends State<APICall> {
   }
 
   Future<void> getEmail() async {
-    final response = await GetApi.get("user/email");
-    emailController.text = response["email"];
+    Response response = await ApiRequest.get("user/email");
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      return;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getEmail FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return;
+    }
+    emailController.text = responseData["email"];
   }
 
   @override

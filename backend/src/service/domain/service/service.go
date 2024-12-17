@@ -33,12 +33,34 @@ func (self *ServiceService) FindActionByServiceId(serviceId string) ([]entities.
 	return self.ActionRepository.FindActionByServiceId(serviceId)
 }
 
-func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
+func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
+	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		return nil, errFoundService
+	}
+
+	actions, errFindActions := self.ActionRepository.FindActionByServiceId(foundService.Id)
+	if errFindActions != nil {
+		return nil, errFindActions
+	}
+	return actions, nil
 }
 
-func (self *ServiceService) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
-	return self.ReactionRepository.FindReactionByServiceId(serviceId)
+func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error) {
+	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errFoundService != nil {
+		return nil, errFoundService
+	}
+
+	reactions, errFindReactions := self.ReactionRepository.FindReactionByServiceId(foundService.Id)
+	if errFindReactions != nil {
+		return nil, errFindReactions
+	}
+	return reactions, errFindReactions
+}
+
+func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
+	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
 }
 
 func (self *ServiceService) FindReactionByID(id string) (entities.Reaction, error) {

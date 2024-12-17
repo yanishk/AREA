@@ -19,7 +19,7 @@ func (self *UserServiceRepository) CreateUserService(userId string, token string
 
 	_, err := self.FindUserServiceByServiceIdandUserId(userId, serviceId)
 	if err == nil {
-		return fmt.Errorf("service for user already exist")
+		return fmt.Errorf("Service for user already exist")
 	}
 
 	_, err = self.db.Exec(sqlStatement, userId, token, tokenRefresh, expiryDate, serviceId)
@@ -47,7 +47,7 @@ func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(service
 
 	_, err := self.FindUserServiceByServiceIdandUserId(userId, serviceId)
 	if err != nil {
-		return fmt.Errorf("service doesn't exist for user")
+		return fmt.Errorf("Service doesn't exist for user")
 	}
 
 	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, userId, serviceId)

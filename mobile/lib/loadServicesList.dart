@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import "package:http/src/response.dart";
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import "custom_widget.dart";
 import "globalData.dart";
-import "exploreAll.dart";
+import "explore/explorePage.dart";
+import "apiCall/apiRequest.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -25,14 +27,13 @@ class APICall extends StatefulWidget {
 }
 
 class LoadService extends State<APICall> {
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String result = '';
   String apiRoute = 'actions-services';
   String title = "Select action service";
   String actionsServices = "actions-services";
   String reactionsServices = "reactions-services";
   bool isInit = true;
+  bool hasToRetry = false;
 
   void storeData(List<String> servicesName, List<String> servicesColor,
       List<String> servicesIcons, dynamic service) {
@@ -41,72 +42,54 @@ class LoadService extends State<APICall> {
     servicesIcons.add(service['Logo']);
   }
 
-  void setStoreData(dynamic responseData) {
+  void setStoreData(dynamic responseData, String route) {
     final firstService = responseData[0];
     if (firstService is Map<String, dynamic>) {
       result = firstService['Name'] ?? 'No Name';
-      developer.log("getServices OK :\n$result");
-      if (apiRoute == actionsServices) {
+      if (route == actionsServices) {
         storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, firstService);
-        developer.log("getServices $actionsServices");
-        apiRoute = reactionsServices;
-        getServices();
+          Globaldata.actionServicesIcons, firstService);
       } else {
         storeData(
-            Globaldata.reactionServicesName,
-            Globaldata.reactionServicesColor,
-            Globaldata.reactionServicesIcons,
-            firstService);
-        developer.log("getServices $reactionsServices");
-        Navigator.push(
+          Globaldata.reactionServicesName,
+          Globaldata.reactionServicesColor,
+          Globaldata.reactionServicesIcons,
+          firstService
+        );
+        Navigator.pushReplacement(
           Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePageAll()),
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
         );
       }
     }
   }
 
-  Future<void> getServices() async {
-    developer.log('SERVER_LINK : $apiUrl');
-    try {
-      developer.log('SERVER_LINK + redirection : ${apiUrl + apiRoute}');
-      final response = await http.get(
-        Uri.parse(apiUrl + apiRoute),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': Globaldata.JWToken,
-        },
-      );
-      final responseData = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        setState(() {
-          developer.log("getServices OK :\n$responseData");
-          if (responseData is List && responseData.isNotEmpty) {
-            setStoreData(responseData);
-          } else {
-            result = 'No data available';
-          }
-        });
-      } else {
-        developer.log(
-            "getServices FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-        setState(() {
-          result = '${responseData['error']}';
-        });
-      }
-    } catch (e) {
-      developer.log("getServices ERROR: $e", level: 1);
-      setState(() {
-        result = '$e';
-        developer.log(result);
-        if (result.split(' ').contains("SocketException:") == true ||
-            (result.split(' ').contains("Invalid") == true &&
-                result.split(' ').contains("argument(s):") == true)) {
-          result = Globaldata.ErrorServerConnection;
-        }
-      });
+  Future<dynamic> getServiceResponse(String route) async {
+    Response response = await ApiRequest.get(route);
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      developer.log('${response.body}');
+      return null;
     }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getServiceResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return null;
+    }
+    developer.log('pass');
+    return responseData;
+  }
+
+  Future<void> getServices() async {
+    final response = await getServiceResponse(actionsServices);
+    final responseReaction = await getServiceResponse(reactionsServices);
+    if (response == null || responseReaction == null) {
+      hasToRetry = true;
+      return;
+    }
+    setStoreData(response, actionsServices);
+    setStoreData(responseReaction, reactionsServices);
   }
 
   @override
@@ -116,10 +99,50 @@ class LoadService extends State<APICall> {
       getServices();
     }
 
-    return Column(
-      children: const [
-        MyDivider(),
-      ],
-    );
+    if (hasToRetry) {
+      return Scaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding (
+                padding: EdgeInsets.only (
+                  top: MediaQuery.sizeOf(Globaldata.myContext).height / 3
+                ),
+              ),
+              AutoSizeText(
+                "Error during connection",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 0, 0, 0)),
+              ),
+              Padding (padding: EdgeInsets.only (top: 50),),
+              CustomButton(
+                backgroundColor: Color.fromARGB(255, 34, 34, 34),
+                text: AutoSizeText(
+                  "Retry",
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                onPressed: () {getServices();},
+                size: Size(double.infinity, 55),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        body: Center(
+          child: LoadingAnimationWidget.dotsTriangle(
+            color: Color.fromARGB(255, 34, 34, 34),
+            size: 200,
+          ),
+        ),
+      );
+    }
   }
 }
