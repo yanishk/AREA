@@ -26,7 +26,7 @@ type TimeResponse struct {
 	Timezone  string `json:"timezone"`
 	Formatted string `json:"formatted"`
 	Timestamp int    `json:"timestamp"`
-	WeekDay   int    `json:"week_day"`
+	WeekDay   int    `json:"weekDay"`
 	Day       int    `json:"day"`
 	Month     int    `json:"month"`
 	Year      int    `json:"year"`
