@@ -31,7 +31,7 @@ ENV PATH="/opt/flutter/bin:${PATH}"
 RUN flutter doctor --android-licenses
 RUN flutter doctor
 
-WORKDIR /app
+WORKDIR /local
 COPY . .
 
 COPY .env .env
@@ -48,4 +48,4 @@ RUN apt-get update && apt-get install -y \
   libglu1-mesa \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/build/app/outputs/flutter-apk/app-release.apk /app/
+COPY --from=build /local/build/app/outputs/flutter-apk/app-release.apk /shared/client.apk

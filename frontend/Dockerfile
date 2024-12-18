@@ -1,6 +1,6 @@
 FROM node:18-alpine AS builder
 
-WORKDIR /app
+WORKDIR /local
 
 COPY package.json ./
 
@@ -14,11 +14,11 @@ RUN npm run build
 
 FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /local
 
 RUN npm install vite
 
-COPY --from=builder /app/dist /app/dist
+COPY --from=builder /local/dist /local/dist
 
 EXPOSE 8081
 
