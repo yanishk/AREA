@@ -36,7 +36,7 @@ func (self *UserServiceHandler) PublicRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 	callback := router.Group("/callback", middleware.VerifyJWTCookie)
 	{
-		callback.GET("/:service", self.ServiceCallBack)
+		callback.POST("/:service", self.ServiceCallBack)
 	}
 }
 
@@ -81,7 +81,7 @@ func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 // @Failure		200		{object}	docs_userservice.ServiceCallBackSuccessResponse
 // @Failure		400		{object}	docs_userservice.ServiceCallBackBadRequestResponse
 // @Failure		500		{object}	docs_userservice.ServiceCallBackInternalServerErrorResponse
-// @Router       /callback/{service} [get]
+// @Router       /callback/{service} [post]
 func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
 	code := context.Query("code")
 	serviceName := context.Param("service")
