@@ -20,7 +20,7 @@ const DownloadMobileApk = () => {
 
     return (
         <div className="flex items-center justify-center flex-col px-10 pt-[100px] py-5">
-            <a href="/client.apk" download="client.apk" ref={downloadRef} style={{ display: "none" }}></a>
+            <a href="/client.apk" download="client.apk" ref={downloadRef} style={{ display: "none" }}>Download mobile app</a>
         </div>
     );
 };
