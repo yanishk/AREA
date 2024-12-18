@@ -83,7 +83,6 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.ServiceUsefu
 	return self.ServiceRepository.FindReactionsServices()
 }
 
-// login / service callback
 func GetGoogleOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var googleCallback string
 
