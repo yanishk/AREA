@@ -3,8 +3,6 @@ package service
 import (
 	"backend/src/entities"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UserService interface {
@@ -33,8 +31,6 @@ type ServiceService interface {
 }
 
 type UserServiceService interface {
-	GetEmailFromContext(context *gin.Context) (string, bool)
-	GetConnectionTypeFromContext(context *gin.Context) (string, bool)
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
 	UpdateTokenForService(code string, serviceName string, email string, connectionType string) error
 }

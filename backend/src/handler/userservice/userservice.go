@@ -24,7 +24,8 @@ func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
-	router.POST("/service-callback/:service", middleware.VerifyJWTCookie, self.ServiceCallback)
+	router.POST("/service-callback/:service",
+		middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.ServiceCallback)
 }
 
 // @Summary      Service Callback
@@ -40,6 +41,8 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 	code := context.Query("code")
 	serviceName := context.Param("service")
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -48,23 +51,7 @@ func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 		return
 	}
 
-	emailStr, err := self.UserServiceService.GetEmailFromContext(context)
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get email",
-		})
-		return
-	}
-
-	connectionTypeStr, err := self.UserServiceService.GetConnectionTypeFromContext(context)
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get connection type",
-		})
-		return
-	}
-
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, emailStr, connectionTypeStr)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, email, connectionType)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",
