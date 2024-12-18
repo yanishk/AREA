@@ -192,6 +192,20 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
+func (self *ServiceService) RequestService(request *http.Request) (*http.Response, error) {
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed to reach requested service API")
+	}
+	return res, nil
+}
+
 func (self *ServiceService) GetResultTokenFromCode(code string, serviceName string, callbackType string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var request *http.Request
@@ -207,15 +221,9 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		return tokenRes, errRequest
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(request)
+	res, err := self.RequestService(request)
 	if err != nil {
 		return tokenRes, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return tokenRes, fmt.Errorf("Failed to reach requested service API")
 	}
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
@@ -239,15 +247,9 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errRequest
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(request)
+	res, err := self.RequestService(request)
 	if err != nil {
 		return userInfo, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return userInfo, fmt.Errorf("Failed to reach requested service API")
 	}
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&userInfo)

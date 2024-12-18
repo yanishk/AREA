@@ -83,15 +83,9 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		return tokenRes, errRequest
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(request)
+	res, err := self.ServiceService.RequestService(request)
 	if err != nil {
 		return tokenRes, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return tokenRes, fmt.Errorf("Failed to reach requested service API")
 	}
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)

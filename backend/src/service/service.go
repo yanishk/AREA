@@ -29,6 +29,7 @@ type ServiceService interface {
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
+	RequestService(request *http.Request) (*http.Response, error)
 }
 
 type UserServiceService interface {
