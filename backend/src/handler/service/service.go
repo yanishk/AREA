@@ -145,7 +145,8 @@ func (self *ServiceHandler) executeActiveActionsEveryWeekAt(timeRes entities.Tim
 	}
 
 	for _, day := range dayArray {
-		if int(minute.(float64)) == timeRes.Minute && int(hour.(float64)) == timeRes.Hour && int(day.(float64)) == timeRes.WeekDay && workflow.IsActivated {
+		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
+			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 			return self.executeSpotifyReactions(workflow)
 		}
 	}
@@ -161,7 +162,24 @@ func (self *ServiceHandler) executeActiveActionsEveryMonthOnThe(timeRes entities
 		return fmt.Errorf("Error in the minute, hour or day sent")
 	}
 
-	if int(minute.(float64)) == timeRes.Minute && int(hour.(float64)) == timeRes.Hour && int(day.(float64)) == timeRes.Day && workflow.IsActivated {
+	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
+	}
+	return nil
+}
+
+func (self *ServiceHandler) executeActiveActionsEveryYearOn(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	month, monthExists := workflow.ActionParam["month"]
+	day, dayExists := workflow.ActionParam["day"]
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists || !hourExists || !dayExists || !monthExists {
+		return fmt.Errorf("Error in the minute, hour, day or month sent")
+	}
+
+	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
 		return self.executeSpotifyReactions(workflow)
 	}
 	return nil
@@ -185,6 +203,9 @@ func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, act
 		}
 		if action.Name == "Every month on the" {
 			self.executeActiveActionsEveryMonthOnThe(timeRes, workflow)
+		}
+		if action.Name == "Every year on" {
+			self.executeActiveActionsEveryYearOn(timeRes, workflow)
 		}
 	}
 	return nil
