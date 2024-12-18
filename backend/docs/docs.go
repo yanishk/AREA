@@ -48,13 +48,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Google OAuth2",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Callback type (login or classic)",
+                        "description": "Callback type (login or service)",
                         "name": "callback-type",
                         "in": "path",
                         "required": true
@@ -64,32 +64,32 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2SuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2BadRequestResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
             }
         },
-        "/authentication/Spotify/callback-type}": {
+        "/authentication/Spotify/{callback-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Spotify OAuth2",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Callback type (login or classic)",
+                        "description": "Callback type (login or service)",
                         "name": "callback-type",
                         "in": "path",
                         "required": true
@@ -99,61 +99,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2SuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/callback/{service}": {
-            "get": {
-                "description": "Callback for services",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Service Callback",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Authorization code given by the service",
-                        "name": "code",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
@@ -206,6 +158,54 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login-callback/{service}": {
+            "post": {
+                "description": "Callback for login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Login Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -284,6 +284,54 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.FailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-callback/{service}": {
+            "post": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -678,6 +726,24 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceOAuth2BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid callback type"
+                }
+            }
+        },
+        "docs_service.ServiceOAuth2SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
             "type": "object",
             "properties": {
@@ -771,6 +837,33 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_user.LoginCallbackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization"
+                }
+            }
+        },
+        "docs_user.LoginCallbackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to connect with requested service"
+                }
+            }
+        },
+        "docs_user.LoginCallbackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Connection successful"
                 }
             }
         },
@@ -873,25 +966,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.OAuth2BadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid callback type"
-                }
-            }
-        },
-        "docs_userservice.OAuth2SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "auth-url": {
-                    "type": "string",
-                    "example": "url-example.com"
-                }
-            }
-        },
-        "docs_userservice.ServiceCallBackBadRequestResponse": {
+        "docs_userservice.ServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -900,7 +975,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+        "docs_userservice.ServiceCallbackInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -909,7 +984,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.ServiceCallBackSuccessResponse": {
+        "docs_userservice.ServiceCallbackSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -1077,9 +1152,6 @@ const docTemplate = `{
         "entities.UserCredentials": {
             "type": "object",
             "properties": {
-                "connectiontype": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },

@@ -22,6 +22,10 @@ type ResultToken struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type UserInfo struct {
+	Email  string `json:"email"`
+}
+
 type TimeResponse struct {
 	Timezone  string `json:"timezone"`
 	Formatted string `json:"formatted"`

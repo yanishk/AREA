@@ -34,6 +34,19 @@ type LoginFailureTokenErrorResponse struct {
 	Msg string `json:"error"example:"Error creating token"`
 }
 
+// Login Callback Responses
+type LoginCallbackSuccessResponse struct {
+	Msg string `json:"success"example:"Connection successful"`
+}
+
+type LoginCallbackBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid code authorization"`
+}
+
+type LoginCallbackInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Failed to connect with requested service"`
+}
+
 // Modify Password Responses
 type ModifyPasswordSuccessResponse struct {
 	Msg string `json:"success"example:"Password modified"`

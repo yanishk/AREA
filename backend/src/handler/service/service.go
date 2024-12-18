@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +32,16 @@ func NewServiceHandler(ServiceService service.ServiceService, UserServiceService
 }
 
 func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
+	self.PublicRoutes(router)
 	self.PrivateRoutes(router)
+}
+
+func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
+	authentication := router.Group("/authentication")
+	{
+		authentication.GET("/Spotify/:callback-type", self.OAuth2Spotify)
+		authentication.GET("/Google/:callback-type", self.OAuth2Google)
+	}
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
@@ -200,6 +210,70 @@ func (self *ServiceHandler) CallTimeApi() error {
 		}
 	}
 	return nil
+}
+
+// @Summary		Google OAuth2
+// @Description	Get Google OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Google/{callback-type} [get]
+func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param("callback-type")
+
+	if (callbackType == "login") {
+		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
+	} else if (callbackType == "service") {
+		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+		return
+	}
+
+	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
+		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
+		callbackLink + "&scope=email"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": googleAuthUrl,
+	})
+}
+
+// @Summary		Spotify OAuth2
+// @Description	Get Spotify OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Spotify/{callback-type} [get]
+func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param("callback-type")
+
+	if (callbackType == "login") {
+		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
+	} else if (callbackType == "service") {
+		callbackLink = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+		return
+	}
+
+	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
+		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": spotifyAuthUrl,
+	})
 }
 
 // @Summary		Actions Services

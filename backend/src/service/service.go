@@ -2,6 +2,7 @@ package service
 
 import (
 	"backend/src/entities"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +10,7 @@ import (
 type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
 	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
-	LoginWithService(code string, serviceName string) error
+	LoginWithService(code string, serviceName string) (string, error)
 	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
@@ -24,6 +25,10 @@ type ServiceService interface {
 	RetrieveActionsFromService(serviceName string) ([]entities.Action, error)
 	RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error)
 	FindActionByServiceId(serviceId string) ([]entities.Action, error)
+	GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetResultTokenFromCode(code string, serviceName string, callbackType string) (entities.ResultToken, error)
+	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 }
 
 type UserServiceService interface {

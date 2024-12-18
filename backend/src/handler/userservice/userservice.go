@@ -5,7 +5,6 @@ import (
 	_ "backend/src/handler/userservice/docs"
 	"backend/src/service"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,100 +20,24 @@ func NewUserServiceHandler(UserServiceService service.UserServiceService, router
 }
 
 func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
-	self.PublicRoutes(router)
 	self.PrivateRoutes(router)
 }
 
-func (self *UserServiceHandler) PublicRoutes(router *gin.Engine) {
-	authentication := router.Group("/authentication")
-	{
-		authentication.GET("/Spotify/:callback-type", self.Auth02Spotify) // faire pareil ici
-		authentication.GET("/Google/:callback-type", self.Auth02Google)
-	}
-}
-
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
-	callback := router.Group("/callback", middleware.VerifyJWTCookie)
-	{
-		callback.GET("/:service", self.ServiceCallBack)
-	}
-}
-
-// @Summary		Google OAuth2
-// @Description	Get Google OAuth2 URL
-// @Tags			Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or classic)"
-// @Success		200		{object}	docs_userservice.OAuth2SuccessResponse
-// @Failure		400		{object}	docs_userservice.OAuth2BadRequestResponse
-// @Router			/authentication/Google/{callback-type} [get]
-func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
-	var callbackLink string
-	callbackType := context.Param("callback-type")
-
-	if (callbackType == "login") {
-		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
-	} else if (callbackType == "classic") {
-		callbackLink = os.Getenv("GOOGLE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid callback type",
-		})
-		return
-	}
-
-	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
-		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
-		callbackLink + "&scope=email"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": googleAuthUrl,
-	})
-}
-
-// @Summary		Spotify OAuth2
-// @Description	Get Spotify OAuth2 URL
-// @Tags			Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or classic)"
-// @Success		200		{object}	docs_userservice.OAuth2SuccessResponse
-// @Failure		400		{object}	docs_userservice.OAuth2BadRequestResponse
-// @Router			/authentication/Spotify/callback-type} [get]
-func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
-	var callbackLink string
-	callbackType := context.Param("callback-type")
-
-	if (callbackType == "login") {
-		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
-	} else if (callbackType == "classic") {
-		callbackLink = os.Getenv("SPOTIFY_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid callback type",
-		})
-		return
-	}
-
-	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
-		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": spotifyAuthUrl,
-	})
+	router.POST("/service-callback/:service", middleware.VerifyJWTCookie, self.ServiceCallback)
 }
 
 // @Summary      Service Callback
 // @Description  Callback for services
-// @Tags         Authentication
+// @Tags         Callbacks
 // @Produce      json
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
 // @Param        code     query     string  true  "Authorization code given by the service"
-// @Failure		200		{object}	docs_userservice.ServiceCallBackSuccessResponse
-// @Failure		400		{object}	docs_userservice.ServiceCallBackBadRequestResponse
-// @Failure		500		{object}	docs_userservice.ServiceCallBackInternalServerErrorResponse
-// @Router       /callback/{service} [get]
-func (self *UserServiceHandler) ServiceCallBack(context *gin.Context) {
+// @Failure		200		{object}	docs_userservice.ServiceCallbackSuccessResponse
+// @Failure		400		{object}	docs_userservice.ServiceCallbackBadRequestResponse
+// @Failure		500		{object}	docs_userservice.ServiceCallbackInternalServerErrorResponse
+// @Router       /service-callback/{service} [post]
+func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 	code := context.Query("code")
 	serviceName := context.Param("service")
 

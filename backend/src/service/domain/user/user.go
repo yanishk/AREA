@@ -4,20 +4,19 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"net/http"
-	"bytes"
-	"encoding/json"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 
 	"backend/src/entities"
 	"backend/src/storage"
+	"backend/src/service"
 )
 
 type UserService struct {
 	UserRepository storage.UserRepository
 	ServiceRepository  storage.ServiceRepository
+	ServiceService service.ServiceService
 }
 
 const ContentType = "Content-Type"
@@ -25,13 +24,13 @@ const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 const FormattingDate = "2006-01-02 15:04:05-07:00"
 const BasicConnectionType = "basic"
 
-func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository) *UserService {
+func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository, ServiceService service.ServiceService) *UserService {
 	return &UserService{
 		UserRepository: UserRepository,
 		ServiceRepository: ServiceRepository,
+		ServiceService: ServiceService,
 	}
 }
-
 
 func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
 	var errorUser error
@@ -92,94 +91,35 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
-
-func GetGoogleOAuth2Request(code string) (*http.Request, error) {
-	tokenUrl := "https://oauth2.googleapis.com/token"
-	jsonBody := fmt.Sprintf(
-		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
-		code,
-		os.Getenv("GOOGLE_CLIENT_ID"),
-		os.Getenv("GOOGLE_CLIENT_SECRET"),
-		os.Getenv("GOOGLE_CALLBACK"),
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
-
-	request.Header.Set(ContentType, ContentTypeUrlEncoded)
-	return request, nil
-}
-
-func GetSpotifyOAuth2Request(code string) (*http.Request, error) {
-	tokenUrl := "https://accounts.spotify.com/api/token"
-	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
-		code,
-		os.Getenv("SPOTIFY_CALLBACK"),
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
-
-	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
-	request.Header.Set(ContentType, ContentTypeUrlEncoded)
-
-	return request, nil
-}
-
-func GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
-	var tokenRes entities.ResultToken
-	var request *http.Request
-	var errRequest error
-
-	if serviceName == "Google" {
-		request, errRequest = GetGoogleOAuth2Request(code)
-	} else if serviceName == "Spotify" {
-		request, errRequest = GetSpotifyOAuth2Request(code)
-	}
-
-	if errRequest != nil {
-		return tokenRes, errRequest
-	}
-
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return tokenRes, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return tokenRes, err
-	}
-
-	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
-	if errDecoder != nil {
-		return tokenRes, errDecoder
-	}
-	return tokenRes, nil
-}
-
-func (self *UserService) LoginWithService(code string, serviceName string) error {
+func (self *UserService) LoginWithService(code string, serviceName string) (string, error) {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
-		return errorService
+		return "", errorService
 	}
 
-	_, errToken := GetAccessTokenFromCode(code, serviceName)
+	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login")
 	if errToken != nil {
-		return errToken
+		return "", errToken
 	}
-	if serviceName == "Google" {
 
-	} else if serviceName == "Spotify" {
-
+	userInfo, errUserInfo := self.ServiceService.GetUserInfoFromService(resultToken.AccessToken, serviceName)
+	if errUserInfo != nil {
+		return "", errUserInfo
 	}
-	return nil
+
+	_, errFindingUser := self.UserRepository.FindUserByEmail(userInfo.Email, serviceName)
+	if errFindingUser != nil {
+		errCreatingUser := self.CreateUser(userInfo.Email, "", serviceName)
+		if errCreatingUser != nil {
+			return "", fmt.Errorf("Email address already used")
+		}
+	}
+
+	token, errLogin := self.LoginAuthentication(userInfo.Email, "", serviceName)
+	if errLogin != nil {
+		return "", errLogin
+	}
+	return token, nil
 }
 
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {

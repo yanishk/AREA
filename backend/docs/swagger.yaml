@@ -52,6 +52,18 @@ definitions:
         example: Internal server error
         type: string
     type: object
+  docs_service.ServiceOAuth2BadRequestResponse:
+    properties:
+      error:
+        example: Invalid callback type
+        type: string
+    type: object
+  docs_service.ServiceOAuth2SuccessResponse:
+    properties:
+      auth-url:
+        example: url-example.com
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
     properties:
       actions:
@@ -114,6 +126,24 @@ definitions:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.LoginCallbackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization
+        type: string
+    type: object
+  docs_user.LoginCallbackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to connect with requested service
+        type: string
+    type: object
+  docs_user.LoginCallbackSuccessResponse:
+    properties:
+      success:
+        example: Connection successful
         type: string
     type: object
   docs_user.LoginFailureTokenErrorResponse:
@@ -183,31 +213,19 @@ definitions:
         example: New user created
         type: string
     type: object
-  docs_userservice.OAuth2BadRequestResponse:
-    properties:
-      error:
-        example: Invalid callback type
-        type: string
-    type: object
-  docs_userservice.OAuth2SuccessResponse:
-    properties:
-      auth-url:
-        example: url-example.com
-        type: string
-    type: object
-  docs_userservice.ServiceCallBackBadRequestResponse:
+  docs_userservice.ServiceCallbackBadRequestResponse:
     properties:
       error:
         example: Invalid code authorization
         type: string
     type: object
-  docs_userservice.ServiceCallBackInternalServerErrorResponse:
+  docs_userservice.ServiceCallbackInternalServerErrorResponse:
     properties:
       error:
         example: Failed to get email-Failed to update token
         type: string
     type: object
-  docs_userservice.ServiceCallBackSuccessResponse:
+  docs_userservice.ServiceCallbackSuccessResponse:
     properties:
       success:
         example: Token generated
@@ -321,8 +339,6 @@ definitions:
     type: object
   entities.UserCredentials:
     properties:
-      connectiontype:
-        type: string
       email:
         type: string
       password:
@@ -407,7 +423,7 @@ paths:
     get:
       description: Get Google OAuth2 URL
       parameters:
-      - description: Callback type (login or classic)
+      - description: Callback type (login or service)
         in: path
         name: callback-type
         required: true
@@ -418,19 +434,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2SuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2BadRequestResponse'
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Google OAuth2
       tags:
-      - Authentication
-  /authentication/Spotify/callback-type}:
+      - Services Authentication
+  /authentication/Spotify/{callback-type}:
     get:
       description: Get Spotify OAuth2 URL
       parameters:
-      - description: Callback type (login or classic)
+      - description: Callback type (login or service)
         in: path
         name: callback-type
         required: true
@@ -441,46 +457,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2SuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_userservice.OAuth2BadRequestResponse'
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Spotify OAuth2
       tags:
-      - Authentication
-  /callback/{service}:
-    get:
-      description: Callback for services
-      parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: Authorization code given by the service
-        in: query
-        name: code
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackBadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse'
-      summary: Service Callback
-      tags:
-      - Authentication
+      - Services Authentication
   /login:
     post:
       consumes:
@@ -515,6 +499,38 @@ paths:
       summary: Login
       tags:
       - Users
+  /login-callback/{service}:
+    post:
+      description: Callback for login
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackInternalServerErrorResponse'
+      summary: Login Callback
+      tags:
+      - Callbacks
   /reactions-services:
     get:
       description: Retrieve services with reactions available
@@ -566,6 +582,38 @@ paths:
       summary: Register
       tags:
       - Users
+  /service-callback/{service}:
+    post:
+      description: Callback for services
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackInternalServerErrorResponse'
+      summary: Service Callback
+      tags:
+      - Callbacks
   /user/delete-account:
     delete:
       consumes:

@@ -22,6 +22,14 @@ type ReactionExample struct {
 	NbParam     int    `json"NbParam" example: 0`
 }
 
+type ServiceOAuth2SuccessResponse struct {
+	Msg string `json:"auth-url"example:"url-example.com"`
+}
+
+type ServiceOAuth2BadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid callback type"`
+}
+
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
 	Services []ServiceExample
 }
