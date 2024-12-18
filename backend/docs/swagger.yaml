@@ -85,147 +85,147 @@ definitions:
           $ref: '#/definitions/docs_service.ReactionExample'
         type: array
     type: object
-  docs_user.DeleteAccountFailureInternalServerErrorResponse:
+  docs_user.UserDeleteAccountInternalServerErrorResponse:
     properties:
       error:
         example: Could not delete account
         type: string
     type: object
-  docs_user.DeleteAccountFailureUnauthorizedResponse:
-    properties:
-      error:
-        example: Email not found in token-Email is not a valid string-Connection type
-          not found in token-Connection type is not a valid string
-        type: string
-    type: object
-  docs_user.DeleteAccountSuccessResponse:
+  docs_user.UserDeleteAccountSuccessResponse:
     properties:
       success:
         example: Account deleted
         type: string
     type: object
-  docs_user.FailureInternalServerErrorResponse:
-    properties:
-      error:
-        example: Internal server error
-        type: string
-    type: object
-  docs_user.FailureInvalidBodyResponse:
-    properties:
-      error:
-        example: Invalid request body
-        type: string
-    type: object
-  docs_user.GetUserEmailSuccessResponse:
-    properties:
-      email:
-        example: email@example.com
-        type: string
-    type: object
-  docs_user.GetUserEmailUnauthorizedResponse:
-    properties:
-      error:
-        example: Email not found in token-Email is not a valid string
-        type: string
-    type: object
-  docs_user.LoginCallbackBadRequestResponse:
-    properties:
-      error:
-        example: Invalid code authorization
-        type: string
-    type: object
-  docs_user.LoginCallbackInternalServerErrorResponse:
-    properties:
-      error:
-        example: Failed to connect with requested service
-        type: string
-    type: object
-  docs_user.LoginCallbackSuccessResponse:
-    properties:
-      success:
-        example: Connection successful
-        type: string
-    type: object
-  docs_user.LoginFailureTokenErrorResponse:
-    properties:
-      error:
-        example: Error creating token
-        type: string
-    type: object
-  docs_user.LoginFailureUnauthorizedResponse:
-    properties:
-      error:
-        example: Could not find requested user-Wrong password
-        type: string
-    type: object
-  docs_user.LoginSuccessResponse:
-    properties:
-      success:
-        example: Connection successful
-        type: string
-    type: object
-  docs_user.ModifyPasswordBadRequestResponse:
-    properties:
-      error:
-        example: Invalid request body-Could not find requested user
-        type: string
-    type: object
-  docs_user.ModifyPasswordFailureInternalServerErrorResponse:
-    properties:
-      error:
-        example: Failed to hash password-Could not modify the password
-        type: string
-    type: object
-  docs_user.ModifyPasswordFailureOldPasswordNotValidResponse:
-    properties:
-      error:
-        example: Old password is incorrect
-        type: string
-    type: object
-  docs_user.ModifyPasswordFailureUnauthorizedResponse:
+  docs_user.UserDeleteAccountUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string-Connection type
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_user.ModifyPasswordSuccessResponse:
+  docs_user.UserGetUserEmailSuccessResponse:
     properties:
-      success:
-        example: Password modified
+      email:
+        example: email@example.com
         type: string
     type: object
-  docs_user.RegisterFailureBadRequestResponse:
-    properties:
-      error:
-        example: Invalid request body-Connection type doesn't exist
-        type: string
-    type: object
-  docs_user.RegisterFailureConflictResponse:
+  docs_user.UserGetUserEmailUnauthorizedResponse:
     properties:
       error:
-        example: Email address already used
+        example: Email not found in token-Email is not a valid string
         type: string
     type: object
-  docs_user.RegisterSuccessResponse:
+  docs_user.UserInternalServerErrorResponse:
     properties:
-      success:
-        example: New user created
+      error:
+        example: Internal server error
         type: string
     type: object
-  docs_userservice.ServiceCallbackBadRequestResponse:
+  docs_user.UserInvalidBodyResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_user.UserLoginCallbackBadRequestResponse:
     properties:
       error:
         example: Invalid code authorization
         type: string
     type: object
-  docs_userservice.ServiceCallbackInternalServerErrorResponse:
+  docs_user.UserLoginCallbackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to connect with requested service
+        type: string
+    type: object
+  docs_user.UserLoginCallbackSuccessResponse:
+    properties:
+      success:
+        example: Connection successful
+        type: string
+    type: object
+  docs_user.UserLoginSuccessResponse:
+    properties:
+      success:
+        example: Connection successful
+        type: string
+    type: object
+  docs_user.UserLoginTokenErrorResponse:
+    properties:
+      error:
+        example: Error creating token
+        type: string
+    type: object
+  docs_user.UserLoginUnauthorizedResponse:
+    properties:
+      error:
+        example: Could not find requested user-Wrong password
+        type: string
+    type: object
+  docs_user.UserModifyPasswordBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Could not find requested user
+        type: string
+    type: object
+  docs_user.UserModifyPasswordInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to hash password-Could not modify the password
+        type: string
+    type: object
+  docs_user.UserModifyPasswordOldPasswordNotValidResponse:
+    properties:
+      error:
+        example: Old password is incorrect
+        type: string
+    type: object
+  docs_user.UserModifyPasswordSuccessResponse:
+    properties:
+      success:
+        example: Password modified
+        type: string
+    type: object
+  docs_user.UserModifyPasswordUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string-Connection type
+          not found in token-Connection type is not a valid string
+        type: string
+    type: object
+  docs_user.UserRegisterBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Connection type doesn't exist
+        type: string
+    type: object
+  docs_user.UserRegisterConflictResponse:
+    properties:
+      error:
+        example: Email address already used
+        type: string
+    type: object
+  docs_user.UserRegisterSuccessResponse:
+    properties:
+      success:
+        example: New user created
+        type: string
+    type: object
+  docs_userservice.UserServiceServiceCallbackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization
+        type: string
+    type: object
+  docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse:
     properties:
       error:
         example: Failed to get email-Failed to update token
         type: string
     type: object
-  docs_userservice.ServiceCallbackSuccessResponse:
+  docs_userservice.UserServiceServiceCallbackSuccessResponse:
     properties:
       success:
         example: Token generated
@@ -483,19 +483,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.LoginSuccessResponse'
+            $ref: '#/definitions/docs_user.UserLoginSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.FailureInvalidBodyResponse'
+            $ref: '#/definitions/docs_user.UserInvalidBodyResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.LoginFailureUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.UserLoginUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_user.LoginFailureTokenErrorResponse'
+            $ref: '#/definitions/docs_user.UserLoginTokenErrorResponse'
       summary: Login
       tags:
       - Users
@@ -519,15 +519,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.LoginCallbackSuccessResponse'
+            $ref: '#/definitions/docs_user.UserLoginCallbackSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.LoginCallbackBadRequestResponse'
+            $ref: '#/definitions/docs_user.UserLoginCallbackBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_user.LoginCallbackInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse'
       summary: Login Callback
       tags:
       - Callbacks
@@ -566,19 +566,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.RegisterSuccessResponse'
+            $ref: '#/definitions/docs_user.UserRegisterSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.RegisterFailureBadRequestResponse'
+            $ref: '#/definitions/docs_user.UserRegisterBadRequestResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/docs_user.RegisterFailureConflictResponse'
+            $ref: '#/definitions/docs_user.UserRegisterConflictResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_user.FailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.UserInternalServerErrorResponse'
       summary: Register
       tags:
       - Users
@@ -602,15 +602,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallbackSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceServiceCallbackSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallbackBadRequestResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceServiceCallbackBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallbackInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse'
       summary: Service Callback
       tags:
       - Callbacks
@@ -625,15 +625,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.DeleteAccountSuccessResponse'
+            $ref: '#/definitions/docs_user.UserDeleteAccountSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.DeleteAccountFailureUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.UserDeleteAccountUnauthorizedResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_user.DeleteAccountFailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.UserDeleteAccountInternalServerErrorResponse'
       summary: Delete Account
       tags:
       - Users
@@ -646,11 +646,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.GetUserEmailSuccessResponse'
+            $ref: '#/definitions/docs_user.UserGetUserEmailSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.GetUserEmailUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse'
       summary: Get User Email
       tags:
       - Users
@@ -672,23 +672,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordSuccessResponse'
+            $ref: '#/definitions/docs_user.UserModifyPasswordSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordBadRequestResponse'
+            $ref: '#/definitions/docs_user.UserModifyPasswordBadRequestResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordFailureUnauthorizedResponse'
+            $ref: '#/definitions/docs_user.UserModifyPasswordUnauthorizedResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordFailureOldPasswordNotValidResponse'
+            $ref: '#/definitions/docs_user.UserModifyPasswordOldPasswordNotValidResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordFailureInternalServerErrorResponse'
+            $ref: '#/definitions/docs_user.UserModifyPasswordInternalServerErrorResponse'
       summary: Modify Password
       tags:
       - Users

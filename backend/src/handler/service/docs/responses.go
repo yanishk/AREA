@@ -22,6 +22,12 @@ type ReactionExample struct {
 	NbParam     int    `json"NbParam" example: 0`
 }
 
+// General Responses
+type ServiceInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Internal server error"`
+}
+
+// OAuth2 Responses
 type ServiceOAuth2SuccessResponse struct {
 	Msg string `json:"auth-url"example:"url-example.com"`
 }
@@ -30,18 +36,17 @@ type ServiceOAuth2BadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid callback type"`
 }
 
+// Retrieve Actions/Reactions Services Responses
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
 	Services []ServiceExample
 }
 
+// Retrieve Actions from Service Responses
 type ServiceRetrieveActionsFromServiceSuccessResponse struct {
 	Actions []ActionExample
 }
 
+// Retrieve Reactions from Service Responses
 type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 	Reactions []ReactionExample
-}
-
-type ServiceInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Internal server error"`
 }
