@@ -26,4 +26,3 @@ RUN chmod +x /app/dist/launchFrontend.sh
 EXPOSE 8081
 
 CMD ["/app/dist/launchFrontend.sh"]
-# CMD ["npx", "vite", "preview", "--port", "8081", "--host"]
