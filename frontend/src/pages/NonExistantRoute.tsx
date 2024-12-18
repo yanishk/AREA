@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 
-function NoExistantRoute() {
+function NonExistantRoute() {
     const error = "Service doesn't exist or this account doesn't have access to it";
     const errorTrigger = Date.now();
 
@@ -12,4 +12,4 @@ function NoExistantRoute() {
     )
 }
 
-export { NoExistantRoute }
+export { NonExistantRoute }
