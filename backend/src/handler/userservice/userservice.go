@@ -82,9 +82,9 @@ func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 func (self *UserServiceHandler) Auth02Discord(context *gin.Context) {
 	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
 		os.Getenv("DISCORD_CLIENT_ID") +
-		"&permissions=3072+32&response_type=code&redirect_uri=" +
+		"&permissions=141376&response_type=code&redirect_uri=" +
 		os.Getenv("DISCORD_CALLBACK") +
-		"&scope=bot+applications.commands+guilds+guilds.join+guilds.members.read+webhook.incoming"
+		"&scope=identify+email+guilds+bot"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"auth-url": discordAuthUrl,
