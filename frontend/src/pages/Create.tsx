@@ -43,10 +43,8 @@ const WorkflowBuilder = () => {
         const codeAuth = searchParams.get("code");
         if (codeAuth) {
             await axios.post(
-                `${import.meta.env.VITE_API_URL}callback/${serviceName}`,
+                `${import.meta.env.VITE_API_URL}callback/${serviceName}?code=${codeAuth}`,
                 {
-                    service: serviceName,
-                    code: codeAuth,
                 },
                 {
                     withCredentials: true,
