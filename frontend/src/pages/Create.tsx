@@ -27,7 +27,6 @@ const WorkflowBuilder = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-
     const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") ?? "null");
 
     const [selectedAction, setSelectedAction] = useState(
@@ -37,7 +36,6 @@ const WorkflowBuilder = () => {
     const [selectedReaction, setSelectedReaction] = useState(
         location.state?.selectedReaction || savedData?.selectedReaction || null
     );
-
 
     const handleDeleteAction = () => {
         setSelectedAction(null);
