@@ -197,6 +197,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
@@ -303,7 +310,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback/{service}": {
+        "/service-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -319,6 +326,13 @@ const docTemplate = `{
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -985,7 +999,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },

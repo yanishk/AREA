@@ -24,7 +24,7 @@ func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
-	router.POST("/service-callback/:service", middleware.VerifyJWTCookie, self.ServiceCallback)
+	router.POST("/service-callback/:service/:app-type", middleware.VerifyJWTCookie, self.ServiceCallback)
 }
 
 // @Summary      Service Callback
@@ -32,18 +32,27 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Tags         Callbacks
 // @Produce      json
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        app-type     query     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
 // @Failure		200		{object}	docs_userservice.ServiceCallbackSuccessResponse
 // @Failure		400		{object}	docs_userservice.ServiceCallbackBadRequestResponse
 // @Failure		500		{object}	docs_userservice.ServiceCallbackInternalServerErrorResponse
-// @Router       /service-callback/{service} [post]
+// @Router       /service-callback/{service}/{app-type} [post]
 func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
-	code := context.Query("code")
+	appType := context.Param("app-type")
 	serviceName := context.Param("service")
+	code := context.Query("code")
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid code authorization",
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
 		})
 		return
 	}
@@ -64,7 +73,7 @@ func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 		return
 	}
 
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, emailStr, connectionTypeStr)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, appType, emailStr, connectionTypeStr)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",

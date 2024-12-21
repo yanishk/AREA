@@ -188,6 +188,13 @@
                     },
                     {
                         "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
@@ -294,7 +301,7 @@
                 }
             }
         },
-        "/service-callback/{service}": {
+        "/service-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -310,6 +317,13 @@
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -976,7 +990,7 @@
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },

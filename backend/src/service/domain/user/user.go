@@ -91,13 +91,13 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
-func (self *UserService) LoginWithService(code string, serviceName string) (string, error) {
+func (self *UserService) LoginWithService(code string, serviceName string, appType string) (string, error) {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return "", errorService
 	}
 
-	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login")
+	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login", appType)
 	if errToken != nil {
 		return "", errToken
 	}

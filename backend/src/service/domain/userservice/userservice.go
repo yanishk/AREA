@@ -150,13 +150,13 @@ func (self *UserServiceService) CreateOrUpdateUserService(userId string, service
 	}
 }
 
-func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, email string, connectionType string) error {
+func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return errorService
 	}
 
-	token, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "service")
+	token, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "service", appType)
 	if errToken != nil {
 		return errToken
 	}
