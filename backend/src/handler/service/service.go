@@ -4,9 +4,11 @@ import (
 	"backend/src/entities"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -106,6 +108,52 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 	return fmt.Errorf("Unknown reaction")
 }
 
+func (self *ServiceHandler) executeDiscordReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
+	foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
+	if errReaction != nil || errUser != nil {
+		return fmt.Errorf("Error finding reaction")
+	}
+	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Discord")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
+
+	if reactionFound.Name == "Post a message to a channel" {
+		message, messageErr := workflow.ReactionParam["message"]
+		channelID, channelErr := workflow.ReactionParam["channelid"]
+		if !messageErr || !channelErr {
+			return fmt.Errorf("Failed to get message body or channel id")
+		}
+
+		content, errContent := json.Marshal(map[string]string{
+			"content": message.(string),
+		})
+		if errContent != nil {
+			return fmt.Errorf("Failed to marshall message content")
+		}
+
+		req, err := http.NewRequest("POST", "https://discord.com/api/v10/channels/"+channelID.(string)+"/messages", bytes.NewBuffer(content))
+		if err != nil {
+			return err
+		}
+
+		req.Header.Set("Authorization", "Bot "+tokenBot)
+		req.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+	}
+	return fmt.Errorf("Unknown reaction")
+}
+
 func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -114,7 +162,8 @@ func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeRe
 	}
 
 	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		return self.executeSpotifyReactions(workflow)
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
 	}
 	return nil
 }
@@ -126,7 +175,8 @@ func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeR
 	}
 
 	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		return self.executeSpotifyReactions(workflow)
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
 	}
 	return nil
 }
@@ -147,7 +197,8 @@ func (self *ServiceHandler) executeActiveActionsEveryWeekAt(timeRes entities.Tim
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
 			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			return self.executeSpotifyReactions(workflow)
+			self.executeSpotifyReactions(workflow)
+			self.executeDiscordReactions(workflow)
 		}
 	}
 
@@ -164,7 +215,8 @@ func (self *ServiceHandler) executeActiveActionsEveryMonthOnThe(timeRes entities
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		return self.executeSpotifyReactions(workflow)
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
 	}
 	return nil
 }
@@ -180,7 +232,8 @@ func (self *ServiceHandler) executeActiveActionsEveryYearOn(timeRes entities.Tim
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		return self.executeSpotifyReactions(workflow)
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
 	}
 	return nil
 }
