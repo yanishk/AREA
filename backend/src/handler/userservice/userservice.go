@@ -32,7 +32,7 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Tags         Callbacks
 // @Produce      json
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
-// @Param        app-type     query     string  true  "App type (web or mobile)"
+// @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
 // @Failure		200		{object}	docs_userservice.ServiceCallbackSuccessResponse
 // @Failure		400		{object}	docs_userservice.ServiceCallbackBadRequestResponse
