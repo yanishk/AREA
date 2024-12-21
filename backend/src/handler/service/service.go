@@ -368,13 +368,37 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 // @Description	Get Discord OAuth2 URL
 // @Tags			Services Authentication
 // @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
 // @Router			/authentication/Discord/{callback-type}/{app-type} [get]
 func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param("callback-type")
+	appType := context.Param("app-type")
+
+	if (callbackType == "login") {
+		callbackLink = os.Getenv("DISCORD_LOGIN_CALLBACK")
+	} else if (callbackType == "service") {
+		callbackLink = os.Getenv("DISCORD_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+		return
+	}
+
+	if (appType != "web" && appType != "mobile") {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+		return
+	}
 	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
 		os.Getenv("DISCORD_CLIENT_ID") +
 		"&permissions=141376&response_type=code&redirect_uri=" +
-		os.Getenv("DISCORD_CALLBACK") +
+		callbackLink +
 		"&scope=identify+email+guilds+bot"
 
 	context.IndentedJSON(http.StatusOK, gin.H{

@@ -161,12 +161,22 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func GetDiscordOAuth2AccessTokenRequest(code string) (*http.Request, error) {
+func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var discordCallback string
+
+	if callbackType == "service" {
+		discordCallback = os.Getenv("DISCORD_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		discordCallback = os.Getenv("DISCORD_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf("Invalid callback type")
+	}
+
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
 		"grant_type=authorization_code&code=%s&redirect_uri=%s",
 		code,
-		os.Getenv("DISCORD_CALLBACK"),
+		discordCallback,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -271,7 +281,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	} else if serviceName == "Spotify" {
 		request, errRequest = GetSpotifyOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Discord" {
-		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code)
+		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code, callbackType)
 	}
 
 	if errRequest != nil {
