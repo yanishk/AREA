@@ -21,6 +21,7 @@ type ServiceHandler struct {
 
 const InternalServerErrorMessage = "Internal server error"
 const SpotifyAPICallFailed = "Spotify API call failed"
+const getUserServersFailed = "Could not retrieve get the user's server"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -44,6 +45,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	}
 	router.GET("/actions-services", self.RetrieveActionsServices)
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
+	router.GET("/Discord/user/servers", self.getUserServer)
 }
 
 func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
@@ -106,6 +108,72 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 		return self.spotifyRequest(urlSave, "PUT", accessToken)
 	}
 	return fmt.Errorf("Unknown reaction")
+}
+
+func (self *ServiceHandler) getUserServer(context *gin.Context) {
+	emailUser, err := context.Get("email")
+	if !err {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve the user's mail",
+		})
+		return
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser.(string), "Discord")
+	if errRefreshing != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve or refresh the token",
+		})
+		return
+	}
+
+	req, errRequest := http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailed,
+		})
+		return
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, errHttp := client.Do(req)
+	if errHttp != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailed,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailed,
+		})
+		return
+	}
+
+	var guilds []map[string]interface{}
+	var ownedServer []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailed,
+		})
+		return
+	}
+
+	for _, guild := range guilds {
+		if guild["owner"] == true {
+			ownedServer = append(ownedServer, guild)
+		}
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": ownedServer,
+	})
 }
 
 func (self *ServiceHandler) executeDiscordReactions(workflow entities.Workflow) error {
