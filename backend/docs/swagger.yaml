@@ -305,7 +305,7 @@ definitions:
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse:
     properties:
-      workflow:
+      workflows:
         items:
           $ref: '#/definitions/docs_workflow.WorkflowExample'
         type: array

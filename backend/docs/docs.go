@@ -1102,7 +1102,7 @@ const docTemplate = `{
         "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
             "type": "object",
             "properties": {
-                "workflow": {
+                "workflows": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/docs_workflow.WorkflowExample"
