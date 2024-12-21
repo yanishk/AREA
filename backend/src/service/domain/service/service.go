@@ -217,7 +217,6 @@ func (self *ServiceService) RequestService(request *http.Request) (*http.Respons
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Failed to reach requested service API")
@@ -244,6 +243,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	if err != nil {
 		return tokenRes, err
 	}
+	defer res.Body.Close()
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&tokenRes)
 	if errDecoder != nil {
@@ -270,6 +270,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	if err != nil {
 		return userInfo, err
 	}
+	defer res.Body.Close()
 
 	errDecoder := json.NewDecoder(res.Body).Decode(&userInfo)
 	if errDecoder != nil {

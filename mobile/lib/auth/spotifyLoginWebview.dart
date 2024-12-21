@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
+import 'dart:convert';
+import "package:http/src/response.dart";
 
-import "globalData.dart";
+import "../globalData.dart";
+
+String spotifyAuthType = "";
 
 class SpotifyAuthPage extends StatelessWidget {
+  SpotifyAuthPage({
+    super.key,
+    required this.callBackType,
+  });
+  final String callBackType;
   @override
   Widget build(BuildContext context) {
+    spotifyAuthType = callBackType;
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
@@ -26,6 +37,18 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
   final String apiUrl = dotenv.get('SERVER_LINK',
       fallback: 'Cannot find .env variable "SERVER_LINK"');
   String newUrl = "";
+  String apiRoute = "service-callback/Spotify";
+
+  @override
+  void initState() {
+    super.initState();
+    if (spotifyAuthType == "login") {
+      developer.log("spotifyAuthType : $spotifyAuthType");
+      setState(() {
+        apiRoute = "login-callback/Spotify";
+      });
+    }
+  }
 
   Future<void> _setCookiesAndNavigate() async {
     final cookieManager = CookieManager();
@@ -53,17 +76,18 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           _setCookiesAndNavigate();
         },
         onLoadStop: (controller, url) async {
+          developer.log(url.toString());
           if (url != null &&
-              url.toString().contains("${apiUrl}callback/Spotify")) {
-            final content = await controller.evaluateJavascript(
-                source: "document.body.innerText");
-            if (content != null &&
-                content.contains('"success": "Token generated"')) {
-              developer.log("User connected :\n$content");
+              url.toString().contains(apiUrl + apiRoute)) {
+            final urlSplit = url.toString().split('/area/');
+            final Response response = await ApiRequest.post(urlSplit.last, jsonEncode(<String, dynamic>{}),);
+
+            if (response.statusCode == 200) {
+              developer.log("User connected");
               Navigator.pop(context);
               Navigator.pop(Globaldata.myContext);
             } else {
-              developer.log("Error auth failed :\n$content");
+              developer.log("Error auth failed : ${jsonDecode(response.body)}");
             }
           }
         },
