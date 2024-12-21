@@ -519,7 +519,7 @@ paths:
         required: true
         type: string
       - description: App type (web or mobile)
-        in: query
+        in: path
         name: app-type
         required: true
         type: string
@@ -607,7 +607,7 @@ paths:
         required: true
         type: string
       - description: App type (web or mobile)
-        in: query
+        in: path
         name: app-type
         required: true
         type: string
