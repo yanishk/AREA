@@ -5,7 +5,7 @@ type ServiceCallbackSuccessResponse struct {
 }
 
 type ServiceCallbackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization"`
+	Msg string `json:"error"example:"Invalid code authorization-Invalid app type"`
 }
 
 type ServiceCallbackInternalServerErrorResponse struct {

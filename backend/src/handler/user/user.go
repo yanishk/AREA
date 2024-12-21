@@ -35,7 +35,7 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
-	router.POST("/login-callback/:service", self.LoginCallback)
+	router.POST("/login-callback/:service/:app-type", self.LoginCallback)
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
@@ -139,14 +139,16 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Tags         Callbacks
 // @Produce      json
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        app-type     query     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
 // @Failure		200		{object}	docs_user.LoginCallbackSuccessResponse
 // @Failure		400		{object}	docs_user.LoginCallbackBadRequestResponse
 // @Failure		500		{object}	docs_user.LoginCallbackInternalServerErrorResponse
-// @Router       /login-callback/{service} [post]
+// @Router       /login-callback/{service}/{app-type} [post]
 func (self *UserHandler) LoginCallback(context *gin.Context) {
-	code := context.Query("code")
+	appType := context.Param("app-type")
 	serviceName := context.Param("service")
+	code := context.Query("code")
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -155,7 +157,14 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 		return
 	}
 
-	token, err := self.UserService.LoginWithService(code, serviceName)
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+		return
+	}
+
+	token, err := self.UserService.LoginWithService(code, serviceName, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to connect with requested service",

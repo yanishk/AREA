@@ -41,7 +41,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Google/{callback-type}": {
+        "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
                 "produces": [
@@ -56,6 +56,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -76,7 +83,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Spotify/{callback-type}": {
+        "/authentication/Spotify/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
@@ -91,6 +98,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -163,7 +177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback/{service}": {
+        "/login-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for login",
                 "produces": [
@@ -179,6 +193,13 @@ const docTemplate = `{
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -289,7 +310,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback/{service}": {
+        "/service-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -305,6 +326,13 @@ const docTemplate = `{
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -731,7 +759,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type"
+                    "example": "Invalid callback type-Invalid app type"
                 }
             }
         },
@@ -971,7 +999,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },

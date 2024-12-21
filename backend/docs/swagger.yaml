@@ -55,7 +55,7 @@ definitions:
   docs_service.ServiceOAuth2BadRequestResponse:
     properties:
       error:
-        example: Invalid callback type
+        example: Invalid callback type-Invalid app type
         type: string
     type: object
   docs_service.ServiceOAuth2SuccessResponse:
@@ -216,7 +216,7 @@ definitions:
   docs_userservice.ServiceCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization
+        example: Invalid code authorization-Invalid app type
         type: string
     type: object
   docs_userservice.ServiceCallbackInternalServerErrorResponse:
@@ -419,13 +419,18 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Google/{callback-type}:
+  /authentication/Google/{callback-type}/{app-type}:
     get:
       description: Get Google OAuth2 URL
       parameters:
       - description: Callback type (login or service)
         in: path
         name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
         required: true
         type: string
       produces:
@@ -442,13 +447,18 @@ paths:
       summary: Google OAuth2
       tags:
       - Services Authentication
-  /authentication/Spotify/{callback-type}:
+  /authentication/Spotify/{callback-type}/{app-type}:
     get:
       description: Get Spotify OAuth2 URL
       parameters:
       - description: Callback type (login or service)
         in: path
         name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
         required: true
         type: string
       produces:
@@ -499,13 +509,18 @@ paths:
       summary: Login
       tags:
       - Users
-  /login-callback/{service}:
+  /login-callback/{service}/{app-type}:
     post:
       description: Callback for login
       parameters:
       - description: Service name (Google, Spotify..)
         in: path
         name: service
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: query
+        name: app-type
         required: true
         type: string
       - description: Authorization code given by the service
@@ -582,13 +597,18 @@ paths:
       summary: Register
       tags:
       - Users
-  /service-callback/{service}:
+  /service-callback/{service}/{app-type}:
     post:
       description: Callback for services
       parameters:
       - description: Service name (Google, Spotify..)
         in: path
         name: service
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: query
+        name: app-type
         required: true
         type: string
       - description: Authorization code given by the service

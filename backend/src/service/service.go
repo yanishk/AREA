@@ -10,7 +10,7 @@ import (
 type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
 	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
-	LoginWithService(code string, serviceName string) (string, error)
+	LoginWithService(code string, serviceName string, appType string) (string, error)
 	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
@@ -27,7 +27,7 @@ type ServiceService interface {
 	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 	GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
-	GetResultTokenFromCode(code string, serviceName string, callbackType string) (entities.ResultToken, error)
+	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	RequestService(request *http.Request) (*http.Response, error)
 }
@@ -36,7 +36,7 @@ type UserServiceService interface {
 	GetEmailFromContext(context *gin.Context) (string, bool)
 	GetConnectionTypeFromContext(context *gin.Context) (string, bool)
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
-	UpdateTokenForService(code string, serviceName string, email string, connectionType string) error
+	UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error
 }
 
 type WorkflowService interface {
