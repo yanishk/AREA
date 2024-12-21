@@ -22,6 +22,7 @@ type ServiceHandler struct {
 const InternalServerErrorMessage = "Internal server error"
 const SpotifyAPICallFailed = "Spotify API call failed"
 const getUserServersFailed = "Could not retrieve get the user's server"
+const getServerChannelsFailed = "Could not retrieve get the server's channels"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -46,6 +47,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	router.GET("/actions-services", self.RetrieveActionsServices)
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
 	router.GET("/Discord/user/servers", self.getUserServer)
+	router.GET("/Discord/server/channels", self.getGuildChannel)
 }
 
 func (self *ServiceHandler) spotifyRequest(url string, method string, accessToken string) error {
@@ -173,6 +175,52 @@ func (self *ServiceHandler) getUserServer(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": ownedServer,
+	})
+}
+
+func (self *ServiceHandler) getGuildChannel(context *gin.Context) {
+	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
+	guildId := context.Query("id")
+	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
+
+	req, errRequest := http.NewRequest("GET", getChannelUrl, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailed,
+		})
+		return
+	}
+
+	req.Header.Set("Authorization", "Bot "+tokenBot)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, errHttp := client.Do(req)
+	if errHttp != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailed,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailed,
+		})
+		return
+	}
+
+	var channels []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailed,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": channels,
 	})
 }
 
