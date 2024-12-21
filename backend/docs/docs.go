@@ -177,7 +177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback/{service}": {
+        "/login-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for login",
                 "produces": [

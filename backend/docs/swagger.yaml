@@ -509,7 +509,7 @@ paths:
       summary: Login
       tags:
       - Users
-  /login-callback/{service}:
+  /login-callback/{service}/{app-type}:
     post:
       description: Callback for login
       parameters:

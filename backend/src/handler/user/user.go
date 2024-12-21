@@ -35,7 +35,7 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
-	router.POST("/login-callback/:service", self.LoginCallback)
+	router.POST("/login-callback/:service/:app-type", self.LoginCallback)
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
@@ -144,7 +144,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Failure		200		{object}	docs_user.LoginCallbackSuccessResponse
 // @Failure		400		{object}	docs_user.LoginCallbackBadRequestResponse
 // @Failure		500		{object}	docs_user.LoginCallbackInternalServerErrorResponse
-// @Router       /login-callback/{service} [post]
+// @Router       /login-callback/{service}/{app-type} [post]
 func (self *UserHandler) LoginCallback(context *gin.Context) {
 	appType := context.Param("app-type")
 	serviceName := context.Param("service")
