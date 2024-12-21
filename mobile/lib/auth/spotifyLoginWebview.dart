@@ -62,7 +62,7 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     );
   }
 
-  String incertAppTypeInUrl(String url) {
+  String insertAppTypeInUrl(String url) {
     final splitUrl = url.split("?code=");
     String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
     return finalUrl;
@@ -87,7 +87,7 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
             final urlSplit = url.toString().split('/area/');
-            final Response response = await ApiRequest.post(incertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
+            final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
               developer.log("User connected");
