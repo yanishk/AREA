@@ -419,6 +419,19 @@ paths:
       summary: Actions Services
       tags:
       - Services
+  /authentication/Discord/{callback-type}/{app-type}:
+    get:
+      description: Get Discord OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+      summary: Discord OAuth2
+      tags:
+      - Services Authentication
   /authentication/Google/{callback-type}/{app-type}:
     get:
       description: Get Google OAuth2 URL

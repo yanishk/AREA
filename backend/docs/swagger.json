@@ -32,6 +32,26 @@
                 }
             }
         },
+        "/authentication/Discord/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Discord OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Discord OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",

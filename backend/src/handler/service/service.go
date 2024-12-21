@@ -20,6 +20,7 @@ type ServiceHandler struct {
 
 const InternalServerErrorMessage = "Internal server error"
 const SpotifyAPICallFailed = "Spotify API call failed"
+const authURL = "auth-url"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -41,6 +42,7 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 	{
 		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
 		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
+		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
 	}
 }
 
@@ -317,7 +319,7 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 		callbackLink + "&scope=email"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": googleAuthUrl,
+		authURL: googleAuthUrl,
 	})
 }
 
@@ -358,7 +360,25 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": spotifyAuthUrl,
+		authURL: spotifyAuthUrl,
+	})
+}
+
+// @Summary		Discord OAuth2
+// @Description	Get Discord OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Router			/authentication/Discord/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
+	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
+		os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376&response_type=code&redirect_uri=" +
+		os.Getenv("DISCORD_CALLBACK") +
+		"&scope=identify+email+guilds+bot"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: discordAuthUrl,
 	})
 }
 

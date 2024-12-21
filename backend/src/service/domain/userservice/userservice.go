@@ -77,6 +77,8 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetGoogleRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Spotify" {
 		request, errRequest = self.ServiceService.GetSpotifyRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Discord" {
+		request, errRequest = self.ServiceService.GetDiscordRefreshTokenRequest(refreshToken)
 	}
 
 	if errRequest != nil {

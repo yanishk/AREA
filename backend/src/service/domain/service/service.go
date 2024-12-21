@@ -161,6 +161,25 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
+func GetDiscordOAuth2AccessTokenRequest(code string) (*http.Request, error) {
+	tokenUrl := "https://discord.com/api/v10/oauth2/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		code,
+		os.Getenv("DISCORD_CALLBACK"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
 	tokenUrl := "https://www.googleapis.com/oauth2/v3/userinfo"
 
@@ -211,6 +230,24 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
+func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://discord.com/api/v10/oauth2/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=refresh_token&refresh_token=%s",
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) RequestService(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
@@ -233,6 +270,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetGoogleOAuth2AccessTokenRequest(code, callbackType, appType)
 	} else if serviceName == "Spotify" {
 		request, errRequest = GetSpotifyOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Discord" {
+		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code)
 	}
 
 	if errRequest != nil {
