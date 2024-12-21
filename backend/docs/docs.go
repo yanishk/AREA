@@ -15,6 +15,67 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Discord/server/channels": {
+            "get": {
+                "description": "Retrieve the channels from the selected server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord Server Channels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "server id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceDiscordGetGuildChannelsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Discord/user/servers": {
+            "get": {
+                "description": "Retrieve the discord servers from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord User Servers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceDiscordGetUserServersSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/actions-services": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -36,6 +97,26 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Discord": {
+            "get": {
+                "description": "Get Discord OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Discord OAuth2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
                         }
                     }
                 }
@@ -598,6 +679,12 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.DiscordChannelExample": {
+            "type": "object"
+        },
+        "docs_service.DiscordServerExample": {
+            "type": "object"
+        },
         "docs_service.ReactionExample": {
             "type": "object",
             "properties": {
@@ -619,6 +706,46 @@ const docTemplate = `{
                 },
                 "nbParam": {
                     "type": "integer"
+                }
+            }
+        },
+        "docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the server's channels"
+                }
+            }
+        },
+        "docs_service.ServiceDiscordGetGuildChannelsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve get the user's servers"
+                }
+            }
+        },
+        "docs_service.ServiceDiscordGetUserServersSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordServerExample"
+                    }
                 }
             }
         },

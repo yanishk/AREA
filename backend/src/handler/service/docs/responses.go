@@ -22,6 +22,12 @@ type ReactionExample struct {
 	NbParam     int    `json"NbParam" example: 0`
 }
 
+type DiscordServerExample struct {
+}
+
+type DiscordChannelExample struct {
+}
+
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
 	Services []ServiceExample
 }
@@ -36,4 +42,22 @@ type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 
 type ServiceInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Internal server error"`
+}
+
+// Discord Get User Servers
+type ServiceDiscordGetUserServersSuccessResponse struct {
+	DiscordServers []DiscordServerExample `json:"success"`
+}
+
+type ServiceDiscordGetUserServersInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve get the user's servers"`
+}
+
+// Discord Get Guild Channels
+type ServiceDiscordGetGuildChannelsSuccessResponse struct {
+	DiscordChannels []DiscordChannelExample `json:"success"`
+}
+
+type ServiceDiscordGetGuildChannelsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve the server's channels"`
 }

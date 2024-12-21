@@ -16,6 +16,10 @@ definitions:
       nbParam:
         type: integer
     type: object
+  docs_service.DiscordChannelExample:
+    type: object
+  docs_service.DiscordServerExample:
+    type: object
   docs_service.ReactionExample:
     properties:
       Description:
@@ -33,6 +37,33 @@ definitions:
         type: string
       nbParam:
         type: integer
+    type: object
+  docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the server's channels
+        type: string
+    type: object
+  docs_service.ServiceDiscordGetGuildChannelsSuccessResponse:
+    properties:
+      success:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelExample'
+        type: array
+    type: object
+  docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve or refresh the token-Could not retrieve get the
+          user's servers
+        type: string
+    type: object
+  docs_service.ServiceDiscordGetUserServersSuccessResponse:
+    properties:
+      success:
+        items:
+          $ref: '#/definitions/docs_service.DiscordServerExample'
+        type: array
     type: object
   docs_service.ServiceExample:
     properties:
@@ -368,6 +399,46 @@ paths:
       summary: Reactions From Service
       tags:
       - Services
+  /Discord/server/channels:
+    get:
+      description: Retrieve the channels from the selected server
+      parameters:
+      - description: server id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceDiscordGetGuildChannelsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse'
+      summary: Discord Server Channels
+      tags:
+      - Services
+  /Discord/user/servers:
+    get:
+      description: Retrieve the discord servers from the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceDiscordGetUserServersSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse'
+      summary: Discord User Servers
+      tags:
+      - Services
   /actions-services:
     get:
       description: Retrieve services with actions available
@@ -385,6 +456,19 @@ paths:
       summary: Actions Services
       tags:
       - Services
+  /authentication/Discord:
+    get:
+      description: Get Discord OAuth2 URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.OAuth2Response'
+      summary: Discord OAuth2
+      tags:
+      - Authentication
   /authentication/Google:
     get:
       description: Get Google OAuth2 URL

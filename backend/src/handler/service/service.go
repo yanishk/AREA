@@ -22,8 +22,8 @@ type ServiceHandler struct {
 
 const InternalServerErrorMessage = "Internal server error"
 const APICallFailed = "API call failed"
-const getUserServersFailed = "Could not retrieve get the user's server"
-const getServerChannelsFailed = "Could not retrieve get the server's channels"
+const getUserServersFailed = "Could not retrieve the user's servers"
+const getServerChannelsFailed = "Could not retrieve the server's channels"
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
@@ -116,6 +116,13 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 	return fmt.Errorf("Unknown reaction")
 }
 
+// @Summary		Discord User Servers
+// @Description	Retrieve the discord servers from the authenticated user
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceDiscordGetUserServersSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse
+// @Router			/Discord/user/servers [get]
 func (self *ServiceHandler) getUserServer(context *gin.Context) {
 	emailUser, err := context.Get("email")
 	if !err {
@@ -163,6 +170,14 @@ func (self *ServiceHandler) getUserServer(context *gin.Context) {
 	})
 }
 
+// @Summary		Discord Server Channels
+// @Description	Retrieve the channels from the selected server
+// @Tags			Services
+// @Produce		json
+// @Param        id  query      string  true  "server id"
+// @Success		200		{object}	docs_service.ServiceDiscordGetGuildChannelsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse
+// @Router /Discord/server/channels [get]
 func (self *ServiceHandler) getGuildChannel(context *gin.Context) {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	guildId := context.Query("id")
