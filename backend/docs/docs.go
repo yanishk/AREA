@@ -199,7 +199,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "App type (web or mobile)",
                         "name": "app-type",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -332,7 +332,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "App type (web or mobile)",
                         "name": "app-type",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
