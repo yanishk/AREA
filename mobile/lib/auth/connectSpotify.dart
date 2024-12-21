@@ -10,7 +10,7 @@ import "spotifyLoginWebview.dart";
 class MySpotifyAuth {
   static Future<String> getSpotifyAuthLink(String callBackType) async {
     String spotifyLink = "";
-    Response response = await ApiRequest.get("authentication/Spotify/$callBackType");
+    Response response = await ApiRequest.get("authentication/Spotify/$callBackType/${Globaldata.appType}");
     if (response.statusCode == 504) {
       developer.log('${response.body}');
       return spotifyLink;
