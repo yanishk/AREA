@@ -6,6 +6,7 @@ import 'dart:developer' as developer;
 import 'dart:convert';
 import "package:http/src/response.dart";
 
+import "../apiCall/apiErrorHandling.dart";
 import "../globalData.dart";
 
 String spotifyAuthType = "";
@@ -61,6 +62,12 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     );
   }
 
+  String insertAppTypeInUrl(String url) {
+    final splitUrl = url.split("?code=");
+    String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
+    return finalUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,14 +87,17 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
             final urlSplit = url.toString().split('/area/');
-            final Response response = await ApiRequest.post(urlSplit.last, jsonEncode(<String, dynamic>{}),);
+            final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
               developer.log("User connected");
               Navigator.pop(context);
               Navigator.pop(Globaldata.myContext);
             } else {
-              developer.log("Error auth failed : ${jsonDecode(response.body)}");
+              final responseData = await errorHandler.basicResponseErrorHandler(response, "Error auth failed : ");
+              if (responseData == null) {
+                return;
+              }
             }
           }
         },
