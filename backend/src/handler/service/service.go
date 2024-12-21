@@ -39,8 +39,8 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/Spotify/:callback-type", self.OAuth2Spotify)
-		authentication.GET("/Google/:callback-type", self.OAuth2Google)
+		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
+		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
 	}
 }
 
@@ -280,12 +280,15 @@ func (self *ServiceHandler) CallTimeApi() error {
 // @Tags			Services Authentication
 // @Produce		json
 // @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Google/{callback-type} [get]
+// @Router			/authentication/Google/{callback-type}/{app-type} [get]
 func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 	var callbackLink string
+	var appTypeLink string
 	callbackType := context.Param("callback-type")
+	appType := context.Param("app-type")
 
 	if (callbackType == "login") {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
@@ -298,8 +301,19 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 		return
 	}
 
+	if (appType == "web") {
+		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
+	} else if (appType == "mobile") {
+		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+		return
+	}
+
 	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
-		os.Getenv("GOOGLE_CLIENT_ID") + "&response_type=code&access_type=offline&redirect_uri=" +
+		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
 		callbackLink + "&scope=email"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
@@ -312,12 +326,14 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 // @Tags			Services Authentication
 // @Produce		json
 // @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Spotify/{callback-type} [get]
+// @Router			/authentication/Spotify/{callback-type}/{app-type} [get]
 func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 	var callbackLink string
 	callbackType := context.Param("callback-type")
+	appType := context.Param("app-type")
 
 	if (callbackType == "login") {
 		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
@@ -326,6 +342,13 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid callback type",
+		})
+		return
+	}
+
+	if (appType != "web" && appType != "mobile") {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
 		})
 		return
 	}

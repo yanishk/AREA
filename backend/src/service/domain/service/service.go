@@ -98,7 +98,7 @@ func GetGoogleOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	jsonBody := fmt.Sprintf(
 		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
 		code,
-		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
 		googleCallback,
 	)
@@ -158,7 +158,7 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 	tokenUrl := "https://oauth2.googleapis.com/token"
 	jsonBody := fmt.Sprintf(
 		"client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s",
-		os.Getenv("GOOGLE_CLIENT_ID"),
+		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
 		refreshToken,
 	)

@@ -41,7 +41,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Google/{callback-type}": {
+        "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
                 "produces": [
@@ -56,6 +56,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -76,7 +83,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Spotify/{callback-type}": {
+        "/authentication/Spotify/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
@@ -91,6 +98,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -731,7 +745,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type"
+                    "example": "Invalid callback type-Invalid app type"
                 }
             }
         },

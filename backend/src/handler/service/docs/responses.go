@@ -27,7 +27,7 @@ type ServiceOAuth2SuccessResponse struct {
 }
 
 type ServiceOAuth2BadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid callback type"`
+	Msg string `json:"error"example:"Invalid callback type-Invalid app type"`
 }
 
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
