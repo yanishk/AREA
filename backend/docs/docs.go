@@ -82,7 +82,7 @@ const docTemplate = `{
             }
         },
         "/callback/{service}": {
-            "get": {
+            "post": {
                 "description": "Callback for services",
                 "produces": [
                     "application/json"

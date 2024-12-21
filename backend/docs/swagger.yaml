@@ -412,7 +412,7 @@ paths:
       tags:
       - Authentication
   /callback/{service}:
-    get:
+    post:
       description: Callback for services
       parameters:
       - description: Service name (Google, Spotify..)
