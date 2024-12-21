@@ -49,8 +49,8 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	}
 	router.GET("/actions-services", self.RetrieveActionsServices)
 	router.GET("/reactions-services", self.RetrieveReactionsServices)
-	router.GET("/Discord/user/servers", self.getUserServer)
-	router.GET("/Discord/server/channels", self.getGuildChannel)
+	router.GET("/Discord/user/servers", self.getDiscordUserServers)
+	router.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
 func (self *ServiceHandler) apiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
@@ -116,7 +116,7 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 	return fmt.Errorf("Unknown reaction")
 }
 
-func (self *ServiceHandler) getUserServer(context *gin.Context) {
+func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	emailUser, err := context.Get("email")
 	if !err {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -143,7 +143,7 @@ func (self *ServiceHandler) getUserServer(context *gin.Context) {
 	defer resp.Body.Close()
 
 	var guilds []map[string]interface{}
-	var ownedServer []map[string]interface{}
+	var ownedServers []map[string]interface{}
 	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
 	if errDecoder != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -154,16 +154,16 @@ func (self *ServiceHandler) getUserServer(context *gin.Context) {
 
 	for _, guild := range guilds {
 		if guild["owner"] == true {
-			ownedServer = append(ownedServer, guild)
+			ownedServers = append(ownedServers, guild)
 		}
 	}
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": ownedServer,
+		"servers": ownedServers,
 	})
 }
 
-func (self *ServiceHandler) getGuildChannel(context *gin.Context) {
+func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	guildId := context.Query("id")
 	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
@@ -186,7 +186,7 @@ func (self *ServiceHandler) getGuildChannel(context *gin.Context) {
 		return
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": channels,
+		"channels": channels,
 	})
 }
 
