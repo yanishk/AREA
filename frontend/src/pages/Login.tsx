@@ -78,9 +78,14 @@ const LoginForm = () => {
         return;
     };
 
+    const handleErrorClose = () => {
+        setError("");
+        setErrorTrigger(0);
+    }
+
     return (
         <>
-            <ErrorMessage message={error} trigger={errorTrigger} />
+            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">

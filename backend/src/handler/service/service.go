@@ -131,6 +131,60 @@ func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeR
 	return nil
 }
 
+func (self *ServiceHandler) executeActiveActionsEveryWeekAt(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	days, dayExists := workflow.ActionParam["day"]
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists || !hourExists || !dayExists {
+		return fmt.Errorf("Error in the minute, hour or day sent")
+	}
+
+	dayArray, err := days.([]interface{})
+	if !err {
+		return fmt.Errorf("Error parsing the day array")
+	}
+
+	for _, day := range dayArray {
+		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
+			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+			return self.executeSpotifyReactions(workflow)
+		}
+	}
+
+	return nil
+}
+
+func (self *ServiceHandler) executeActiveActionsEveryMonthOnThe(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	day, dayExists := workflow.ActionParam["day"]
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists || !hourExists || !dayExists {
+		return fmt.Errorf("Error in the minute, hour or day sent")
+	}
+
+	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
+	}
+	return nil
+}
+
+func (self *ServiceHandler) executeActiveActionsEveryYearOn(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	month, monthExists := workflow.ActionParam["month"]
+	day, dayExists := workflow.ActionParam["day"]
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !minuteExists || !hourExists || !dayExists || !monthExists {
+		return fmt.Errorf("Error in the minute, hour, day or month sent")
+	}
+
+	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
+		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		return self.executeSpotifyReactions(workflow)
+	}
+	return nil
+}
+
 func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
 	AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
@@ -143,6 +197,15 @@ func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, act
 		}
 		if action.Name == "Every hour at" {
 			self.executeActiveActionsEveryHour(timeRes, workflow)
+		}
+		if action.Name == "Every day of the week at" {
+			self.executeActiveActionsEveryWeekAt(timeRes, workflow)
+		}
+		if action.Name == "Every month on the" {
+			self.executeActiveActionsEveryMonthOnThe(timeRes, workflow)
+		}
+		if action.Name == "Every year on" {
+			self.executeActiveActionsEveryYearOn(timeRes, workflow)
 		}
 	}
 	return nil
