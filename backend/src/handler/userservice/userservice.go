@@ -14,6 +14,8 @@ type UserServiceHandler struct {
 	UserServiceService service.UserServiceService
 }
 
+const authURL = "auth-url"
+
 func NewUserServiceHandler(UserServiceService service.UserServiceService, router *gin.Engine) *UserServiceHandler {
 	handler := &UserServiceHandler{UserServiceService: UserServiceService}
 	handler.SetupRoutes(router)
@@ -30,6 +32,7 @@ func (self *UserServiceHandler) PublicRoutes(router *gin.Engine) {
 	{
 		authentication.GET("/Spotify", self.Auth02Spotify)
 		authentication.GET("/Google", self.Auth02Google)
+		authentication.GET("/Discord", self.Auth02Discord)
 	}
 }
 
@@ -52,7 +55,7 @@ func (self *UserServiceHandler) Auth02Google(context *gin.Context) {
 		os.Getenv("GOOGLE_CALLBACK") + "&scope=email"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": googleAuthUrl,
+		authURL: googleAuthUrl,
 	})
 }
 
@@ -68,7 +71,25 @@ func (self *UserServiceHandler) Auth02Spotify(context *gin.Context) {
 		os.Getenv("SPOTIFY_CALLBACK") + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"auth-url": spotifyAuthUrl,
+		authURL: spotifyAuthUrl,
+	})
+}
+
+// @Summary		Discord OAuth2
+// @Description	Get Discord OAuth2 URL
+// @Tags			Authentication
+// @Produce		json
+// @Success		200		{object}	docs_userservice.OAuth2Response
+// @Router			/authentication/Discord [get]
+func (self *UserServiceHandler) Auth02Discord(context *gin.Context) {
+	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
+		os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376&response_type=code&redirect_uri=" +
+		os.Getenv("DISCORD_CALLBACK") +
+		"&scope=identify+email+guilds+bot"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: discordAuthUrl,
 	})
 }
 

@@ -109,6 +109,25 @@ func GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	return request, nil
 }
 
+func GetDiscordOAuth2Request(code string) (*http.Request, error) {
+	tokenUrl := "https://discord.com/api/v10/oauth2/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		code,
+		os.Getenv("DISCORD_CALLBACK"),
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
@@ -127,6 +146,24 @@ func GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	return request, nil
 }
 
+func GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://discord.com/api/v10/oauth2/token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=refresh_token&refresh_token=%s",
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var request *http.Request
@@ -136,6 +173,8 @@ func (self *UserServiceService) GetAccessTokenFromCode(code string, serviceName 
 		request, errRequest = GetGoogleOAuth2Request(code)
 	} else if serviceName == "Spotify" {
 		request, errRequest = GetSpotifyOAuth2Request(code)
+	} else if serviceName == "Discord" {
+		request, errRequest = GetDiscordOAuth2Request(code)
 	}
 
 	if errRequest != nil {
@@ -173,6 +212,8 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 	if serviceName == "Google" {
 		request, errRequest = GetGoogleRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Spotify" {
+		request, errRequest = GetSpotifyRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Discord" {
 		request, errRequest = GetSpotifyRefreshTokenRequest(refreshToken)
 	}
 
