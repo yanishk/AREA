@@ -2,6 +2,7 @@ package service_handler
 
 import (
 	"backend/src/entities"
+	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"bytes"
