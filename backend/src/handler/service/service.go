@@ -19,7 +19,13 @@ type ServiceHandler struct {
 }
 
 const InternalServerErrorMessage = "Internal server error"
-const SpotifyAPICallFailed = "Spotify API call failed"
+const InvalidCallbackTypeMessage = "Invalid callback type"
+const InvalidAppTypeMessage = "Invalid app type"
+const SpotifyAPICallFailedMessage = "Spotify API call failed"
+
+const callbackTypeParamName = "callback-type"
+const appTypeParamName = "app-type"
+
 const authURL = "auth-url"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
@@ -73,7 +79,7 @@ func (self *ServiceHandler) spotifyRequest(url string, method string, accessToke
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf(SpotifyAPICallFailed)
+		return fmt.Errorf(SpotifyAPICallFailedMessage)
 	}
 	return nil
 }
@@ -289,8 +295,8 @@ func (self *ServiceHandler) CallTimeApi() error {
 func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 	var callbackLink string
 	var appTypeLink string
-	callbackType := context.Param("callback-type")
-	appType := context.Param("app-type")
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
 
 	if (callbackType == "login") {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
@@ -298,7 +304,7 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid callback type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}
@@ -309,7 +315,7 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid app type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}
@@ -334,8 +340,8 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 // @Router			/authentication/Spotify/{callback-type}/{app-type} [get]
 func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 	var callbackLink string
-	callbackType := context.Param("callback-type")
-	appType := context.Param("app-type")
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
 
 	if (callbackType == "login") {
 		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
@@ -343,14 +349,14 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 		callbackLink = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid callback type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}
 
 	if (appType != "web" && appType != "mobile") {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid app type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}
@@ -375,8 +381,8 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 // @Router			/authentication/Discord/{callback-type}/{app-type} [get]
 func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
 	var callbackLink string
-	callbackType := context.Param("callback-type")
-	appType := context.Param("app-type")
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
 
 	if (callbackType == "login") {
 		callbackLink = os.Getenv("DISCORD_LOGIN_CALLBACK")
@@ -384,14 +390,14 @@ func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
 		callbackLink = os.Getenv("DISCORD_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid callback type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}
 
 	if (appType != "web" && appType != "mobile") {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid app type",
+			"error": InvalidCallbackTypeMessage,
 		})
 		return
 	}

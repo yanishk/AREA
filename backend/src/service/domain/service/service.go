@@ -20,6 +20,7 @@ type ServiceService struct {
 
 const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+const InvalidCallbackTypeMessage = "Invalid callback type"
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -111,7 +112,7 @@ func GetGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType
 	} else if callbackType == "login" {
 		googleCallback = os.Getenv("GOOGLE_LOGIN_CALLBACK")
 	} else {
-		return nil, fmt.Errorf("Invalid callback type")
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
 	if appType == "web" {
@@ -140,7 +141,7 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	} else if callbackType == "login" {
 		spotifyCallback = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
 	} else {
-		return nil, fmt.Errorf("Invalid callback type")
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
 	tokenUrl := "https://accounts.spotify.com/api/token"
@@ -169,7 +170,7 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	} else if callbackType == "login" {
 		discordCallback = os.Getenv("DISCORD_LOGIN_CALLBACK")
 	} else {
-		return nil, fmt.Errorf("Invalid callback type")
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
@@ -282,6 +283,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetSpotifyOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Discord" {
 		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code, callbackType)
+	} else {
+		return tokenRes, fmt.Errorf("Unknown service")
 	}
 
 	if errRequest != nil {
@@ -308,7 +311,8 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 
 	if serviceName == "Google" {
 		request, errRequest = GetGoogleOAuth2UserEmailRequest(accessToken)
-	} else if serviceName == "Spotify" {
+	} else {
+		return userInfo, fmt.Errorf("Unknown service")
 	}
 
 	if errRequest != nil {
