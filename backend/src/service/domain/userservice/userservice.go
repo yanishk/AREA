@@ -2,8 +2,8 @@ package userservice_service
 
 import (
 	"backend/src/entities"
-	"backend/src/storage"
 	"backend/src/service"
+	"backend/src/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -16,24 +16,23 @@ type UserServiceService struct {
 	UserServiceRepository storage.UserServiceRepository
 	ServiceRepository     storage.ServiceRepository
 	UserRepository        storage.UserRepository
-	ServiceService	      service.ServiceService
+	ServiceService        service.ServiceService
 }
 
 const FormattingDate = "2006-01-02 15:04:05-07:00"
 
 func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
-		UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
+	UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
 	return &UserServiceService{
 		ServiceRepository:     ServiceRepository,
 		UserRepository:        UserRepository,
 		UserServiceRepository: UserServiceRepository,
-		ServiceService: ServiceService,
+		ServiceService:        ServiceService,
 	}
 }
 
 func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (string, bool) {
 	email, err := context.Get("email")
-
 	if !err {
 		return "", err
 	}
@@ -47,7 +46,6 @@ func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (strin
 
 func (self *UserServiceService) GetConnectionTypeFromContext(context *gin.Context) (string, bool) {
 	connectionType, err := context.Get("connectionType")
-
 	if !err {
 		return "", err
 	}

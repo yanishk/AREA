@@ -23,7 +23,7 @@ type ResultToken struct {
 }
 
 type UserInfo struct {
-	Email  string `json:"email"`
+	Email string `json:"email"`
 }
 
 type TimeResponse struct {

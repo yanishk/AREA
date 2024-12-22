@@ -298,9 +298,9 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 	callbackType := context.Param(callbackTypeParamName)
 	appType := context.Param(appTypeParamName)
 
-	if (callbackType == "login") {
+	if callbackType == "login" {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
-	} else if (callbackType == "service") {
+	} else if callbackType == "service" {
 		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -309,9 +309,9 @@ func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
 		return
 	}
 
-	if (appType == "web") {
+	if appType == "web" {
 		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
-	} else if (appType == "mobile") {
+	} else if appType == "mobile" {
 		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -343,9 +343,9 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 	callbackType := context.Param(callbackTypeParamName)
 	appType := context.Param(appTypeParamName)
 
-	if (callbackType == "login") {
+	if callbackType == "login" {
 		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
-	} else if (callbackType == "service") {
+	} else if callbackType == "service" {
 		callbackLink = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -354,7 +354,7 @@ func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
 		return
 	}
 
-	if (appType != "web" && appType != "mobile") {
+	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": InvalidCallbackTypeMessage,
 		})
@@ -384,9 +384,9 @@ func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
 	callbackType := context.Param(callbackTypeParamName)
 	appType := context.Param(appTypeParamName)
 
-	if (callbackType == "login") {
+	if callbackType == "login" {
 		callbackLink = os.Getenv("DISCORD_LOGIN_CALLBACK")
-	} else if (callbackType == "service") {
+	} else if callbackType == "service" {
 		callbackLink = os.Getenv("DISCORD_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -395,7 +395,7 @@ func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
 		return
 	}
 
-	if (appType != "web" && appType != "mobile") {
+	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": InvalidCallbackTypeMessage,
 		})
