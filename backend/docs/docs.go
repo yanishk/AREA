@@ -680,10 +680,111 @@ const docTemplate = `{
             }
         },
         "docs_service.DiscordChannelExample": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "flags": {
+                    "type": "integer"
+                },
+                "guild_id": {
+                    "type": "string"
+                },
+                "icon_emoji": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelIconEmojiExample"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nsfw": {
+                    "type": "boolean"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "permission_overwrites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelPermissionOverwritesExample"
+                    }
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "rate_limite_per_user": {
+                    "type": "integer"
+                },
+                "theme_color": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.DiscordChannelIconEmojiExample": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "docs_service.DiscordChannelPermissionOverwritesExample": {
+            "type": "object",
+            "properties": {
+                "allow": {
+                    "type": "string"
+                },
+                "deny": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
         },
         "docs_service.DiscordServerExample": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "banner": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "string"
+                }
+            }
         },
         "docs_service.ReactionExample": {
             "type": "object",
@@ -738,7 +839,7 @@ const docTemplate = `{
         "docs_service.ServiceGetDiscordGuildChannelsSuccessResponse": {
             "type": "object",
             "properties": {
-                "success": {
+                "channels": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/docs_service.DiscordChannelExample"
@@ -758,7 +859,7 @@ const docTemplate = `{
         "docs_service.ServiceGetDiscordUserServersSuccessResponse": {
             "type": "object",
             "properties": {
-                "success": {
+                "servers": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/docs_service.DiscordServerExample"

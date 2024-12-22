@@ -23,9 +23,42 @@ type ReactionExample struct {
 }
 
 type DiscordServerExample struct {
+	Banner string
+	Features []string
+	Icon string
+	Id string
+	Name string
+	Owner bool
+	Permissions string
+}
+
+type DiscordChannelIconEmojiExample struct {
+	Id string
+	Name string
+}
+
+type DiscordChannelPermissionOverwritesExample struct {
+	Allow string
+	Deny string
+	Id string
+	Type int
 }
 
 type DiscordChannelExample struct {
+	Flags int
+	Guild_id string
+	Icon_emoji []DiscordChannelIconEmojiExample
+	Id string
+	Name string
+	Nsfw bool
+	Parent_id string
+	Permission_overwrites []DiscordChannelPermissionOverwritesExample
+	Position int
+	Rate_limite_per_user int
+	Theme_color string
+	Topic string
+	Type int
+
 }
 
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
@@ -46,7 +79,7 @@ type ServiceInternalServerErrorResponse struct {
 
 // Discord Get User Servers
 type ServiceGetDiscordUserServersSuccessResponse struct {
-	DiscordServers []DiscordServerExample `json:"success"`
+	Servers []DiscordServerExample
 }
 
 type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
@@ -55,7 +88,7 @@ type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
 
 // Discord Get Guild Channels
 type ServiceGetDiscordGuildChannelsSuccessResponse struct {
-	DiscordChannels []DiscordChannelExample `json:"success"`
+	Channels []DiscordChannelExample
 }
 
 type ServiceGetDiscordGuildChannelsInternalServerErrorResponse struct {

@@ -17,8 +17,74 @@ definitions:
         type: integer
     type: object
   docs_service.DiscordChannelExample:
+    properties:
+      flags:
+        type: integer
+      guild_id:
+        type: string
+      icon_emoji:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelIconEmojiExample'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      nsfw:
+        type: boolean
+      parent_id:
+        type: string
+      permission_overwrites:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelPermissionOverwritesExample'
+        type: array
+      position:
+        type: integer
+      rate_limite_per_user:
+        type: integer
+      theme_color:
+        type: string
+      topic:
+        type: string
+      type:
+        type: integer
+    type: object
+  docs_service.DiscordChannelIconEmojiExample:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  docs_service.DiscordChannelPermissionOverwritesExample:
+    properties:
+      allow:
+        type: string
+      deny:
+        type: string
+      id:
+        type: string
+      type:
+        type: integer
     type: object
   docs_service.DiscordServerExample:
+    properties:
+      banner:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: boolean
+      permissions:
+        type: string
     type: object
   docs_service.ReactionExample:
     properties:
@@ -58,7 +124,7 @@ definitions:
     type: object
   docs_service.ServiceGetDiscordGuildChannelsSuccessResponse:
     properties:
-      success:
+      channels:
         items:
           $ref: '#/definitions/docs_service.DiscordChannelExample'
         type: array
@@ -72,7 +138,7 @@ definitions:
     type: object
   docs_service.ServiceGetDiscordUserServersSuccessResponse:
     properties:
-      success:
+      servers:
         items:
           $ref: '#/definitions/docs_service.DiscordServerExample'
         type: array
