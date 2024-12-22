@@ -24,8 +24,8 @@ func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
-	router.POST("/service-callback/:service/:app-type",
-		middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.ServiceCallback)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	private.POST("/service-callback/:service/:app-type", self.ServiceCallback)
 }
 
 // @Summary      Service Callback

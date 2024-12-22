@@ -61,16 +61,18 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	service := router.Group("/:service", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	service := private.Group("/:service")
 	{
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	router.GET("/actions-services", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.RetrieveActionsServices)
-	router.GET("/reactions-services", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.RetrieveReactionsServices)
-	router.GET("/Discord/user/servers", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.getDiscordUserServers)
-	router.GET("/Discord/server/channels", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext, self.getDiscordGuildChannels)
+	private.GET("/actions-services", self.RetrieveActionsServices)
+	private.GET("/reactions-services", self.RetrieveReactionsServices)
+	private.GET("/Discord/user/servers", self.getDiscordUserServers)
+	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
+
 
 func (self *ServiceHandler) apiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)

@@ -31,7 +31,8 @@ func (self *WorkflowHandler) SetupRoutes(router *gin.Engine) {
 }
 
 func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
-	workflow := router.Group("/workflow", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	workflow := private.Group("/workflow")
 	{
 		workflow.POST("/create", self.CreateWorkflow)
 		workflow.GET("/retrieve", self.GetUserWorkflows)

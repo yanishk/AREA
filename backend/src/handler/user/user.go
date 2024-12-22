@@ -35,7 +35,8 @@ func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
-	user := router.Group("/user", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	user := private.Group("/user")
 	{
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
