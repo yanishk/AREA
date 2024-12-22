@@ -22,8 +22,8 @@ type ServiceHandler struct {
 
 const InternalServerErrorMessage = "Internal server error"
 const APICallFailed = "API call failed"
-const getUserServersFailed = "Could not retrieve get the user's server"
-const getServerChannelsFailed = "Could not retrieve get the server's channels"
+const getUserServersFailed = "Could not retrieve the user's servers"
+const getServerChannelsFailed = "Could not retrieve the server's channels"
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
