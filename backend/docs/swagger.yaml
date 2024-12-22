@@ -149,6 +149,18 @@ definitions:
         example: Internal server error
         type: string
     type: object
+  docs_service.ServiceOAuth2BadRequestResponse:
+    properties:
+      error:
+        example: Invalid callback type-Invalid app type
+        type: string
+    type: object
+  docs_service.ServiceOAuth2SuccessResponse:
+    properties:
+      auth-url:
+        example: url-example.com
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
     properties:
       actions:
@@ -179,7 +191,8 @@ definitions:
   docs_user.DeleteAccountFailureUnauthorizedResponse:
     properties:
       error:
-        example: Email not found in token-Email is not a valid string
+        example: Email not found in token-Email is not a valid string-Connection type
+          not found in token-Connection type is not a valid string
         type: string
     type: object
   docs_user.DeleteAccountSuccessResponse:
@@ -212,6 +225,24 @@ definitions:
         example: Email not found in token-Email is not a valid string
         type: string
     type: object
+  docs_user.LoginCallbackBadRequestResponse:
+    properties:
+      error:
+        example: Invalid code authorization
+        type: string
+    type: object
+  docs_user.LoginCallbackInternalServerErrorResponse:
+    properties:
+      error:
+        example: Failed to connect with requested service
+        type: string
+    type: object
+  docs_user.LoginCallbackSuccessResponse:
+    properties:
+      success:
+        example: Connection successful
+        type: string
+    type: object
   docs_user.LoginFailureTokenErrorResponse:
     properties:
       error:
@@ -236,12 +267,6 @@ definitions:
         example: Invalid request body-Could not find requested user
         type: string
     type: object
-  docs_user.ModifyPasswordFailureEmailNotValidResponse:
-    properties:
-      error:
-        example: Email is not a valid string
-        type: string
-    type: object
   docs_user.ModifyPasswordFailureInternalServerErrorResponse:
     properties:
       error:
@@ -254,13 +279,26 @@ definitions:
         example: Old password is incorrect
         type: string
     type: object
+  docs_user.ModifyPasswordFailureUnauthorizedResponse:
+    properties:
+      error:
+        example: Email not found in token-Email is not a valid string-Connection type
+          not found in token-Connection type is not a valid string
+        type: string
+    type: object
   docs_user.ModifyPasswordSuccessResponse:
     properties:
       success:
         example: Password modified
         type: string
     type: object
-  docs_user.RegisterFailureEmailAlreadyUsedResponse:
+  docs_user.RegisterFailureBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body-Connection type doesn't exist
+        type: string
+    type: object
+  docs_user.RegisterFailureConflictResponse:
     properties:
       error:
         example: Email address already used
@@ -272,25 +310,19 @@ definitions:
         example: New user created
         type: string
     type: object
-  docs_userservice.OAuth2Response:
-    properties:
-      auth-url:
-        example: url-example.com
-        type: string
-    type: object
-  docs_userservice.ServiceCallBackBadRequestResponse:
+  docs_userservice.ServiceCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization
+        example: Invalid code authorization-Invalid app type
         type: string
     type: object
-  docs_userservice.ServiceCallBackInternalServerErrorResponse:
+  docs_userservice.ServiceCallbackInternalServerErrorResponse:
     properties:
       error:
         example: Failed to get email-Failed to update token
         type: string
     type: object
-  docs_userservice.ServiceCallBackSuccessResponse:
+  docs_userservice.ServiceCallbackSuccessResponse:
     properties:
       success:
         example: Token generated
@@ -317,7 +349,8 @@ definitions:
   docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse:
     properties:
       error:
-        example: Email not found in token-Email is not a valid string
+        example: Email not found in token-Email is not a valid string-Connection type
+          not found in token-Connection type is not a valid string
         type: string
     type: object
   docs_workflow.WorkflowExample:
@@ -377,7 +410,8 @@ definitions:
   docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
     properties:
       error:
-        example: Email not found in token-Email is not a valid string
+        example: Email not found in token-Email is not a valid string-Connection type
+          not found in token-Connection type is not a valid string
         type: string
     type: object
   entities.ChangeActivationWorkflow:
@@ -522,57 +556,18 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Discord:
+  /authentication/Discord/{callback-type}/{app-type}:
     get:
       description: Get Discord OAuth2 URL
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.OAuth2Response'
-      summary: Discord OAuth2
-      tags:
-      - Authentication
-  /authentication/Google:
-    get:
-      description: Get Google OAuth2 URL
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.OAuth2Response'
-      summary: Google OAuth2
-      tags:
-      - Authentication
-  /authentication/Spotify:
-    get:
-      description: Get Spotify OAuth2 URL
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.OAuth2Response'
-      summary: Spotify OAuth2
-      tags:
-      - Authentication
-  /callback/{service}:
-    post:
-      description: Callback for services
       parameters:
-      - description: Service name (Google, Spotify..)
+      - description: Callback type (login or service)
         in: path
-        name: service
+        name: callback-type
         required: true
         type: string
-      - description: Authorization code given by the service
-        in: query
-        name: code
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
         required: true
         type: string
       produces:
@@ -581,18 +576,70 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackSuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackBadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse'
-      summary: Service Callback
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Discord OAuth2
       tags:
-      - Authentication
+      - Services Authentication
+  /authentication/Google/{callback-type}/{app-type}:
+    get:
+      description: Get Google OAuth2 URL
+      parameters:
+      - description: Callback type (login or service)
+        in: path
+        name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Google OAuth2
+      tags:
+      - Services Authentication
+  /authentication/Spotify/{callback-type}/{app-type}:
+    get:
+      description: Get Spotify OAuth2 URL
+      parameters:
+      - description: Callback type (login or service)
+        in: path
+        name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Spotify OAuth2
+      tags:
+      - Services Authentication
   /login:
     post:
       consumes:
@@ -627,6 +674,43 @@ paths:
       summary: Login
       tags:
       - Users
+  /login-callback/{service}/{app-type}:
+    post:
+      description: Callback for login
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.LoginCallbackInternalServerErrorResponse'
+      summary: Login Callback
+      tags:
+      - Callbacks
   /reactions-services:
     get:
       description: Retrieve services with reactions available
@@ -666,11 +750,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_user.FailureInvalidBodyResponse'
+            $ref: '#/definitions/docs_user.RegisterFailureBadRequestResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse'
+            $ref: '#/definitions/docs_user.RegisterFailureConflictResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -678,6 +762,43 @@ paths:
       summary: Register
       tags:
       - Users
+  /service-callback/{service}/{app-type}:
+    post:
+      description: Callback for services
+      parameters:
+      - description: Service name (Google, Spotify..)
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      - description: Authorization code given by the service
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.ServiceCallbackInternalServerErrorResponse'
+      summary: Service Callback
+      tags:
+      - Callbacks
   /user/delete-account:
     delete:
       consumes:
@@ -744,7 +865,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse'
+            $ref: '#/definitions/docs_user.ModifyPasswordFailureUnauthorizedResponse'
         "403":
           description: Forbidden
           schema:

@@ -102,89 +102,113 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Discord": {
+        "/authentication/Discord/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Discord OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Discord OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
             }
         },
-        "/authentication/Google": {
+        "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Google OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
             }
         },
-        "/authentication/Spotify": {
+        "/authentication/Spotify/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Spotify OAuth2",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/callback/{service}": {
-            "post": {
-                "description": "Callback for services",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Service Callback",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Authorization code given by the service",
-                        "name": "code",
-                        "in": "query",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -192,19 +216,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
@@ -257,6 +275,61 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login-callback/{service}/{app-type}": {
+            "post": {
+                "description": "Callback for login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Login Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.LoginCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -322,19 +395,74 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.RegisterFailureBadRequestResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/docs_user.RegisterFailureConflictResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.FailureInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-callback/{service}/{app-type}": {
+            "post": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.ServiceCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -441,7 +569,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureUnauthorizedResponse"
                         }
                     },
                     "403": {
@@ -876,6 +1004,24 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceOAuth2BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid callback type-Invalid app type"
+                }
+            }
+        },
+        "docs_service.ServiceOAuth2SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
             "type": "object",
             "properties": {
@@ -923,7 +1069,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -972,6 +1118,33 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_user.LoginCallbackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization"
+                }
+            }
+        },
+        "docs_user.LoginCallbackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to connect with requested service"
+                }
+            }
+        },
+        "docs_user.LoginCallbackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Connection successful"
+                }
+            }
+        },
         "docs_user.LoginFailureTokenErrorResponse": {
             "type": "object",
             "properties": {
@@ -1008,15 +1181,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.ModifyPasswordFailureEmailNotValidResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email is not a valid string"
-                }
-            }
-        },
         "docs_user.ModifyPasswordFailureInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1035,6 +1199,15 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_user.ModifyPasswordFailureUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
         "docs_user.ModifyPasswordSuccessResponse": {
             "type": "object",
             "properties": {
@@ -1044,7 +1217,16 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.RegisterFailureEmailAlreadyUsedResponse": {
+        "docs_user.RegisterFailureBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Connection type doesn't exist"
+                }
+            }
+        },
+        "docs_user.RegisterFailureConflictResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1062,25 +1244,16 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.OAuth2Response": {
-            "type": "object",
-            "properties": {
-                "auth-url": {
-                    "type": "string",
-                    "example": "url-example.com"
-                }
-            }
-        },
-        "docs_userservice.ServiceCallBackBadRequestResponse": {
+        "docs_userservice.ServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },
-        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+        "docs_userservice.ServiceCallbackInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1089,7 +1262,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.ServiceCallBackSuccessResponse": {
+        "docs_userservice.ServiceCallbackSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -1130,7 +1303,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -1220,7 +1393,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },

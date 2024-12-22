@@ -22,7 +22,7 @@ type WorkflowCreateWorkflowBadRequestResponse struct {
 }
 
 type WorkflowCreateWorkflowUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type WorkflowCreateWorkflowInternalServerErrorResponse struct {
@@ -35,7 +35,7 @@ type WorkflowRetrieveUserWorkflowsSuccessResponse struct {
 }
 
 type WorkflowRetrieveUserWorkflowsUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type WorkflowRetrieveUserWorkflowsInternalServerErrorResponse struct {

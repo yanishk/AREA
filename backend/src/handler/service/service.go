@@ -20,12 +20,20 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const InternalServerErrorMessage = "Internal server error"
-const APICallFailed = "API call failed"
-const getUserServersFailed = "Could not retrieve the user's servers"
-const getServerChannelsFailed = "Could not retrieve the server's channels"
+const callbackTypeParamName = "callback-type"
+const appTypeParamName = "app-type"
+
 const botBearer = "Bot "
 const accessBearer = "Bearer "
+
+const InternalServerErrorMessage = "Internal server error"
+const InvalidCallbackTypeMessage = "Invalid callback type"
+const InvalidAppTypeMessage = "Invalid app type"
+const APICallFailedMessage = "API call failed"
+const getUserServersFailedMessage = "Could not retrieve the user's servers"
+const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
+
+const authURL = "auth-url"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -38,7 +46,17 @@ func NewServiceHandler(ServiceService service.ServiceService, UserServiceService
 }
 
 func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
+	self.PublicRoutes(router)
 	self.PrivateRoutes(router)
+}
+
+func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
+	authentication := router.Group("/authentication")
+	{
+		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
+		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
+		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
+	}
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
@@ -69,7 +87,7 @@ func (self *ServiceHandler) apiRequest(url string, method string, typeToken stri
 	}
 
 	if resp.StatusCode != 200 {
-		return resp, fmt.Errorf(APICallFailed)
+		return resp, fmt.Errorf(APICallFailedMessage)
 	}
 	return resp, nil
 }
@@ -81,7 +99,7 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 	if errReaction != nil || errUser != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Spotify")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Spotify")
 	if errRefreshing != nil {
 		return errRefreshing
 	}
@@ -132,7 +150,15 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 		return
 	}
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser.(string), "Discord")
+	connectionTypeUser, err := context.Get("connectionType")
+	if !err {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve the user's connection type",
+		})
+		return
+	}
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser.(string), connectionTypeUser.(string), "Discord")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve or refresh the token",
@@ -143,7 +169,7 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	resp, errRequest := self.apiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailed,
+			"error": getUserServersFailedMessage,
 		})
 		return
 	}
@@ -154,7 +180,7 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
 	if errDecoder != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailed,
+			"error": getUserServersFailedMessage,
 		})
 		return
 	}
@@ -186,7 +212,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	resp, errRequest := self.apiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailed,
+			"error": getServerChannelsFailedMessage,
 		})
 		return
 	}
@@ -196,7 +222,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
 	if errDecoder != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailed,
+			"error": getServerChannelsFailedMessage,
 		})
 		return
 	}
@@ -212,7 +238,7 @@ func (self *ServiceHandler) executeDiscordReactions(workflow entities.Workflow) 
 	if errReaction != nil || errUser != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
-	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, "Discord")
+	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Discord")
 	if errRefreshing != nil {
 		return errRefreshing
 	}
@@ -403,6 +429,135 @@ func (self *ServiceHandler) CallTimeApi() error {
 		}
 	}
 	return nil
+}
+
+// @Summary		Google OAuth2
+// @Description	Get Google OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Google/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
+	var callbackLink string
+	var appTypeLink string
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
+
+	if callbackType == "login" {
+		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	if appType == "web" {
+		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
+	} else if appType == "mobile" {
+		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
+		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
+		callbackLink + "&scope=email"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: googleAuthUrl,
+	})
+}
+
+// @Summary		Spotify OAuth2
+// @Description	Get Spotify OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Spotify/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
+
+	if callbackType == "login" {
+		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		callbackLink = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
+		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: spotifyAuthUrl,
+	})
+}
+
+// @Summary		Discord OAuth2
+// @Description	Get Discord OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Discord/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
+	var callbackLink string
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
+
+	if callbackType == "login" {
+		callbackLink = os.Getenv("DISCORD_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		callbackLink = os.Getenv("DISCORD_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
+		os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376&response_type=code&redirect_uri=" +
+		callbackLink +
+		"&scope=identify+email+guilds+bot"
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: discordAuthUrl,
+	})
 }
 
 // @Summary		Actions Services

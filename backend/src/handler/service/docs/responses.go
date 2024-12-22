@@ -60,6 +60,14 @@ type DiscordChannelExample struct {
 	Type                  int
 }
 
+type ServiceOAuth2SuccessResponse struct {
+	Msg string `json:"auth-url"example:"url-example.com"`
+}
+
+type ServiceOAuth2BadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid callback type-Invalid app type"`
+}
+
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
 	Services []ServiceExample
 }

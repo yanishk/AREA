@@ -16,7 +16,9 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
+const ConnectionTypeNotFoundInTokenMessage = "Connection type not found in token"
 const EmailNotFoundInTokenMessage = "Email not found in token"
+const ConnectionTypeNotValidMessage = "Connection type is not a valid string"
 const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
@@ -33,6 +35,7 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
+	router.POST("/login-callback/:service/:app-type", self.LoginCallback)
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
@@ -51,8 +54,8 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 // @Produce		json
 // @Param			user	body		entities.UserCredentials	true	"User credentials"
 // @Success		200		{object}	docs_user.RegisterSuccessResponse
-// @Failure		400		{object}	docs_user.FailureInvalidBodyResponse
-// @Failure		409		{object}	docs_user.RegisterFailureEmailAlreadyUsedResponse
+// @Failure		400		{object}	docs_user.RegisterFailureBadRequestResponse
+// @Failure		409		{object}	docs_user.RegisterFailureConflictResponse
 // @Failure		500		{object}	docs_user.FailureInternalServerErrorResponse
 // @Router			/register [post]
 func (self *UserHandler) CreateUser(context *gin.Context) {
@@ -66,10 +69,14 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 		return
 	}
 
-	err = self.UserService.CreateUser(newUser.Email, newUser.Password)
+	err = self.UserService.CreateUser(newUser.Email, newUser.Password, "basic")
 
 	if err != nil {
-		if err.Error() == "Email address already used" {
+		if err.Error() == "Connection type doesn't exist" {
+			context.IndentedJSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+		} else if err.Error() == "Email address already used" {
 			context.IndentedJSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
 			})
@@ -107,7 +114,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 		return
 	}
 
-	token, err := self.UserService.LoginAuthentication(user.Email, user.Password)
+	token, err := self.UserService.LoginAuthentication(user.Email, user.Password, "basic")
 	if err != nil {
 		if err.Error() == "Could not find requested user" || err.Error() == "Wrong password" {
 			context.IndentedJSON(http.StatusUnauthorized, gin.H{
@@ -118,13 +125,57 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 				"error": err.Error(),
 			})
 		}
-	} else {
-		context.SetSameSite(http.SameSiteNoneMode)
-		context.SetCookie("JWToken", token, 3600, "", "", true, true)
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": "Connection successful",
-		})
+		return
 	}
+	context.SetSameSite(http.SameSiteNoneMode)
+	context.SetCookie("JWToken", token, 3600, "", "", true, true)
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Connection successful",
+	})
+}
+
+// @Summary      Login Callback
+// @Description  Callback for login
+// @Tags         Callbacks
+// @Produce      json
+// @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        app-type     path     string  true  "App type (web or mobile)"
+// @Param        code     query     string  true  "Authorization code given by the service"
+// @Failure		200		{object}	docs_user.LoginCallbackSuccessResponse
+// @Failure		400		{object}	docs_user.LoginCallbackBadRequestResponse
+// @Failure		500		{object}	docs_user.LoginCallbackInternalServerErrorResponse
+// @Router       /login-callback/{service}/{app-type} [post]
+func (self *UserHandler) LoginCallback(context *gin.Context) {
+	appType := context.Param("app-type")
+	serviceName := context.Param("service")
+	code := context.Query("code")
+
+	if code == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid code authorization",
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+		return
+	}
+
+	token, err := self.UserService.LoginWithService(code, serviceName, appType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to connect with requested service",
+		})
+		return
+	}
+	context.SetSameSite(http.SameSiteNoneMode)
+	context.SetCookie("JWToken", token, 3600, "", "", true, true)
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Connection successful",
+	})
 }
 
 // @Summary		Modify Password
@@ -135,7 +186,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Param			user	body		entities.UserModifyPassword true	"New password of the user"
 // @Success		200		{object}	docs_user.ModifyPasswordSuccessResponse
 // @Failure		400		{object}	docs_user.ModifyPasswordBadRequestResponse
-// @Failure		401		{object}	docs_user.ModifyPasswordFailureEmailNotValidResponse
+// @Failure		401		{object}	docs_user.ModifyPasswordFailureUnauthorizedResponse
 // @Failure		403		{object}	docs_user.ModifyPasswordFailureOldPasswordNotValidResponse
 // @Failure		500		{object}	docs_user.ModifyPasswordFailureInternalServerErrorResponse
 // @Router			/user/modify-password [put]
@@ -157,6 +208,23 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
+	connectionType, err := context.Get("connectionType")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotFoundInTokenMessage,
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotValidMessage,
+		})
+		return
+	}
+
 	var newPassword entities.UserModifyPassword
 
 	errorBody := context.ShouldBindJSON(&newPassword)
@@ -167,7 +235,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	errorModifyPassword := self.UserService.ModifyPassword(emailStr, newPassword)
+	errorModifyPassword := self.UserService.ModifyPassword(emailStr, connectionTypeStr, newPassword)
 	if errorModifyPassword != nil {
 		if errorModifyPassword.Error() == "Could not find requested user" {
 			context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -216,7 +284,24 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 		return
 	}
 
-	errDelete := self.UserService.DeleteAccount(emailStr)
+	connectionType, err := context.Get("connectionType")
+
+	if !err {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotFoundInTokenMessage,
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": ConnectionTypeNotValidMessage,
+		})
+		return
+	}
+
+	errDelete := self.UserService.DeleteAccount(emailStr, connectionTypeStr)
 	if errDelete != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",

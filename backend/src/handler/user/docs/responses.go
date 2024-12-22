@@ -14,8 +14,12 @@ type RegisterSuccessResponse struct {
 	Msg string `json:"success"example:"New user created"`
 }
 
-type RegisterFailureEmailAlreadyUsedResponse struct {
+type RegisterFailureConflictResponse struct {
 	Msg string `json:"error"example:"Email address already used"`
+}
+
+type RegisterFailureBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body-Connection type doesn't exist"`
 }
 
 // Login Responses
@@ -30,13 +34,26 @@ type LoginFailureTokenErrorResponse struct {
 	Msg string `json:"error"example:"Error creating token"`
 }
 
+// Login Callback Responses
+type LoginCallbackSuccessResponse struct {
+	Msg string `json:"success"example:"Connection successful"`
+}
+
+type LoginCallbackBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid code authorization"`
+}
+
+type LoginCallbackInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Failed to connect with requested service"`
+}
+
 // Modify Password Responses
 type ModifyPasswordSuccessResponse struct {
 	Msg string `json:"success"example:"Password modified"`
 }
 
-type ModifyPasswordFailureEmailNotValidResponse struct {
-	Msg string `json:"error"example:"Email is not a valid string"`
+type ModifyPasswordFailureUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type ModifyPasswordFailureOldPasswordNotValidResponse struct {
@@ -57,7 +74,7 @@ type DeleteAccountSuccessResponse struct {
 }
 
 type DeleteAccountFailureUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
 type DeleteAccountFailureInternalServerErrorResponse struct {

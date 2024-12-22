@@ -37,7 +37,6 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 		workflow.GET("/retrieve", self.GetUserWorkflows)
 		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
 	}
-
 }
 
 // @Summary		Create Workflow
@@ -77,7 +76,24 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 		})
 		return
 	}
-	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, newWorkflow)
+
+	connectionType, errGetConnectionType := context.Get("connectionType")
+	if !errGetConnectionType {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type not found in token",
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type is not a valid string",
+		})
+		return
+	}
+
+	errCreationWorkflow := self.WorkflowService.CreateWorkflow(emailStr, connectionTypeStr, newWorkflow)
 	if errCreationWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create workflow",
@@ -114,7 +130,23 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		return
 	}
 
-	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr)
+	connectionType, errGetConnectionType := context.Get("connectionType")
+	if !errGetConnectionType {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type not found in token",
+		})
+		return
+	}
+
+	connectionTypeStr, ok := connectionType.(string)
+	if !ok {
+		context.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"error": "Connection type is not a valid string",
+		})
+		return
+	}
+
+	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(emailStr, connectionTypeStr)
 	if errRetrievedWorkflow != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve user's workflows",
