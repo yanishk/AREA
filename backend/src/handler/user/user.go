@@ -16,10 +16,6 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
-const ConnectionTypeNotFoundInTokenMessage = "Connection type not found in token"
-const EmailNotFoundInTokenMessage = "Email not found in token"
-const ConnectionTypeNotValidMessage = "Connection type is not a valid string"
-const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -39,7 +35,8 @@ func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
-	user := router.Group("/user", middleware.VerifyJWTCookie)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	user := private.Group("/user")
 	{
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
@@ -191,41 +188,9 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 // @Failure		500		{object}	docs_user.ModifyPasswordFailureInternalServerErrorResponse
 // @Router			/user/modify-password [put]
 func (self *UserHandler) ModifyPassword(context *gin.Context) {
-	email, err := context.Get("email")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
-
-	connectionType, err := context.Get("connectionType")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	connectionTypeStr, ok := connectionType.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotValidMessage,
-		})
-		return
-	}
-
 	var newPassword entities.UserModifyPassword
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
@@ -235,7 +200,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	errorModifyPassword := self.UserService.ModifyPassword(emailStr, connectionTypeStr, newPassword)
+	errorModifyPassword := self.UserService.ModifyPassword(email, connectionType, newPassword)
 	if errorModifyPassword != nil {
 		if errorModifyPassword.Error() == "Could not find requested user" {
 			context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -267,41 +232,10 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 // @Failure		500		{object}	docs_user.DeleteAccountFailureInternalServerErrorResponse
 // @Router			/user/delete-account [delete]
 func (self *UserHandler) DeleteAccount(context *gin.Context) {
-	email, err := context.Get("email")
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
-
-	connectionType, err := context.Get("connectionType")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	connectionTypeStr, ok := connectionType.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotValidMessage,
-		})
-		return
-	}
-
-	errDelete := self.UserService.DeleteAccount(emailStr, connectionTypeStr)
+	errDelete := self.UserService.DeleteAccount(email, connectionType)
 	if errDelete != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",
@@ -321,23 +255,9 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 // @Failure		401		{object}	docs_user.GetUserEmailUnauthorizedResponse
 // @Router			/user/email [get]
 func (self *UserHandler) GetUserEmail(context *gin.Context) {
-	email, err := context.Get("email")
+	email := context.GetString("email")
 
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"email": emailStr,
+		"email": email,
 	})
 }
