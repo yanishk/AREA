@@ -116,6 +116,13 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 	return fmt.Errorf("Unknown reaction")
 }
 
+// @Summary		Discord User Servers
+// @Description	Retrieve the discord servers from the authenticated user
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
+// @Router			/Discord/user/servers [get]
 func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	emailUser, err := context.Get("email")
 	if !err {
@@ -163,6 +170,14 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	})
 }
 
+// @Summary		Discord Server Channels
+// @Description	Retrieve the channels from the selected server
+// @Tags			Services
+// @Produce		json
+// @Param        id  query      string  true  "server id"
+// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
+// @Router /Discord/server/channels [get]
 func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	guildId := context.Query("id")
