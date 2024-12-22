@@ -73,7 +73,6 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
-
 func (self *ServiceHandler) apiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
