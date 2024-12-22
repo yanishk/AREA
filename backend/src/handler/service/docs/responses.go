@@ -83,7 +83,7 @@ type ServiceGetDiscordUserServersSuccessResponse struct {
 }
 
 type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve get the user's servers"`
+	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the user's servers"`
 }
 
 // Discord Get Guild Channels
