@@ -852,7 +852,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Could not retrieve or refresh the token-Could not retrieve get the user's servers"
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's servers"
                 }
             }
         },
