@@ -38,33 +38,6 @@ definitions:
       nbParam:
         type: integer
     type: object
-  docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve the server's channels
-        type: string
-    type: object
-  docs_service.ServiceDiscordGetGuildChannelsSuccessResponse:
-    properties:
-      success:
-        items:
-          $ref: '#/definitions/docs_service.DiscordChannelExample'
-        type: array
-    type: object
-  docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve or refresh the token-Could not retrieve get the
-          user's servers
-        type: string
-    type: object
-  docs_service.ServiceDiscordGetUserServersSuccessResponse:
-    properties:
-      success:
-        items:
-          $ref: '#/definitions/docs_service.DiscordServerExample'
-        type: array
-    type: object
   docs_service.ServiceExample:
     properties:
       Color:
@@ -76,6 +49,33 @@ definitions:
       Name:
         example: Google
         type: string
+    type: object
+  docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the server's channels
+        type: string
+    type: object
+  docs_service.ServiceGetDiscordGuildChannelsSuccessResponse:
+    properties:
+      success:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelExample'
+        type: array
+    type: object
+  docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve or refresh the token-Could not retrieve get the
+          user's servers
+        type: string
+    type: object
+  docs_service.ServiceGetDiscordUserServersSuccessResponse:
+    properties:
+      success:
+        items:
+          $ref: '#/definitions/docs_service.DiscordServerExample'
+        type: array
     type: object
   docs_service.ServiceInternalServerErrorResponse:
     properties:
@@ -414,11 +414,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceDiscordGetGuildChannelsSuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
       summary: Discord Server Channels
       tags:
       - Services
@@ -431,11 +431,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceDiscordGetUserServersSuccessResponse'
+            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
       summary: Discord User Servers
       tags:
       - Services

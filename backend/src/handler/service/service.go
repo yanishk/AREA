@@ -120,8 +120,8 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 // @Description	Retrieve the discord servers from the authenticated user
 // @Tags			Services
 // @Produce		json
-// @Success		200		{object}	docs_service.ServiceDiscordGetUserServersSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse
+// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
 // @Router			/Discord/user/servers [get]
 func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	emailUser, err := context.Get("email")
@@ -175,8 +175,8 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 // @Tags			Services
 // @Produce		json
 // @Param        id  query      string  true  "server id"
-// @Success		200		{object}	docs_service.ServiceDiscordGetGuildChannelsSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse
+// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
 // @Router /Discord/server/channels [get]
 func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")

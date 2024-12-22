@@ -45,19 +45,19 @@ type ServiceInternalServerErrorResponse struct {
 }
 
 // Discord Get User Servers
-type ServiceDiscordGetUserServersSuccessResponse struct {
+type ServiceGetDiscordUserServersSuccessResponse struct {
 	DiscordServers []DiscordServerExample `json:"success"`
 }
 
-type ServiceDiscordGetUserServersInternalServerErrorResponse struct {
+type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve get the user's servers"`
 }
 
 // Discord Get Guild Channels
-type ServiceDiscordGetGuildChannelsSuccessResponse struct {
+type ServiceGetDiscordGuildChannelsSuccessResponse struct {
 	DiscordChannels []DiscordChannelExample `json:"success"`
 }
 
-type ServiceDiscordGetGuildChannelsInternalServerErrorResponse struct {
+type ServiceGetDiscordGuildChannelsInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve the server's channels"`
 }

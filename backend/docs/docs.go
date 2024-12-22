@@ -38,13 +38,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceDiscordGetGuildChannelsSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse"
                         }
                     }
                 }
@@ -64,13 +64,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceDiscordGetUserServersSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse"
                         }
                     }
                 }
@@ -709,46 +709,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ServiceDiscordGetGuildChannelsInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve the server's channels"
-                }
-            }
-        },
-        "docs_service.ServiceDiscordGetGuildChannelsSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/docs_service.DiscordChannelExample"
-                    }
-                }
-            }
-        },
-        "docs_service.ServiceDiscordGetUserServersInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve or refresh the token-Could not retrieve get the user's servers"
-                }
-            }
-        },
-        "docs_service.ServiceDiscordGetUserServersSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/docs_service.DiscordServerExample"
-                    }
-                }
-            }
-        },
         "docs_service.ServiceExample": {
             "type": "object",
             "properties": {
@@ -763,6 +723,46 @@ const docTemplate = `{
                 "Name": {
                     "type": "string",
                     "example": "Google"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the server's channels"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordGuildChannelsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve get the user's servers"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordServerExample"
+                    }
                 }
             }
         },
