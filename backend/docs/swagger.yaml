@@ -16,6 +16,76 @@ definitions:
       nbParam:
         type: integer
     type: object
+  docs_service.DiscordChannelExample:
+    properties:
+      flags:
+        type: integer
+      guild_id:
+        type: string
+      icon_emoji:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelIconEmojiExample'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      nsfw:
+        type: boolean
+      parent_id:
+        type: string
+      permission_overwrites:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelPermissionOverwritesExample'
+        type: array
+      position:
+        type: integer
+      rate_limite_per_user:
+        type: integer
+      theme_color:
+        type: string
+      topic:
+        type: string
+      type:
+        type: integer
+    type: object
+  docs_service.DiscordChannelIconEmojiExample:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  docs_service.DiscordChannelPermissionOverwritesExample:
+    properties:
+      allow:
+        type: string
+      deny:
+        type: string
+      id:
+        type: string
+      type:
+        type: integer
+    type: object
+  docs_service.DiscordServerExample:
+    properties:
+      banner:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: boolean
+      permissions:
+        type: string
+    type: object
   docs_service.ReactionExample:
     properties:
       Description:
@@ -45,6 +115,33 @@ definitions:
       Name:
         example: Google
         type: string
+    type: object
+  docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the server's channels
+        type: string
+    type: object
+  docs_service.ServiceGetDiscordGuildChannelsSuccessResponse:
+    properties:
+      channels:
+        items:
+          $ref: '#/definitions/docs_service.DiscordChannelExample'
+        type: array
+    type: object
+  docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve or refresh the token-Could not retrieve the user's
+          servers
+        type: string
+    type: object
+  docs_service.ServiceGetDiscordUserServersSuccessResponse:
+    properties:
+      servers:
+        items:
+          $ref: '#/definitions/docs_service.DiscordServerExample'
+        type: array
     type: object
   docs_service.ServiceInternalServerErrorResponse:
     properties:
@@ -400,6 +497,46 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
       summary: Reactions From Service
+      tags:
+      - Services
+  /Discord/server/channels:
+    get:
+      description: Retrieve the channels from the selected server
+      parameters:
+      - description: server id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
+      summary: Discord Server Channels
+      tags:
+      - Services
+  /Discord/user/servers:
+    get:
+      description: Retrieve the discord servers from the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
+      summary: Discord User Servers
       tags:
       - Services
   /actions-services:
