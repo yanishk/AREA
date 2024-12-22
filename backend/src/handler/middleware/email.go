@@ -8,7 +8,6 @@ import (
 
 func VerifyEmailFromContext(context *gin.Context) {
 	email, errGetEmail := context.Get("email")
-
 	if !errGetEmail {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Email not found in token",

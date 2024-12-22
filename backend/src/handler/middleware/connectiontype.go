@@ -8,7 +8,6 @@ import (
 
 func VerifyConnectionTypeFromContext(context *gin.Context) {
 	connectionType, errGetConnectionType := context.Get("connectionType")
-
 	if !errGetConnectionType {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Connection type not found in token",
