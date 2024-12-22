@@ -60,7 +60,7 @@ func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 		return
 	}
 
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, email, connectionType)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, appType, email, connectionType)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",
