@@ -98,7 +98,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 	currentTime := time.Now()
 	expiryDate := currentTime.Add(time.Duration(tokenRes.ExpiresIn) * time.Second).Format(FormattingDate)
 
-	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName("Spotify")
+	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName(serviceName)
 	if errServiceFound != nil {
 		return tokenRes, errServiceFound
 	}
