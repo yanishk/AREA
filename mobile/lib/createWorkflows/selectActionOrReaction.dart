@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'dart:developer' as developer;
 import "package:http/src/response.dart";
 
 import "../custom_widget.dart";
 import "../globalData.dart";
-import "../spotifyAuth.dart";
 import "../apiCall/apiRequest.dart";
 import "../apiCall/apiErrorHandling.dart";
 import 'createWidget.dart';
 import 'createWorkflowsData.dart';
+import "../auth/connectSpotify.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -66,7 +65,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
 
   Future<void> getActionsOrReactions() async {
     Response response = await ApiRequest.get("${CreateData.serviceNameList[serviceIndex]}/$apiRoute");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getSpotifyAuthLink");
+    final responseData = await errorHandler.basicResponseErrorHandler(response, "getActionsOrReactions");
     if (responseData == null) {
       return;
     }
@@ -132,19 +131,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     );
   }
 
-  Future<void> getSpotifyAuthLink() async {
-    Response response = await ApiRequest.get("authentication/Spotify");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getSpotifyAuthLink");
-    if (responseData == null) {
-      return;
-    }
-    Globaldata.spotifyConnectionLink = responseData["auth-url"];
-    developer.log(
-        "getSpotifyAuthLink response : ${Globaldata.spotifyConnectionLink}");
-    await Navigator.push(Globaldata.myContext,
-        MaterialPageRoute(builder: (context) => SpotifyAuthPage()));
-  }
-
   Future<void> saveSelectedActionOrReaction(int index) async {
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];
@@ -159,7 +145,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       return CustomButton(
         backgroundColor: colorTheme,
         text: ButtonText(text: "Connect",),
-        onPressed: getSpotifyAuthLink,
+        onPressed: () {MySpotifyAuth.connectSpotify("service");},
         size: buttonSize,
         padding: EdgeInsets.symmetric(horizontal: 15.0),
         borderCircularRadius: buttonRadius,

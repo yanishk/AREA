@@ -9,14 +9,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"backend/src/entities"
-	"backend/src/storage"
 	"backend/src/service"
+	"backend/src/storage"
 )
 
 type UserService struct {
-	UserRepository storage.UserRepository
-	ServiceRepository  storage.ServiceRepository
-	ServiceService service.ServiceService
+	UserRepository    storage.UserRepository
+	ServiceRepository storage.ServiceRepository
+	ServiceService    service.ServiceService
 }
 
 const ContentType = "Content-Type"
@@ -26,23 +26,23 @@ const BasicConnectionType = "basic"
 
 func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository, ServiceService service.ServiceService) *UserService {
 	return &UserService{
-		UserRepository: UserRepository,
+		UserRepository:    UserRepository,
 		ServiceRepository: ServiceRepository,
-		ServiceService: ServiceService,
+		ServiceService:    ServiceService,
 	}
 }
 
 func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
 	var errorUser error
 
-	if (userConnectionType == BasicConnectionType) {
+	if userConnectionType == BasicConnectionType {
 		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("Internal server error")
 		}
 		errorUser = self.UserRepository.CreateUser(userEmail, string(hash), userConnectionType)
 	} else {
-		_ , errorService := self.ServiceRepository.FindServiceByName(userConnectionType)
+		_, errorService := self.ServiceRepository.FindServiceByName(userConnectionType)
 		if errorService != nil {
 			return fmt.Errorf("Connection type doesn't exist")
 		}
@@ -57,9 +57,9 @@ func (self *UserService) CreateUser(userEmail string, userPassword string, userC
 func createToken(email string, connectionType string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"email": email,
+			"email":          email,
 			"connectionType": connectionType,
-			"exp":   time.Now().Add(time.Hour * 24).Unix(),
+			"exp":            time.Now().Add(time.Hour * 24).Unix(),
 		})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
@@ -69,7 +69,7 @@ func createToken(email string, connectionType string) (string, error) {
 }
 
 func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
-	if (userConnectionType != BasicConnectionType && userPassword != "") {
+	if userConnectionType != BasicConnectionType && userPassword != "" {
 		return "", fmt.Errorf("Wrong password")
 	}
 
@@ -78,7 +78,7 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	if (userConnectionType == BasicConnectionType) {
+	if userConnectionType == BasicConnectionType {
 		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
 		if resBcrypt != nil {
 			return "", fmt.Errorf("Wrong password")
@@ -91,13 +91,13 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
-func (self *UserService) LoginWithService(code string, serviceName string) (string, error) {
+func (self *UserService) LoginWithService(code string, serviceName string, appType string) (string, error) {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return "", errorService
 	}
 
-	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login")
+	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login", appType)
 	if errToken != nil {
 		return "", errToken
 	}
@@ -123,7 +123,7 @@ func (self *UserService) LoginWithService(code string, serviceName string) (stri
 }
 
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
-	if (userConnectionType != BasicConnectionType) {
+	if userConnectionType != BasicConnectionType {
 		return fmt.Errorf("Could not modify the password")
 	}
 

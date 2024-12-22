@@ -2,8 +2,8 @@ package userservice_service
 
 import (
 	"backend/src/entities"
-	"backend/src/storage"
 	"backend/src/service"
+	"backend/src/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -14,18 +14,18 @@ type UserServiceService struct {
 	UserServiceRepository storage.UserServiceRepository
 	ServiceRepository     storage.ServiceRepository
 	UserRepository        storage.UserRepository
-	ServiceService	      service.ServiceService
+	ServiceService        service.ServiceService
 }
 
 const FormattingDate = "2006-01-02 15:04:05-07:00"
 
 func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
-		UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
+	UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
 	return &UserServiceService{
 		ServiceRepository:     ServiceRepository,
 		UserRepository:        UserRepository,
 		UserServiceRepository: UserServiceRepository,
-		ServiceService: ServiceService,
+		ServiceService:        ServiceService,
 	}
 }
 
@@ -47,6 +47,10 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetGoogleRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Spotify" {
 		request, errRequest = self.ServiceService.GetSpotifyRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Discord" {
+		request, errRequest = self.ServiceService.GetDiscordRefreshTokenRequest(refreshToken)
+	} else {
+		return tokenRes, fmt.Errorf("Unknown service")
 	}
 
 	if errRequest != nil {
@@ -66,7 +70,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 	currentTime := time.Now()
 	expiryDate := currentTime.Add(time.Duration(tokenRes.ExpiresIn) * time.Second).Format(FormattingDate)
 
-	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName("Spotify")
+	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName(serviceName)
 	if errServiceFound != nil {
 		return tokenRes, errServiceFound
 	}
@@ -120,13 +124,13 @@ func (self *UserServiceService) CreateOrUpdateUserService(userId string, service
 	}
 }
 
-func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, email string, connectionType string) error {
+func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return errorService
 	}
 
-	token, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "service")
+	token, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "service", appType)
 	if errToken != nil {
 		return errToken
 	}
