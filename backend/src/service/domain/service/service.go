@@ -204,6 +204,19 @@ func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) 
 	return request, nil
 }
 
+func GetSpotifyOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
+	tokenUrl := "https://api.spotify.com/v1/me"
+
+	request, errRequest := http.NewRequest("GET", tokenUrl, nil)
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set("Authorization", "Bearer "+accessToken)
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+	return request, nil
+}
+
 func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://oauth2.googleapis.com/token"
 	jsonBody := fmt.Sprintf(
@@ -311,6 +324,8 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 
 	if serviceName == "Google" {
 		request, errRequest = GetGoogleOAuth2UserEmailRequest(accessToken)
+	} else if serviceName == "Spotify" {
+		request, errRequest = GetSpotifyOAuth2UserEmailRequest(accessToken)
 	} else {
 		return userInfo, fmt.Errorf("Unknown service")
 	}
