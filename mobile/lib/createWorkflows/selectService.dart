@@ -131,7 +131,7 @@ class MySquareServicesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (servicesIndex > Globaldata.actionServicesName.length) {
-      return Column();
+      return MyDivider();
     }
     developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
