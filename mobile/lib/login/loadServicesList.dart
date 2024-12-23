@@ -5,10 +5,11 @@ import 'dart:developer' as developer;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import "custom_widget.dart";
-import "globalData.dart";
-import "explore/explorePage.dart";
-import "apiCall/apiRequest.dart";
+import "../custom_widget.dart";
+import "../globalData.dart";
+import "../explore/explorePage.dart";
+import "../apiCall/apiRequest.dart";
+import "loginNavigator.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -56,10 +57,7 @@ class LoadService extends State<APICall> {
           Globaldata.reactionServicesIcons,
           firstService
         );
-        Navigator.pushReplacement(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePage(),),
-        );
+        LoginNavigator.pushAndPushGoBack(ExplorePage(), LoadServicePage());
       }
     }
   }
@@ -77,7 +75,6 @@ class LoadService extends State<APICall> {
           "getServiceResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return null;
     }
-    developer.log('pass');
     return responseData;
   }
 
