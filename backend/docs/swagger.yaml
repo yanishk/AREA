@@ -584,6 +584,34 @@ paths:
       summary: Discord OAuth2
       tags:
       - Services Authentication
+  /authentication/Github/{callback-type}/{app-type}:
+    get:
+      description: Get Github OAuth2 URL
+      parameters:
+      - description: Callback type (login or service)
+        in: path
+        name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Github OAuth2
+      tags:
+      - Services Authentication
   /authentication/Google/{callback-type}/{app-type}:
     get:
       description: Get Google OAuth2 URL
