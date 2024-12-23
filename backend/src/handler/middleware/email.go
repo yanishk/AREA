@@ -7,8 +7,8 @@ import (
 )
 
 func VerifyEmailFromContext(context *gin.Context) {
-	email, errGetEmail := context.Get("email")
-	if !errGetEmail {
+	email, ok := context.Get("email")
+	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Email not found in token",
 		})
@@ -16,8 +16,8 @@ func VerifyEmailFromContext(context *gin.Context) {
 		return
 	}
 
-	_, errGetEmailStr := email.(string)
-	if !errGetEmailStr {
+	_, ok := email.(string)
+	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Email is not a valid string",
 		})

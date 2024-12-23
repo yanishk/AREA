@@ -7,8 +7,8 @@ import (
 )
 
 func VerifyConnectionTypeFromContext(context *gin.Context) {
-	connectionType, errGetConnectionType := context.Get("connectionType")
-	if !errGetConnectionType {
+	connectionType, ok := context.Get("connectionType")
+	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Connection type not found in token",
 		})
@@ -16,8 +16,8 @@ func VerifyConnectionTypeFromContext(context *gin.Context) {
 		return
 	}
 
-	_, errGetConnectionTypeStr := connectionType.(string)
-	if !errGetConnectionTypeStr {
+	_, ok := connectionType.(string)
+	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Connection type is not a valid string",
 		})
