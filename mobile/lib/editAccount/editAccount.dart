@@ -249,7 +249,7 @@ class EditAccount extends State<APICall> {
           ],
         ),
       ),
-      bottomNavigationBar: FooterNavigationBar(currentIndex: 4),
+      bottomNavigationBar: FooterNavigationBar(currentIndex: 3),
     );
   }
 }
