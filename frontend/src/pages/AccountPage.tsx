@@ -98,8 +98,12 @@ const AccountPage = () => {
                     onClickNo={handleCloseModal}
                 />
             )}
+
             <Navbar />
-            <div className="flex items-center justify-between px-10 py-5">
+
+            <div
+                className="flex items-center justify-between px-10 py-5"
+            >
                 <div>
                     <CancelButton
                         text="Cancel"
@@ -110,11 +114,40 @@ const AccountPage = () => {
                     />
                 </div>
             </div>
-            <div className="flex flex-col justify-center items-center">
-                <p className="text-black text-xl font-[800]">
+
+            <div
+                className="flex items-center justify-center mt-10"
+            >
+                <div
+                    className="flex flex-col items-center text-center"
+                >
+                    <h1
+                        className="text-5xl text-[#222222] font-[900] mx-[80px]"
+                    >
+                        Account settings
+                    </h1>
+
+                    <div
+                        className="flex items-center w-full mt-6"
+                    >
+                        <div
+                            className="flex-grow border-[1.5px] border-[#e7e7e7]"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div
+                className="flex flex-col justify-center items-center"
+            >
+                <p
+                    className="text-black text-xl font-[800]"
+                >
                     {userEmail}
                 </p>
-                <div className="max-w-96 mt-10">
+                <div
+                    className="max-w-96 mt-10"
+                >
                     <InputField
                         type="password"
                         placeholder="Current password"
