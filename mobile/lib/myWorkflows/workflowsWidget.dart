@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import "../globalData.dart";
+
 class WorkflowCard extends StatelessWidget {
   const WorkflowCard({
     super.key,
@@ -47,6 +49,26 @@ class WorkflowCard extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class GoBackArrow extends StatelessWidget {
+  const GoBackArrow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.pop(Globaldata.myContext);
+      },
+      icon: Icon(
+        Icons.arrow_back,
+        size: 32,
+        color: Colors.white,
       ),
     );
   }

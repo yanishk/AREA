@@ -36,7 +36,7 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
   void initState() {
     super.initState();
     getEmail();
-    getWorkflows();
+    getWorkflows(workflowsCardList);
   }
 
   String apiRoute = "workflow/retrieve";
@@ -55,14 +55,28 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
     });
   }
 
+  Future<void> redirectWorkflowInfos(int index) async {
+    MyWorkflowsData.selectedWorkflowsIndex = index;
+    await Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(builder: (context) => WorkflowInfosPage(),),
+    );
+    setState(() {
+      MyWorkflowsData.allWorkflowsData.clear();
+    });
+    List<Widget> tmpWorkflowsCardList = [];
+    await getWorkflows(tmpWorkflowsCardList);
+    setState(() {
+      workflowsCardList.clear();
+      workflowsCardList.addAll(tmpWorkflowsCardList);
+      tmpWorkflowsCardList.clear();
+    });
+  }
+
   Widget workflowsTiles(int index) {
     return InkWell(
       onTap: () {
-        MyWorkflowsData.selectedWorkflowsIndex = index;
-        Navigator.push(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => WorkflowInfosPage(),),
-        );
+        redirectWorkflowInfos(index);
       },
       child: Column (
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +134,7 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
     );
   }
 
-  void storeServiceDescription(dynamic responseData) {
+  void storeServiceDescription(dynamic responseData, List<Widget> cardList) {
     if (responseData is Map<String, dynamic> &&
         responseData[workflowsResponseName] is List) {
       List<dynamic> actions = responseData[workflowsResponseName];
@@ -138,7 +152,7 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
             actionResponse['actionparam'] ?? '',
             actionResponse['reactionparam'] ?? '',
           ));
-          workflowsCardList.add(
+          cardList.add(
             WorkflowCard(
               content: workflowsTiles(i),
             ),
@@ -164,13 +178,13 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
     return responseData;
   }
 
-  Future<void> getWorkflows() async {
+  Future<void> getWorkflows(List<Widget> cardList) async {
     final response = await getWorkflowsResponse(apiRoute);
     if (response == null) {
       return;
     }
     setState(() {
-      storeServiceDescription(response);
+      storeServiceDescription(response, cardList);
     });
   }
 
