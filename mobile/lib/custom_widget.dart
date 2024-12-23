@@ -448,16 +448,18 @@ class DoubleWidget extends StatelessWidget {
     required this.firstChild,
     required this.secondChild,
     this.padding = const EdgeInsets.only(left: 50),
+    this.mainAxisAlignment = MainAxisAlignment.spaceEvenly,
   });
 
   final Widget firstChild;
   final Widget secondChild;
   final EdgeInsetsGeometry padding;
+  final MainAxisAlignment mainAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: mainAxisAlignment,
       children: [
         firstChild,
         Padding(padding: padding),
