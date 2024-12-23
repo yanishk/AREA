@@ -2,8 +2,8 @@ package service
 
 import (
 	"backend/src/entities"
-	"net/http"
 	"io"
+	"net/http"
 )
 
 type UserService interface {
@@ -26,8 +26,8 @@ type ServiceService interface {
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
-	RequestService(request *http.Request) (*http.Response, error)
-	ApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
+	ExecuteRequest(request *http.Request) (*http.Response, error)
+	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
 	RequestToTimeApi() (entities.TimeResponse, error)
 }
 

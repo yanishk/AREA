@@ -2,21 +2,21 @@ package workflow_service
 
 import (
 	"backend/src/entities"
-	"backend/src/storage"
 	"backend/src/service"
+	"backend/src/storage"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"net/http"
+	"os"
 )
 
 type WorkflowService struct {
 	WorkflowRepository storage.WorkflowRepository
 	UserRepository     storage.UserRepository
-	ActionRepository storage.ActionRepository
+	ActionRepository   storage.ActionRepository
 	ReactionRepository storage.ReactionRepository
-	ServiceService service.ServiceService
+	ServiceService     service.ServiceService
 	UserServiceService service.UserServiceService
 }
 
@@ -29,9 +29,9 @@ func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepos
 	return &WorkflowService{
 		WorkflowRepository: WorkflowRepository,
 		UserRepository:     UserRepository,
-		ActionRepository: ActionRepository,
+		ActionRepository:   ActionRepository,
 		ReactionRepository: ReactionRepository,
-		ServiceService: ServiceService,
+		ServiceService:     ServiceService,
 		UserServiceService: UserServiceService,
 	}
 }
@@ -90,13 +90,13 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 
 	var resp *http.Response
 	if reactionFound.Name == "Start playback" {
-		resp, _ = self.ServiceService.ApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
 	}
 	if reactionFound.Name == "Pause playback" {
-		resp, _ = self.ServiceService.ApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
 	}
 	if reactionFound.Name == "Skip track" {
-		resp, _ = self.ServiceService.ApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
 	}
 	if reactionFound.Name == "Add track to playback queue" {
 		uri, uriErr := workflow.ReactionParam["uri"]
@@ -104,7 +104,7 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 			return fmt.Errorf("Incorrect URI")
 		}
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-		resp, _ = self.ServiceService.ApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
 	}
 	if reactionFound.Name == "Save a track" {
 		id, idErr := workflow.ReactionParam["id"]
@@ -112,12 +112,11 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 			return fmt.Errorf("Incorrect ID")
 		}
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
-		resp, _ = self.ServiceService.ApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
 	defer resp.Body.Close()
 	return fmt.Errorf("Unknown reaction")
 }
-
 
 func (self *WorkflowService) executeDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
@@ -147,7 +146,7 @@ func (self *WorkflowService) executeDiscordReactions(workflow entities.Workflow)
 			return fmt.Errorf("Failed to marshall message content")
 		}
 
-		resp, errRequest := self.ServiceService.ApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
+		resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
 		if errRequest != nil {
 			return errRequest
 		}

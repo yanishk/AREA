@@ -87,7 +87,7 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getUserServersFailedMessage,
@@ -130,7 +130,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	guildId := context.Query("id")
 	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	resp, errRequest := self.ServiceService.ApiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getServerChannelsFailedMessage,

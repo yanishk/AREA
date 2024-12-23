@@ -6,9 +6,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"io"
 )
 
 type ServiceService struct {
@@ -248,7 +248,7 @@ func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
-func (self *ServiceService) RequestService(request *http.Request) (*http.Response, error) {
+func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
@@ -256,9 +256,21 @@ func (self *ServiceService) RequestService(request *http.Request) (*http.Respons
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Failed to reach requested service API")
+		return nil, fmt.Errorf(APICallFailedMessage)
 	}
 	return res, nil
+}
+
+func (self *ServiceService) ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", typeToken+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	return self.ExecuteRequest(req)
 }
 
 func (self *ServiceService) GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error) {
@@ -280,7 +292,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		return tokenRes, errRequest
 	}
 
-	res, err := self.RequestService(request)
+	res, err := self.ExecuteRequest(request)
 	if err != nil {
 		return tokenRes, err
 	}
@@ -312,7 +324,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errRequest
 	}
 
-	res, err := self.RequestService(request)
+	res, err := self.ExecuteRequest(request)
 	if err != nil {
 		return userInfo, err
 	}
@@ -323,27 +335,6 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errDecoder
 	}
 	return userInfo, nil
-}
-
-func (self *ServiceService) ApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", typeToken+accessToken)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return resp, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return resp, fmt.Errorf(APICallFailedMessage)
-	}
-	return resp, nil
 }
 
 func (self *ServiceService) RequestToTimeApi() (entities.TimeResponse, error) {
