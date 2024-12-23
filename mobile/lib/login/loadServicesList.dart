@@ -57,7 +57,7 @@ class LoadService extends State<APICall> {
           Globaldata.reactionServicesIcons,
           firstService
         );
-        LoginNavigator.pushAndPushGoBack(ExplorePage(), LoadServicePage());
+        LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
       }
     }
   }

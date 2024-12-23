@@ -67,7 +67,7 @@ class _APICallState extends State<APICall> {
         result = "";
         developer.log("JWToken : {${JWToken}}");
         Globaldata.JWToken = JWToken;
-        LoginNavigator.pushAndPushGoBack(LoadServicePage(), LoadServicePage());
+        LoginNavigator.redirectAndHandleGoBackRedirection(LoadServicePage(), LoadServicePage());
       });
       return;
     }
