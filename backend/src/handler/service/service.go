@@ -597,7 +597,7 @@ func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
 	}
 
 	githubAuthUrl := "https://github.com/login/oauth/authorize?" +
-		clientID + clientID +
+		"client_id=" + clientID +
 		"&redirect_uri=" + callbackLink +
 		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
 		"&state=" + os.Getenv("GITHUB_STATE")
