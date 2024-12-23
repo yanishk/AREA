@@ -225,42 +225,6 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var githubCallback string
-	var githubClientID string
-	var githubClientSecret string
-
-	if callbackType == "service" {
-		githubCallback = os.Getenv("GITHUB_SERVICE_CALLBACK")
-		githubClientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
-		githubClientSecret = os.Getenv("GITHUB_SERVICE_CLIENT_SECRET")
-	} else if callbackType == "login" {
-		githubCallback = os.Getenv("GITHUB_LOGIN_CALLBACK")
-		githubClientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
-		githubClientSecret = os.Getenv("GITHUB_LOGIN_CLIENT_SECRET")
-	} else {
-		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
-	}
-
-	tokenUrl := "https://github.com/login/oauth/access_token"
-	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s",
-		githubClientID,
-		githubClientSecret,
-		code,
-		githubCallback,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
-
-	request.Header.Set(ContentType, ContentTypeUrlEncoded)
-
-	return request, nil
-}
-
 func GetOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
