@@ -145,14 +145,14 @@ const AccountPage = () => {
                 <div
                     className="flex flex-col justify-center items-center"
                 >
-                    <p
-                        className="text-black text-xl font-[800]"
-                    >
-                        {userEmail}
-                    </p>
                     <div
                         className="w-full mt-10"
                     >
+                        <InputField
+                            type="text"
+                            value={userEmail}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
                         <InputField
                             type="password"
                             placeholder="Current password"
