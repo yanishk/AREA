@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UserServiceService struct {
@@ -29,32 +27,6 @@ func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepo
 		UserServiceRepository: UserServiceRepository,
 		ServiceService:        ServiceService,
 	}
-}
-
-func (self *UserServiceService) GetEmailFromContext(context *gin.Context) (string, bool) {
-	email, err := context.Get("email")
-	if !err {
-		return "", err
-	}
-
-	emailStr, errEmail := email.(string)
-	if !errEmail {
-		return "", errEmail
-	}
-	return emailStr, true
-}
-
-func (self *UserServiceService) GetConnectionTypeFromContext(context *gin.Context) (string, bool) {
-	connectionType, err := context.Get("connectionType")
-	if !err {
-		return "", err
-	}
-
-	connectionTypeStr, errConnectionType := connectionType.(string)
-	if !errConnectionType {
-		return "", errConnectionType
-	}
-	return connectionTypeStr, true
 }
 
 func (self *UserServiceService) GetUser(emailStr string, connectionTypeStr string) (entities.User, error) {
@@ -85,7 +57,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		return tokenRes, errRequest
 	}
 
-	res, err := self.ServiceService.RequestService(request)
+	res, err := self.ServiceService.ExecuteRequest(request)
 	if err != nil {
 		return tokenRes, err
 	}

@@ -27,6 +27,7 @@ class APICall extends StatefulWidget {
 class SelectService extends State<APICall> {
   String title = "Select action service";
   int serviceIndex = 0;
+  List<Widget> services = [];
 
   Future<void> setActionOrReactionServiceList() async {
     if (isAnAction == true) {
@@ -47,7 +48,6 @@ class SelectService extends State<APICall> {
   Widget serviceTiles(int index) {
     if (index + 1 < CreateData.serviceNameList.length && index % 2 == 0) {
       serviceIndex++;
-      developer.log("index : $index, index2 : ${index + 1}");
       return Row(
         children: [
           MySquareServicesCard(
@@ -70,17 +70,20 @@ class SelectService extends State<APICall> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    setActionOrReactionServiceList();
-    List<Widget> services = [];
-    for (serviceIndex = 0;
+  void initState() {
+    super.initState();
+    setState(() {
+      setActionOrReactionServiceList();
+      for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-      developer.log(
-          "index : ${serviceIndex}, list size : ${CreateData.serviceNameList.length}");
-      services.add(serviceTiles(serviceIndex));
-    }
+        services.add(serviceTiles(serviceIndex));
+      }
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -121,7 +124,7 @@ class MySquareServicesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (servicesIndex >= Globaldata.actionServicesName.length) {
+    if (servicesIndex > Globaldata.actionServicesName.length) {
       return MyDivider();
     }
     developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");

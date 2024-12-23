@@ -1,13 +1,14 @@
 package docs_userservice
 
-type ServiceCallbackSuccessResponse struct {
+// Service Callback Responses
+type UserServiceServiceCallbackSuccessResponse struct {
 	Msg string `json:"success"example:"Token generated"`
 }
 
-type ServiceCallbackBadRequestResponse struct {
+type UserServiceServiceCallbackBadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid code authorization-Invalid app type"`
 }
 
-type ServiceCallbackInternalServerErrorResponse struct {
+type UserServiceServiceCallbackInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to get email-Failed to update token"`
 }

@@ -5,10 +5,11 @@ import 'dart:developer' as developer;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import "custom_widget.dart";
-import "globalData.dart";
-import "explore/explorePage.dart";
-import "apiCall/apiRequest.dart";
+import "../custom_widget.dart";
+import "../globalData.dart";
+import "../explore/explorePage.dart";
+import "../apiCall/apiRequest.dart";
+import "loginNavigator.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -43,23 +44,23 @@ class LoadService extends State<APICall> {
   }
 
   void setStoreData(dynamic responseData, String route) {
-    final firstService = responseData[0];
-    if (firstService is Map<String, dynamic>) {
-      result = firstService['Name'] ?? 'No Name';
-      if (route == actionsServices) {
-        storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-          Globaldata.actionServicesIcons, firstService);
-      } else {
-        storeData(
-          Globaldata.reactionServicesName,
-          Globaldata.reactionServicesColor,
-          Globaldata.reactionServicesIcons,
-          firstService
-        );
-        Navigator.pushReplacement(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => ExplorePage(),),
-        );
+    final List<dynamic> allResponse = responseData;
+    for (int i = 0; i < allResponse.length; i++) {
+      final service = responseData[i];
+      if (service is Map<String, dynamic>) {
+        result = service['Name'] ?? 'No Name';
+        if (route == actionsServices) {
+          storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
+            Globaldata.actionServicesIcons, service);
+        } else {
+          storeData(
+            Globaldata.reactionServicesName,
+            Globaldata.reactionServicesColor,
+            Globaldata.reactionServicesIcons,
+            service
+          );
+          LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+        }
       }
     }
   }
@@ -77,7 +78,6 @@ class LoadService extends State<APICall> {
           "getServiceResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return null;
     }
-    developer.log('pass');
     return responseData;
   }
 

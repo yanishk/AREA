@@ -1,13 +1,10 @@
 package service_handler
 
 import (
-	"backend/src/entities"
+	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"os"
 
@@ -29,7 +26,6 @@ const accessBearer = "Bearer "
 const InternalServerErrorMessage = "Internal server error"
 const InvalidCallbackTypeMessage = "Invalid callback type"
 const InvalidAppTypeMessage = "Invalid app type"
-const APICallFailedMessage = "API call failed"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
 
@@ -61,78 +57,16 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	service := router.Group("/:service")
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	service := private.Group("/:service")
 	{
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	router.GET("/actions-services", self.RetrieveActionsServices)
-	router.GET("/reactions-services", self.RetrieveReactionsServices)
-	router.GET("/Discord/user/servers", self.getDiscordUserServers)
-	router.GET("/Discord/server/channels", self.getDiscordGuildChannels)
-}
-
-func (self *ServiceHandler) apiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", typeToken+accessToken)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return resp, err
-	}
-
-	if resp.StatusCode != 200 {
-		return resp, fmt.Errorf(APICallFailedMessage)
-	}
-	return resp, nil
-}
-
-func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) error {
-
-	reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
-		return fmt.Errorf("Error finding reaction")
-	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	var resp *http.Response
-	if reactionFound.Name == "Start playback" {
-		resp, _ = self.apiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Pause playback" {
-		resp, _ = self.apiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Skip track" {
-		resp, _ = self.apiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Add track to playback queue" {
-		uri, uriErr := workflow.ReactionParam["uri"]
-		if !uriErr {
-			return fmt.Errorf("Incorrect URI")
-		}
-		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-		resp, _ = self.apiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Save a track" {
-		id, idErr := workflow.ReactionParam["id"]
-		if !idErr {
-			return fmt.Errorf("Incorrect ID")
-		}
-		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
-		resp, _ = self.apiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
-	}
-	defer resp.Body.Close()
-	return fmt.Errorf("Unknown reaction")
+	private.GET("/actions-services", self.RetrieveActionsServices)
+	private.GET("/reactions-services", self.RetrieveReactionsServices)
+	private.GET("/Discord/user/servers", self.getDiscordUserServers)
+	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
 // @Summary		Discord User Servers
@@ -143,23 +77,10 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 // @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
 // @Router			/Discord/user/servers [get]
 func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
-	emailUser, err := context.Get("email")
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's mail",
-		})
-		return
-	}
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
-	connectionTypeUser, err := context.Get("connectionType")
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's connection type",
-		})
-		return
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser.(string), connectionTypeUser.(string), "Discord")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve or refresh the token",
@@ -167,7 +88,7 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 		return
 	}
 
-	resp, errRequest := self.apiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getUserServersFailedMessage,
@@ -210,7 +131,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	guildId := context.Query("id")
 	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	resp, errRequest := self.apiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getServerChannelsFailedMessage,
@@ -230,206 +151,6 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"channels": channels,
 	})
-}
-
-func (self *ServiceHandler) executeDiscordReactions(workflow entities.Workflow) error {
-	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, errReaction := self.ServiceService.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserService.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
-		return fmt.Errorf("Error finding reaction")
-	}
-	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Discord")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
-	if reactionFound.Name == "Post a message to a channel" {
-		message, messageErr := workflow.ReactionParam["message"]
-		channelID, channelErr := workflow.ReactionParam["channelid"]
-		if !messageErr || !channelErr {
-			return fmt.Errorf("Failed to get message body or channel id")
-		}
-
-		urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
-		content, errContent := json.Marshal(map[string]string{
-			"content": message.(string),
-		})
-		if errContent != nil {
-			return fmt.Errorf("Failed to marshall message content")
-		}
-
-		resp, errRequest := self.apiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
-		if errRequest != nil {
-			return errRequest
-		}
-		defer resp.Body.Close()
-	}
-	return fmt.Errorf("Unknown reaction")
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryDay(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	hour, hourExists := workflow.ActionParam["hour"]
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !hourExists || !minuteExists {
-		return fmt.Errorf("Error in the hour and minute sent")
-	}
-
-	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryHour(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !minuteExists {
-		return fmt.Errorf("Error in the minute sent")
-	}
-
-	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryWeekAt(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	days, dayExists := workflow.ActionParam["day"]
-	hour, hourExists := workflow.ActionParam["hour"]
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
-	}
-
-	dayArray, err := days.([]interface{})
-	if !err {
-		return fmt.Errorf("Error parsing the day array")
-	}
-
-	for _, day := range dayArray {
-		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
-			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			self.executeSpotifyReactions(workflow)
-			self.executeDiscordReactions(workflow)
-		}
-	}
-
-	return nil
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryMonthOnThe(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	day, dayExists := workflow.ActionParam["day"]
-	hour, hourExists := workflow.ActionParam["hour"]
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
-	}
-
-	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) executeActiveActionsEveryYearOn(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	month, monthExists := workflow.ActionParam["month"]
-	day, dayExists := workflow.ActionParam["day"]
-	hour, hourExists := workflow.ActionParam["hour"]
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !minuteExists || !hourExists || !dayExists || !monthExists {
-		return fmt.Errorf("Error in the minute, hour, day or month sent")
-	}
-
-	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
-	}
-	return nil
-}
-
-func (self *ServiceHandler) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
-	AllworkflowFound, errWorkflow := self.ServiceService.FindWorkflowByActionId(action.Id)
-	if errWorkflow != nil {
-		return errWorkflow
-	}
-
-	for _, workflow := range AllworkflowFound {
-		if action.Name == "Every day at" {
-			self.executeActiveActionsEveryDay(timeRes, workflow)
-		}
-		if action.Name == "Every hour at" {
-			self.executeActiveActionsEveryHour(timeRes, workflow)
-		}
-		if action.Name == "Every day of the week at" {
-			self.executeActiveActionsEveryWeekAt(timeRes, workflow)
-		}
-		if action.Name == "Every month on the" {
-			self.executeActiveActionsEveryMonthOnThe(timeRes, workflow)
-		}
-		if action.Name == "Every year on" {
-			self.executeActiveActionsEveryYearOn(timeRes, workflow)
-		}
-	}
-	return nil
-}
-
-func (self *ServiceHandler) requestToTimeAPI() (entities.TimeResponse, error) {
-	timeUrl := "https://tools.aimylogic.com/api/now?tz=Europe/Paris"
-	var timeRes entities.TimeResponse
-
-	request, errRequest := http.NewRequest("GET", timeUrl, nil)
-	if errRequest != nil {
-		return timeRes, errRequest
-	}
-
-	client := &http.Client{}
-	res, err := client.Do(request)
-	if err != nil {
-		return timeRes, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return timeRes, fmt.Errorf("HTTP request failed: %s", res.Status)
-	}
-
-	errDecoder := json.NewDecoder(res.Body).Decode(&timeRes)
-	if errDecoder != nil {
-		return timeRes, errDecoder
-	}
-	return timeRes, nil
-}
-
-func (self *ServiceHandler) CallTimeApi() error {
-	var timeRes entities.TimeResponse
-
-	timeRes, errRequest := self.requestToTimeAPI()
-	if errRequest != nil {
-		return errRequest
-	}
-
-	serviceFound, errFindingService := self.ServiceService.FindServiceByName("Time & Date")
-	if errFindingService != nil {
-		return errFindingService
-	}
-
-	allactionFound, errFindingaction := self.ServiceService.FindActionByServiceId(serviceFound.Id)
-	if errFindingaction != nil {
-		return errFindingaction
-	}
-
-	for _, action := range allactionFound {
-		errCheckName := self.checkNameOfAction(timeRes, action)
-		if errCheckName != nil {
-			return errCheckName
-		}
-	}
-	return nil
 }
 
 // @Summary		Google OAuth2

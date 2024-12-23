@@ -31,7 +31,7 @@ type WorkflowCreateWorkflowInternalServerErrorResponse struct {
 
 // Retrieve User's Workflow Responses
 type WorkflowRetrieveUserWorkflowsSuccessResponse struct {
-	Workflow []WorkflowExample
+	Workflows []WorkflowExample
 }
 
 type WorkflowRetrieveUserWorkflowsUnauthorizedResponse struct {

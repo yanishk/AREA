@@ -2,9 +2,8 @@ package service
 
 import (
 	"backend/src/entities"
+	"io"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UserService interface {
@@ -20,22 +19,19 @@ type ServiceService interface {
 	RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error)
 	RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error)
 	FindServiceByName(name string) (entities.Service, error)
-	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
-	FindReactionByID(id string) (entities.Reaction, error)
 	RetrieveActionsFromService(serviceName string) ([]entities.Action, error)
 	RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error)
-	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 	GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
-	RequestService(request *http.Request) (*http.Response, error)
+	ExecuteRequest(request *http.Request) (*http.Response, error)
+	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
+	RequestToTimeApi() (entities.TimeResponse, error)
 }
 
 type UserServiceService interface {
-	GetEmailFromContext(context *gin.Context) (string, bool)
-	GetConnectionTypeFromContext(context *gin.Context) (string, bool)
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
 	UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error
 }
@@ -44,6 +40,7 @@ type WorkflowService interface {
 	CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error
 	ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error
 	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
+	CallTimeApi() error
 }
 
 type Service struct {

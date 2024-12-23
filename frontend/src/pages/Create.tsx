@@ -41,9 +41,10 @@ const WorkflowBuilder = () => {
 
     const getAuthCode = async () => {
         const codeAuth = searchParams.get("code");
+
         if (codeAuth) {
             await axios.post(
-                `${import.meta.env.VITE_API_URL}callback/${serviceName}?code=${codeAuth}`,
+                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
                 {
                 },
                 {
@@ -92,6 +93,7 @@ const WorkflowBuilder = () => {
     const handleContinue = async () => {
         let timeValue;
         let quarterValue;
+
         if (selectedAction?.fields) {
             const { time, quarter } = selectedAction.fields;
             timeValue = parseInt(time) || 0;
