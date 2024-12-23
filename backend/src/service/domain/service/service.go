@@ -328,6 +328,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetSpotifyOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Discord" {
 		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Github" {
+		request, errRequest = GetGithubOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
