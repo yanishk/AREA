@@ -77,8 +77,6 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetSpotifyRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Discord" {
 		request, errRequest = self.ServiceService.GetDiscordRefreshTokenRequest(refreshToken)
-	} else if serviceName == "Github" {
-		request, errRequest = self.ServiceService.GetGithubRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
@@ -131,7 +129,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 		return "", errTimestamp
 	}
 
-	if expiryDate.Before(time.Now()) {
+	if expiryDate.Before(time.Now()) && serviceName != "Github" {
 		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {
