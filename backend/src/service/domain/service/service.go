@@ -23,6 +23,7 @@ const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 const InvalidCallbackTypeMessage = "Invalid callback type"
 const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
+const oneYearSecond = 31536000
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -350,6 +351,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Github" {
 		request, errRequest = GetGithubOAuth2AccessTokenRequest(code, callbackType)
+		request.Header.Set("Accept", "application/json")
+		tokenRes.ExpiresIn = oneYearSecond
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
