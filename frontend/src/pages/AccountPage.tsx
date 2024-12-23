@@ -94,7 +94,7 @@ const AccountPage = () => {
         <>
             {isModalVisible && (
                 <Modal
-                    message={"Do you want to delete you'r account ?"}
+                    message={"Are you sure you want to delete your account ?"}
                     onClickYes={handleDelete}
                     onClickNo={handleCloseModal}
                 />
@@ -184,6 +184,17 @@ const AccountPage = () => {
                                 Change password
                             </p>
                         </div>
+
+                        <div
+                            className="flex justify-start mt-6"
+                        >
+                            <p
+                                className="font-[700] text-[20px] text-[#D0011C] hover:text-[#D51932] hover:cursor-pointer"
+                                onClick={handleShowModal}
+                            >
+                                Delete my account
+                            </p>
+                        </div>
                     </div>
 
 
@@ -207,15 +218,6 @@ const AccountPage = () => {
                             text="Logout"
                             onClick={handleLogout}
                         /> */}
-
-
-                    <TriggerButton
-                        text="Delete my account"
-                        textColor="text-[#D0001D]"
-                        bgColor="bg-[#F9FAFB]"
-                        hoverColor="hover:bg-[#D0001D] hover:text-white"
-                        onClick={handleShowModal}
-                    />
                 </div>
             </MaxWidthWrapper>
         </>
