@@ -75,9 +75,6 @@ class SelectService extends State<APICall> {
     super.initState();
     setState(() {
       setActionOrReactionServiceList();
-      developer.log("serviceNameList: ${CreateData.serviceNameList}");
-      developer.log("serviceColorList: ${CreateData.serviceColorList}");
-      developer.log("serviceIconsList: ${CreateData.serviceIconsList}");
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
