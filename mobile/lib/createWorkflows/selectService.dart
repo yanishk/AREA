@@ -48,7 +48,6 @@ class SelectService extends State<APICall> {
   Widget serviceTiles(int index) {
     if (index + 1 < CreateData.serviceNameList.length && index % 2 == 0) {
       serviceIndex++;
-      developer.log("index : $index, index2 : ${index + 1}");
       return Row(
         children: [
           MySquareServicesCard(
@@ -78,8 +77,6 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-        developer.log(
-            "index : ${serviceIndex}, list size : ${CreateData.serviceNameList.length}");
         services.add(serviceTiles(serviceIndex));
       }
     });
