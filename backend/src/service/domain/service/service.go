@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io"
 )
 
 type ServiceService struct {
@@ -20,7 +21,9 @@ type ServiceService struct {
 
 const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+
 const InvalidCallbackTypeMessage = "Invalid callback type"
+const APICallFailedMessage = "API call failed"
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -36,10 +39,6 @@ func NewServiceService(ServiceRepository storage.ServiceRepository, UserReposito
 
 func (self *ServiceService) FindServiceByName(name string) (entities.Service, error) {
 	return self.ServiceRepository.FindServiceByName(name)
-}
-
-func (self *ServiceService) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
-	return self.ActionRepository.FindActionByServiceId(serviceId)
 }
 
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
@@ -66,14 +65,6 @@ func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]
 		return nil, errFindReactions
 	}
 	return reactions, errFindReactions
-}
-
-func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
-}
-
-func (self *ServiceService) FindReactionByID(id string) (entities.Reaction, error) {
-	return self.ReactionRepository.FindReactionByID(id)
 }
 
 func (self *ServiceService) RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error) {
@@ -332,4 +323,52 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errDecoder
 	}
 	return userInfo, nil
+}
+
+func (self *ServiceService) ApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", typeToken+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return resp, fmt.Errorf(APICallFailedMessage)
+	}
+	return resp, nil
+}
+
+func (self *ServiceService) RequestToTimeApi() (entities.TimeResponse, error) {
+	timeUrl := "https://tools.aimylogic.com/api/now?tz=Europe/Paris"
+	var timeRes entities.TimeResponse
+
+	request, errRequest := http.NewRequest("GET", timeUrl, nil)
+	if errRequest != nil {
+		return timeRes, errRequest
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return timeRes, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return timeRes, fmt.Errorf("HTTP request failed: %s", res.Status)
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&timeRes)
+	if errDecoder != nil {
+		return timeRes, errDecoder
+	}
+	return timeRes, nil
 }

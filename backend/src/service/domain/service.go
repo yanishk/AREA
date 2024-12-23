@@ -13,7 +13,7 @@ func New(repositories *storage.Repository) *service.Service {
 	serviceService := service_service.NewServiceService(repositories.ServiceRepository, repositories.UserRepository, repositories.ActionRepository, repositories.WorkflowRepository, repositories.ReactionRepository)
 	userService := user_service.NewUserService(repositories.UserRepository, repositories.ServiceRepository, serviceService)
 	userServiceService := user_service_service.NewUserServiceService(repositories.ServiceRepository, repositories.UserRepository, repositories.UserServiceRepository, serviceService)
-	workflowService := workflow_service.NewWorkflowService(repositories.WorkflowRepository, repositories.UserRepository)
+	workflowService := workflow_service.NewWorkflowService(repositories.WorkflowRepository, repositories.UserRepository, repositories.ActionRepository, repositories.ReactionRepository, serviceService, userServiceService)
 
 	return &service.Service{
 		ServiceService:     serviceService,
