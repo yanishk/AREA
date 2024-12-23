@@ -21,6 +21,8 @@ type ServiceService struct {
 const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 const InvalidCallbackTypeMessage = "Invalid callback type"
+const grantTypeRefreshToken = "refresh_token"
+const grantTypeAuthorization = "authorization_code"
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -86,20 +88,22 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.ServiceUsefu
 
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
 	return fmt.Sprintf(
-		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
+		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
 		code,
 		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
 		callback,
+		grantTypeAuthorization,
 	)
 }
 
 func GetGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) string {
 	return fmt.Sprintf(
-		"code=%s&client_id=%s&redirect_uri=%s&grant_type=authorization_code",
+		"code=%s&client_id=%s&redirect_uri=%s&grant_type=%s",
 		code,
 		os.Getenv("GOOGLE_MOBILE_CLIENT_ID"),
 		callback,
+		grantTypeAuthorization,
 	)
 }
 
@@ -146,7 +150,8 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
 		code,
 		spotifyCallback,
 	)
@@ -175,7 +180,8 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
 		code,
 		discordCallback,
 	)
@@ -207,9 +213,10 @@ func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) 
 func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://oauth2.googleapis.com/token"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s",
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
 		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
@@ -226,7 +233,8 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=refresh_token&refresh_token=%s",
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
@@ -244,7 +252,8 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=refresh_token&refresh_token=%s",
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
