@@ -192,9 +192,9 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 }
 
 func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
-	tokenUrl := "https://www.googleapis.com/oauth2/v3/userinfo"
+	userInfoUrl := "https://www.googleapis.com/oauth2/v3/userinfo"
 
-	request, errRequest := http.NewRequest("GET", tokenUrl, nil)
+	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
 		return request, errRequest
 	}
@@ -205,9 +205,9 @@ func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) 
 }
 
 func GetSpotifyOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
-	tokenUrl := "https://api.spotify.com/v1/me"
+	userInfoUrl := "https://api.spotify.com/v1/me"
 
-	request, errRequest := http.NewRequest("GET", tokenUrl, nil)
+	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
 		return request, errRequest
 	}
