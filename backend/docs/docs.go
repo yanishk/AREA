@@ -144,6 +144,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/authentication/Github/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Github OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Github OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
