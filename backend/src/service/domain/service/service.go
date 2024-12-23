@@ -192,9 +192,22 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 }
 
 func GetGoogleOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
-	tokenUrl := "https://www.googleapis.com/oauth2/v3/userinfo"
+	userInfoUrl := "https://www.googleapis.com/oauth2/v3/userinfo"
 
-	request, errRequest := http.NewRequest("GET", tokenUrl, nil)
+	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set("Authorization", "Bearer "+accessToken)
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+	return request, nil
+}
+
+func GetSpotifyOAuth2UserEmailRequest(accessToken string) (*http.Request, error) {
+	userInfoUrl := "https://api.spotify.com/v1/me"
+
+	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
 		return request, errRequest
 	}
@@ -311,6 +324,8 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 
 	if serviceName == "Google" {
 		request, errRequest = GetGoogleOAuth2UserEmailRequest(accessToken)
+	} else if serviceName == "Spotify" {
+		request, errRequest = GetSpotifyOAuth2UserEmailRequest(accessToken)
 	} else {
 		return userInfo, fmt.Errorf("Unknown service")
 	}
