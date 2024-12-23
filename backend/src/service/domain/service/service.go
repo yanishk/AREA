@@ -304,6 +304,26 @@ func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
+func (self *ServiceService) GetGithubRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://github.com/login/oauth/access_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
+		os.Getenv("GITHUB_SERVICE_CLIENT_ID"),
+		os.Getenv("GITHUB_SERVICE_CLIENT_SECRET"),
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) RequestService(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
