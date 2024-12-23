@@ -146,8 +146,8 @@ class CreateWorkflows extends State<APICall> {
             builder: (context) => SelectServicePage()),
       );
       setState(() {
-        secondButtonColor = HexColor(CreateData.serviceColorList[Globaldata.secondService]);
         if (result != null) {
+          secondButtonColor = HexColor(CreateData.serviceColorList[Globaldata.secondService]);
           secondButtonState = 2;
           secondSelectedService = "$result";
         }

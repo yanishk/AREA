@@ -44,20 +44,23 @@ class LoadService extends State<APICall> {
   }
 
   void setStoreData(dynamic responseData, String route) {
-    final firstService = responseData[0];
-    if (firstService is Map<String, dynamic>) {
-      result = firstService['Name'] ?? 'No Name';
-      if (route == actionsServices) {
-        storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-          Globaldata.actionServicesIcons, firstService);
-      } else {
-        storeData(
-          Globaldata.reactionServicesName,
-          Globaldata.reactionServicesColor,
-          Globaldata.reactionServicesIcons,
-          firstService
-        );
-        LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+    final List<dynamic> allResponse = responseData;
+    for (int i = 0; i < allResponse.length; i++) {
+      final service = responseData[i];
+      if (service is Map<String, dynamic>) {
+        result = service['Name'] ?? 'No Name';
+        if (route == actionsServices) {
+          storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
+            Globaldata.actionServicesIcons, service);
+        } else {
+          storeData(
+            Globaldata.reactionServicesName,
+            Globaldata.reactionServicesColor,
+            Globaldata.reactionServicesIcons,
+            service
+          );
+          LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+        }
       }
     }
   }
