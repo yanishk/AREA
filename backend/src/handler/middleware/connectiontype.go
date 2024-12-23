@@ -16,7 +16,7 @@ func VerifyConnectionTypeFromContext(context *gin.Context) {
 		return
 	}
 
-	_, ok := connectionType.(string)
+	_, ok = connectionType.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Connection type is not a valid string",

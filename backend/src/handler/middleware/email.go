@@ -16,7 +16,7 @@ func VerifyEmailFromContext(context *gin.Context) {
 		return
 	}
 
-	_, ok := email.(string)
+	_, ok = email.(string)
 	if !ok {
 		context.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"error": "Email is not a valid string",
