@@ -16,10 +16,6 @@ type UserHandler struct {
 }
 
 const InvalidRequestBodyMessage = "Invalid request body"
-const ConnectionTypeNotFoundInTokenMessage = "Connection type not found in token"
-const EmailNotFoundInTokenMessage = "Email not found in token"
-const ConnectionTypeNotValidMessage = "Connection type is not a valid string"
-const EmailNotValidMessage = "Email is not a valid string"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -35,11 +31,12 @@ func (self *UserHandler) SetupRoutes(router *gin.Engine) {
 func (self *UserHandler) PublicRoutes(router *gin.Engine) {
 	router.POST("/register", self.CreateUser)
 	router.POST("/login", self.LoginAuthentication)
-	router.POST("/login-callback/:service", self.LoginCallback)
+	router.POST("/login-callback/:service/:app-type", self.LoginCallback)
 }
 
 func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
-	user := router.Group("/user", middleware.VerifyJWTCookie)
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	user := private.Group("/user")
 	{
 		user.PUT("/modify-password", self.ModifyPassword)
 		user.DELETE("/delete-account", self.DeleteAccount)
@@ -139,14 +136,16 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Tags         Callbacks
 // @Produce      json
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
 // @Failure		200		{object}	docs_user.UserLoginCallbackSuccessResponse
 // @Failure		400		{object}	docs_user.UserLoginCallbackBadRequestResponse
 // @Failure		500		{object}	docs_user.UserLoginCallbackInternalServerErrorResponse
-// @Router       /login-callback/{service} [post]
+// @Router       /login-callback/{service}/{app-type} [post]
 func (self *UserHandler) LoginCallback(context *gin.Context) {
-	code := context.Query("code")
+	appType := context.Param("app-type")
 	serviceName := context.Param("service")
+	code := context.Query("code")
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -155,7 +154,14 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 		return
 	}
 
-	token, err := self.UserService.LoginWithService(code, serviceName)
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+		return
+	}
+
+	token, err := self.UserService.LoginWithService(code, serviceName, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to connect with requested service",
@@ -182,41 +188,9 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 // @Failure		500		{object}	docs_user.UserModifyPasswordInternalServerErrorResponse
 // @Router			/user/modify-password [put]
 func (self *UserHandler) ModifyPassword(context *gin.Context) {
-	email, err := context.Get("email")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
-
-	connectionType, err := context.Get("connectionType")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	connectionTypeStr, ok := connectionType.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotValidMessage,
-		})
-		return
-	}
-
 	var newPassword entities.UserModifyPassword
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
@@ -226,7 +200,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 		return
 	}
 
-	errorModifyPassword := self.UserService.ModifyPassword(emailStr, connectionTypeStr, newPassword)
+	errorModifyPassword := self.UserService.ModifyPassword(email, connectionType, newPassword)
 	if errorModifyPassword != nil {
 		if errorModifyPassword.Error() == "Could not find requested user" {
 			context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -258,41 +232,10 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 // @Failure		500		{object}	docs_user.UserDeleteAccountInternalServerErrorResponse
 // @Router			/user/delete-account [delete]
 func (self *UserHandler) DeleteAccount(context *gin.Context) {
-	email, err := context.Get("email")
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
-
-	connectionType, err := context.Get("connectionType")
-
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	connectionTypeStr, ok := connectionType.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": ConnectionTypeNotValidMessage,
-		})
-		return
-	}
-
-	errDelete := self.UserService.DeleteAccount(emailStr, connectionTypeStr)
+	errDelete := self.UserService.DeleteAccount(email, connectionType)
 	if errDelete != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete account",
@@ -312,23 +255,9 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 // @Failure		401		{object}	docs_user.UserGetUserEmailUnauthorizedResponse
 // @Router			/user/email [get]
 func (self *UserHandler) GetUserEmail(context *gin.Context) {
-	email, err := context.Get("email")
+	email := context.GetString("email")
 
-	if !err {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotFoundInTokenMessage,
-		})
-		return
-	}
-
-	emailStr, ok := email.(string)
-	if !ok {
-		context.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"error": EmailNotValidMessage,
-		})
-		return
-	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"email": emailStr,
+		"email": email,
 	})
 }

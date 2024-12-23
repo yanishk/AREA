@@ -15,6 +15,67 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Discord/server/channels": {
+            "get": {
+                "description": "Retrieve the channels from the selected server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord Server Channels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "server id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Discord/user/servers": {
+            "get": {
+                "description": "Retrieve the discord servers from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord User Servers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/actions-services": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -41,21 +102,28 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Google/{callback-type}": {
+        "/authentication/Discord/{callback-type}/{app-type}": {
             "get": {
-                "description": "Get Google OAuth2 URL",
+                "description": "Get Discord OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Services Authentication"
                 ],
-                "summary": "Google OAuth2",
+                "summary": "Discord OAuth2",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -76,7 +144,49 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Spotify/{callback-type}": {
+        "/authentication/Google/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Google OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Google OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Spotify/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
@@ -91,6 +201,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Callback type (login or service)",
                         "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     }
@@ -163,7 +280,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback/{service}": {
+        "/login-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for login",
                 "produces": [
@@ -178,6 +295,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     },
@@ -289,7 +413,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback/{service}": {
+        "/service-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -304,6 +428,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service name (Google, Spotify..)",
                         "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
                         "in": "path",
                         "required": true
                     },
@@ -676,6 +807,113 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.DiscordChannelExample": {
+            "type": "object",
+            "properties": {
+                "flags": {
+                    "type": "integer"
+                },
+                "guild_id": {
+                    "type": "string"
+                },
+                "icon_emoji": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelIconEmojiExample"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nsfw": {
+                    "type": "boolean"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "permission_overwrites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelPermissionOverwritesExample"
+                    }
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "rate_limite_per_user": {
+                    "type": "integer"
+                },
+                "theme_color": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.DiscordChannelIconEmojiExample": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "docs_service.DiscordChannelPermissionOverwritesExample": {
+            "type": "object",
+            "properties": {
+                "allow": {
+                    "type": "string"
+                },
+                "deny": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.DiscordServerExample": {
+            "type": "object",
+            "properties": {
+                "banner": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "string"
+                }
+            }
+        },
         "docs_service.ReactionExample": {
             "type": "object",
             "properties": {
@@ -717,6 +955,46 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the server's channels"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordGuildChannelsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's servers"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordServerExample"
+                    }
+                }
+            }
+        },
         "docs_service.ServiceInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -731,7 +1009,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type"
+                    "example": "Invalid callback type-Invalid app type"
                 }
             }
         },
@@ -845,7 +1123,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },

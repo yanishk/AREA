@@ -42,6 +42,7 @@ const ConnectService = () => {
                     icon: serviceIcon,
                 },
             };
+            localStorage.setItem("serviceName", JSON.stringify(serviceName));
             localStorage.setItem("workflowData", JSON.stringify(authData));
 
             window.location.href = authUrl;
