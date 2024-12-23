@@ -4,12 +4,13 @@ import 'dart:convert';
 import "package:http/src/response.dart";
 import 'dart:developer' as developer;
 
-import "custom_widget.dart";
+import "../custom_widget.dart";
 import "sign_up.dart";
-import "explore/explorePage.dart";
-import "globalData.dart";
+import "../explore/explorePage.dart";
+import "../globalData.dart";
 import "loadServicesList.dart";
-import 'apiCall/apiRequest.dart';
+import '../apiCall/apiRequest.dart';
+import "loginNavigator.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -66,10 +67,7 @@ class _APICallState extends State<APICall> {
         result = "";
         developer.log("JWToken : {${JWToken}}");
         Globaldata.JWToken = JWToken;
-        Navigator.push(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => LoadServicePage()),
-        );
+        LoginNavigator.redirectAndHandleGoBackRedirection(LoadServicePage(), LoadServicePage());
       });
       return;
     }
