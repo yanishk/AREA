@@ -103,10 +103,10 @@ const AccountPage = () => {
                 <div>
                     <CancelButton
                         text="Cancel"
-                        textColor="text-white"
+                        textColor="text-[#222222]"
                         borderColor="border-[#222222]"
-                        bgColor="bg-[#222222]"
-                        onClick={goBack}
+                        bgColor="bg-[#F9FAFB]"
+                        onClick={goHome}
                     />
                 </div>
             </div>
