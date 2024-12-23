@@ -5,9 +5,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "package:http/src/response.dart";
 import 'package:fluttertoast/fluttertoast.dart';
 
-import "custom_widget.dart";
-import "globalData.dart";
-import 'apiCall/apiRequest.dart';
+import "../custom_widget.dart";
+import "../globalData.dart";
+import '../apiCall/apiRequest.dart';
 
 class EditPasswordPage extends StatelessWidget {
   @override
