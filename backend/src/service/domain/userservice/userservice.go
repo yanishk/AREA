@@ -57,7 +57,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		return tokenRes, errRequest
 	}
 
-	res, err := self.ServiceService.RequestService(request)
+	res, err := self.ServiceService.ExecuteRequest(request)
 	if err != nil {
 		return tokenRes, err
 	}

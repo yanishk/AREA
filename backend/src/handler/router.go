@@ -19,7 +19,6 @@ type UserHandler interface {
 }
 
 type ServiceHandler interface {
-	CallTimeApi() error
 }
 
 type UserServiceHandler interface {
