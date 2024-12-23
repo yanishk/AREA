@@ -33,11 +33,22 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
   Color backgroundColor = Color.fromARGB(255, 63, 68, 69);
   bool editNameMode = false;
   String editNameButtonText = "Edit name";
+  String modifDate = "";
 
   @override
   void initState() {
     super.initState();
     getEmail();
+    setDateReadable();
+  }
+
+  void setDateReadable() {
+    List<String> dateSplited = MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].createdAt.split(RegExp(r'[-:T\.]'));
+    if (dateSplited.length < 5) {
+      return;
+    }
+    dateSplited.removeAt(dateSplited.length - 1);
+    modifDate = "Created on ${dateSplited[1]} ${dateSplited[2]} ${dateSplited[0]} at ${dateSplited[3]}h${dateSplited[4]}";
   }
 
   Future<void> getEmail() async {
@@ -110,6 +121,15 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
               ),
             ),
             Padding(padding: EdgeInsets.only(top: 30)),
+            AutoSizeText(
+              "$modifDate",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              maxLines: 1,
+            ),
           ],
         ),
       ),

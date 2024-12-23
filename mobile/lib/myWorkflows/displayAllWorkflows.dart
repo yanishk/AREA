@@ -57,6 +57,9 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
 
   Future<void> redirectWorkflowInfos(int index) async {
     MyWorkflowsData.selectedWorkflowsIndex = index;
+    if (MyWorkflowsData.allWorkflowsData.isEmpty) {
+      return;
+    }
     await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(builder: (context) => WorkflowInfosPage(),),
