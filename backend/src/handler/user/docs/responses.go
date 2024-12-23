@@ -1,91 +1,91 @@
 package docs_user
 
 // General Responses
-type FailureInvalidBodyResponse struct {
+type UserInvalidBodyResponse struct {
 	Msg string `json:"error"example:"Invalid request body"`
 }
 
-type FailureInternalServerErrorResponse struct {
+type UserInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Internal server error"`
 }
 
 // Register Responses
-type RegisterSuccessResponse struct {
+type UserRegisterSuccessResponse struct {
 	Msg string `json:"success"example:"New user created"`
 }
 
-type RegisterFailureConflictResponse struct {
+type UserRegisterConflictResponse struct {
 	Msg string `json:"error"example:"Email address already used"`
 }
 
-type RegisterFailureBadRequestResponse struct {
+type UserRegisterBadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid request body-Connection type doesn't exist"`
 }
 
 // Login Responses
-type LoginSuccessResponse struct {
+type UserLoginSuccessResponse struct {
 	Msg string `json:"success"example:"Connection successful"`
 }
 
-type LoginFailureUnauthorizedResponse struct {
+type UserLoginUnauthorizedResponse struct {
 	Msg string `json:"error"example:"Could not find requested user-Wrong password"`
 }
-type LoginFailureTokenErrorResponse struct {
+type UserLoginTokenErrorResponse struct {
 	Msg string `json:"error"example:"Error creating token"`
 }
 
 // Login Callback Responses
-type LoginCallbackSuccessResponse struct {
+type UserLoginCallbackSuccessResponse struct {
 	Msg string `json:"success"example:"Connection successful"`
 }
 
-type LoginCallbackBadRequestResponse struct {
+type UserLoginCallbackBadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid code authorization"`
 }
 
-type LoginCallbackInternalServerErrorResponse struct {
+type UserLoginCallbackInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to connect with requested service"`
 }
 
 // Modify Password Responses
-type ModifyPasswordSuccessResponse struct {
+type UserModifyPasswordSuccessResponse struct {
 	Msg string `json:"success"example:"Password modified"`
 }
 
-type ModifyPasswordFailureUnauthorizedResponse struct {
+type UserModifyPasswordUnauthorizedResponse struct {
 	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
-type ModifyPasswordFailureOldPasswordNotValidResponse struct {
+type UserModifyPasswordOldPasswordNotValidResponse struct {
 	Msg string `json:"error"example:"Old password is incorrect"`
 }
 
-type ModifyPasswordFailureInternalServerErrorResponse struct {
+type UserModifyPasswordInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to hash password-Could not modify the password"`
 }
 
-type ModifyPasswordBadRequestResponse struct {
+type UserModifyPasswordBadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid request body-Could not find requested user"`
 }
 
 // Delete Account Responses
-type DeleteAccountSuccessResponse struct {
+type UserDeleteAccountSuccessResponse struct {
 	Msg string `json:"success"example:"Account deleted"`
 }
 
-type DeleteAccountFailureUnauthorizedResponse struct {
+type UserDeleteAccountUnauthorizedResponse struct {
 	Msg string `json:"error"example:"Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"`
 }
 
-type DeleteAccountFailureInternalServerErrorResponse struct {
+type UserDeleteAccountInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not delete account"`
 }
 
 // Get User Email Responses
-type GetUserEmailSuccessResponse struct {
+type UserGetUserEmailSuccessResponse struct {
 	Msg string `json:"email"example:"email@example.com"`
 }
 
-type GetUserEmailUnauthorizedResponse struct {
+type UserGetUserEmailUnauthorizedResponse struct {
 	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
 }

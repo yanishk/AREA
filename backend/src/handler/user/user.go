@@ -50,10 +50,10 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 // @Accept			json
 // @Produce		json
 // @Param			user	body		entities.UserCredentials	true	"User credentials"
-// @Success		200		{object}	docs_user.RegisterSuccessResponse
-// @Failure		400		{object}	docs_user.RegisterFailureBadRequestResponse
-// @Failure		409		{object}	docs_user.RegisterFailureConflictResponse
-// @Failure		500		{object}	docs_user.FailureInternalServerErrorResponse
+// @Success		200		{object}	docs_user.UserRegisterSuccessResponse
+// @Failure		400		{object}	docs_user.UserRegisterBadRequestResponse
+// @Failure		409		{object}	docs_user.UserRegisterConflictResponse
+// @Failure		500		{object}	docs_user.UserInternalServerErrorResponse
 // @Router			/register [post]
 func (self *UserHandler) CreateUser(context *gin.Context) {
 	var newUser entities.UserCredentials
@@ -95,10 +95,10 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Param			user	body		entities.UserCredentials	true	"User credentials"
-// @Success		200		{object}	docs_user.LoginSuccessResponse
-// @Failure		400		{object}	docs_user.FailureInvalidBodyResponse
-// @Failure		401		{object}	docs_user.LoginFailureUnauthorizedResponse
-// @Failure		500		{object}	docs_user.LoginFailureTokenErrorResponse
+// @Success		200		{object}	docs_user.UserLoginSuccessResponse
+// @Failure		400		{object}	docs_user.UserInvalidBodyResponse
+// @Failure		401		{object}	docs_user.UserLoginUnauthorizedResponse
+// @Failure		500		{object}	docs_user.UserLoginTokenErrorResponse
 // @Router			/login [post]
 func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 	var user entities.UserCredentials
@@ -138,9 +138,9 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
 // @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
-// @Failure		200		{object}	docs_user.LoginCallbackSuccessResponse
-// @Failure		400		{object}	docs_user.LoginCallbackBadRequestResponse
-// @Failure		500		{object}	docs_user.LoginCallbackInternalServerErrorResponse
+// @Failure		200		{object}	docs_user.UserLoginCallbackSuccessResponse
+// @Failure		400		{object}	docs_user.UserLoginCallbackBadRequestResponse
+// @Failure		500		{object}	docs_user.UserLoginCallbackInternalServerErrorResponse
 // @Router       /login-callback/{service}/{app-type} [post]
 func (self *UserHandler) LoginCallback(context *gin.Context) {
 	appType := context.Param("app-type")
@@ -181,11 +181,11 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Param			user	body		entities.UserModifyPassword true	"New password of the user"
-// @Success		200		{object}	docs_user.ModifyPasswordSuccessResponse
-// @Failure		400		{object}	docs_user.ModifyPasswordBadRequestResponse
-// @Failure		401		{object}	docs_user.ModifyPasswordFailureUnauthorizedResponse
-// @Failure		403		{object}	docs_user.ModifyPasswordFailureOldPasswordNotValidResponse
-// @Failure		500		{object}	docs_user.ModifyPasswordFailureInternalServerErrorResponse
+// @Success		200		{object}	docs_user.UserModifyPasswordSuccessResponse
+// @Failure		400		{object}	docs_user.UserModifyPasswordBadRequestResponse
+// @Failure		401		{object}	docs_user.UserModifyPasswordUnauthorizedResponse
+// @Failure		403		{object}	docs_user.UserModifyPasswordOldPasswordNotValidResponse
+// @Failure		500		{object}	docs_user.UserModifyPasswordInternalServerErrorResponse
 // @Router			/user/modify-password [put]
 func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	var newPassword entities.UserModifyPassword
@@ -227,9 +227,9 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 // @Tags			Users
 // @Accept			json
 // @Produce		json
-// @Success		200		{object}	docs_user.DeleteAccountSuccessResponse
-// @Failure		401		{object}	docs_user.DeleteAccountFailureUnauthorizedResponse
-// @Failure		500		{object}	docs_user.DeleteAccountFailureInternalServerErrorResponse
+// @Success		200		{object}	docs_user.UserDeleteAccountSuccessResponse
+// @Failure		401		{object}	docs_user.UserDeleteAccountUnauthorizedResponse
+// @Failure		500		{object}	docs_user.UserDeleteAccountInternalServerErrorResponse
 // @Router			/user/delete-account [delete]
 func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	email := context.GetString("email")
@@ -251,8 +251,8 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 // @Description	Get the email of user connected
 // @Tags			Users
 // @Produce		json
-// @Success		200		{object}	docs_user.GetUserEmailSuccessResponse
-// @Failure		401		{object}	docs_user.GetUserEmailUnauthorizedResponse
+// @Success		200		{object}	docs_user.UserGetUserEmailSuccessResponse
+// @Failure		401		{object}	docs_user.UserGetUserEmailUnauthorizedResponse
 // @Router			/user/email [get]
 func (self *UserHandler) GetUserEmail(context *gin.Context) {
 	email := context.GetString("email")

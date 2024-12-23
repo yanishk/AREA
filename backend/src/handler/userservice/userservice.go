@@ -35,9 +35,9 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Param        service  path      string  true  "Service name (Google, Spotify..)"
 // @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
-// @Failure		200		{object}	docs_userservice.ServiceCallbackSuccessResponse
-// @Failure		400		{object}	docs_userservice.ServiceCallbackBadRequestResponse
-// @Failure		500		{object}	docs_userservice.ServiceCallbackInternalServerErrorResponse
+// @Failure		200		{object}	docs_userservice.UserServiceServiceCallbackSuccessResponse
+// @Failure		400		{object}	docs_userservice.UserServiceServiceCallbackBadRequestResponse
+// @Failure		500		{object}	docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse
 // @Router       /service-callback/{service}/{app-type} [post]
 func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
 	appType := context.Param("app-type")
