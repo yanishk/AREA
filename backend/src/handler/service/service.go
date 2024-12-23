@@ -2,6 +2,7 @@ package service_handler
 
 import (
 	"backend/src/entities"
+	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"bytes"
@@ -60,15 +61,16 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
-	service := router.Group("/:service")
+	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	service := private.Group("/:service")
 	{
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	router.GET("/actions-services", self.RetrieveActionsServices)
-	router.GET("/reactions-services", self.RetrieveReactionsServices)
-	router.GET("/Discord/user/servers", self.getDiscordUserServers)
-	router.GET("/Discord/server/channels", self.getDiscordGuildChannels)
+	private.GET("/actions-services", self.RetrieveActionsServices)
+	private.GET("/reactions-services", self.RetrieveReactionsServices)
+	private.GET("/Discord/user/servers", self.getDiscordUserServers)
+	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
 func (self *ServiceHandler) apiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
@@ -142,23 +144,10 @@ func (self *ServiceHandler) executeSpotifyReactions(workflow entities.Workflow) 
 // @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
 // @Router			/Discord/user/servers [get]
 func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
-	emailUser, err := context.Get("email")
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's mail",
-		})
-		return
-	}
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
-	connectionTypeUser, err := context.Get("connectionType")
-	if !err {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's connection type",
-		})
-		return
-	}
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(emailUser.(string), connectionTypeUser.(string), "Discord")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve or refresh the token",
