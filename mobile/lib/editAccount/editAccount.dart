@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:namer_app/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
 import "../../apiCall/apiErrorHandling.dart";
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 import "../custom_widget.dart";
 import "../footer_page.dart";
@@ -76,10 +76,7 @@ class EditAccount extends State<APICall> {
         fontSize: 24.0
       );
     });
-    Navigator.push(
-      Globaldata.myContext,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+    Phoenix.rebirth(Globaldata.myContext);
   }
 
   Future<void> deleteAccountConfirmDialog() async {
@@ -136,10 +133,7 @@ class EditAccount extends State<APICall> {
             Globaldata.resetActionReactionServicesList();
             Globaldata.JWToken = "";
             Navigator.of(context).pop();
-            Navigator.push(
-              Globaldata.myContext,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-            );
+            Phoenix.rebirth(Globaldata.myContext);
           },
           secondChoiceonPressed: () {
             Navigator.of(context).pop();

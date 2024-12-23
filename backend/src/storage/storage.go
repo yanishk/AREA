@@ -5,11 +5,11 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(email string, password string) error
-	FindUserByEmail(email string) (entities.User, error)
-	UpdateUser(email string, password string) error
-	DeleteUser(email string) error
+	CreateUser(email string, password string, connectionType string) error
+	FindUserByEmail(email string, connectionType string) (entities.User, error)
 	FindUserById(userId string) (entities.User, error)
+	UpdateUser(email string, password string, connectionType string) error
+	DeleteUser(email string, connectionType string) error
 }
 
 type ServiceRepository interface {

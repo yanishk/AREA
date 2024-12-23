@@ -20,6 +20,8 @@ class Globaldata {
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
 
+  static const String appType = "mobile";
+
   static void resetActionReactionServicesList() {
     Globaldata.actionServicesName = [];
     Globaldata.actionServicesColor = [];

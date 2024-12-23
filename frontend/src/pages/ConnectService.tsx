@@ -21,7 +21,7 @@ const ConnectService = () => {
     const handleConnect = async () => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_API_URL}authentication/${serviceName}`,
+                `${import.meta.env.VITE_API_URL}authentication/${serviceName}/service/web`,
                 {
                     withCredentials: true,
                 }
@@ -42,6 +42,7 @@ const ConnectService = () => {
                     icon: serviceIcon,
                 },
             };
+            localStorage.setItem("serviceName", JSON.stringify(serviceName));
             localStorage.setItem("workflowData", JSON.stringify(authData));
 
             window.location.href = authUrl;

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
+import "package:http/src/response.dart";
 import 'dart:developer' as developer;
 
-import "custom_widget.dart";
-import "login_page.dart";
-import "globalData.dart";
-import 'apiCall/apiRequest.dart';
+import "../custom_widget.dart";
+import "sign_up.dart";
+import "../explore/explorePage.dart";
+import "../globalData.dart";
+import "loadServicesList.dart";
+import '../apiCall/apiRequest.dart';
+import "loginNavigator.dart";
 
-class SignUp extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,10 +29,10 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = new TextEditingController(text: "");
+  final TextEditingController passwordController = new TextEditingController(text: "");
   String result = '';
-  String apiRoute = 'register';
+  String apiRoute = 'login';
 
   @override
   void dispose() {
@@ -37,7 +41,42 @@ class _APICallState extends State<APICall> {
     super.dispose();
   }
 
-  Future<void> postRegisterData() async {
+  @override
+  void initState() {
+    super.initState();
+    _checkJWToken();
+  }
+
+  void _checkJWToken() {
+    if (Globaldata.JWToken.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ExplorePage(),),
+        );
+      });
+    }
+  }
+
+  Future<void> saveJWToken(Response response) async {
+    String? cookiesBrute = response.headers["set-cookie"];
+    String JWToken = "";
+    if (cookiesBrute != null) {
+      JWToken = cookiesBrute.split(';').first;
+      setState(() {
+        result = "";
+        developer.log("JWToken : {${JWToken}}");
+        Globaldata.JWToken = JWToken;
+        LoginNavigator.pushAndPushGoBack(LoadServicePage(), LoadServicePage());
+      });
+      return;
+    }
+    setState(() {
+      result = 'Failed to get the token';
+    });
+  }
+
+  Future<void> postLoginData() async {
     final response = await ApiRequest.post(apiRoute, jsonEncode(<String, dynamic>{'email': emailController.text,'password': passwordController.text,}),);
     if (response.statusCode == 504) {
       setState(() {
@@ -48,20 +87,18 @@ class _APICallState extends State<APICall> {
     final responseData = jsonDecode(response.body);
     if (response.statusCode != 200) {
       developer.log(
-          "postRegisterData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+          "postLoginData FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       setState(() {
         result = '${responseData['error']}';
       });
       return;
     }
-    Navigator.push(
-      Globaldata.myContext,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+    saveJWToken(response);
   }
 
   @override
   Widget build(BuildContext context) {
+    Globaldata.myContext = context;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -73,7 +110,7 @@ class _APICallState extends State<APICall> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               Text(
-                "Sign up",
+                "Log in",
                 style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
               ),
               Text(
@@ -88,21 +125,24 @@ class _APICallState extends State<APICall> {
                 controller: emailController,
               ),
               CustomClassicForm(
-                hint: 'Password',
-                obscureText: true,
-                controller: passwordController,
+                  hint: 'Password',
+                  controller: passwordController,
+                  obscureText: true),
+              Text(
+                "Forgot your password?",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 20),
               CustomButton(
                 backgroundColor: Color.fromARGB(255, 34, 34, 34),
                 text: AutoSizeText(
-                  "Get started",
+                  "Log in",
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
-                onPressed: postRegisterData,
+                onPressed: postLoginData,
                 size: Size(double.infinity, 70),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
               ),
@@ -180,7 +220,12 @@ class _APICallState extends State<APICall> {
                       color: Colors.white),
                   maxLines: 1,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    Globaldata.myContext,
+                    MaterialPageRoute(builder: (context) => LoadServicePage()),
+                  );
+                },
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
@@ -190,7 +235,7 @@ class _APICallState extends State<APICall> {
               Padding(padding: EdgeInsets.only(top: 30)),
               CustomTextButton(
                 text: Text(
-                  "Already on AREA? Log in here",
+                  "New to AREA? Sign up here.",
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -200,7 +245,7 @@ class _APICallState extends State<APICall> {
                 onPressed: () {
                   Navigator.push(
                     Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => SignUp()),
                   );
                 },
               ),
