@@ -8,6 +8,7 @@ import { useAuth } from "./AuthContext";
 import CancelButton from "../components/buttons/CancelButton";
 import Modal from "../components/modals/Modal";
 import Navbar from "../components/navbar/Navbar";
+import MaxWidthWrapper from "../components/MaxWidthWrapper";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
@@ -115,68 +116,73 @@ const AccountPage = () => {
                 </div>
             </div>
 
-            <div
-                className="flex items-center justify-center mt-10"
+            <MaxWidthWrapper
+                maxWidth="720px"
             >
                 <div
-                    className="flex flex-col items-center text-center"
+                    className="flex items-center justify-center mt-10"
                 >
-                    <h1
-                        className="text-5xl text-[#222222] font-[900] mx-[80px]"
-                    >
-                        Account settings
-                    </h1>
-
                     <div
-                        className="flex items-center w-full mt-6"
+                        className="flex flex-col items-center text-center w-full"
                     >
+                        <h1
+                            className="text-5xl text-[#222222] font-[900]"
+                        >
+                            Account settings
+                        </h1>
+
                         <div
-                            className="flex-grow border-[1.5px] border-[#e7e7e7]"
+                            className="flex items-center w-full mt-6"
+                        >
+                            <div
+                                className="flex-grow border-[1.5px] border-[#e7e7e7] w-full"
+                            />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div
+                    className="flex flex-col justify-center items-center"
+                >
+                    <p
+                        className="text-black text-xl font-[800]"
+                    >
+                        {userEmail}
+                    </p>
+                    <div
+                        className="w-full mt-10"
+                    >
+                        <InputField
+                            type="password"
+                            placeholder="Current password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <InputField
+                            type="password"
+                            placeholder="New password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <ButtonValidation
+                            text="Submit"
+                            onClick={handleSubmit}
+                        />
+                        <ButtonValidation
+                            text="Logout"
+                            onClick={handleLogout}
+                        />
+                        <TriggerButton
+                            text="Delete my account"
+                            textColor="text-[#D0001D]"
+                            bgColor="bg-[#F9FAFB]"
+                            hoverColor="hover:bg-[#D0001D] hover:text-white"
+                            onClick={handleShowModal}
                         />
                     </div>
                 </div>
-            </div>
-
-            <div
-                className="flex flex-col justify-center items-center"
-            >
-                <p
-                    className="text-black text-xl font-[800]"
-                >
-                    {userEmail}
-                </p>
-                <div
-                    className="max-w-96 mt-10"
-                >
-                    <InputField
-                        type="password"
-                        placeholder="Current password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <InputField
-                        type="password"
-                        placeholder="New password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                    <ButtonValidation
-                        text="Submit"
-                        onClick={handleSubmit}
-                    />
-                    <ButtonValidation
-                        text="Logout"
-                        onClick={handleLogout}
-                        />
-                    <TriggerButton
-                        text="Delete my account"
-                        textColor="text-[#D0001D]"
-                        bgColor="bg-[#F9FAFB]"
-                        hoverColor="hover:bg-[#D0001D] hover:text-white"
-                        onClick={handleShowModal}
-                        />
-                </div>
-            </div>
+            </MaxWidthWrapper>
         </>
     )
 }
