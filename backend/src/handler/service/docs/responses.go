@@ -89,7 +89,6 @@ type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 	Reactions []ReactionExample
 }
 
-
 // Discord Get User Servers
 type ServiceGetDiscordUserServersSuccessResponse struct {
 	Servers []DiscordServerExample
