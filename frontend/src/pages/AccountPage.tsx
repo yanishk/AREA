@@ -148,12 +148,46 @@ const AccountPage = () => {
                     <div
                         className="w-full mt-10"
                     >
+                        <p
+                            className="font-extrabold text-[22.5px] mb-[6px]"
+                        >
+                            Email
+                        </p>
                         <InputField
                             type="text"
                             value={userEmail}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        <InputField
+                    </div>
+
+                    <div
+                        className="flex flex-col justify-start mt-4 w-full"
+                    >
+                        <p
+                            className="font-extrabold text-[22.5px] mt-[6px]"
+                        >
+                            Password
+                        </p>
+                        <input
+                            className="text-[1.6em] mt-2 font-mono"
+                            type="password"
+                            name="password"
+                            value="****************"
+                            disabled={true}
+                        />
+                        <div
+                            className="flex justify-start mt-2"
+                        >
+                            <p
+                                className="font-[700] text-[20px] text-[#0099FF] hover:text-[#1BA3FF] hover:cursor-pointer"
+                            >
+                                Change password
+                            </p>
+                        </div>
+                    </div>
+
+
+                        {/* <InputField
                             type="password"
                             placeholder="Current password"
                             value={password}
@@ -164,23 +198,24 @@ const AccountPage = () => {
                             placeholder="New password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                        />
-                        <ButtonValidation
+                        /> */}
+                        {/* <ButtonValidation
                             text="Submit"
                             onClick={handleSubmit}
                         />
                         <ButtonValidation
                             text="Logout"
                             onClick={handleLogout}
-                        />
-                        <TriggerButton
-                            text="Delete my account"
-                            textColor="text-[#D0001D]"
-                            bgColor="bg-[#F9FAFB]"
-                            hoverColor="hover:bg-[#D0001D] hover:text-white"
-                            onClick={handleShowModal}
-                        />
-                    </div>
+                        /> */}
+
+
+                    <TriggerButton
+                        text="Delete my account"
+                        textColor="text-[#D0001D]"
+                        bgColor="bg-[#F9FAFB]"
+                        hoverColor="hover:bg-[#D0001D] hover:text-white"
+                        onClick={handleShowModal}
+                    />
                 </div>
             </MaxWidthWrapper>
         </>
