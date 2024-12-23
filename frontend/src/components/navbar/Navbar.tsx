@@ -3,7 +3,11 @@ import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
 
-const Navbar = () => {
+interface navbarProps {
+    bgColor?: string;
+}
+
+const Navbar: React.FC<navbarProps> = ({ bgColor }) => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
@@ -19,9 +23,8 @@ const Navbar = () => {
     }
 
     return (
-        <div className="bg-white">
+        <div className={`${bgColor}`}>
             <div className="pt-6 pb-6 flex justify-between items-center px-6">
-
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                         <a
