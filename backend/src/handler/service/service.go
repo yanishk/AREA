@@ -52,6 +52,7 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
 		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
 		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
+		authentication.GET("/Github/:callback-type/:app-type", self.OAuth2Github)
 	}
 }
 
@@ -278,6 +279,52 @@ func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		authURL: discordAuthUrl,
+	})
+}
+
+// @Summary		Github OAuth2
+// @Description	Get Github OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Github/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
+	var callbackLink string
+	var clientID string
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
+
+	if callbackType == "login" {
+		clientID = os.Getenv("GITHUB_LOGIN_CLIENT_ID")
+		callbackLink = os.Getenv("GITHUB_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		clientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
+		callbackLink = os.Getenv("GITHUB_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	githubAuthUrl := "https://github.com/login/oauth/authorize?" +
+		"client_id=" + clientID +
+		"&redirect_uri=" + callbackLink +
+		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
+		"&state=" + os.Getenv("GITHUB_STATE")
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: githubAuthUrl,
 	})
 }
 

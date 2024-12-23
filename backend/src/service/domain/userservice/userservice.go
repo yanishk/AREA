@@ -101,7 +101,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 		return "", errTimestamp
 	}
 
-	if expiryDate.Before(time.Now()) {
+	if expiryDate.Before(time.Now()) && serviceName != "Github" {
 		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {
