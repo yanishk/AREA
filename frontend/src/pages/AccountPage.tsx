@@ -90,6 +90,10 @@ const AccountPage = () => {
         setIsModalVisible(false);
     };
 
+    const handleChangePassword = () => {
+        navigate("/settings/change_password")
+    }
+
     return (
         <>
             {isModalVisible && (
@@ -180,6 +184,7 @@ const AccountPage = () => {
                         >
                             <p
                                 className="font-[700] text-[20px] text-[#0099FF] hover:text-[#1BA3FF] hover:cursor-pointer"
+                                onClick={handleChangePassword}
                             >
                                 Change password
                             </p>

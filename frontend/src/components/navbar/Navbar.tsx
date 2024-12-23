@@ -16,7 +16,7 @@ const Navbar: React.FC<navbarProps> = ({ bgColor }) => {
     }
 
     const handleAccount = () => {
-        navigate("/account");
+        navigate("/settings");
     };
     const handleCreate = () => {
         navigate("/create");
