@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import CancelButton from "../components/buttons/CancelButton";
 import Modal from "../components/modals/Modal";
+import Navbar from "../components/navbar/Navbar";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
@@ -97,6 +98,7 @@ const AccountPage = () => {
                     onClickNo={handleCloseModal}
                 />
             )}
+            <Navbar />
             <div className="flex items-center justify-between px-10 py-5">
                 <div>
                     <CancelButton
