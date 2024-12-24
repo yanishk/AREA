@@ -331,6 +331,26 @@ func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
+func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://www.reddit.com/api/v1/access_token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(os.Getenv("REDDIT_SERVICE_CLIENT_ID"), os.Getenv("REDDIT_SERVICE_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	return request, nil
+}
+
 func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
