@@ -86,10 +86,13 @@ const Navbar: React.FC<navbarProps> = ({ bgColor }) => {
                             </li>
                             <li>
                                 <button
-                                    className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center cursor-pointer"
+                                    className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center border-[3px] border-[#222222] cursor-pointer"
                                     onClick={handleAccount}
                                 >
-                                    <p className="text-white font-[900]">W</p>
+                                    <img
+                                        src="iconAvatar.svg"
+                                        alt="Avatar"
+                                    />
                                 </button>
                             </li>
                         </>
