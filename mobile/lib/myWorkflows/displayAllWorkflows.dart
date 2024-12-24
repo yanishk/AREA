@@ -14,6 +14,7 @@ import "myWorkflowsData.dart";
 import "workflowsWidget.dart";
 import "../globalData.dart";
 import 'workflowInfos.dart';
+import 'myWorkflowsFunctions.dart';
 
 class DisplayWorkflows extends StatelessWidget {
   @override
@@ -137,57 +138,13 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
     );
   }
 
-  void storeServiceDescription(dynamic responseData, List<Widget> cardList) {
-    if (responseData is Map<String, dynamic> &&
-        responseData[workflowsResponseName] is List) {
-      List<dynamic> actions = responseData[workflowsResponseName];
-      for (int i = 0; !actions.isEmpty; i++) {
-        final actionResponse = actions.removeLast();
-        if (actionResponse is Map<String, dynamic>) {
-          MyWorkflowsData.allWorkflowsData.add(WorkflowsData.optional(
-            actionResponse['Id'] ?? '',
-            actionResponse['Name'] ?? '',
-            actionResponse['OwnerId'] ?? '',
-            actionResponse['ActionId'] ?? '',
-            actionResponse['ReactionId'] ?? '',
-            actionResponse['IsActivated'] ?? false,
-            actionResponse['CreatedAt'] ?? '',
-            actionResponse['actionparam'] ?? '',
-            actionResponse['reactionparam'] ?? '',
-          ));
-          cardList.add(
-            WorkflowCard(
-              content: workflowsTiles(i),
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<dynamic> getWorkflowsResponse(String route) async {
-    Response response = await ApiRequest.get(route);
-    if (response.statusCode == 504) {
-      developer.log('${response.body}');
-      developer.log('${response.body}');
-      return null;
-    }
-    final responseData = jsonDecode(response.body);
-    if (response.statusCode != 200) {
-      developer.log(
-          "getWorkflowsResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
-      return null;
-    }
-    return responseData;
-  }
-
   Future<void> getWorkflows(List<Widget> cardList) async {
-    final response = await getWorkflowsResponse(apiRoute);
+    final response = await MyWorkflowsfunctions.getWorkflowsResponse(apiRoute);
     if (response == null) {
       return;
     }
     setState(() {
-      storeServiceDescription(response, cardList);
+      MyWorkflowsfunctions.storeServiceDescription(response, cardList, workflowsResponseName, workflowsTiles);
     });
   }
 

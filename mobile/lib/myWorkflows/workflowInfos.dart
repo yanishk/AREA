@@ -3,12 +3,16 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "package:http/src/response.dart";
 import 'package:flutter_switch/flutter_switch.dart';
 import 'dart:convert';
+import 'dart:developer' as developer;
+import "../../apiCall/apiErrorHandling.dart";
 
 import "../custom_widget.dart";
 import "../apiCall/apiRequest.dart";
-import "../apiCall/apiErrorHandling.dart";
 import "myWorkflowsData.dart";
 import 'workflowsWidget.dart';
+import '../globalData.dart';
+import "myWorkflowsFunctions.dart";
+import 'deleteWorkflow.dart';
 
 class WorkflowInfosPage extends StatelessWidget {
   @override
@@ -34,21 +38,13 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
   bool editNameMode = false;
   String editNameButtonText = "Edit name";
   String modifDate = "";
+  String workflowID = MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].id;
 
   @override
   void initState() {
     super.initState();
     getEmail();
-    setDateReadable();
-  }
-
-  void setDateReadable() {
-    List<String> dateSplited = MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].createdAt.split(RegExp(r'[-:T\.]'));
-    if (dateSplited.length < 5) {
-      return;
-    }
-    dateSplited.removeAt(dateSplited.length - 1);
-    modifDate = "Created on ${dateSplited[1]} ${dateSplited[2]} ${dateSplited[0]} at ${dateSplited[3]}h${dateSplited[4]}";
+    modifDate = MyWorkflowsfunctions.getWorkflowDate();
   }
 
   Future<void> getEmail() async {
@@ -114,21 +110,51 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
                 onToggle: (bool) {
                   ApiRequest.put(
                     "workflow/modify-activation",
-                    jsonEncode(<String, dynamic>{'id': MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].id,}),
+                    jsonEncode(<String, dynamic>{'id': workflowID,}),
                   );
                   changeActivationBool();
                 },
               ),
             ),
             Padding(padding: EdgeInsets.only(top: 30)),
-            AutoSizeText(
-              "$modifDate",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            LeftWidget(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AutoSizeText(
+                    "More details",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 102, 102, 102),
+                    ),
+                    maxLines: 1,
+                  ),
+                  AutoSizeText(
+                    "$modifDate",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    maxLines: 5,
+                  ),
+                ],
+              )
+            ),
+            Padding(padding: EdgeInsets.only(top: 30)),
+            CustomButton(
+              backgroundColor: Color.fromARGB(255, 240, 240, 240),
+              text: AutoSizeText(
+                "Delete my Workflow",
+                style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 255, 0, 0)),
               ),
-              maxLines: 1,
+              onPressed: () {DeleteWorkflows.deleteWorkflowConfirmDialog(workflowID);},
+              size: Size(double.infinity, 55),
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
           ],
         ),
