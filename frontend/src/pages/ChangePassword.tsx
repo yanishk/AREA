@@ -67,7 +67,7 @@ const ChangePasswordPage = () => {
             setPasswordError("");
             setNewPasswordError("");
             setConfirmPasswordError("");
-            setError("Please confirm your new password");
+            setError("The new password and the confirmation do not match");
             return;
         }
 
