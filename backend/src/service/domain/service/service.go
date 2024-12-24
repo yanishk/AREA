@@ -357,8 +357,6 @@ func (self *ServiceService) ExecuteApiRequest(url string, method string, typeTok
 		return nil, err
 	}
 
-	fmt.Println(2222)
-	fmt.Println(err)
 	req.Header.Set("Authorization", typeToken+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 
