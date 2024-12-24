@@ -5,7 +5,6 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import { useNavigate } from "react-router-dom";
-import ErrorMessage from "../components/errors/ErrorMessage";
 import ErrorField from "../components/errors/ErrorField";
 
 
@@ -42,23 +41,33 @@ const ChangePasswordPage = () => {
     const handleSubmit = async () => {
         if (!password) {
             setPasswordError("Please provide your current password");
+            setNewPasswordError("");
+            setConfirmPasswordError("");
+            setError("");
             return;
         }
 
         if (!newPassword) {
-            setNewPasswordError("Please provide your new password");
             setPasswordError("");
+            setNewPasswordError("Please provide your new password");
+            setConfirmPasswordError("");
+            setError("");
             return;
         }
 
         if (!confirmPassword) {
-            setConfirmPasswordError("Please confirm your new password");
+            setPasswordError("");
             setNewPasswordError("");
+            setConfirmPasswordError("Please confirm your new password");
+            setError("");
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError("");
+            setPasswordError("");
+            setNewPasswordError("");
+            setConfirmPasswordError("");
+            setError("Please confirm your new password");
             return;
         }
 
@@ -137,6 +146,12 @@ const ChangePasswordPage = () => {
                         >
                             Current password
                         </p>
+
+                        { error &&
+                            <ErrorField
+                                error={error}
+                            />
+                        }
 
                         { passwordError &&
                             <ErrorField
