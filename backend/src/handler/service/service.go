@@ -340,7 +340,6 @@ func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
 // @Router			/service/retrieve [get]
 func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 	serviceId := context.Query("id")
-
 	if serviceId == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid service id",
