@@ -105,9 +105,7 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           developer.log(url.toString());
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
-            developer.log("url no split : ${url.toString()}");
             final urlSplit = url.toString().split('/area/');
-            developer.log("url : ${insertAppTypeInUrl(urlSplit.last)}");
             final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
