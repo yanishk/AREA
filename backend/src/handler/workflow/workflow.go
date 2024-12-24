@@ -106,6 +106,9 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 // @Produce		json
 // @Param        id     query     string  true  "Workflow id"
 // @Param			workflow	body		entities.UpdatedWorkflow	true	"Workflow informations"
+// @Success		200		{object}	docs_workflow.WorkflowUpdateWorkflowSuccessResponse
+// @Success		400		{object}	docs_workflow.WorkflowUpdateWorkflowBadRequestResponse
+// @Success		500		{object}	docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse
 // @Router			/workflow/update [put]
 func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 	var workflow entities.UpdatedWorkflow

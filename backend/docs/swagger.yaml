@@ -421,6 +421,24 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
+  docs_workflow.WorkflowUpdateWorkflowBadRequestResponse:
+    properties:
+      error:
+        example: Invalid workflow id-Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not update workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Workflow successfully updated
+        type: string
+    type: object
   entities.NewWorkflow:
     properties:
       actionid:
@@ -1025,7 +1043,19 @@ paths:
           $ref: '#/definitions/entities.UpdatedWorkflow'
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
       summary: Update Workflow
       tags:
       - Workflow
