@@ -393,7 +393,6 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		tokenRes.ExpiresIn = oneYearSecond
 	} else if serviceName == "Reddit" {
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
-
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
