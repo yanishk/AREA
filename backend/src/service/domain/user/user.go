@@ -14,9 +14,11 @@ import (
 )
 
 type UserService struct {
-	UserRepository    storage.UserRepository
-	ServiceRepository storage.ServiceRepository
-	ServiceService    service.ServiceService
+	UserRepository        storage.UserRepository
+	ServiceRepository     storage.ServiceRepository
+	UserServiceRepository storage.UserServiceRepository
+	WorkflowRepository    storage.WorkflowRepository
+	ServiceService        service.ServiceService
 }
 
 const ContentType = "Content-Type"
@@ -24,11 +26,14 @@ const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 const FormattingDate = "2006-01-02 15:04:05-07:00"
 const BasicConnectionType = "basic"
 
-func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository, ServiceService service.ServiceService) *UserService {
+func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository,
+	UserServiceRepository storage.UserServiceRepository, WorkflowRepository storage.WorkflowRepository, ServiceService service.ServiceService) *UserService {
 	return &UserService{
-		UserRepository:    UserRepository,
-		ServiceRepository: ServiceRepository,
-		ServiceService:    ServiceService,
+		UserRepository:        UserRepository,
+		ServiceRepository:     ServiceRepository,
+		UserServiceRepository: UserServiceRepository,
+		WorkflowRepository:    WorkflowRepository,
+		ServiceService:        ServiceService,
 	}
 }
 
@@ -150,7 +155,22 @@ func (self *UserService) ModifyPassword(userEmail string, userConnectionType str
 }
 
 func (self *UserService) DeleteAccount(userEmail string, userConnectionType string) error {
-	err := self.UserRepository.DeleteUser(userEmail, userConnectionType)
+	user, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
+	if err != nil {
+		return err
+	}
+
+	err = self.WorkflowRepository.DeleteWorkflowByOwnerId(user.Id)
+	if err != nil {
+		return err
+	}
+
+	err = self.UserServiceRepository.DeleteUserServiceByUserId(user.Id)
+	if err != nil {
+		return err
+	}
+
+	err = self.UserRepository.DeleteUser(userEmail, userConnectionType)
 	if err != nil {
 		return fmt.Errorf("Could not delete account")
 	}
