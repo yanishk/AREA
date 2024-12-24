@@ -31,7 +31,7 @@ func (self *UserRepository) CreateUser(email string, password string, connection
 }
 
 func (self *UserRepository) FindUserByEmail(email string, connectionType string) (entities.User, error) {
-	sqlStatement := `SELECT * FROM users where email = ($1) AND connectiontype = ($2)`
+	sqlStatement := `SELECT * FROM users WHERE email = ($1) AND connectiontype = ($2)`
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, email, connectionType)
@@ -43,7 +43,7 @@ func (self *UserRepository) FindUserByEmail(email string, connectionType string)
 }
 
 func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
-	sqlStatement := `SELECT * FROM users where id = ($1)`
+	sqlStatement := `SELECT * FROM users WHERE id = ($1)`
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, userId)

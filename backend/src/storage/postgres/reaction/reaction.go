@@ -31,7 +31,7 @@ func (self *ReactionRepository) CreateReaction(name string, description string, 
 }
 
 func (self *ReactionRepository) FindReactionByName(name string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions where name = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE name = ($1)`
 	var retrievedReaction entities.Reaction
 
 	row := self.db.QueryRow(sqlStatement, name)
@@ -43,7 +43,7 @@ func (self *ReactionRepository) FindReactionByName(name string) (entities.Reacti
 }
 
 func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions where serviceid = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE serviceid = ($1)`
 	var reactions []entities.Reaction
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)
@@ -65,7 +65,7 @@ func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]ent
 }
 
 func (self *ReactionRepository) FindReactionByID(id string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions where id = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE id = ($1)`
 	var retrievedReaction entities.Reaction
 
 	row := self.db.QueryRow(sqlStatement, id)

@@ -30,7 +30,7 @@ func (self *UserServiceRepository) CreateUserService(userId string, token string
 }
 
 func (self *UserServiceRepository) FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error) {
-	sqlStatement := `SELECT * FROM userservices where userid = ($1) AND serviceid = ($2)`
+	sqlStatement := `SELECT * FROM userservices WHERE userid = ($1) AND serviceid = ($2)`
 	var retrievedUserService entities.UserService
 
 	row := self.db.QueryRow(sqlStatement, userId, serviceId)

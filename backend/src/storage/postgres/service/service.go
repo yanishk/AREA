@@ -31,7 +31,7 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 }
 
 func (self *ServiceRepository) FindServiceById(id string) (entities.Service, error) {
-	sqlStatement := `SELECT * FROM services where id = ($1)`
+	sqlStatement := `SELECT * FROM services WHERE id = ($1)`
 	var retrievedService entities.Service
 
 	row := self.db.QueryRow(sqlStatement, id)
@@ -43,7 +43,7 @@ func (self *ServiceRepository) FindServiceById(id string) (entities.Service, err
 }
 
 func (self *ServiceRepository) FindServiceByName(name string) (entities.Service, error) {
-	sqlStatement := `SELECT * FROM services where name = ($1)`
+	sqlStatement := `SELECT * FROM services WHERE name = ($1)`
 	var retrievedService entities.Service
 
 	row := self.db.QueryRow(sqlStatement, name)
@@ -55,7 +55,7 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 }
 
 func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
-	sqlStatement := `SELECT * FROM services where hasactions = true`
+	sqlStatement := `SELECT * FROM services WHERE hasactions = true`
 	var retrievedServices []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
@@ -76,7 +76,7 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error)
 }
 
 func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
-	sqlStatement := `SELECT * FROM services where hasreactions = true`
+	sqlStatement := `SELECT * FROM services WHERE hasreactions = true`
 	var retrievedServices []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
