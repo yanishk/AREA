@@ -53,6 +53,7 @@ func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
 		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
 		authentication.GET("/Github/:callback-type/:app-type", self.OAuth2Github)
+		authentication.GET("/Reddit/:callback-type/:app-type", self.OAuth2Reddit)
 	}
 }
 
@@ -322,6 +323,54 @@ func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
 		"&redirect_uri=" + callbackLink +
 		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
 		"&state=" + os.Getenv("GITHUB_STATE")
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		authURL: githubAuthUrl,
+	})
+}
+
+// @Summary		Reddit OAuth2
+// @Description	Get Reddit OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/Reddit/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Reddit(context *gin.Context) {
+	var callbackLink string
+	var clientID string
+	callbackType := context.Param(callbackTypeParamName)
+	appType := context.Param(appTypeParamName)
+
+	if callbackType == "login" {
+		clientID = os.Getenv("REDDIT_LOGIN_CLIENT_ID")
+		callbackLink = os.Getenv("REDDIT_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		clientID = os.Getenv("REDDIT_SERVICE_CLIENT_ID")
+		callbackLink = os.Getenv("REDDIT_SERVICE_CALLBACK")
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidCallbackTypeMessage,
+		})
+		return
+	}
+
+	githubAuthUrl := "https://www.reddit.com/api/v1/authorize?" +
+		"client_id=" + clientID +
+		"&response_type=code" +
+		"&state=" + os.Getenv("REDDIT_STATE") +
+		"&redirect_uri=" + callbackLink +
+		"&duration=permanent" +
+		"&scope=identity read submit vote mysubreddits history account edit privatemessages"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		authURL: githubAuthUrl,
