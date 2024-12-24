@@ -3,7 +3,11 @@ import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
 
-const Navbar = () => {
+interface NavbarProps {
+    bgColor?: string;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
@@ -12,16 +16,15 @@ const Navbar = () => {
     }
 
     const handleAccount = () => {
-        navigate("/account");
+        navigate("/settings");
     };
     const handleCreate = () => {
         navigate("/create");
     }
 
     return (
-        <div className="bg-white">
+        <div className={`${bgColor}`}>
             <div className="pt-6 pb-6 flex justify-between items-center px-6">
-
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                         <a
@@ -83,10 +86,13 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <button
-                                    className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center cursor-pointer"
+                                    className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center border-[3px] border-[#222222] cursor-pointer"
                                     onClick={handleAccount}
                                 >
-                                    <p className="text-white font-[900]">W</p>
+                                    <img
+                                        src="/iconAvatar.svg"
+                                        alt="Avatar"
+                                    />
                                 </button>
                             </li>
                         </>
