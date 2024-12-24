@@ -725,49 +725,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/modify-activation": {
-            "put": {
-                "description": "Modify the activation status of the specified workflow",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflow"
-                ],
-                "summary": "Modify Workflow Activation Status",
-                "parameters": [
-                    {
-                        "description": "Workflow informations",
-                        "name": "workflow",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.ChangeActivationWorkflow"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/workflow/retrieve": {
             "get": {
                 "description": "Retrieve the workflows of the user actually connected",
@@ -1497,33 +1454,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid request body"
-                }
-            }
-        },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not update workflow's activation status"
-                }
-            }
-        },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Successfully updates workflow's activation status"
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1550,14 +1480,6 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
-                }
-            }
-        },
-        "entities.ChangeActivationWorkflow": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
                 }
             }
         },

@@ -42,19 +42,6 @@ type WorkflowRetrieveUserWorkflowsInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve user's workflows"`
 }
 
-// Modify Workflow Activation Status Responses
-type WorkflowModifyWorkflowActivationStatusSuccessResponse struct {
-	Msg string `json:"success"example:"Successfully updates workflow's activation status"`
-}
-
-type WorkflowModifyWorkflowActivationStatusBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid request body"`
-}
-
-type WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not update workflow's activation status"`
-}
-
 // Delete Workflow Responses
 type WorkflowDeleteWorkflowSuccessResponse struct {
 	Msg string `json:"success"example:"Workflow deleted"`

@@ -37,7 +37,6 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 		workflow.POST("/create", self.CreateWorkflow)
 		workflow.GET("/retrieve", self.GetUserWorkflows)
 		workflow.PUT("/update", self.UpdateWorkflow)
-		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
 		workflow.DELETE("/delete", self.DeleteWorkflow)
 	}
 }
@@ -138,39 +137,6 @@ func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Workflow successfully updated",
-	})
-}
-
-// @Summary		Modify Workflow Activation Status
-// @Description	Modify the activation status of the specified workflow
-// @Tags			Workflow
-// @Produce		json
-// @Param			workflow	body		entities.ChangeActivationWorkflow	true	"Workflow informations"
-// @Success		200		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse
-// @Failure		400		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse
-// @Failure		500		{object}	docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse
-// @Router			/workflow/modify-activation [put]
-func (self *WorkflowHandler) ActivateDeactivateWorkflow(context *gin.Context) {
-	var workflowActivation entities.ChangeActivationWorkflow
-
-	err := context.ShouldBindJSON(&workflowActivation)
-	if err != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
-		})
-		return
-	}
-
-	errUpdateworkflow := self.WorkflowService.ActivateDeactivateWorkflow(workflowActivation)
-	if errUpdateworkflow != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not update workflow's activation status",
-		})
-		return
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": "Successfully updates workflow's activation status",
 	})
 }
 

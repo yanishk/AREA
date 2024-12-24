@@ -93,19 +93,6 @@ func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities
 	return nil
 }
 
-func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error {
-	foundWorkflow, errFetchWorkflow := self.WorkflowRepository.FindWorkflowById(workflowActivation.WorkflowId)
-	if errFetchWorkflow != nil {
-		return errFetchWorkflow
-	}
-
-	errUpdate := self.WorkflowRepository.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
-	if errUpdate != nil {
-		return errUpdate
-	}
-	return nil
-}
-
 func (self *WorkflowService) DeleteWorkflow(email string, connectionType string, workflowId string) error {
 	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
 	if err != nil {

@@ -106,16 +106,6 @@ func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflo
 	return nil
 }
 
-func (self *WorkflowRepository) ActivateDeactivateWorkflow(workflowId string, isActivated bool) error {
-	sqlStatement := `UPDATE workflows SET isactivated = ($1) WHERE id = ($2)`
-
-	_, err := self.db.Exec(sqlStatement, !isActivated, workflowId)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows where id = ($1)`
 	var retrievedWorkflow entities.Workflow

@@ -44,7 +44,6 @@ type WorkflowRepository interface {
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
 	UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error
-	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
 	DeleteWorkflow(workflowId string, ownerId string) error
 }
