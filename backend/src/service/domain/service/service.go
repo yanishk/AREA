@@ -165,8 +165,7 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func genericAccessTokenRequest(code string, callbackUrl string) (*http.Request, error) {
-	tokenUrl := "https://accounts.spotify.com/api/token"
+func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&code=%s&redirect_uri=%s",
 		grantTypeAuthorization,
@@ -192,7 +191,7 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
-	request, err := genericAccessTokenRequest(code, spotifyCallback)
+	request, err := genericAccessTokenRequest("https://accounts.spotify.com/api/token", code, spotifyCallback)
 	if err != nil {
 		return request, err
 	}
@@ -214,7 +213,7 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
-	request, err := genericAccessTokenRequest(code, discordCallback)
+	request, err := genericAccessTokenRequest("https://discord.com/api/v10/oauth2/token", code, discordCallback)
 	if err != nil {
 		return request, err
 	}
@@ -242,7 +241,7 @@ func GetRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
-	request, err := genericAccessTokenRequest(code, redditCallback)
+	request, err := genericAccessTokenRequest("https://www.reddit.com/api/v1/access_token", code, redditCallback)
 	if err != nil {
 		return request, err
 	}
@@ -358,6 +357,8 @@ func (self *ServiceService) ExecuteApiRequest(url string, method string, typeTok
 		return nil, err
 	}
 
+	fmt.Println(2222)
+	fmt.Println(err)
 	req.Header.Set("Authorization", typeToken+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 
