@@ -209,12 +209,12 @@ const ChangePasswordPage = () => {
                                 text="Change"
                                 onClick={handleSubmit}
                             />
-                            <p
+                            <button
                                 className="underline mt-7 text-[1.2em] text-[#222222] font-[900] cursor-pointer"
                                 onClick={handleCancel}
                             >
                                 Cancel
-                            </p>
+                            </button>
                         </div>
                     </div>
                 </div>

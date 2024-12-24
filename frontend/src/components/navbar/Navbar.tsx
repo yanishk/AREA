@@ -3,11 +3,11 @@ import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
 
-interface navbarProps {
+interface NavbarProps {
     bgColor?: string;
 }
 
-const Navbar: React.FC<navbarProps> = ({ bgColor }) => {
+const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 

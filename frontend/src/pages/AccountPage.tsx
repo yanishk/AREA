@@ -154,23 +154,23 @@ const AccountPage = () => {
                         <div
                             className="flex justify-start mt-2"
                         >
-                            <p
+                            <button
                                 className="font-[700] text-[20px] text-[#0099FF] hover:text-[#1BA3FF] hover:cursor-pointer"
                                 onClick={handleChangePassword}
                             >
                                 Change password
-                            </p>
+                            </button>
                         </div>
 
                         <div
                             className="flex justify-start mt-6"
                         >
-                            <p
+                            <button
                                 className="font-[700] text-[20px] text-[#D0011C] hover:text-[#D51932] hover:cursor-pointer"
                                 onClick={handleShowModal}
                             >
                                 Delete my account
-                            </p>
+                            </button>
                         </div>
                     </div>
 
