@@ -3,14 +3,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "package:http/src/response.dart";
 import 'package:flutter_switch/flutter_switch.dart';
 import 'dart:convert';
-import 'dart:developer' as developer;
 import "../../apiCall/apiErrorHandling.dart";
 
 import "../custom_widget.dart";
 import "../apiCall/apiRequest.dart";
 import "myWorkflowsData.dart";
 import 'workflowsWidget.dart';
-import '../globalData.dart';
 import "myWorkflowsFunctions.dart";
 import 'deleteWorkflow.dart';
 
@@ -32,7 +30,6 @@ class WorkflowInfosAPICall extends StatefulWidget {
 
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
-  final String apiRoute = "workflow/create";
   String email = "";
   Color backgroundColor = Color.fromARGB(255, 63, 68, 69);
   bool editNameMode = false;
@@ -148,9 +145,11 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
               text: AutoSizeText(
                 "Delete my Workflow",
                 style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(255, 255, 0, 0)),
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 255, 0, 0)
+                ),
+                maxLines: 1,
               ),
               onPressed: () {DeleteWorkflows.deleteWorkflowConfirmDialog(workflowID);},
               size: Size(double.infinity, 55),

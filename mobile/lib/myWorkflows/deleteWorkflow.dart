@@ -9,7 +9,7 @@ import "../apiCall/apiRequest.dart";
 import '../globalData.dart';
 
 class DeleteWorkflows {
-  static void displayToastError(String text) {
+  static void deleteWorkflowToast(String text) {
     Fluttertoast.showToast(
       msg: text,
       toastLength: Toast.LENGTH_SHORT,
@@ -26,24 +26,17 @@ class DeleteWorkflows {
       apiRoute,
     );
     if (response.statusCode == 504) {
-      displayToastError(response.body);
+      deleteWorkflowToast(response.body);
       return;
     }
     final responseData = jsonDecode(response.body);
     if (response.statusCode != 200) {
-      displayToastError('${responseData['error']}');
+      deleteWorkflowToast('${responseData['error']}');
       developer.log(
           "deleteWorkflow FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return;
     }
-    Fluttertoast.showToast(
-      msg: "Workflow deleted",
-      toastLength: Toast.LENGTH_SHORT,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 24.0
-    );
+    deleteWorkflowToast("Workflow deleted");
     Navigator.pop(Globaldata.myContext);
   }
 
@@ -54,9 +47,9 @@ class DeleteWorkflows {
       builder: (BuildContext context) {
         return TwoChoiceAlertDialog(
           firstChoiceText: Text(
-            "Delete my workflow",
+            "Continue",
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           secondChoiceText: Text(
             "Cancel",

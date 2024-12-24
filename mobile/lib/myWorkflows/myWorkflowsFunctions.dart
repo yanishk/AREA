@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import "package:http/src/response.dart";
-import 'package:flutter_switch/flutter_switch.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:fluttertoast/fluttertoast.dart';
-import "../../apiCall/apiErrorHandling.dart";
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-import "../custom_widget.dart";
 import "../apiCall/apiRequest.dart";
 import "myWorkflowsData.dart";
 import 'workflowsWidget.dart';
-import '../globalData.dart';
 
 class MyWorkflowsfunctions {
   static String getWorkflowDate() {
@@ -40,7 +33,7 @@ class MyWorkflowsfunctions {
     return responseData;
   }
 
-  static void storeServiceDescription(dynamic responseData, List<Widget> cardList, String workflowsResponseName, Widget workflowsTiles(int index)) {
+  static void storeServiceDescription(dynamic responseData, List<Widget> cardList, String workflowsResponseName, Future<void> onTapFunction(int index), String email) {
     if (responseData is Map<String, dynamic> &&
         responseData[workflowsResponseName] is List) {
       List<dynamic> actions = responseData[workflowsResponseName];
@@ -60,7 +53,11 @@ class MyWorkflowsfunctions {
           ));
           cardList.add(
             WorkflowCard(
-              content: workflowsTiles(i),
+              content: WorkflowsTiles(
+                index: i,
+                onTap: () {onTapFunction(i);},
+                email: email,
+              )
             ),
           );
         }
