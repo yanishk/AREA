@@ -23,6 +23,7 @@ type UserServiceRepository interface {
 	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
 	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
 	UpdateUserServiceByServiceIdAndUserId(userId string, accessToken string, refreshToken string, expiryDate string, serviceId string) error
+	DeleteUserServiceByUserId(userId string) error
 }
 
 type ReactionRepository interface {
@@ -46,6 +47,7 @@ type WorkflowRepository interface {
 	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
 	DeleteWorkflow(workflowId string, ownerId string) error
+	DeleteWorkflowByOwnerId(ownerId string) error
 }
 
 type Repository struct {
