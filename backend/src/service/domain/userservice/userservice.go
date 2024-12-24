@@ -57,7 +57,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		return tokenRes, errRequest
 	}
 
-	res, err := self.ServiceService.RequestService(request)
+	res, err := self.ServiceService.ExecuteRequest(request)
 	if err != nil {
 		return tokenRes, err
 	}
@@ -101,7 +101,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 		return "", errTimestamp
 	}
 
-	if expiryDate.Before(time.Now()) {
+	if expiryDate.Before(time.Now()) && serviceName != "Github" {
 		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {

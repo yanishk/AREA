@@ -144,6 +144,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/authentication/Github/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Github OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Github OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
@@ -631,6 +673,53 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/delete": {
+            "delete": {
+                "description": "Delete a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Delete Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -1299,6 +1388,42 @@ const docTemplate = `{
             }
         },
         "docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid workflow id"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not delete workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Workflow deleted"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {

@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -20,7 +21,12 @@ type ServiceService struct {
 
 const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+
 const InvalidCallbackTypeMessage = "Invalid callback type"
+const APICallFailedMessage = "API call failed"
+const grantTypeRefreshToken = "refresh_token"
+const grantTypeAuthorization = "authorization_code"
+const oneYearSecond = 31536000
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -36,10 +42,6 @@ func NewServiceService(ServiceRepository storage.ServiceRepository, UserReposito
 
 func (self *ServiceService) FindServiceByName(name string) (entities.Service, error) {
 	return self.ServiceRepository.FindServiceByName(name)
-}
-
-func (self *ServiceService) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
-	return self.ActionRepository.FindActionByServiceId(serviceId)
 }
 
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
@@ -68,14 +70,6 @@ func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]
 	return reactions, errFindReactions
 }
 
-func (self *ServiceService) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
-	return self.WorkflowRepository.FindWorkflowByActionId(actionId)
-}
-
-func (self *ServiceService) FindReactionByID(id string) (entities.Reaction, error) {
-	return self.ReactionRepository.FindReactionByID(id)
-}
-
 func (self *ServiceService) RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error) {
 	return self.ServiceRepository.FindActionsServices()
 }
@@ -86,20 +80,22 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.ServiceUsefu
 
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
 	return fmt.Sprintf(
-		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code",
+		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
 		code,
 		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
 		callback,
+		grantTypeAuthorization,
 	)
 }
 
 func GetGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) string {
 	return fmt.Sprintf(
-		"code=%s&client_id=%s&redirect_uri=%s&grant_type=authorization_code",
+		"code=%s&client_id=%s&redirect_uri=%s&grant_type=%s",
 		code,
 		os.Getenv("GOOGLE_MOBILE_CLIENT_ID"),
 		callback,
+		grantTypeAuthorization,
 	)
 }
 
@@ -146,7 +142,8 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
 		code,
 		spotifyCallback,
 	)
@@ -175,7 +172,8 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=authorization_code&code=%s&redirect_uri=%s",
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
 		code,
 		discordCallback,
 	)
@@ -186,6 +184,42 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	}
 
 	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var githubCallback string
+	var githubClientID string
+	var githubClientSecret string
+
+	if callbackType == "service" {
+		githubCallback = os.Getenv("GITHUB_SERVICE_CALLBACK")
+		githubClientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
+		githubClientSecret = os.Getenv("GITHUB_SERVICE_CLIENT_SECRET")
+	} else if callbackType == "login" {
+		githubCallback = os.Getenv("GITHUB_LOGIN_CALLBACK")
+		githubClientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
+		githubClientSecret = os.Getenv("GITHUB_LOGIN_CLIENT_SECRET")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://github.com/login/oauth/access_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s",
+		githubClientID,
+		githubClientSecret,
+		code,
+		githubCallback,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
 	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
 	return request, nil
@@ -205,9 +239,10 @@ func GetOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Re
 func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://oauth2.googleapis.com/token"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s",
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
 		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
 		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
@@ -224,7 +259,8 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=refresh_token&refresh_token=%s",
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
@@ -242,7 +278,8 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=refresh_token&refresh_token=%s",
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
 		refreshToken,
 	)
 
@@ -257,7 +294,7 @@ func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (
 	return request, nil
 }
 
-func (self *ServiceService) RequestService(request *http.Request) (*http.Response, error) {
+func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
@@ -265,9 +302,21 @@ func (self *ServiceService) RequestService(request *http.Request) (*http.Respons
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Failed to reach requested service API")
+		return nil, fmt.Errorf(APICallFailedMessage)
 	}
 	return res, nil
+}
+
+func (self *ServiceService) ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", typeToken+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	return self.ExecuteRequest(req)
 }
 
 func (self *ServiceService) GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error) {
@@ -281,6 +330,10 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetSpotifyOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Discord" {
 		request, errRequest = GetDiscordOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Github" {
+		request, errRequest = GetGithubOAuth2AccessTokenRequest(code, callbackType)
+		request.Header.Set("Accept", "application/json")
+		tokenRes.ExpiresIn = oneYearSecond
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
@@ -289,7 +342,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		return tokenRes, errRequest
 	}
 
-	res, err := self.RequestService(request)
+	res, err := self.ExecuteRequest(request)
 	if err != nil {
 		return tokenRes, err
 	}
@@ -321,7 +374,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errRequest
 	}
 
-	res, err := self.RequestService(request)
+	res, err := self.ExecuteRequest(request)
 	if err != nil {
 		return userInfo, err
 	}
@@ -332,4 +385,31 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 		return userInfo, errDecoder
 	}
 	return userInfo, nil
+}
+
+func (self *ServiceService) RequestToTimeApi() (entities.TimeResponse, error) {
+	timeUrl := "https://tools.aimylogic.com/api/now?tz=Europe/Paris"
+	var timeRes entities.TimeResponse
+
+	request, errRequest := http.NewRequest("GET", timeUrl, nil)
+	if errRequest != nil {
+		return timeRes, errRequest
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		return timeRes, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return timeRes, fmt.Errorf("HTTP request failed: %s", res.Status)
+	}
+
+	errDecoder := json.NewDecoder(res.Body).Decode(&timeRes)
+	if errDecoder != nil {
+		return timeRes, errDecoder
+	}
+	return timeRes, nil
 }
