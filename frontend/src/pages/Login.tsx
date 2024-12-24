@@ -7,7 +7,7 @@ import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import CallToActionLink from "../components/CallToActionLink";
 import SocialButton from "../components/buttons/SocialButton";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../components/errors/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ErrorMessage from "../components/ErrorMessage"
+import ErrorMessage from "../components/errors/ErrorMessage"
 import Navbar from "../components/navbar/Navbar"
 import {useLocation, useNavigate } from "react-router-dom";
 
@@ -26,7 +26,7 @@ const HomePage = () => {
 
     return (
         <>
-            <Navbar />
+            <Navbar bgColor="bg-white"/>
             <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose} />
         </>
     )

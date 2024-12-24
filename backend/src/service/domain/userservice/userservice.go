@@ -49,6 +49,8 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetSpotifyRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Discord" {
 		request, errRequest = self.ServiceService.GetDiscordRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Reddit" {
+		request, errRequest = self.ServiceService.GetRedditRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
