@@ -1,8 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import InputField from "../components/inputs/InputsField";
-import ButtonValidation from "../components/buttons/ButtonValidation";
-import TriggerButton from "../components/buttons/TriggerButton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import CancelButton from "../components/buttons/CancelButton";
@@ -12,8 +10,6 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -32,29 +28,6 @@ const AccountPage = () => {
     useEffect(() => {
         getUserEmail();
     }, []);
-
-    const handleSubmit = async () => {
-        if (!password || !newPassword)
-            return;
-        try {
-            const result = await axios.put(
-                `${import.meta.env.VITE_API_URL}user/modify-password`,
-                {
-                    oldpassword: password,
-                    password: newPassword,
-                },
-                {
-                    withCredentials: true,
-                }
-            );
-
-            if (result.data.success) {
-                goHome();
-            }
-        } catch (error) {
-            console.error("Failed to modify password : ", error);
-        }
-    }
 
     const handleLogout = () => {
         logout();
@@ -160,7 +133,6 @@ const AccountPage = () => {
                         <InputField
                             type="text"
                             value={userEmail}
-                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 
@@ -202,27 +174,6 @@ const AccountPage = () => {
                         </div>
                     </div>
 
-
-                        {/* <InputField
-                            type="password"
-                            placeholder="Current password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <InputField
-                            type="password"
-                            placeholder="New password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                        /> */}
-                        {/* <ButtonValidation
-                            text="Submit"
-                            onClick={handleSubmit}
-                        />
-                        <ButtonValidation
-                            text="Logout"
-                            onClick={handleLogout}
-                        /> */}
                 </div>
             </MaxWidthWrapper>
         </>

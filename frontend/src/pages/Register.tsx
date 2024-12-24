@@ -1,7 +1,7 @@
 import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../components/errors/ErrorMessage";
 import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import SocialButton from "../components/buttons/SocialButton";
