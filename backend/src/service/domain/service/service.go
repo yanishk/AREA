@@ -129,66 +129,6 @@ func GetGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType
 	return request, nil
 }
 
-func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var spotifyCallback string
-
-	if callbackType == "service" {
-		spotifyCallback = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
-	} else if callbackType == "login" {
-		spotifyCallback = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
-	} else {
-		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
-	}
-
-	tokenUrl := "https://accounts.spotify.com/api/token"
-	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
-		grantTypeAuthorization,
-		code,
-		spotifyCallback,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
-
-	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
-	request.Header.Set(ContentType, ContentTypeUrlEncoded)
-
-	return request, nil
-}
-
-func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var discordCallback string
-
-	if callbackType == "service" {
-		discordCallback = os.Getenv("DISCORD_SERVICE_CALLBACK")
-	} else if callbackType == "login" {
-		discordCallback = os.Getenv("DISCORD_LOGIN_CALLBACK")
-	} else {
-		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
-	}
-
-	tokenUrl := "https://discord.com/api/v10/oauth2/token"
-	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
-		grantTypeAuthorization,
-		code,
-		discordCallback,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
-
-	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
-	request.Header.Set(ContentType, ContentTypeUrlEncoded)
-
-	return request, nil
-}
-
 func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var githubCallback string
 	var githubClientID string
@@ -225,6 +165,94 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
+func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
+	jsonBody := fmt.Sprintf(
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
+		code,
+		callbackUrl,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+	return request, nil
+}
+
+func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var spotifyCallback string
+
+	if callbackType == "service" {
+		spotifyCallback = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		spotifyCallback = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://accounts.spotify.com/api/token", code, spotifyCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var discordCallback string
+
+	if callbackType == "service" {
+		discordCallback = os.Getenv("DISCORD_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		discordCallback = os.Getenv("DISCORD_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://discord.com/api/v10/oauth2/token", code, discordCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var redditCallback string
+	var redditClientID string
+	var redditClientSecret string
+
+	if callbackType == "service" {
+		redditCallback = os.Getenv("REDDIT_SERVICE_CALLBACK")
+		redditClientID = os.Getenv("REDDIT_SERVICE_CLIENT_ID")
+		redditClientSecret = os.Getenv("REDDIT_SERVICE_CLIENT_SECRET")
+	} else if callbackType == "login" {
+		redditCallback = os.Getenv("REDDIT_LOGIN_CALLBACK")
+		redditClientID = os.Getenv("REDDIT_LOGIN_CLIENT_ID")
+		redditClientSecret = os.Getenv("REDDIT_LOGIN_CLIENT_SECRET")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://www.reddit.com/api/v1/access_token", code, redditCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(redditClientID, redditClientSecret)
+	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func GetOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
@@ -256,8 +284,7 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 	return request, nil
 }
 
-func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
-	tokenUrl := "https://accounts.spotify.com/api/token"
+func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshToken string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&refresh_token=%s",
 		grantTypeRefreshToken,
@@ -267,6 +294,15 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
 		return request, errRequest
+	}
+	return request, nil
+}
+
+func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://accounts.spotify.com/api/token"
+	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
+	if err != nil {
+		return request, err
 	}
 
 	request.SetBasicAuth(os.Getenv("SPOTIFY_CLIENT_ID"), os.Getenv("SPOTIFY_CLIENT_SECRET"))
@@ -277,19 +313,27 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 
 func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
-	jsonBody := fmt.Sprintf(
-		"grant_type=%s&refresh_token=%s",
-		grantTypeRefreshToken,
-		refreshToken,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
+	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
+	if err != nil {
+		return request, err
 	}
 
 	request.SetBasicAuth(os.Getenv("DISCORD_CLIENT_ID"), os.Getenv("DISCORD_CLIENT_SECRET"))
 	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://www.reddit.com/api/v1/access_token"
+	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("REDDIT_SERVICE_CLIENT_ID"), os.Getenv("REDDIT_SERVICE_CLIENT_SECRET"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
 	return request, nil
 }
@@ -334,6 +378,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetGithubOAuth2AccessTokenRequest(code, callbackType)
 		request.Header.Set("Accept", "application/json")
 		tokenRes.ExpiresIn = oneYearSecond
+	} else if serviceName == "Reddit" {
+		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
