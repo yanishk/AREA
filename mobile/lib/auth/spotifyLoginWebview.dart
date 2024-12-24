@@ -8,6 +8,8 @@ import "package:http/src/response.dart";
 
 import "../apiCall/apiErrorHandling.dart";
 import "../globalData.dart";
+import "../login/loginNavigator.dart";
+import "../login/loadServicesList.dart";
 
 String spotifyAuthType = "";
 
@@ -52,6 +54,9 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
   }
 
   Future<void> _setCookiesAndNavigate() async {
+    if (Globaldata.JWToken.isEmpty) {
+      return;
+    }
     final cookieManager = CookieManager();
     await cookieManager.setCookie(
       url: WebUri(apiUrl),
@@ -60,6 +65,20 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
       isSecure: true,
       isHttpOnly: true,
     );
+  }
+
+  Future<void> saveJWToken(Response response) async {
+    String? cookiesBrute = response.headers["set-cookie"];
+    String JWToken = "";
+    if (cookiesBrute != null) {
+      JWToken = cookiesBrute.split(';').first;
+      setState(() {
+        developer.log("JWToken : {${JWToken}}");
+        Globaldata.JWToken = JWToken;
+        LoginNavigator.redirectAndHandleGoBackRedirection(LoadServicePage(), LoadServicePage());
+      });
+      return;
+    }
   }
 
   String insertAppTypeInUrl(String url) {
@@ -86,11 +105,16 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           developer.log(url.toString());
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
+            developer.log("url no split : ${url.toString()}");
             final urlSplit = url.toString().split('/area/');
+            developer.log("url : ${insertAppTypeInUrl(urlSplit.last)}");
             final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
               developer.log("User connected");
+              if (Globaldata.JWToken.isEmpty) {
+                saveJWToken(response);
+              }
               Navigator.pop(context);
               Navigator.pop(Globaldata.myContext);
             } else {
