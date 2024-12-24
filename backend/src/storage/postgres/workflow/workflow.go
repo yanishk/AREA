@@ -175,3 +175,13 @@ func (self *WorkflowRepository) DeleteWorkflow(workflowId string, ownerId string
 	}
 	return nil
 }
+
+func (self *WorkflowRepository) DeleteWorkflowByUserId(ownerId string) error {
+	sqlStatement := `DELETE workflows WHERE ownerid = ($1)`
+
+	_, err := self.db.Exec(sqlStatement, ownerId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
