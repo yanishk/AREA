@@ -10,6 +10,7 @@ import { AuthProvider } from './pages/AuthContext'
 import ConnectService from './pages/ConnectService'
 import TriggerActionPage from './pages/TriggerAction'
 import AccountPage from './pages/AccountPage'
+import { NonExistantRoute } from './pages/NonExistantRoute'
 import DownloadMobileApk from './pages/DownloadMobileApk'
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
               <Route path="/select-service/:name" element={<ServicePage />} />
               <Route path="/select-action/:name" element={<TriggerActionPage />} />
               <Route path="/connect-service/:name" element={<ConnectService />} />
+              <Route path="*" element={<NonExistantRoute/>} />
               <Route path="/client.apk" element={<DownloadMobileApk />} />
           </Routes>
         </Router>

@@ -15,6 +15,67 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Discord/server/channels": {
+            "get": {
+                "description": "Retrieve the channels from the selected server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord Server Channels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "server id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Discord/user/servers": {
+            "get": {
+                "description": "Retrieve the discord servers from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Discord User Servers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/actions-services": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -41,69 +102,155 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Google": {
+        "/authentication/Discord/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Discord OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Discord OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Github/{callback-type}/{app-type}": {
+            "get": {
+                "description": "Get Github OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services Authentication"
+                ],
+                "summary": "Github OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authentication/Google/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Google OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Google OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
             }
         },
-        "/authentication/Spotify": {
+        "/authentication/Spotify/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Spotify OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Authentication"
+                    "Services Authentication"
                 ],
                 "summary": "Spotify OAuth2",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.OAuth2Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/callback/{service}": {
-            "get": {
-                "description": "Callback for services",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Service Callback",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
+                        "description": "Callback type (login or service)",
+                        "name": "callback-type",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Authorization code given by the service",
-                        "name": "code",
-                        "in": "query",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -111,19 +258,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackSuccessResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackBadRequestResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.ServiceCallBackInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
                         }
                     }
                 }
@@ -157,25 +298,80 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.LoginSuccessResponse"
+                            "$ref": "#/definitions/docs_user.UserLoginSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.UserInvalidBodyResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.LoginFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/docs_user.UserLoginUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.LoginFailureTokenErrorResponse"
+                            "$ref": "#/definitions/docs_user.UserLoginTokenErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login-callback/{service}/{app-type}": {
+            "post": {
+                "description": "Callback for login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Login Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLoginCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLoginCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -235,25 +431,80 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.RegisterSuccessResponse"
+                            "$ref": "#/definitions/docs_user.UserRegisterSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.FailureInvalidBodyResponse"
+                            "$ref": "#/definitions/docs_user.UserRegisterBadRequestResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.RegisterFailureEmailAlreadyUsedResponse"
+                            "$ref": "#/definitions/docs_user.UserRegisterConflictResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.FailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.UserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-callback/{service}/{app-type}": {
+            "post": {
+                "description": "Callback for services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Callbacks"
+                ],
+                "summary": "Service Callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization code given by the service",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceServiceCallbackSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceServiceCallbackBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse"
                         }
                     }
                 }
@@ -276,19 +527,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.DeleteAccountSuccessResponse"
+                            "$ref": "#/definitions/docs_user.UserDeleteAccountSuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.DeleteAccountFailureUnauthorizedResponse"
+                            "$ref": "#/definitions/docs_user.UserDeleteAccountUnauthorizedResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.DeleteAccountFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.UserDeleteAccountInternalServerErrorResponse"
                         }
                     }
                 }
@@ -308,13 +559,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.GetUserEmailSuccessResponse"
+                            "$ref": "#/definitions/docs_user.UserGetUserEmailSuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.GetUserEmailUnauthorizedResponse"
+                            "$ref": "#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse"
                         }
                     }
                 }
@@ -348,31 +599,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordSuccessResponse"
+                            "$ref": "#/definitions/docs_user.UserModifyPasswordSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordBadRequestResponse"
+                            "$ref": "#/definitions/docs_user.UserModifyPasswordBadRequestResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureEmailNotValidResponse"
+                            "$ref": "#/definitions/docs_user.UserModifyPasswordUnauthorizedResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureOldPasswordNotValidResponse"
+                            "$ref": "#/definitions/docs_user.UserModifyPasswordOldPasswordNotValidResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_user.ModifyPasswordFailureInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_user.UserModifyPasswordInternalServerErrorResponse"
                         }
                     }
                 }
@@ -422,6 +673,53 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/delete": {
+            "delete": {
+                "description": "Delete a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Delete Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -598,6 +896,113 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.DiscordChannelExample": {
+            "type": "object",
+            "properties": {
+                "flags": {
+                    "type": "integer"
+                },
+                "guild_id": {
+                    "type": "string"
+                },
+                "icon_emoji": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelIconEmojiExample"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nsfw": {
+                    "type": "boolean"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "permission_overwrites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelPermissionOverwritesExample"
+                    }
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "rate_limite_per_user": {
+                    "type": "integer"
+                },
+                "theme_color": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.DiscordChannelIconEmojiExample": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "docs_service.DiscordChannelPermissionOverwritesExample": {
+            "type": "object",
+            "properties": {
+                "allow": {
+                    "type": "string"
+                },
+                "deny": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "docs_service.DiscordServerExample": {
+            "type": "object",
+            "properties": {
+                "banner": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "string"
+                }
+            }
+        },
         "docs_service.ReactionExample": {
             "type": "object",
             "properties": {
@@ -639,12 +1044,70 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the server's channels"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordGuildChannelsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordChannelExample"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's servers"
+                }
+            }
+        },
+        "docs_service.ServiceGetDiscordUserServersSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_service.DiscordServerExample"
+                    }
+                }
+            }
+        },
         "docs_service.ServiceInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "Internal server error"
+                }
+            }
+        },
+        "docs_service.ServiceOAuth2BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid callback type-Invalid app type"
+                }
+            }
+        },
+        "docs_service.ServiceOAuth2SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "auth-url": {
+                    "type": "string",
+                    "example": "url-example.com"
                 }
             }
         },
@@ -681,7 +1144,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.DeleteAccountFailureInternalServerErrorResponse": {
+        "docs_user.UserDeleteAccountInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -690,16 +1153,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.DeleteAccountFailureUnauthorizedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
-                }
-            }
-        },
-        "docs_user.DeleteAccountSuccessResponse": {
+        "docs_user.UserDeleteAccountSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -708,25 +1162,16 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.FailureInternalServerErrorResponse": {
+        "docs_user.UserDeleteAccountUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Internal server error"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
-        "docs_user.FailureInvalidBodyResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid request body"
-                }
-            }
-        },
-        "docs_user.GetUserEmailSuccessResponse": {
+        "docs_user.UserGetUserEmailSuccessResponse": {
             "type": "object",
             "properties": {
                 "email": {
@@ -735,7 +1180,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.GetUserEmailUnauthorizedResponse": {
+        "docs_user.UserGetUserEmailUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -744,106 +1189,25 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.LoginFailureTokenErrorResponse": {
+        "docs_user.UserInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Error creating token"
+                    "example": "Internal server error"
                 }
             }
         },
-        "docs_user.LoginFailureUnauthorizedResponse": {
+        "docs_user.UserInvalidBodyResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Could not find requested user-Wrong password"
+                    "example": "Invalid request body"
                 }
             }
         },
-        "docs_user.LoginSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Connection successful"
-                }
-            }
-        },
-        "docs_user.ModifyPasswordBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid request body-Could not find requested user"
-                }
-            }
-        },
-        "docs_user.ModifyPasswordFailureEmailNotValidResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email is not a valid string"
-                }
-            }
-        },
-        "docs_user.ModifyPasswordFailureInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Failed to hash password-Could not modify the password"
-                }
-            }
-        },
-        "docs_user.ModifyPasswordFailureOldPasswordNotValidResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Old password is incorrect"
-                }
-            }
-        },
-        "docs_user.ModifyPasswordSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Password modified"
-                }
-            }
-        },
-        "docs_user.RegisterFailureEmailAlreadyUsedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Email address already used"
-                }
-            }
-        },
-        "docs_user.RegisterSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "New user created"
-                }
-            }
-        },
-        "docs_userservice.OAuth2Response": {
-            "type": "object",
-            "properties": {
-                "auth-url": {
-                    "type": "string",
-                    "example": "url-example.com"
-                }
-            }
-        },
-        "docs_userservice.ServiceCallBackBadRequestResponse": {
+        "docs_user.UserLoginCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -852,7 +1216,133 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.ServiceCallBackInternalServerErrorResponse": {
+        "docs_user.UserLoginCallbackInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to connect with requested service"
+                }
+            }
+        },
+        "docs_user.UserLoginCallbackSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Connection successful"
+                }
+            }
+        },
+        "docs_user.UserLoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Connection successful"
+                }
+            }
+        },
+        "docs_user.UserLoginTokenErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Error creating token"
+                }
+            }
+        },
+        "docs_user.UserLoginUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested user-Wrong password"
+                }
+            }
+        },
+        "docs_user.UserModifyPasswordBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Could not find requested user"
+                }
+            }
+        },
+        "docs_user.UserModifyPasswordInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to hash password-Could not modify the password"
+                }
+            }
+        },
+        "docs_user.UserModifyPasswordOldPasswordNotValidResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Old password is incorrect"
+                }
+            }
+        },
+        "docs_user.UserModifyPasswordSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Password modified"
+                }
+            }
+        },
+        "docs_user.UserModifyPasswordUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
+        "docs_user.UserRegisterBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body-Connection type doesn't exist"
+                }
+            }
+        },
+        "docs_user.UserRegisterConflictResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email address already used"
+                }
+            }
+        },
+        "docs_user.UserRegisterSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "New user created"
+                }
+            }
+        },
+        "docs_userservice.UserServiceServiceCallbackBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid code authorization-Invalid app type"
+                }
+            }
+        },
+        "docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -861,7 +1351,7 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_userservice.ServiceCallBackSuccessResponse": {
+        "docs_userservice.UserServiceServiceCallbackSuccessResponse": {
             "type": "object",
             "properties": {
                 "success": {
@@ -902,7 +1392,43 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid workflow id"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not delete workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Workflow deleted"
+                }
+            }
+        },
+        "docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },
@@ -979,7 +1505,7 @@ const docTemplate = `{
         "docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse": {
             "type": "object",
             "properties": {
-                "workflow": {
+                "workflows": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/docs_workflow.WorkflowExample"
@@ -992,7 +1518,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Email not found in token-Email is not a valid string"
+                    "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
                 }
             }
         },

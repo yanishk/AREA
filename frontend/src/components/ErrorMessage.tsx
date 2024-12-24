@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 interface ErrorMessageProps {
     message?: string;
     trigger?: number;
+    onClose?: () => void;
 }
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger }) => {
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger, onClose }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -14,6 +15,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger }) => {
 
             const timer = setTimeout(() => {
                 setIsVisible(false);
+                onClose?.();
             }, 3000);
 
             return () => clearTimeout(timer);

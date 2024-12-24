@@ -1,6 +1,6 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import ButtonIfCustom from "../components/buttons/ButtonIfCustom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonIfDefault from "../components/buttons/ButtonIfDefault";
 import CancelButton from "../components/buttons/CancelButton";
 import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
@@ -26,9 +26,10 @@ type WorkflowData = {
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const [searchParams] = useSearchParams()
 
     const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") ?? "null");
+    const serviceName: WorkflowData = JSON.parse(localStorage.getItem("serviceName") ?? "null");
 
     const [selectedAction, setSelectedAction] = useState(
         location.state?.selectedAction || savedData?.selectedAction || null
@@ -38,6 +39,24 @@ const WorkflowBuilder = () => {
         location.state?.selectedReaction || savedData?.selectedReaction || null
     );
 
+    const getAuthCode = async () => {
+        const codeAuth = searchParams.get("code");
+
+        if (codeAuth) {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
+                {
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+        }
+    }
+
+    useEffect(() => {
+        getAuthCode();
+    }, [useSearchParams]);
 
     const handleDeleteAction = () => {
         setSelectedAction(null);
@@ -74,6 +93,7 @@ const WorkflowBuilder = () => {
     const handleContinue = async () => {
         let timeValue;
         let quarterValue;
+
         if (selectedAction?.fields) {
             const { time, quarter } = selectedAction.fields;
             timeValue = parseInt(time) || 0;
@@ -102,7 +122,6 @@ const WorkflowBuilder = () => {
         setSelectedReaction(null);
         navigate("/");
     };
-
 
     return (
         <div>
