@@ -100,6 +100,7 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 		"workflows": retrievedWorkflow,
 	})
 }
+
 // @Summary		Update Workflow
 // @Description	Update a user's workflow by specifying the workflow id
 // @Tags			Workflow
