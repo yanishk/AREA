@@ -1,5 +1,13 @@
 #!/bin/sh
 
-cp /shared/area.apk /app/dist/
+APK_SOURCE="/shared/area.apk"
 
-nohup npx vite preview --port 8081 --host
+APK_DEST="/app/dist/area.apk"
+
+if [ -f "$APK_SOURCE" ]; then
+    cp "$APK_SOURCE" "$APK_DEST"
+else
+    echo "$APK_SOURCE not found. Skipping copy."
+fi
+
+exec "$@"
