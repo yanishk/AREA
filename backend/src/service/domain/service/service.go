@@ -28,6 +28,9 @@ const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
 
+const accessTokenRequestBody = "grant_type=%s&code=%s&redirect_uri=%s"
+const refreshTokenRequestBody = "grant_type=%s&refresh_token=%s"
+
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
 	ReactionRepository storage.ReactionRepository) *ServiceService {
@@ -142,7 +145,7 @@ func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
+		accessTokenRequestBody,
 		grantTypeAuthorization,
 		code,
 		spotifyCallback,
@@ -172,7 +175,7 @@ func GetDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
+		accessTokenRequestBody,
 		grantTypeAuthorization,
 		code,
 		discordCallback,
@@ -244,7 +247,7 @@ func GetRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 
 	tokenUrl := "https://www.reddit.com/api/v1/access_token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
+		accessTokenRequestBody,
 		grantTypeAuthorization,
 		code,
 		redditCallback,
@@ -296,7 +299,7 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&refresh_token=%s",
+		refreshTokenRequestBody,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
@@ -315,7 +318,7 @@ func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (
 func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://discord.com/api/v10/oauth2/token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&refresh_token=%s",
+		refreshTokenRequestBody,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
@@ -334,7 +337,7 @@ func (self *ServiceService) GetDiscordRefreshTokenRequest(refreshToken string) (
 func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://www.reddit.com/api/v1/access_token"
 	jsonBody := fmt.Sprintf(
-		"grant_type=%s&refresh_token=%s",
+		refreshTokenRequestBody,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
