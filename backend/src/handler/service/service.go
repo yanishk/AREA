@@ -155,34 +155,34 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	})
 }
 
-func (self *ServiceHandler) getCallbackandID(context *gin.Context, service string, necessaryID bool) (string, string, error) {
+func (self *ServiceHandler) getCallbackandID(context *gin.Context, serviceName string, isIdNecessary bool) (string, string, error) {
 	var callbackLink string
 	var clientID string
 	callbackType := context.Param(callbackTypeParamName)
 	appType := context.Param(appTypeParamName)
 
 	if callbackType == "login" {
-		if necessaryID {
-			clientID = os.Getenv(service + "LOGIN_CLIENT_ID")
+		if isIdNecessary {
+			clientID = os.Getenv(serviceName + "_LOGIN_CLIENT_ID")
 		}
-		callbackLink = os.Getenv(service + "_LOGIN_CALLBACK")
+		callbackLink = os.Getenv(serviceName + "_LOGIN_CALLBACK")
 	} else if callbackType == "service" {
-		if necessaryID {
-			clientID = os.Getenv(service + "_SERVICE_CLIENT_ID")
+		if isIdNecessary {
+			clientID = os.Getenv(serviceName + "_SERVICE_CLIENT_ID")
 		}
-		callbackLink = os.Getenv(service + "_SERVICE_CALLBACK")
+		callbackLink = os.Getenv(serviceName + "_SERVICE_CALLBACK")
 	} else {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": InvalidCallbackTypeMessage,
 		})
-		return callbackLink, clientID, fmt.Errorf("Invalid callback")
+		return callbackLink, clientID, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
 
 	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": InvalidCallbackTypeMessage,
 		})
-		return callbackLink, clientID, fmt.Errorf("Invalid app type")
+		return callbackLink, clientID, fmt.Errorf(InvalidAppTypeMessage)
 	}
 	return callbackLink, clientID, nil
 }
