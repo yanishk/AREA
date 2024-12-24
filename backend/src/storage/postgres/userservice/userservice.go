@@ -58,7 +58,7 @@ func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(service
 }
 
 func (self *UserServiceRepository) DeleteUserServiceByUserId(userId string) error {
-	sqlStatement := `DELETE userservices WHERE userid = ($1)`
+	sqlStatement := `DELETE FROM userservices WHERE userid = ($1)`
 
 	_, err := self.db.Exec(sqlStatement, userId)
 	if err != nil {
