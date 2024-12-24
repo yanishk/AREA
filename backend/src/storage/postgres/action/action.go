@@ -16,7 +16,7 @@ func NewActionRepository(db *sql.DB) *ActionRepository {
 }
 
 func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
+	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindActionByName(name)
 	if err == nil {

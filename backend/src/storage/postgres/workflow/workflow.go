@@ -18,7 +18,7 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 
 func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
 	actionParam map[string]interface{}, reactionParam map[string]interface{}) error {
-	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7);`
+	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
 	if errMarshallActionParam != nil {

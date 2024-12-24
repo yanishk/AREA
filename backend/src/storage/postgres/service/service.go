@@ -16,7 +16,7 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 }
 
 func (self *ServiceRepository) CreateService(name string, color string, logo string) error {
-	sqlStatement := `INSERT INTO services (name, color, logo) VALUES ($1, $2, $3);`
+	sqlStatement := `INSERT INTO services (name, color, logo) VALUES ($1, $2, $3)`
 
 	_, err := self.FindServiceByName(name)
 	if err == nil {

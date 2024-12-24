@@ -16,7 +16,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func (self *UserRepository) CreateUser(email string, password string, connectionType string) error {
-	sqlStatement := `INSERT INTO users (email, password, connectiontype) VALUES ($1, $2, $3);`
+	sqlStatement := `INSERT INTO users (email, password, connectiontype) VALUES ($1, $2, $3)`
 
 	_, err := self.FindUserByEmail(email, connectionType)
 	if err == nil {
@@ -55,7 +55,7 @@ func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
 }
 
 func (self *UserRepository) UpdateUser(email string, password string, connectionType string) error {
-	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2);`
+	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2)`
 
 	_, err := self.FindUserByEmail(email, connectionType)
 	if err != nil {

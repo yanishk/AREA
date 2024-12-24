@@ -16,7 +16,7 @@ func NewReactionRepository(db *sql.DB) *ReactionRepository {
 }
 
 func (self *ReactionRepository) CreateReaction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO reactions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
+	sqlStatement := `INSERT INTO reactions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindReactionByName(name)
 	if err == nil {
