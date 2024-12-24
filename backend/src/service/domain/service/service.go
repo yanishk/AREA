@@ -44,6 +44,10 @@ func (self *ServiceService) FindServiceByName(name string) (entities.Service, er
 	return self.ServiceRepository.FindServiceByName(name)
 }
 
+func (self *ServiceService) FindServiceById(id string) (entities.Service, error) {
+	return self.ServiceRepository.FindServiceById(id)
+}
+
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
 	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errFoundService != nil {
@@ -70,11 +74,11 @@ func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]
 	return reactions, errFindReactions
 }
 
-func (self *ServiceService) RetrieveActionsServices() ([]entities.ServiceUsefulInformations, error) {
+func (self *ServiceService) RetrieveActionsServices() ([]entities.Service, error) {
 	return self.ServiceRepository.FindActionsServices()
 }
 
-func (self *ServiceService) RetrieveReactionsServices() ([]entities.ServiceUsefulInformations, error) {
+func (self *ServiceService) RetrieveReactionsServices() ([]entities.Service, error) {
 	return self.ServiceRepository.FindReactionsServices()
 }
 

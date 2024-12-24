@@ -63,6 +63,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
+	private.GET("/service/retrieve", self.RetrieveServiceById)
 	private.GET("/actions-services", self.RetrieveActionsServices)
 	private.GET("/reactions-services", self.RetrieveReactionsServices)
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
@@ -325,6 +326,38 @@ func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		authURL: githubAuthUrl,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by id
+// @Tags			Services
+// @Produce		json
+// @Param        id     query     string  true  "Service id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/service/retrieve [get]
+func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
+	serviceId := context.Query("id")
+
+	if serviceId == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid service id",
+		})
+		return
+	}
+
+	service, err := self.ServiceService.FindServiceById(serviceId)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve requested service",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
 	})
 }
 

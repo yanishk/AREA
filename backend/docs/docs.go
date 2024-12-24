@@ -510,6 +510,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/service/retrieve": {
+            "get": {
+                "description": "Retrieve service by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/delete-account": {
             "delete": {
                 "description": "Delete the user account",
@@ -1030,17 +1071,23 @@ const docTemplate = `{
         "docs_service.ServiceExample": {
             "type": "object",
             "properties": {
-                "Color": {
-                    "type": "string",
-                    "example": "#E84A4A"
+                "color": {
+                    "type": "string"
                 },
-                "Logo": {
-                    "type": "string",
-                    "example": "assets/logos/Google.webp"
+                "hasActions": {
+                    "type": "boolean"
                 },
-                "Name": {
-                    "type": "string",
-                    "example": "Google"
+                "hasReactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1141,6 +1188,32 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/docs_service.ReactionExample"
                     }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid service id"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve requested service"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "$ref": "#/definitions/docs_service.ServiceExample"
                 }
             }
         },

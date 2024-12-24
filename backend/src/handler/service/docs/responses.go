@@ -1,9 +1,12 @@
 package docs_service
 
 type ServiceExample struct {
-	Name  string `json:"Name" example:"Google"`
-	Color string `json:"Color" example:"#E84A4A"`
-	Logo  string `json:"Logo" example:"assets/logos/Google.webp"`
+	Id           string
+	Name         string
+	Color        string
+	Logo         string
+	HasActions   bool
+	HasReactions bool
 }
 
 type ActionExample struct {
@@ -72,6 +75,19 @@ type ServiceOAuth2SuccessResponse struct {
 
 type ServiceOAuth2BadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid callback type-Invalid app type"`
+}
+
+// Retrieve Service by Id
+type ServiceRetrieveServiceByIdSuccessResponse struct {
+	Service ServiceExample
+}
+
+type ServiceRetrieveServiceByIdBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid service id"`
+}
+
+type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve requested service"`
 }
 
 // Retrieve Actions/Reactions Services Responses

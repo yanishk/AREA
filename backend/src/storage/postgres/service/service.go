@@ -30,6 +30,18 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 	return nil
 }
 
+func (self *ServiceRepository) FindServiceById(id string) (entities.Service, error) {
+	sqlStatement := `SELECT * FROM services where id = ($1)`
+	var retrievedService entities.Service
+
+	row := self.db.QueryRow(sqlStatement, id)
+	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
+	if err != nil {
+		return retrievedService, err
+	}
+	return retrievedService, nil
+}
+
 func (self *ServiceRepository) FindServiceByName(name string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services where name = ($1)`
 	var retrievedService entities.Service
@@ -42,9 +54,9 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 	return retrievedService, nil
 }
 
-func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulInformations, error) {
-	sqlStatement := `SELECT name, color, logo FROM services where hasactions = true`
-	var retrievedServices []entities.ServiceUsefulInformations
+func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
+	sqlStatement := `SELECT * FROM services where hasactions = true`
+	var retrievedServices []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
 	if err != nil {
@@ -53,8 +65,8 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulIn
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedService entities.ServiceUsefulInformations
-		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
+		var retrievedService entities.Service
+		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
 		if err != nil {
 			return retrievedServices, err
 		}
@@ -63,9 +75,9 @@ func (self *ServiceRepository) FindActionsServices() ([]entities.ServiceUsefulIn
 	return retrievedServices, nil
 }
 
-func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUsefulInformations, error) {
-	sqlStatement := `SELECT name, color, logo FROM services where hasreactions = true`
-	var retrievedServices []entities.ServiceUsefulInformations
+func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
+	sqlStatement := `SELECT * FROM services where hasreactions = true`
+	var retrievedServices []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
 	if err != nil {
@@ -74,8 +86,8 @@ func (self *ServiceRepository) FindReactionsServices() ([]entities.ServiceUseful
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedService entities.ServiceUsefulInformations
-		err := rows.Scan(&retrievedService.Name, &retrievedService.Color, &retrievedService.Logo)
+		var retrievedService entities.Service
+		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
 		if err != nil {
 			return retrievedServices, err
 		}
