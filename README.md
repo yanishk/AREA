@@ -3,6 +3,10 @@
 ![Static Badge](https://img.shields.io/badge/mobile-flutter-purple)
 ![Static Badge](https://img.shields.io/badge/containerization-docker-yellow)
 
+[![Quality Gate Status](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=alert_status&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+[![Security Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=security_rating&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+[![Maintainability Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=sqale_rating&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+
 # AREA
 
 AREA is an application development project designed to replicate the functionality of IFTTT. Its principle is straightforward: connecting actions and reactions across different services to automate workflows.
