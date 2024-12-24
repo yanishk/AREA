@@ -157,3 +157,21 @@ func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entitie
 	}
 	return retrievedWorkflows, nil
 }
+
+func (self *WorkflowRepository) DeleteWorkflow(workflowId string, ownerId string) error {
+	sqlStatement := `DELETE FROM workflows WHERE id = ($1) AND ownerid = ($2)`
+
+	res, err := self.db.Exec(sqlStatement, workflowId, ownerId)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("Could not delete workflow")
+	}
+	return nil
+}

@@ -76,6 +76,19 @@ func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entit
 	return nil
 }
 
+func (self *WorkflowService) DeleteWorkflow(email string, connectionType string, workflowId string) error {
+	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
+	if err != nil {
+		return err
+	}
+
+	err = self.WorkflowRepository.DeleteWorkflow(workflowId, user.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
