@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 interface ErrorMessageProps {
-    message?: string;
-    trigger?: number;
-    onClose?: () => void;
+    message: string;
+    trigger: number;
+    onClose: () => void;
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, trigger, onClose }) => {
