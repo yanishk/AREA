@@ -364,7 +364,7 @@ func (self *ServiceHandler) OAuth2Reddit(context *gin.Context) {
 		return
 	}
 
-	githubAuthUrl := "https://www.reddit.com/api/v1/authorize?" +
+	redditAuthUrl := "https://www.reddit.com/api/v1/authorize?" +
 		"client_id=" + clientID +
 		"&response_type=code" +
 		"&state=" + os.Getenv("REDDIT_STATE") +
@@ -373,7 +373,7 @@ func (self *ServiceHandler) OAuth2Reddit(context *gin.Context) {
 		"&scope=identity read submit vote mysubreddits history account edit privatemessages"
 
 	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: githubAuthUrl,
+		authURL: redditAuthUrl,
 	})
 }
 
