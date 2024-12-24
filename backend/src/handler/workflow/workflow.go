@@ -37,6 +37,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 		workflow.POST("/create", self.CreateWorkflow)
 		workflow.GET("/retrieve", self.GetUserWorkflows)
 		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
+		workflow.DELETE("/delete", self.DeleteWorkflow)
 	}
 }
 
@@ -130,5 +131,39 @@ func (self *WorkflowHandler) ActivateDeactivateWorkflow(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Successfully updates workflow's activation status",
+	})
+}
+
+// @Summary		Delete Workflow
+// @Description	Delete a user's workflow by specifying the workflow id
+// @Tags			Workflow
+// @Produce		json
+// @Param        id     query     string  true  "Workflow id"
+// @Success		200		{object}	docs_workflow.WorkflowDeleteWorkflowSuccessResponse
+// @Failure		400		{object}	docs_workflow.WorkflowDeleteWorkflowBadRequestResponse
+// @Failure		401 	{object}	docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse
+// @Failure		500		{object}	docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse
+// @Router			/workflow/delete [delete]
+func (self *WorkflowHandler) DeleteWorkflow(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+	workflowId := context.Query("id")
+
+	if workflowId == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid workflow id",
+		})
+		return
+	}
+
+	err := self.WorkflowService.DeleteWorkflow(email, connectionType, workflowId)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not delete workflow",
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Workflow deleted",
 	})
 }

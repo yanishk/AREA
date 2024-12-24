@@ -45,6 +45,7 @@ type WorkflowRepository interface {
 	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
 	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
+	DeleteWorkflow(workflowId string, ownerId string) error
 }
 
 type Repository struct {
