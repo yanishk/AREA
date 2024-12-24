@@ -16,7 +16,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func (self *UserRepository) CreateUser(email string, password string, connectionType string) error {
-	sqlStatement := `INSERT INTO users (email, password, connectiontype) VALUES ($1, $2, $3);`
+	sqlStatement := `INSERT INTO users (email, password, connectiontype) VALUES ($1, $2, $3)`
 
 	_, err := self.FindUserByEmail(email, connectionType)
 	if err == nil {
@@ -31,7 +31,7 @@ func (self *UserRepository) CreateUser(email string, password string, connection
 }
 
 func (self *UserRepository) FindUserByEmail(email string, connectionType string) (entities.User, error) {
-	sqlStatement := `SELECT * FROM users where email = ($1) AND connectiontype = ($2)`
+	sqlStatement := `SELECT * FROM users WHERE email = ($1) AND connectiontype = ($2)`
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, email, connectionType)
@@ -43,7 +43,7 @@ func (self *UserRepository) FindUserByEmail(email string, connectionType string)
 }
 
 func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
-	sqlStatement := `SELECT * FROM users where id = ($1)`
+	sqlStatement := `SELECT * FROM users WHERE id = ($1)`
 	var retrievedUser entities.User
 
 	row := self.db.QueryRow(sqlStatement, userId)
@@ -55,7 +55,7 @@ func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
 }
 
 func (self *UserRepository) UpdateUser(email string, password string, connectionType string) error {
-	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2);`
+	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2)`
 
 	_, err := self.FindUserByEmail(email, connectionType)
 	if err != nil {

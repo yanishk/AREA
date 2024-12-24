@@ -106,14 +106,17 @@ definitions:
     type: object
   docs_service.ServiceExample:
     properties:
-      Color:
-        example: '#E84A4A'
+      color:
         type: string
-      Logo:
-        example: assets/logos/Google.webp
+      hasActions:
+        type: boolean
+      hasReactions:
+        type: boolean
+      id:
         type: string
-      Name:
-        example: Google
+      logo:
+        type: string
+      name:
         type: string
     type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
@@ -181,6 +184,23 @@ definitions:
         items:
           $ref: '#/definitions/docs_service.ReactionExample'
         type: array
+    type: object
+  docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
+    properties:
+      error:
+        example: Invalid service id
+        type: string
+    type: object
+  docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve requested service
+        type: string
+    type: object
+  docs_service.ServiceRetrieveServiceByIdSuccessResponse:
+    properties:
+      service:
+        $ref: '#/definitions/docs_service.ServiceExample'
     type: object
   docs_user.UserDeleteAccountInternalServerErrorResponse:
     properties:
@@ -852,6 +872,33 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
+  /service/retrieve:
+    get:
+      description: Retrieve service by id
+      parameters:
+      - description: Service id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
   /user/delete-account:
     delete:
       consumes:

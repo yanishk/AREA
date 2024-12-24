@@ -18,7 +18,7 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 
 func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
 	actionParam map[string]interface{}, reactionParam map[string]interface{}) error {
-	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7);`
+	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
 	if errMarshallActionParam != nil {
@@ -42,7 +42,7 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 }
 
 func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows where name = ($1) AND ownerid = ($2)`
+	sqlStatement := `SELECT * FROM workflows WHERE name = ($1) AND ownerid = ($2)`
 	var retrievedWorkflow entities.Workflow
 
 	row := self.db.QueryRow(sqlStatement, name, ownerId)
@@ -55,7 +55,7 @@ func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId
 }
 
 func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows where actionid = ($1)`
+	sqlStatement := `SELECT * FROM workflows WHERE actionid = ($1)`
 
 	rows, errQuery := self.db.Query(sqlStatement, actionId)
 	if errQuery != nil {
@@ -71,7 +71,7 @@ func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entit
 }
 
 func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows where ownerid = ($1)`
+	sqlStatement := `SELECT * FROM workflows WHERE ownerid = ($1)`
 
 	rows, errQuery := self.db.Query(sqlStatement, userId)
 	if errQuery != nil {
@@ -98,7 +98,7 @@ func (self *WorkflowRepository) ActivateDeactivateWorkflow(workflowId string, is
 }
 
 func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows where id = ($1)`
+	sqlStatement := `SELECT * FROM workflows WHERE id = ($1)`
 	var retrievedWorkflow entities.Workflow
 	var actionParamByte []byte
 	var reactionParamByte []byte
