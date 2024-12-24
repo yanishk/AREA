@@ -13,7 +13,7 @@ const ChangePasswordPage = () => {
     const [userEmail, setUserEmail] = useState("");
     const [password, setPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [newPasswordError, setNewPasswordError] = useState("");
@@ -80,6 +80,10 @@ const ChangePasswordPage = () => {
         } catch (error) {
             console.error("Failed to modify password : ", error);
         }
+    }
+
+    const handleCancel = () => {
+        navigate(-1);
     }
 
     return (
@@ -182,13 +186,21 @@ const ChangePasswordPage = () => {
                             type="password"
                             placeholder=""
                             value={confirmPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
 
-                        <ButtonValidation
-                            text="Submit"
-                            onClick={handleSubmit}
-                        />
+                        <div className="flex flex-col text-center justify-center mb-28 max-w-[300px] mx-auto">
+                            <ButtonValidation
+                                text="Change"
+                                onClick={handleSubmit}
+                            />
+                            <p
+                                className="underline mt-7 text-[1.2em] text-[#222222] font-[900] cursor-pointer"
+                                onClick={handleCancel}
+                            >
+                                Cancel
+                            </p>
+                        </div>
                     </div>
                 </div>
             </MaxWidthWrapper>
