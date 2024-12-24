@@ -1042,4 +1042,25 @@ paths:
       summary: Retrieve User's Workflows
       tags:
       - Workflow
+  /workflow/update:
+    put:
+      description: Update a user's workflow by specifying the workflow id
+      parameters:
+      - description: Workflow id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.NewWorkflow'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update Workflow
+      tags:
+      - Workflow
 swagger: "2.0"

@@ -36,6 +36,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	{
 		workflow.POST("/create", self.CreateWorkflow)
 		workflow.GET("/retrieve", self.GetUserWorkflows)
+		workflow.PUT("/update", self.UpdateWorkflow)
 		workflow.PUT("/modify-activation", self.ActivateDeactivateWorkflow)
 		workflow.DELETE("/delete", self.DeleteWorkflow)
 	}
@@ -98,6 +99,44 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"workflows": retrievedWorkflow,
+	})
+}
+// @Summary		Update Workflow
+// @Description	Update a user's workflow by specifying the workflow id
+// @Tags			Workflow
+// @Produce		json
+// @Param        id     query     string  true  "Workflow id"
+// @Param			workflow	body		entities.NewWorkflow	true	"Workflow informations"
+// @Router			/workflow/update [put]
+func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
+	var workflow entities.NewWorkflow
+	workflowId := context.Query("id")
+
+	if workflowId == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid workflow id",
+		})
+		return
+	}
+
+	err := context.ShouldBindJSON(&workflow)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": InvalidRequestBodyMessage,
+		})
+		return
+	}
+
+	err = self.WorkflowService.UpdateWorkflow(workflowId, workflow)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not update workflow",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Workflow successfully updated",
 	})
 }
 

@@ -791,6 +791,37 @@
                 }
             }
         },
+        "/workflow/update": {
+            "put": {
+                "description": "Update a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Update Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.NewWorkflow"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/{service}/actions": {
             "get": {
                 "description": "Retrieve actions from requested service",
