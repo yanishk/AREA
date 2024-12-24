@@ -90,7 +90,7 @@ const Navbar: React.FC<navbarProps> = ({ bgColor }) => {
                                     onClick={handleAccount}
                                 >
                                     <img
-                                        src="iconAvatar.svg"
+                                        src="/iconAvatar.svg"
                                         alt="Avatar"
                                     />
                                 </button>
