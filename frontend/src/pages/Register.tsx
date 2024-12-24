@@ -15,6 +15,7 @@ const RegisterForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [errorTrigger, setErrorTrigger] = useState(0);
 
     const navigate = useNavigate();
 
@@ -45,11 +46,13 @@ const RegisterForm = () => {
                 setEmail("");
                 setPassword("");
                 setError("The email and password don't match");
+                setErrorTrigger(Date.now());
             }
         } catch (error) {
             setEmail("");
             setPassword("");
             setError("The email and password don't match");
+            setErrorTrigger(Date.now());
         }
     }
 
@@ -69,9 +72,14 @@ const RegisterForm = () => {
         return;
     };
 
+    const handleErrorClose = () => {
+        setError("");
+        setErrorTrigger(0);
+    }
+
     return (
         <>
-            <ErrorMessage message={error} />
+            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
