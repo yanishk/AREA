@@ -41,7 +41,7 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType
 	if errFindingUser != nil {
 		return errFindingUser
 	}
-	errCreationWorkflow := self.WorkflowRepository.CreateWorkflow(newWorkflow.NameWorkflow,
+	errCreationWorkflow := self.WorkflowRepository.CreateWorkflow(newWorkflow.Name,
 		userFound.Id, newWorkflow.ActionId, newWorkflow.ReactionId,
 		newWorkflow.ActionParam, newWorkflow.ReactionParam)
 	if errCreationWorkflow != nil {
@@ -63,15 +63,32 @@ func (self *WorkflowService) GetUserWorkflows(email string, connectionType strin
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error {
-	foundWorkflow, errFetchWorkflow := self.WorkflowRepository.FindWorkflowById(workflowActivation.WorkflowId)
-	if errFetchWorkflow != nil {
-		return errFetchWorkflow
+func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error {
+	updatedWorkflow, err := self.WorkflowRepository.FindWorkflowById(workflowId)
+	if err != nil {
+		return err
 	}
 
-	errUpdate := self.WorkflowRepository.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
-	if errUpdate != nil {
-		return errUpdate
+	if workflow.Name != "" {
+		updatedWorkflow.Name = workflow.Name
+	}
+	if workflow.ActionId != "" {
+		updatedWorkflow.ActionId = workflow.ActionId
+	}
+	if workflow.ReactionId != "" {
+		updatedWorkflow.ReactionId = workflow.ReactionId
+	}
+	if len(workflow.ActionParam) != 0 {
+		updatedWorkflow.ActionParam = workflow.ActionParam
+	}
+	if len(workflow.ReactionParam) != 0 {
+		updatedWorkflow.ReactionParam = workflow.ReactionParam
+	}
+	updatedWorkflow.IsActivated = workflow.IsActivated
+
+	err = self.WorkflowRepository.UpdateWorkflow(workflowId, updatedWorkflow)
+	if err != nil {
+		return err
 	}
 	return nil
 }
