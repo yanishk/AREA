@@ -225,6 +225,43 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
+func GetRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var redditCallback string
+	var redditClientID string
+	var redditClientSecret string
+
+	if callbackType == "service" {
+		redditCallback = os.Getenv("REDDIT_SERVICE_CALLBACK")
+		redditClientID = os.Getenv("REDDIT_SERVICE_CLIENT_ID")
+		redditClientSecret = os.Getenv("REDDIT_SERVICE_CLIENT_SECRET")
+	} else if callbackType == "login" {
+		redditCallback = os.Getenv("REDDIT_LOGIN_CALLBACK")
+		redditClientID = os.Getenv("REDDIT_LOGIN_CLIENT_ID")
+		redditClientSecret = os.Getenv("REDDIT_LOGIN_CLIENT_SECRET")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://www.reddit.com/api/v1/access_token"
+	jsonBody := fmt.Sprintf(
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
+		code,
+		redditCallback,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.SetBasicAuth(redditClientID, redditClientSecret)
+	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func GetOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
@@ -334,6 +371,9 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetGithubOAuth2AccessTokenRequest(code, callbackType)
 		request.Header.Set("Accept", "application/json")
 		tokenRes.ExpiresIn = oneYearSecond
+	} else if serviceName == "Reddit" {
+		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
+
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
