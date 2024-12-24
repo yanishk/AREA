@@ -11,6 +11,7 @@ import ConnectService from './pages/ConnectService'
 import TriggerActionPage from './pages/TriggerAction'
 import AccountPage from './pages/AccountPage'
 import { NonExistantRoute } from './pages/NonExistantRoute'
+import ChangePasswordPage from './pages/ChangePassword'
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
               <Route path="/create" element={<CreatePage />} />
               <Route path="/register" element={<RegisterForm />} />
               <Route path="/login" element={<LoginForm />} />
-              <Route path="/account" element={<AccountPage />} />
+              <Route path="/settings" element={<AccountPage />} />
+              <Route path="/settings/change_password" element={<ChangePasswordPage />} />
               <Route path="/select-service" element={<SelectServicePage />} />
               <Route path="/select-service/:name" element={<ServicePage />} />
               <Route path="/select-action/:name" element={<TriggerActionPage />} />
