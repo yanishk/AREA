@@ -459,6 +459,23 @@ definitions:
         additionalProperties: true
         type: object
     type: object
+  entities.UpdatedWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      isactivated:
+        type: boolean
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
   entities.UserCredentials:
     properties:
       email:
@@ -1056,7 +1073,7 @@ paths:
         name: workflow
         required: true
         schema:
-          $ref: '#/definitions/entities.NewWorkflow'
+          $ref: '#/definitions/entities.UpdatedWorkflow'
       produces:
       - application/json
       responses: {}

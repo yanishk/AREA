@@ -88,7 +88,7 @@ func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.
 }
 
 func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error {
-	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), actionparam = ($4), reactionparam = ($5) WHERE id = ($6)`
+	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), isactivated = ($4), actionparam = ($5), reactionparam = ($6) WHERE id = ($7)`
 
 	actionParamJson, err := json.Marshal(updatedWorkflow.ActionParam)
 	if err != nil {
@@ -99,7 +99,7 @@ func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflo
 		return err
 	}
 
-	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, actionParamJson, reactionParamJson, workflowId)
+	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, updatedWorkflow.IsActivated, actionParamJson, reactionParamJson, workflowId)
 	if err != nil {
 		return err
 	}

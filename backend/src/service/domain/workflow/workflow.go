@@ -63,7 +63,7 @@ func (self *WorkflowService) GetUserWorkflows(email string, connectionType strin
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities.NewWorkflow) error {
+func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error {
 	updatedWorkflow, err := self.WorkflowRepository.FindWorkflowById(workflowId)
 	if err != nil {
 		return err
@@ -84,6 +84,7 @@ func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities
 	if len(workflow.ReactionParam) != 0 {
 		updatedWorkflow.ReactionParam = workflow.ReactionParam
 	}
+	updatedWorkflow.IsActivated = workflow.IsActivated
 
 	err = self.WorkflowRepository.UpdateWorkflow(workflowId, updatedWorkflow)
 	if err != nil {

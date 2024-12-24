@@ -106,11 +106,12 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 // @Tags			Workflow
 // @Produce		json
 // @Param        id     query     string  true  "Workflow id"
-// @Param			workflow	body		entities.NewWorkflow	true	"Workflow informations"
+// @Param			workflow	body		entities.UpdatedWorkflow	true	"Workflow informations"
 // @Router			/workflow/update [put]
 func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
-	var workflow entities.NewWorkflow
+	var workflow entities.UpdatedWorkflow
 	workflowId := context.Query("id")
+	workflow.IsActivated = true
 
 	if workflowId == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{

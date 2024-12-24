@@ -824,7 +824,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entities.NewWorkflow"
+                            "$ref": "#/definitions/entities.UpdatedWorkflow"
                         }
                     }
                 ],
@@ -1570,6 +1570,31 @@ const docTemplate = `{
                 "actionparam": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "entities.UpdatedWorkflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "isactivated": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
