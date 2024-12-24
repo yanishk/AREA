@@ -76,6 +76,19 @@ func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entit
 	return nil
 }
 
+func (self *WorkflowService) DeleteWorkflow(email string, connectionType string, workflowId string) error {
+	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
+	if err != nil {
+		return err
+	}
+
+	err = self.WorkflowRepository.DeleteWorkflow(workflowId, user.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
@@ -190,8 +203,8 @@ func (self *WorkflowService) executeActiveActionsEveryWeekAt(timeRes entities.Ti
 		return fmt.Errorf("Error in the minute, hour or day sent")
 	}
 
-	dayArray, err := days.([]interface{})
-	if !err {
+	dayArray, ok := days.([]interface{})
+	if !ok {
 		return fmt.Errorf("Error parsing the day array")
 	}
 
