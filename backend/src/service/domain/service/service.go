@@ -441,7 +441,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	}
 	defer res.Body.Close()
 
-	if (serviceName == "Github") {
+	if serviceName == "Github" {
 		userInfo, err = decodeUserInfoWithGithub(res)
 	} else {
 		err = json.NewDecoder(res.Body).Decode(&userInfo)
