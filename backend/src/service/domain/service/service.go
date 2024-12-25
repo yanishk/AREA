@@ -85,15 +85,15 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.Service, err
 func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
 	var authUrl string
 
-	if (serviceName == "Google") {
+	if serviceName == "Google" {
 		authUrl = self.OAuth2Google(callbackType, appType)
-	} else if (serviceName == "Spotify") {
+	} else if serviceName == "Spotify" {
 		authUrl = self.OAuth2Spotify(callbackType)
-	} else if (serviceName == "Discord") {
+	} else if serviceName == "Discord" {
 		authUrl = self.OAuth2Discord(callbackType)
-	} else if (serviceName == "Github") {
+	} else if serviceName == "Github" {
 		authUrl = self.OAuth2Github(callbackType)
-	} else if (serviceName == "Reddit") {
+	} else if serviceName == "Reddit" {
 		authUrl = self.OAuth2Reddit(callbackType)
 	} else {
 		return authUrl, fmt.Errorf("Unknown service")

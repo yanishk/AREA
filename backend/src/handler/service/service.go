@@ -86,7 +86,7 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-		"error": "Unknown service",
+			"error": "Unknown service",
 		})
 		return
 	}
