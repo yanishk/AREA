@@ -62,6 +62,12 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
         editNameButtonText = "Save";
       } else {
         editNameButtonText = "Edit name";
+        ApiRequest.put(
+          "workflow/update?id=$workflowID",
+          jsonEncode(<String, dynamic>{
+            'name':workflowTitleController.text,
+          }),
+        );
       }
     });
   }
