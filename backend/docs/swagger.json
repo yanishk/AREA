@@ -93,143 +93,24 @@
                 }
             }
         },
-        "/authentication/Discord/{callback-type}/{app-type}": {
+        "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
-                "description": "Get Discord OAuth2 URL",
+                "description": "Get Service OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Services Authentication"
                 ],
-                "summary": "Discord OAuth2",
+                "summary": "Service OAuth2",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
                         "in": "path",
                         "required": true
                     },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Github/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Github OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Github OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Google/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Google OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Google OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Spotify/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Spotify OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Spotify OAuth2",
-                "parameters": [
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",

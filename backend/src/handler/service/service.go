@@ -5,7 +5,6 @@ import (
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -18,19 +17,9 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const callbackTypeParamName = "callback-type"
-const appTypeParamName = "app-type"
-
-const botBearer = "Bot "
-const accessBearer = "Bearer "
-
 const InternalServerErrorMessage = "Internal server error"
-const InvalidCallbackTypeMessage = "Invalid callback type"
-const InvalidAppTypeMessage = "Invalid app type"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
-
-const authURL = "auth-url"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -50,11 +39,7 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
-		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
-		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
-		authentication.GET("/Github/:callback-type/:app-type", self.OAuth2Github)
-		authentication.GET("/Reddit/:callback-type/:app-type", self.OAuth2Reddit)
+		authentication.GET("/:service/:callback-type/:app-type", self.OAuth2Service)
 	}
 }
 
@@ -91,7 +76,7 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getUserServersFailedMessage,
@@ -134,7 +119,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	guildId := context.Query("id")
 	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getServerChannelsFailedMessage,
@@ -156,11 +141,58 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	})
 }
 
-func (self *ServiceHandler) getCallbackandID(context *gin.Context, serviceName string, isIdNecessary bool) (string, string, error) {
+// @Summary		Service OAuth2
+// @Description	Get Service OAuth2 URL
+// @Tags			Services Authentication
+// @Produce		json
+// @Param        service  path      string  true  "Service name (Github, Spotify, Discord..)"
+// @Param        callback-type  path      string  true  "Callback type (login or service)"
+// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
+// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
+// @Router			/authentication/{service}/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
+	serviceName := context.Param("service")
+	callbackType := context.Param("callback-type")
+	appType := context.Param("app-type")
+	var authUrl string
+
+	if appType != "web" && appType != "mobile" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid app type",
+		})
+	}
+	if callbackType != "login" && callbackType != "service" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid callback type",
+		})
+	}
+
+	if (serviceName == "Google") {
+		authUrl = self.OAuth2Google(callbackType, appType)
+	} else if (serviceName == "Spotify") {
+		authUrl = self.OAuth2Spotify(callbackType)
+	} else if (serviceName == "Discord") {
+		authUrl = self.OAuth2Discord(callbackType)
+	} else if (serviceName == "Github") {
+		authUrl = self.OAuth2Github(callbackType)
+	} else if (serviceName == "Reddit") {
+		authUrl = self.OAuth2Reddit(callbackType)
+	} else {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": authUrl,
+	})
+}
+
+func (self *ServiceHandler) getCallbackandClientId(callbackType string, serviceName string, isIdNecessary bool) (string, string) {
 	var callbackLink string
 	var clientID string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
 
 	if callbackType == "login" {
 		if isIdNecessary {
@@ -172,170 +204,69 @@ func (self *ServiceHandler) getCallbackandID(context *gin.Context, serviceName s
 			clientID = os.Getenv(serviceName + "_SERVICE_CLIENT_ID")
 		}
 		callbackLink = os.Getenv(serviceName + "_SERVICE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return callbackLink, clientID, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
-
-	if appType != "web" && appType != "mobile" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return callbackLink, clientID, fmt.Errorf(InvalidAppTypeMessage)
-	}
-	return callbackLink, clientID, nil
+	return callbackLink, clientID
 }
 
-// @Summary		Google OAuth2
-// @Description	Get Google OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Google/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
+func (self *ServiceHandler) OAuth2Google(callbackType string, appType string) string {
 	var callbackLink string
 	var appTypeLink string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
 
 	if callbackType == "login" {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
 	} else if callbackType == "service" {
 		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
 	}
 
 	if appType == "web" {
 		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
 	} else if appType == "mobile" {
 		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
 	}
 
-	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
+	return ("https://accounts.google.com/o/oauth2/auth?client_id=" +
 		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
-		callbackLink + "&scope=email"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: googleAuthUrl,
-	})
+		callbackLink + "&scope=email")
 }
 
-// @Summary		Spotify OAuth2
-// @Description	Get Spotify OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Spotify/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
-	callbackLink, _, err := self.getCallbackandID(context, "SPOTIFY", false)
-	if err != nil {
-		return
-	}
+func (self *ServiceHandler) OAuth2Spotify(callbackType string) string {
+	callbackLink, _ := self.getCallbackandClientId(callbackType, "SPOTIFY", false)
 
-	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
+	return ("https://accounts.spotify.com/authorize?client_id=" +
 		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: spotifyAuthUrl,
-	})
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
 }
 
-// @Summary		Discord OAuth2
-// @Description	Get Discord OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Discord/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
-	callbackLink, _, err := self.getCallbackandID(context, "DISCORD", false)
-	if err != nil {
-		return
-	}
+func (self *ServiceHandler) OAuth2Discord(callbackType string) string {
+	callbackLink, _ := self.getCallbackandClientId(callbackType, "DISCORD", false)
 
-	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
+	return ("https://discord.com/oauth2/authorize?client_id=" +
 		os.Getenv("DISCORD_CLIENT_ID") +
 		"&permissions=141376&response_type=code&redirect_uri=" +
 		callbackLink +
-		"&scope=identify+email+guilds+bot"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: discordAuthUrl,
-	})
+		"&scope=identify+email+guilds+bot")
 }
 
-// @Summary		Github OAuth2
-// @Description	Get Github OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Github/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
-	callbackLink, clientID, err := self.getCallbackandID(context, "GITHUB", true)
-	if err != nil {
-		return
-	}
+func (self *ServiceHandler) OAuth2Github(callbackType string) string {
+	callbackLink, clientID := self.getCallbackandClientId(callbackType, "GITHUB", true)
 
-	githubAuthUrl := "https://github.com/login/oauth/authorize?" +
+	return ("https://github.com/login/oauth/authorize?" +
 		"client_id=" + clientID +
 		"&redirect_uri=" + callbackLink +
 		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
-		"&state=" + os.Getenv("GITHUB_STATE")
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: githubAuthUrl,
-	})
+		"&state=" + os.Getenv("GITHUB_STATE"))
 }
 
-// @Summary		Reddit OAuth2
-// @Description	Get Reddit OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Reddit/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Reddit(context *gin.Context) {
-	callbackLink, clientID, err := self.getCallbackandID(context, "REDDIT", true)
-	if err != nil {
-		return
-	}
+func (self *ServiceHandler) OAuth2Reddit(callbackType string) string {
+	callbackLink, clientID := self.getCallbackandClientId(callbackType, "REDDIT", true)
 
-	redditAuthUrl := "https://www.reddit.com/api/v1/authorize?" +
+	return ("https://www.reddit.com/api/v1/authorize?" +
 		"client_id=" + clientID +
 		"&response_type=code" +
 		"&state=" + os.Getenv("REDDIT_STATE") +
 		"&redirect_uri=" + callbackLink +
 		"&duration=permanent" +
-		"&scope=identity read submit vote mysubreddits history account edit privatemessages"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: redditAuthUrl,
-	})
+		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
 }
 
 // @Summary		Retrieve Service
