@@ -105,11 +105,13 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
                 padding: 15,
                 activeColor: const Color.fromARGB(255, 34, 34, 34),
                 onToggle: (bool) {
-                  ApiRequest.put(
-                    "workflow/modify-activation",
-                    jsonEncode(<String, dynamic>{'id': workflowID,}),
-                  );
                   changeActivationBool();
+                  ApiRequest.put(
+                    "workflow/update?id=$workflowID",
+                    jsonEncode(<String, dynamic>{
+                      'isactivated': MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].isActivated,
+                    }),
+                  );
                 },
               ),
             ),

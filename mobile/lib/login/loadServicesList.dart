@@ -37,10 +37,11 @@ class LoadService extends State<APICall> {
   bool hasToRetry = false;
 
   void storeData(List<String> servicesName, List<String> servicesColor,
-      List<String> servicesIcons, dynamic service) {
+      List<String> servicesIcons, List<String> servicesID, dynamic service) {
     servicesName.add(service['Name']);
     servicesColor.add(service['Color']);
     servicesIcons.add(service['Logo']);
+    servicesID.add(service['Id']);
   }
 
   void setStoreData(dynamic responseData, String route) {
@@ -51,12 +52,13 @@ class LoadService extends State<APICall> {
         result = service['Name'] ?? 'No Name';
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, service);
+            Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);
         } else {
           storeData(
             Globaldata.reactionServicesName,
             Globaldata.reactionServicesColor,
             Globaldata.reactionServicesIcons,
+            Globaldata.reactionServicesID,
             service
           );
           LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());

@@ -12,10 +12,12 @@ class Globaldata {
   static List<String> actionServicesName = [];
   static List<String> actionServicesColor = [];
   static List<String> actionServicesIcons = [];
+  static List<String> actionServicesID = [];
 
   static List<String> reactionServicesName = [];
   static List<String> reactionServicesColor = [];
   static List<String> reactionServicesIcons = [];
+  static List<String> reactionServicesID = [];
 
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
@@ -29,6 +31,8 @@ class Globaldata {
     Globaldata.reactionServicesName = [];
     Globaldata.reactionServicesColor = [];
     Globaldata.reactionServicesIcons = [];
+    Globaldata.actionServicesID = [];
+    Globaldata.reactionServicesID = [];
   }
 
   static int getActionServicesSize() {
