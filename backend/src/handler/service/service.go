@@ -57,90 +57,6 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
-// @Summary		Discord User Servers
-// @Description	Retrieve the discord servers from the authenticated user
-// @Tags			Services
-// @Produce		json
-// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
-// @Router			/Discord/user/servers [get]
-func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
-	email := context.GetString("email")
-	connectionType := context.GetString("connectionType")
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
-	if errRefreshing != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
-		})
-		return
-	}
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	var guilds []map[string]interface{}
-	var ownedServers []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-
-	for _, guild := range guilds {
-		if guild["owner"] == true {
-			ownedServers = append(ownedServers, guild)
-		}
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"servers": ownedServers,
-	})
-}
-
-// @Summary		Discord Server Channels
-// @Description	Retrieve the channels from the selected server
-// @Tags			Services
-// @Produce		json
-// @Param        id  query      string  true  "server id"
-// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
-// @Router /Discord/server/channels [get]
-func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
-	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	guildId := context.Query("id")
-	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	var channels []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"channels": channels,
-	})
-}
-
 // @Summary		Service OAuth2
 // @Description	Get Service OAuth2 URL
 // @Tags			Services Authentication
@@ -269,6 +185,54 @@ func (self *ServiceHandler) OAuth2Reddit(callbackType string) string {
 		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
 }
 
+// @Summary		Actions From Service
+// @Description	Retrieve actions from requested service
+// @Tags			Services
+// @Produce		json
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/{service}/actions [get]
+func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+
+	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
+	if errActions != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"actions": actions,
+	})
+}
+
+// @Summary		Reactions From Service
+// @Description	Retrieve reactions from requested service
+// @Tags			Services
+// @Produce		json
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/{service}/reactions [get]
+func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+
+	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
+	if errReactions != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"reactions": reactions,
+	})
+}
+
 // @Summary		Retrieve Service
 // @Description	Retrieve service by id
 // @Tags			Services
@@ -336,50 +300,86 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
-// @Summary		Actions From Service
-// @Description	Retrieve actions from requested service
+// @Summary		Discord User Servers
+// @Description	Retrieve the discord servers from the authenticated user
 // @Tags			Services
 // @Produce		json
-// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/{service}/actions [get]
-func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
-	serviceName := context.Param("service")
+// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
+// @Router			/Discord/user/servers [get]
+func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
 
-	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
-	if errActions != nil {
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
+	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": "Could not retrieve or refresh the token",
 		})
 		return
 	}
 
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailedMessage,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var guilds []map[string]interface{}
+	var ownedServers []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailedMessage,
+		})
+		return
+	}
+
+	for _, guild := range guilds {
+		if guild["owner"] == true {
+			ownedServers = append(ownedServers, guild)
+		}
+	}
+
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"actions": actions,
+		"servers": ownedServers,
 	})
 }
 
-// @Summary		Reactions From Service
-// @Description	Retrieve reactions from requested service
+// @Summary		Discord Server Channels
+// @Description	Retrieve the channels from the selected server
 // @Tags			Services
 // @Produce		json
-// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
-// @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/{service}/reactions [get]
-func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
-	serviceName := context.Param("service")
+// @Param        id  query      string  true  "server id"
+// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
+// @Router /Discord/server/channels [get]
+func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
+	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
+	guildId := context.Query("id")
+	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
-	if errReactions != nil {
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
+	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": getServerChannelsFailedMessage,
 		})
 		return
 	}
+	defer resp.Body.Close()
 
+	var channels []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailedMessage,
+		})
+		return
+	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"reactions": reactions,
+		"channels": channels,
 	})
 }
