@@ -31,6 +31,7 @@ type ServiceService interface {
 	ExecuteRequest(request *http.Request) (*http.Response, error)
 	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
 	RequestToTimeApi() (entities.TimeResponse, error)
+	OAuth2Service(serviceName string, callbackType string, appType string) (string, error)
 }
 
 type UserServiceService interface {
