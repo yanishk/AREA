@@ -697,6 +697,34 @@ paths:
       summary: Google OAuth2
       tags:
       - Services Authentication
+  /authentication/Reddit/{callback-type}/{app-type}:
+    get:
+      description: Get Reddit OAuth2 URL
+      parameters:
+      - description: Callback type (login or service)
+        in: path
+        name: callback-type
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: path
+        name: app-type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Reddit OAuth2
+      tags:
+      - Services Authentication
   /authentication/Spotify/{callback-type}/{app-type}:
     get:
       description: Get Spotify OAuth2 URL
@@ -1020,7 +1048,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
       summary: Create Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflow/delete:
     delete:
       description: Delete a user's workflow by specifying the workflow id
@@ -1051,7 +1079,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse'
       summary: Delete Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflow/retrieve:
     get:
       description: Retrieve the workflows of the user actually connected
@@ -1072,7 +1100,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
       summary: Retrieve User's Workflows
       tags:
-      - Workflow
+      - Workflows
   /workflow/update:
     put:
       description: Update a user's workflow by specifying the workflow id
@@ -1105,5 +1133,5 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
       summary: Update Workflow
       tags:
-      - Workflow
+      - Workflows
 swagger: "2.0"
