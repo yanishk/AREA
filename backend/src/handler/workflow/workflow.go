@@ -114,7 +114,6 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 	var workflow entities.UpdatedWorkflow
 	workflowId := context.Query("id")
-	workflow.IsActivated = true
 
 	if workflowId == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{

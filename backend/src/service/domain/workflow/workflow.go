@@ -69,22 +69,24 @@ func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities
 		return err
 	}
 
-	if workflow.Name != "" {
-		updatedWorkflow.Name = workflow.Name
+	if workflow.Name != nil {
+		updatedWorkflow.Name = *workflow.Name
 	}
-	if workflow.ActionId != "" {
-		updatedWorkflow.ActionId = workflow.ActionId
+	if workflow.ActionId != nil {
+		updatedWorkflow.ActionId = *workflow.ActionId
 	}
-	if workflow.ReactionId != "" {
-		updatedWorkflow.ReactionId = workflow.ReactionId
+	if workflow.ReactionId != nil {
+		updatedWorkflow.ReactionId = *workflow.ReactionId
 	}
-	if len(workflow.ActionParam) != 0 {
-		updatedWorkflow.ActionParam = workflow.ActionParam
+	if workflow.IsActivated != nil {
+		updatedWorkflow.IsActivated = *workflow.IsActivated
 	}
-	if len(workflow.ReactionParam) != 0 {
-		updatedWorkflow.ReactionParam = workflow.ReactionParam
+	if workflow.ActionParam != nil {
+		updatedWorkflow.ActionParam = *workflow.ActionParam
 	}
-	updatedWorkflow.IsActivated = workflow.IsActivated
+	if workflow.ReactionParam != nil {
+		updatedWorkflow.ReactionParam = *workflow.ReactionParam
+	}
 
 	err = self.WorkflowRepository.UpdateWorkflow(workflowId, updatedWorkflow)
 	if err != nil {
