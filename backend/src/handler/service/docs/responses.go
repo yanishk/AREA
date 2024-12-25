@@ -74,7 +74,7 @@ type ServiceOAuth2SuccessResponse struct {
 }
 
 type ServiceOAuth2BadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid callback type-Invalid app type"`
+	Msg string `json:"error"example:"Invalid callback type-Invalid app type-Unknown service"`
 }
 
 // Retrieve Service by Id

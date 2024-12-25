@@ -155,7 +155,7 @@ definitions:
   docs_service.ServiceOAuth2BadRequestResponse:
     properties:
       error:
-        example: Invalid callback type-Invalid app type
+        example: Invalid callback type-Invalid app type-Unknown service
         type: string
     type: object
   docs_service.ServiceOAuth2SuccessResponse:
@@ -613,10 +613,15 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Discord/{callback-type}/{app-type}:
+  /authentication/{service}/{callback-type}/{app-type}:
     get:
-      description: Get Discord OAuth2 URL
+      description: Get Service OAuth2 URL
       parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: path
+        name: service
+        required: true
+        type: string
       - description: Callback type (login or service)
         in: path
         name: callback-type
@@ -638,91 +643,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Discord OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Github/{callback-type}/{app-type}:
-    get:
-      description: Get Github OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Github OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Google/{callback-type}/{app-type}:
-    get:
-      description: Get Google OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Google OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Spotify/{callback-type}/{app-type}:
-    get:
-      description: Get Spotify OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Spotify OAuth2
+      summary: Service OAuth2
       tags:
       - Services Authentication
   /login:
