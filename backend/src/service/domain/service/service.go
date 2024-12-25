@@ -23,7 +23,9 @@ const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 
 const InvalidCallbackTypeMessage = "Invalid callback type"
+const UnknownServiceMessage = "Unknown service"
 const APICallFailedMessage = "API call failed"
+
 const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
@@ -96,7 +98,7 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 	} else if serviceName == "Reddit" {
 		authUrl = self.OAuth2Reddit(callbackType)
 	} else {
-		return authUrl, fmt.Errorf("Unknown service")
+		return authUrl, fmt.Errorf(UnknownServiceMessage)
 	}
 	return authUrl, nil
 }
@@ -483,7 +485,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	} else if serviceName == "Reddit" {
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
 	} else {
-		return tokenRes, fmt.Errorf("Unknown service")
+		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}
 
 	if errRequest != nil {
@@ -515,7 +517,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	} else if serviceName == "Discord" {
 		request, errRequest = GetOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
 	} else {
-		return userInfo, fmt.Errorf("Unknown service")
+		return userInfo, fmt.Errorf(UnknownServiceMessage)
 	}
 
 	if errRequest != nil {
