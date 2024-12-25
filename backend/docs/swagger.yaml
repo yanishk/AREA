@@ -155,7 +155,7 @@ definitions:
   docs_service.ServiceOAuth2BadRequestResponse:
     properties:
       error:
-        example: Invalid callback type-Invalid app type
+        example: Invalid callback type-Invalid app type-Unknown service
         type: string
     type: object
   docs_service.ServiceOAuth2SuccessResponse:

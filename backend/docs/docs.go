@@ -1033,7 +1033,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type-Invalid app type"
+                    "example": "Invalid callback type-Invalid app type-Unknown service"
                 }
             }
         },
