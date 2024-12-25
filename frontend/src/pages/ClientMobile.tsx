@@ -15,7 +15,7 @@ const DownloadMobileApk = () => {
                 navigate(-1);
             }, 200);
 
-            clearTimeout(timer);
+            return () => clearTimeout(timer);
         }
     }, []);
 
