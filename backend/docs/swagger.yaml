@@ -421,24 +421,6 @@ definitions:
         additionalProperties: true
         type: object
     type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse:
-    properties:
-      error:
-        example: Invalid request body
-        type: string
-    type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not update workflow's activation status
-        type: string
-    type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse:
-    properties:
-      success:
-        example: Successfully updates workflow's activation status
-        type: string
-    type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
     properties:
       error:
@@ -459,9 +441,22 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  entities.ChangeActivationWorkflow:
+  docs_workflow.WorkflowUpdateWorkflowBadRequestResponse:
     properties:
-      id:
+      error:
+        example: Invalid workflow id-Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not update workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Workflow successfully updated
         type: string
     type: object
   entities.NewWorkflow:
@@ -471,6 +466,23 @@ definitions:
       actionparam:
         additionalProperties: true
         type: object
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
+  entities.UpdatedWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      isactivated:
+        type: boolean
       name:
         type: string
       reactionid:
@@ -1040,34 +1052,6 @@ paths:
       summary: Delete Workflow
       tags:
       - Workflow
-  /workflow/modify-activation:
-    put:
-      description: Modify the activation status of the specified workflow
-      parameters:
-      - description: Workflow informations
-        in: body
-        name: workflow
-        required: true
-        schema:
-          $ref: '#/definitions/entities.ChangeActivationWorkflow'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse'
-      summary: Modify Workflow Activation Status
-      tags:
-      - Workflow
   /workflow/retrieve:
     get:
       description: Retrieve the workflows of the user actually connected
@@ -1087,6 +1071,39 @@ paths:
           schema:
             $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
       summary: Retrieve User's Workflows
+      tags:
+      - Workflow
+  /workflow/update:
+    put:
+      description: Update a user's workflow by specifying the workflow id
+      parameters:
+      - description: Workflow id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UpdatedWorkflow'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
+      summary: Update Workflow
       tags:
       - Workflow
 swagger: "2.0"
