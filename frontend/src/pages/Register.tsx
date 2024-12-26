@@ -75,7 +75,6 @@ const RegisterForm = () => {
         const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
 
         window.location.href = authUrlWithService;
-        return;
     };
 
     const handleSpotifyRegister = () => {
