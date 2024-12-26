@@ -40,8 +40,8 @@ type UserServiceService interface {
 
 type WorkflowService interface {
 	CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error
-	ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error
 	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
+	UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
 	CallTimeApi() error
 }
