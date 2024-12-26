@@ -549,7 +549,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Create Workflow",
                 "parameters": [
@@ -598,7 +598,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Delete Workflow",
                 "parameters": [
@@ -645,7 +645,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Retrieve User's Workflows",
                 "responses": {
@@ -677,7 +677,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Update Workflow",
                 "parameters": [

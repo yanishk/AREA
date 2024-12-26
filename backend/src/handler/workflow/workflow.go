@@ -43,7 +43,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 
 // @Summary		Create Workflow
 // @Description	Create a Workflow
-// @Tags			Workflow
+// @Tags			Workflows
 // @Produce		json
 // @Param			workflow	body		entities.NewWorkflow	true	"Workflow informations"
 // @Success		200		{object}	docs_workflow.WorkflowCreateWorkflowSuccessResponse
@@ -78,7 +78,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 
 // @Summary		Retrieve User's Workflows
 // @Description	Retrieve the workflows of the user actually connected
-// @Tags			Workflow
+// @Tags			Workflows
 // @Produce		json
 // @Success		200		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse
 // @Failure		401		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse
@@ -103,7 +103,7 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 
 // @Summary		Update Workflow
 // @Description	Update a user's workflow by specifying the workflow id
-// @Tags			Workflow
+// @Tags			Workflows
 // @Produce		json
 // @Param        id     query     string  true  "Workflow id"
 // @Param			workflow	body		entities.UpdatedWorkflow	true	"Workflow informations"
@@ -145,7 +145,7 @@ func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 
 // @Summary		Delete Workflow
 // @Description	Delete a user's workflow by specifying the workflow id
-// @Tags			Workflow
+// @Tags			Workflows
 // @Produce		json
 // @Param        id     query     string  true  "Workflow id"
 // @Success		200		{object}	docs_workflow.WorkflowDeleteWorkflowSuccessResponse

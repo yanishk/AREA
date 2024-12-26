@@ -244,7 +244,7 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 		githubClientSecret = os.Getenv("GITHUB_SERVICE_CLIENT_SECRET")
 	} else if callbackType == "login" {
 		githubCallback = os.Getenv("GITHUB_LOGIN_CALLBACK")
-		githubClientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
+		githubClientID = os.Getenv("GITHUB_LOGIN_CLIENT_ID")
 		githubClientSecret = os.Getenv("GITHUB_LOGIN_CLIENT_SECRET")
 	} else {
 		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
@@ -266,21 +266,6 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 
 	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
-	return request, nil
-}
-
-func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
-	jsonBody := fmt.Sprintf(
-		"grant_type=%s&code=%s&redirect_uri=%s",
-		grantTypeAuthorization,
-		code,
-		callbackUrl,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
 	return request, nil
 }
 
@@ -357,6 +342,21 @@ func GetRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
+func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
+	jsonBody := fmt.Sprintf(
+		"grant_type=%s&code=%s&redirect_uri=%s",
+		grantTypeAuthorization,
+		code,
+		callbackUrl,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+	return request, nil
+}
+
 func GetOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
@@ -385,20 +385,6 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 
 	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 
-	return request, nil
-}
-
-func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshToken string) (*http.Request, error) {
-	jsonBody := fmt.Sprintf(
-		"grant_type=%s&refresh_token=%s",
-		grantTypeRefreshToken,
-		refreshToken,
-	)
-
-	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
-	if errRequest != nil {
-		return request, errRequest
-	}
 	return request, nil
 }
 
@@ -439,6 +425,20 @@ func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*
 	request.Header.Set(ContentType, ContentTypeUrlEncoded)
 	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
+	return request, nil
+}
+
+func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshToken string) (*http.Request, error) {
+	jsonBody := fmt.Sprintf(
+		"grant_type=%s&refresh_token=%s",
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
 	return request, nil
 }
 
@@ -505,23 +505,34 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	return tokenRes, nil
 }
 
+func decodeUserInfoWithGithub(res *http.Response) (entities.UserInfo, error) {
+	var userInfos []entities.UserInfo
+
+	err := json.NewDecoder(res.Body).Decode(&userInfos)
+	if err != nil {
+		return userInfos[0], err
+	}
+	return userInfos[0], nil
+}
+
 func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error) {
 	var userInfo entities.UserInfo
 	var request *http.Request
-	var errRequest error
+	var err error
 
 	if serviceName == "Google" {
-		request, errRequest = GetOAuth2UserEmailRequest("https://www.googleapis.com/oauth2/v3/userinfo", accessToken)
+		request, err = GetOAuth2UserEmailRequest("https://www.googleapis.com/oauth2/v3/userinfo", accessToken)
 	} else if serviceName == "Spotify" {
-		request, errRequest = GetOAuth2UserEmailRequest("https://api.spotify.com/v1/me", accessToken)
+		request, err = GetOAuth2UserEmailRequest("https://api.spotify.com/v1/me", accessToken)
 	} else if serviceName == "Discord" {
-		request, errRequest = GetOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
+		request, err = GetOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
+	} else if serviceName == "Github" {
+		request, err = GetOAuth2UserEmailRequest("https://api.github.com/user/emails", accessToken)
 	} else {
 		return userInfo, fmt.Errorf(UnknownServiceMessage)
 	}
-
-	if errRequest != nil {
-		return userInfo, errRequest
+	if err != nil {
+		return userInfo, err
 	}
 
 	res, err := self.ExecuteRequest(request)
@@ -530,9 +541,13 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	}
 	defer res.Body.Close()
 
-	errDecoder := json.NewDecoder(res.Body).Decode(&userInfo)
-	if errDecoder != nil {
-		return userInfo, errDecoder
+	if serviceName == "Github" {
+		userInfo, err = decodeUserInfoWithGithub(res)
+	} else {
+		err = json.NewDecoder(res.Body).Decode(&userInfo)
+	}
+	if err != nil {
+		return userInfo, err
 	}
 	return userInfo, nil
 }

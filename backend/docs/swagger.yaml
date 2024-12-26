@@ -941,7 +941,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
       summary: Create Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflow/delete:
     delete:
       description: Delete a user's workflow by specifying the workflow id
@@ -972,7 +972,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse'
       summary: Delete Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflow/retrieve:
     get:
       description: Retrieve the workflows of the user actually connected
@@ -993,7 +993,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
       summary: Retrieve User's Workflows
       tags:
-      - Workflow
+      - Workflows
   /workflow/update:
     put:
       description: Update a user's workflow by specifying the workflow id
@@ -1026,5 +1026,5 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
       summary: Update Workflow
       tags:
-      - Workflow
+      - Workflows
 swagger: "2.0"

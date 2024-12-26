@@ -558,7 +558,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Create Workflow",
                 "parameters": [
@@ -607,7 +607,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Delete Workflow",
                 "parameters": [
@@ -654,7 +654,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Retrieve User's Workflows",
                 "responses": {
@@ -686,7 +686,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Update Workflow",
                 "parameters": [
