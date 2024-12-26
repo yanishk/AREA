@@ -1,4 +1,4 @@
-import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faApple, faXTwitter, faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
@@ -56,11 +56,29 @@ const RegisterForm = () => {
         }
     }
 
-    const handleGoogleRegister = () => {
+    const handleGoogleRegister = async () => {
+        const result = await axios.get(
+            `${import.meta.env.VITE_API_URL}authentication/Google/login/web`,
+            {
+                withCredentials: true,
+            }
+        );
+
+        const authUrl = result.data["auth-url"];
+        if (!authUrl) {
+            console.error("Error: Authentication URL not received");
+            return;
+        }
+
+        const serviceName = "Google";
+        const state = JSON.stringify({ service: serviceName });
+        const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
+
+        window.location.href = authUrlWithService;
         return;
     };
 
-    const handleFacebookRegister = () => {
+    const handleSpotifyRegister = () => {
         return;
     };
 
@@ -133,11 +151,11 @@ const RegisterForm = () => {
                         onClick={handleGoogleRegister}
                     />
                     <SocialButton
-                        icon={faFacebookF}
-                        bgColor="bg-[#3B579D]"
-                        hoverColor="hover:bg-[#4C6AAE]"
-                        text="Continue with Facebook"
-                        onClick={handleFacebookRegister}
+                        icon={faSpotify}
+                        bgColor="bg-[#20ca5d]"
+                        hoverColor="hover:bg-[#20d561]"
+                        text="Continue with Spotify"
+                        onClick={handleSpotifyRegister}
                     />
                     <SocialButton
                         icon={faXTwitter}
