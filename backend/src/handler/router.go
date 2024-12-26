@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
@@ -57,7 +58,7 @@ func (self *Handler) Run() error {
 	})
 
 	handler := corsAllow.Handler(self.router)
-	err := http.ListenAndServe(":8080", handler)
+	err := http.ListenAndServeTLS(":8080", os.Getenv("CERTIFICATE"), os.Getenv("KEY"), handler)
 	if err != nil {
 		return err
 	}
