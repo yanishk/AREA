@@ -10,6 +10,7 @@ import SocialButton from "../components/buttons/SocialButton";
 import ErrorMessage from "../components/errors/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
+import { handleOAuthLogin } from "../OAuth";
 
 const LoginForm = () => {
     const { login } = useAuth();
@@ -61,22 +62,6 @@ const LoginForm = () => {
             setErrorTrigger(Date.now());
         }
     }
-
-    const handleGoogleLogin = () => {
-        return;
-    };
-
-    const handleFacebookLogin = () => {
-        return;
-    };
-
-    const handleTwitterLogin = () => {
-        return;
-    };
-
-    const handleAppleLogin = () => {
-        return;
-    };
 
     const handleErrorClose = () => {
         setError("");
@@ -144,14 +129,14 @@ const LoginForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
-                        onClick={handleGoogleLogin}
+                        onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
                         icon={faFacebookF}
                         bgColor="bg-[#3B579D]"
                         hoverColor="hover:bg-[#4C6AAE]"
                         text="Continue with Facebook"
-                        onClick={handleFacebookLogin}
+                        onClick={() => handleOAuthLogin("")}
                     />
                     <SocialButton
                         icon={faXTwitter}
@@ -159,7 +144,7 @@ const LoginForm = () => {
                         hoverColor="hover:bg-[#B8B8B8]"
                         text="Continue with X"
                         iconPosition="left-[27px]"
-                        onClick={handleTwitterLogin}
+                        onClick={() => handleOAuthLogin("")}
                     />
                     <SocialButton
                         icon={faApple}
@@ -168,7 +153,7 @@ const LoginForm = () => {
                         text="Continue with Apple"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={handleAppleLogin}
+                        onClick={() => handleOAuthLogin("")}
                     />
 
                     <div
