@@ -530,9 +530,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions From Service
+      summary: Retrieve Actions From Service
       tags:
-      - Services
+      - Service
   /{service}/reactions:
     get:
       description: Retrieve reactions from requested service
@@ -553,9 +553,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions From Service
+      summary: Retrieve Reactions From Service
       tags:
-      - Services
+      - Service
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -576,9 +576,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
-      summary: Discord Server Channels
+      summary: Retrieve Discord Server Channels
       tags:
-      - Services
+      - Service
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -593,26 +593,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
-      summary: Discord User Servers
+      summary: Retrieve Discord User Servers
       tags:
-      - Services
-  /actions-services:
-    get:
-      description: Retrieve services with actions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions Services
-      tags:
-      - Services
+      - Service
   /authentication/{service}/{callback-type}/{app-type}:
     get:
       description: Get Service OAuth2 URL
@@ -645,7 +628,7 @@ paths:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Service OAuth2
       tags:
-      - Services Authentication
+      - Authentication
   /login:
     post:
       consumes:
@@ -717,23 +700,6 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
-  /reactions-services:
-    get:
-      description: Retrieve services with reactions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions Services
-      tags:
-      - Services
   /register:
     post:
       consumes:
@@ -805,12 +771,12 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
-  /service/retrieve:
+  /services/{id}:
     get:
       description: Retrieve service by id
       parameters:
       - description: Service id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -830,6 +796,40 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
       summary: Retrieve Service
+      tags:
+      - Services
+  /services/actions:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reactions:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Reactions
       tags:
       - Services
   /user/delete-account:
