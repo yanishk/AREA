@@ -127,7 +127,9 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	return fmt.Errorf("Unknown reaction")
 }
 
