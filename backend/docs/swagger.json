@@ -382,7 +382,7 @@
                 }
             }
         },
-        "/service/retrieve": {
+        "/service/{id}": {
             "get": {
                 "description": "Retrieve service by id",
                 "produces": [
@@ -397,7 +397,7 @@
                         "type": "string",
                         "description": "Service id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],

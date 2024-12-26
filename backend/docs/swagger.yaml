@@ -805,12 +805,12 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
-  /service/retrieve:
+  /service/{id}:
     get:
       description: Retrieve service by id
       parameters:
       - description: Service id
-        in: query
+        in: path
         name: id
         required: true
         type: string

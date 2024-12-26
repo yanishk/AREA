@@ -391,7 +391,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service/retrieve": {
+        "/service/{id}": {
             "get": {
                 "description": "Retrieve service by id",
                 "produces": [
@@ -406,7 +406,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],

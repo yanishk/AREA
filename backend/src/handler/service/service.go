@@ -50,7 +50,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	private.GET("/service/retrieve", self.RetrieveServiceById)
+	private.GET("/service/:id", self.RetrieveServiceById)
 	private.GET("/actions-services", self.RetrieveActionsServices)
 	private.GET("/reactions-services", self.RetrieveReactionsServices)
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
@@ -148,20 +148,13 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 // @Description	Retrieve service by id
 // @Tags			Services
 // @Produce		json
-// @Param        id     query     string  true  "Service id"
+// @Param        id     path     string  true  "Service id"
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
-// @Router			/service/retrieve [get]
+// @Router			/service/{id} [get]
 func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
-	serviceId := context.Query("id")
-	if serviceId == "" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid service id",
-		})
-		return
-	}
-
+	serviceId := context.Param("id")
 	service, err := self.ServiceService.FindServiceById(serviceId)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
