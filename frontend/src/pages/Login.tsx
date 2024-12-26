@@ -62,8 +62,25 @@ const LoginForm = () => {
         }
     }
 
-    const handleGoogleLogin = () => {
-        return;
+    const handleGoogleLogin = async () => {
+        const result = await axios.get(
+            `${import.meta.env.VITE_API_URL}authentication/Google/login/web`,
+            {
+                withCredentials: true,
+            }
+        );
+
+        const authUrl = result.data["auth-url"];
+        if (!authUrl) {
+            console.error("Error: Authentication URL not received");
+            return;
+        }
+
+        const serviceName = "Google";
+        const state = JSON.stringify({ service: serviceName });
+        const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
+
+        window.location.href = authUrlWithService;
     };
 
     const handleFacebookLogin = () => {
