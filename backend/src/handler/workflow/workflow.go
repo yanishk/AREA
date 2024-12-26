@@ -32,17 +32,17 @@ func (self *WorkflowHandler) SetupRoutes(router *gin.Engine) {
 
 func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
-	workflow := private.Group("/workflow")
+	workflow := private.Group("/workflows")
 	{
-		workflow.POST("/create", self.CreateWorkflow)
-		workflow.GET("/retrieve", self.GetUserWorkflows)
-		workflow.PUT("/update", self.UpdateWorkflow)
-		workflow.DELETE("/delete", self.DeleteWorkflow)
+		workflow.POST("", self.CreateWorkflow)
+		workflow.GET("", self.GetUserWorkflows)
+		workflow.PUT("/:id", self.UpdateWorkflow)
+		workflow.DELETE("/:id", self.DeleteWorkflow)
 	}
 }
 
 // @Summary		Create Workflow
-// @Description	Create a Workflow
+// @Description	Create a workflow
 // @Tags			Workflow
 // @Produce		json
 // @Param			workflow	body		entities.NewWorkflow	true	"Workflow informations"
@@ -50,7 +50,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 // @Failure		400		{object}	docs_workflow.WorkflowCreateWorkflowBadRequestResponse
 // @Failure		401		{object}	docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse
-// @Router			/workflow/create [post]
+// @Router			/workflows [post]
 func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	var newWorkflow entities.NewWorkflow
 	email := context.GetString("email")
@@ -83,7 +83,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 // @Success		200		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse
 // @Failure		401		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse
-// @Router			/workflow/retrieve [get]
+// @Router			/workflows [get]
 func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -105,22 +105,15 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 // @Description	Update a user's workflow by specifying the workflow id
 // @Tags			Workflow
 // @Produce		json
-// @Param        id     query     string  true  "Workflow id"
+// @Param        id     path     string  true  "Workflow id"
 // @Param			workflow	body		entities.UpdatedWorkflow	true	"Workflow informations"
 // @Success		200		{object}	docs_workflow.WorkflowUpdateWorkflowSuccessResponse
 // @Success		400		{object}	docs_workflow.WorkflowUpdateWorkflowBadRequestResponse
 // @Success		500		{object}	docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse
-// @Router			/workflow/update [put]
+// @Router			/workflows/{id} [put]
 func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 	var workflow entities.UpdatedWorkflow
-	workflowId := context.Query("id")
-
-	if workflowId == "" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid workflow id",
-		})
-		return
-	}
+	workflowId := context.Param("id")
 
 	err := context.ShouldBindJSON(&workflow)
 	if err != nil {
@@ -147,23 +140,15 @@ func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 // @Description	Delete a user's workflow by specifying the workflow id
 // @Tags			Workflow
 // @Produce		json
-// @Param        id     query     string  true  "Workflow id"
+// @Param        id     path     string  true  "Workflow id"
 // @Success		200		{object}	docs_workflow.WorkflowDeleteWorkflowSuccessResponse
-// @Failure		400		{object}	docs_workflow.WorkflowDeleteWorkflowBadRequestResponse
 // @Failure		401 	{object}	docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse
-// @Router			/workflow/delete [delete]
+// @Router			/workflows/{id} [delete]
 func (self *WorkflowHandler) DeleteWorkflow(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
-	workflowId := context.Query("id")
-
-	if workflowId == "" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid workflow id",
-		})
-		return
-	}
+	workflowId := context.Param("id")
 
 	err := self.WorkflowService.DeleteWorkflow(email, connectionType, workflowId)
 	if err != nil {
