@@ -23,7 +23,9 @@ const ContentType = "Content-Type"
 const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
 
 const InvalidCallbackTypeMessage = "Invalid callback type"
+const UnknownServiceMessage = "Unknown service"
 const APICallFailedMessage = "API call failed"
+
 const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
@@ -80,6 +82,104 @@ func (self *ServiceService) RetrieveActionsServices() ([]entities.Service, error
 
 func (self *ServiceService) RetrieveReactionsServices() ([]entities.Service, error) {
 	return self.ServiceRepository.FindReactionsServices()
+}
+
+func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
+	var authUrl string
+
+	if serviceName == "Google" {
+		authUrl = self.OAuth2Google(callbackType, appType)
+	} else if serviceName == "Spotify" {
+		authUrl = self.OAuth2Spotify(callbackType)
+	} else if serviceName == "Discord" {
+		authUrl = self.OAuth2Discord(callbackType)
+	} else if serviceName == "Github" {
+		authUrl = self.OAuth2Github(callbackType)
+	} else if serviceName == "Reddit" {
+		authUrl = self.OAuth2Reddit(callbackType)
+	} else {
+		return authUrl, fmt.Errorf(UnknownServiceMessage)
+	}
+	return authUrl, nil
+}
+
+func (self *ServiceService) GetCallbackAndClientId(callbackType string, serviceName string, isIdNecessary bool) (string, string) {
+	var callbackLink string
+	var clientID string
+
+	if callbackType == "login" {
+		if isIdNecessary {
+			clientID = os.Getenv(serviceName + "_LOGIN_CLIENT_ID")
+		}
+		callbackLink = os.Getenv(serviceName + "_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		if isIdNecessary {
+			clientID = os.Getenv(serviceName + "_SERVICE_CLIENT_ID")
+		}
+		callbackLink = os.Getenv(serviceName + "_SERVICE_CALLBACK")
+	}
+	return callbackLink, clientID
+}
+
+func (self *ServiceService) OAuth2Google(callbackType string, appType string) string {
+	var callbackLink string
+	var appTypeLink string
+
+	if callbackType == "login" {
+		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
+	} else if callbackType == "service" {
+		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
+	}
+
+	if appType == "web" {
+		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
+	} else if appType == "mobile" {
+		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
+	}
+
+	return ("https://accounts.google.com/o/oauth2/auth?client_id=" +
+		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
+		callbackLink + "&scope=email")
+}
+
+func (self *ServiceService) OAuth2Spotify(callbackType string) string {
+	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "SPOTIFY", false)
+
+	return ("https://accounts.spotify.com/authorize?client_id=" +
+		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
+		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+}
+
+func (self *ServiceService) OAuth2Discord(callbackType string) string {
+	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "DISCORD", false)
+
+	return ("https://discord.com/oauth2/authorize?client_id=" +
+		os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376&response_type=code&redirect_uri=" +
+		callbackLink +
+		"&scope=identify+email+guilds+bot")
+}
+
+func (self *ServiceService) OAuth2Github(callbackType string) string {
+	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "GITHUB", true)
+
+	return ("https://github.com/login/oauth/authorize?" +
+		"client_id=" + clientID +
+		"&redirect_uri=" + callbackLink +
+		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
+		"&state=" + os.Getenv("GITHUB_STATE"))
+}
+
+func (self *ServiceService) OAuth2Reddit(callbackType string) string {
+	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "REDDIT", true)
+
+	return ("https://www.reddit.com/api/v1/authorize?" +
+		"client_id=" + clientID +
+		"&response_type=code" +
+		"&state=" + os.Getenv("REDDIT_STATE") +
+		"&redirect_uri=" + callbackLink +
+		"&duration=permanent" +
+		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
 }
 
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
@@ -385,7 +485,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	} else if serviceName == "Reddit" {
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
 	} else {
-		return tokenRes, fmt.Errorf("Unknown service")
+		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}
 
 	if errRequest != nil {
@@ -429,7 +529,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	} else if serviceName == "Github" {
 		request, err = GetOAuth2UserEmailRequest("https://api.github.com/user/emails", accessToken)
 	} else {
-		return userInfo, fmt.Errorf("Unknown service")
+		return userInfo, fmt.Errorf(UnknownServiceMessage)
 	}
 	if err != nil {
 		return userInfo, err
