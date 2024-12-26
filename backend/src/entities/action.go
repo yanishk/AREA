@@ -1,9 +1,9 @@
 package entities
 
 type Action struct {
-	Id          string
-	Name        string
-	Description string
-	ServiceId   string
-	NbParam     int
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ServiceId   string `json:"serviceid"`
+	NbParam     int    `json:"nbparam"`
 }
