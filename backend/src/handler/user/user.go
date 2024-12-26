@@ -38,9 +38,9 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	user := private.Group("/user")
 	{
+		user.GET("", self.GetUser)
 		user.PUT("/modify-password", self.ModifyPassword)
-		user.DELETE("/delete-account", self.DeleteAccount)
-		user.GET("/email", self.GetUserEmail)
+		user.DELETE("", self.DeleteAccount)
 	}
 }
 
@@ -90,7 +90,7 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 }
 
 // @Summary		Login
-// @Description	User Authentication
+// @Description	User authentication
 // @Tags			Users
 // @Accept			json
 // @Produce		json
@@ -175,6 +175,31 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve User's Informations
+// @Description	Retrieve informations about the user's connected
+// @Tags			Users
+// @Produce		json
+// @Success		200		{object}	docs_user.UserGetUserSuccessResponse
+// @Failure		401		{object}	docs_user.UserGetUserUnauthorizedResponse
+// @Failure		500		{object}	docs_user.UserGetUserInternalServerErrorResponse
+// @Router			/user [get]
+func (self *UserHandler) GetUser(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	user, err := self.UserService.GetUser(email, connectionType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+}
+
 // @Summary		Modify Password
 // @Description	Modify the user password
 // @Tags			Users
@@ -230,7 +255,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 // @Success		200		{object}	docs_user.UserDeleteAccountSuccessResponse
 // @Failure		401		{object}	docs_user.UserDeleteAccountUnauthorizedResponse
 // @Failure		500		{object}	docs_user.UserDeleteAccountInternalServerErrorResponse
-// @Router			/user/delete-account [delete]
+// @Router			/user [delete]
 func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -244,20 +269,5 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Account deleted",
-	})
-}
-
-// @Summary		Get User Email
-// @Description	Get the email of user connected
-// @Tags			Users
-// @Produce		json
-// @Success		200		{object}	docs_user.UserGetUserEmailSuccessResponse
-// @Failure		401		{object}	docs_user.UserGetUserEmailUnauthorizedResponse
-// @Router			/user/email [get]
-func (self *UserHandler) GetUserEmail(context *gin.Context) {
-	email := context.GetString("email")
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"email": email,
 	})
 }
