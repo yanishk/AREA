@@ -50,16 +50,21 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-	private.GET("/service/:id", self.RetrieveServiceById)
-	private.GET("/actions-services", self.RetrieveActionsServices)
-	private.GET("/reactions-services", self.RetrieveReactionsServices)
+
+	services := private.Group("/services")
+	{
+		services.GET("/:id", self.RetrieveServiceById)
+		services.GET("/actions", self.RetrieveActionsServices)
+		services.GET("/reactions", self.RetrieveReactionsServices)
+	}
+
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
 // @Summary		Service OAuth2
 // @Description	Get Service OAuth2 URL
-// @Tags			Services Authentication
+// @Tags			Authentication
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Github, Spotify, Discord..)"
 // @Param        callback-type  path      string  true  "Callback type (login or service)"
@@ -96,9 +101,9 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 	})
 }
 
-// @Summary		Actions From Service
+// @Summary		Retrieve Actions From Service
 // @Description	Retrieve actions from requested service
-// @Tags			Services
+// @Tags			Service
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
@@ -120,9 +125,9 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	})
 }
 
-// @Summary		Reactions From Service
+// @Summary		Retrieve Reactions From Service
 // @Description	Retrieve reactions from requested service
-// @Tags			Services
+// @Tags			Service
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
@@ -152,7 +157,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
-// @Router			/service/{id} [get]
+// @Router			/services/{id} [get]
 func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 	serviceId := context.Param("id")
 	service, err := self.ServiceService.FindServiceById(serviceId)
@@ -168,13 +173,13 @@ func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 	})
 }
 
-// @Summary		Actions Services
+// @Summary		Retrieve Services With Actions
 // @Description	Retrieve services with actions available
 // @Tags			Services
 // @Produce		json
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/actions-services [get]
+// @Router			/services/actions [get]
 func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
@@ -186,13 +191,13 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, actionsServices)
 }
 
-// @Summary		Reactions Services
+// @Summary		Retrieve Services With Reactions
 // @Description	Retrieve services with reactions available
 // @Tags			Services
 // @Produce		json
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/reactions-services [get]
+// @Router			/services/reactions [get]
 func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
@@ -204,9 +209,9 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
-// @Summary		Discord User Servers
+// @Summary		Retrieve Discord User Servers
 // @Description	Retrieve the discord servers from the authenticated user
-// @Tags			Services
+// @Tags			Service
 // @Produce		json
 // @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
@@ -253,9 +258,9 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	})
 }
 
-// @Summary		Discord Server Channels
+// @Summary		Retrieve Discord Server Channels
 // @Description	Retrieve the channels from the selected server
-// @Tags			Services
+// @Tags			Service
 // @Produce		json
 // @Param        id  query      string  true  "server id"
 // @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse

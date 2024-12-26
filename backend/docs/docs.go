@@ -22,9 +22,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord Server Channels",
+                "summary": "Retrieve Discord Server Channels",
                 "parameters": [
                     {
                         "type": "string",
@@ -57,9 +57,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord User Servers",
+                "summary": "Retrieve Discord User Servers",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -76,32 +76,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/actions-services": {
-            "get": {
-                "description": "Retrieve services with actions available",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Actions Services",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Service OAuth2 URL",
@@ -109,7 +83,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services Authentication"
+                    "Authentication"
                 ],
                 "summary": "Service OAuth2",
                 "parameters": [
@@ -258,32 +232,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/reactions-services": {
-            "get": {
-                "description": "Retrieve services with reactions available",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Reactions Services",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/register": {
             "post": {
                 "description": "Create user account",
@@ -391,7 +339,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/service/{id}": {
+        "/services/actions": {
+            "get": {
+                "description": "Retrieve services with actions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Actions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/reactions": {
+            "get": {
+                "description": "Retrieve services with reactions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Reactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/{id}": {
             "get": {
                 "description": "Retrieve service by id",
                 "produces": [
@@ -736,9 +736,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Actions From Service",
+                "summary": "Retrieve Actions From Service",
                 "parameters": [
                     {
                         "type": "string",
@@ -771,9 +771,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Reactions From Service",
+                "summary": "Retrieve Reactions From Service",
                 "parameters": [
                     {
                         "type": "string",
