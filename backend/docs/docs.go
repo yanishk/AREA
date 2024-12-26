@@ -806,7 +806,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Workflow id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -854,7 +854,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Workflow id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],

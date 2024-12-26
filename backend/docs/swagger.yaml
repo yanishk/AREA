@@ -1068,7 +1068,7 @@ paths:
       description: Delete a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -1094,7 +1094,7 @@ paths:
       description: Update a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string
