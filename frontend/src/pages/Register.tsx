@@ -9,6 +9,7 @@ import CallToActionLink from "../components/CallToActionLink";
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { handleOAuthLogin } from '../OAuth';
 
 const RegisterForm = () => {
 
@@ -55,39 +56,6 @@ const RegisterForm = () => {
             setErrorTrigger(Date.now());
         }
     }
-
-    const handleGoogleRegister = async () => {
-        const result = await axios.get(
-            `${import.meta.env.VITE_API_URL}authentication/Google/login/web`,
-            {
-                withCredentials: true,
-            }
-        );
-
-        const authUrl = result.data["auth-url"];
-        if (!authUrl) {
-            console.error("Error: Authentication URL not received");
-            return;
-        }
-
-        const serviceName = "Google";
-        const state = JSON.stringify({ service: serviceName });
-        const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
-
-        window.location.href = authUrlWithService;
-    };
-
-    const handleSpotifyRegister = () => {
-        return;
-    };
-
-    const handleTwitterRegister = () => {
-        return;
-    };
-
-    const handleAppleRegister = () => {
-        return;
-    };
 
     const handleErrorClose = () => {
         setError("");
@@ -147,14 +115,14 @@ const RegisterForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
-                        onClick={handleGoogleRegister}
+                        onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
                         text="Continue with Spotify"
-                        onClick={handleSpotifyRegister}
+                        onClick={() => handleOAuthLogin("")}
                     />
                     <SocialButton
                         icon={faXTwitter}
@@ -162,7 +130,7 @@ const RegisterForm = () => {
                         hoverColor="hover:bg-[#B8B8B8]"
                         text="Continue with X"
                         iconPosition="left-[27px]"
-                        onClick={handleTwitterRegister}
+                        onClick={() => handleOAuthLogin("")}
                     />
                     <SocialButton
                         icon={faApple}
@@ -171,7 +139,7 @@ const RegisterForm = () => {
                         text="Continue with Apple"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={handleAppleRegister}
+                        onClick={() => handleOAuthLogin("")}
                     />
 
                     <div
@@ -182,7 +150,6 @@ const RegisterForm = () => {
                             underlinedText="Log in here."
                         />
                     </div>
-
 
                 </div>
             </div>
