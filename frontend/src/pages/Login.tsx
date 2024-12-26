@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faFacebookF, faApple, faXTwitter} from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faApple, faXTwitter, faSpotify} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
@@ -132,11 +132,11 @@ const LoginForm = () => {
                         onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
-                        icon={faFacebookF}
-                        bgColor="bg-[#3B579D]"
-                        hoverColor="hover:bg-[#4C6AAE]"
-                        text="Continue with Facebook"
-                        onClick={() => handleOAuthLogin("")}
+                        icon={faSpotify}
+                        bgColor="bg-[#20ca5d]"
+                        hoverColor="hover:bg-[#20d561]"
+                        text="Continue with Spotify"
+                        onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
                         icon={faXTwitter}
