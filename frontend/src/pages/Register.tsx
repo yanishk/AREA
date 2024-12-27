@@ -122,7 +122,7 @@ const RegisterForm = () => {
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
                         text="Continue with Spotify"
-                        onClick={() => handleOAuthLogin("")}
+                        onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
                         icon={faXTwitter}
