@@ -101,7 +101,7 @@ const WorkflowBuilder = () => {
         }
 
         await axios.post(
-            `${import.meta.env.VITE_API_URL}workflow/create`,
+            `${import.meta.env.VITE_API_URL}workflow`,
             {
                 actionid: selectedAction?.id || "",
                 actionparam: {
