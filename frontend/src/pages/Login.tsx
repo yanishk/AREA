@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faApple, faSpotify, faDiscord} from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
@@ -129,6 +129,8 @@ const LoginForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
+                        iconSize="size-10"
+                        iconPosition="left-[20px]"
                         onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
@@ -136,6 +138,8 @@ const LoginForm = () => {
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
                         text="Continue with Spotify"
+                        iconSize="size-11"
+                        iconPosition="left-[19px]"
                         onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
@@ -143,17 +147,18 @@ const LoginForm = () => {
                         bgColor="bg-[#7189DA]"
                         hoverColor="hover:bg-[#7a90da]"
                         text="Continue with Discord"
-                        iconPosition="left-[27px]"
+                        iconPosition="left-[20px]"
+                        iconSize="size-11"
                         onClick={() => handleOAuthLogin("Discord")}
                     />
                     <SocialButton
-                        icon={faApple}
+                        icon={faGithub}
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
-                        text="Continue with Apple"
+                        text="Continue with Github"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={() => handleOAuthLogin("")}
+                        onClick={() => handleOAuthLogin("Github")}
                     />
 
                     <div
