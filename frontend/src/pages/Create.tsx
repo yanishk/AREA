@@ -8,11 +8,27 @@ import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
 import axios from "axios";
 
+enum Steps {
+    HOME,
+    SELECT_SERVICE_ACTION,
+    SELECT_SERVICE_REACTION,
+    CONNECT_SERVICE,
+    TRIGGER_ACTION,
+    TRIGGER_REACTION,
+    SUMMARY,
+}
+
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
 
     const [selectedAction, setSelectedAction] = useState(null);
     const [selectedReaction, setSelectedReaction] = useState(null);
+
+    const [currentStep, setCurrentStep] = useState<Steps>(Steps.HOME);
+
+    const goToStep = (step: Steps) => {
+        setCurrentStep(step);
+    };
 
     const handleOnEditAction = () => {
         return;
@@ -30,84 +46,105 @@ const WorkflowBuilder = () => {
         return;
     }
 
+    const renderStep = () => {
+        switch (currentStep) {
+            case Steps.HOME:
+                return (
+                    <div>
+                    <div className="flex items-center justify-between px-10 py-5">
+                        <div>
+                            <CancelButton
+                                text="Cancel"
+                                textColor="text-[#222222]"
+                                borderColor="border-[#222222]"
+                                bgColor="bg-[#F9FAFB]"
+                                onClick={goHome}
+                            />
+                        </div>
+
+                        <h1 className="text-[3.2rem] font-[900] text-center flex-1">
+                            Create
+                        </h1>
+
+                        <div className="w-[140px]"></div>
+                    </div>
+
+                    <div className="flex items-center justify-center flex-col px-10 pt-[100px] py-5">
+                        <div className="pt-10">
+                            {selectedAction ? (
+                                <ButtonIfDefault
+                                    onClick={() =>
+                                        goHome()
+                                    }
+                                    text="If This"
+                                />
+                            ) : (
+                                <ButtonIfDefault
+                                    onClick={() =>
+                                        goToStep(Steps.SELECT_SERVICE_ACTION)
+                                    }
+                                    text="If This"
+                                />
+                            )}
+                        </div>
+
+                        <div className="h-[70px] w-[5px] bg-[#EEEEEE]" />
+
+                        <div className="mb-[50px]">
+                            {selectedReaction ? (
+                                <ButtonThenDefault
+                                onClick={() =>
+                                    goHome()
+                                }
+                                text="Then That"
+                                disabled={!selectedAction}
+                            />
+                            ) : (
+                                <ButtonThenDefault
+                                    onClick={() =>
+                                        goHome()
+                                    }
+                                    text="Then That"
+                                    disabled={!selectedAction}
+                                />
+                            )}
+                        </div>
+
+                        <div
+                            className="w-full max-w-[350px] flex flex-col items-center justify-center"
+                        >
+                            {selectedAction && selectedReaction ? (
+                                <TriggerButton
+                                    text="Create Workflow"
+                                    textColor="text-white"
+                                    bgColor="bg-[#222222]"
+                                    hoverColor="hover:bg-[#333333]"
+                                    onClick={handleContinue}
+                                />
+                            ) : (
+                                <></>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )
+
+            case Steps.SELECT_SERVICE_ACTION:
+                return (
+                    <>
+                        <div
+                            className="bg-red-500">
+                                a
+                        </div>
+                    </>
+                )
+        }
+    }
+
     return (
-        <div>
-            <div className="flex items-center justify-between px-10 py-5">
-                <div>
-                    <CancelButton
-                        text="Cancel"
-                        textColor="text-[#222222]"
-                        borderColor="border-[#222222]"
-                        bgColor="bg-[#F9FAFB]"
-                        onClick={goHome}
-                    />
-                </div>
-
-                <h1 className="text-[3.2rem] font-[900] text-center flex-1">
-                    Create
-                </h1>
-
-                <div className="w-[140px]"></div>
-            </div>
-
-            <div className="flex items-center justify-center flex-col px-10 pt-[100px] py-5">
-                <div className="pt-10">
-                    {selectedAction ? (
-                        <ButtonIfDefault
-                            onClick={() =>
-                                goHome()
-                            }
-                            text="If This"
-                        />
-                    ) : (
-                        <ButtonIfDefault
-                            onClick={() =>
-                                goHome()
-                            }
-                            text="If This"
-                        />
-                    )}
-                </div>
-
-                <div className="h-[70px] w-[5px] bg-[#EEEEEE]" />
-
-                <div className="mb-[50px]">
-                    {selectedReaction ? (
-                        <ButtonThenDefault
-                        onClick={() =>
-                            goHome()
-                        }
-                        text="Then That"
-                        disabled={!selectedAction}
-                    />
-                    ) : (
-                        <ButtonThenDefault
-                            onClick={() =>
-                                goHome()
-                            }
-                            text="Then That"
-                            disabled={!selectedAction}
-                        />
-                    )}
-                </div>
-
-                <div
-                    className="w-full max-w-[350px] flex flex-col items-center justify-center"
-                >
-                    {selectedAction && selectedReaction ? (
-                        <TriggerButton
-                            text="Create Workflow"
-                            textColor="text-white"
-                            bgColor="bg-[#222222]"
-                            hoverColor="hover:bg-[#333333]"
-                            onClick={handleContinue}
-                        />
-                    ) : (
-                        <></>
-                    )}
-                </div>
-            </div>
-        </div>
+        <>
+            {renderStep()}
+        </>
     );
 };
 
