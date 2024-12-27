@@ -23,7 +23,7 @@ func NewAboutService(ServiceRepository storage.ServiceRepository, ActionReposito
 	}
 }
 
-func (self *AboutService) GetAboutAction(action entities.Action) (entities.AboutAction) {
+func (self *AboutService) GetAboutAction(action entities.Action) entities.AboutAction {
 	var aboutAction entities.AboutAction
 
 	aboutAction.Name = action.Name
@@ -31,7 +31,7 @@ func (self *AboutService) GetAboutAction(action entities.Action) (entities.About
 	return aboutAction
 }
 
-func (self *AboutService) GetAboutReaction(reaction entities.Reaction) (entities.AboutReaction) {
+func (self *AboutService) GetAboutReaction(reaction entities.Reaction) entities.AboutReaction {
 	var aboutReaction entities.AboutReaction
 
 	aboutReaction.Name = reaction.Name
