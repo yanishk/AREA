@@ -24,7 +24,6 @@ const SelectServicePage = () => {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
                     withCredentials: true,
                 });
-                console.log("result ici: ", result);
             } else if (type === "reaction") {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`, {
                     withCredentials: true,
