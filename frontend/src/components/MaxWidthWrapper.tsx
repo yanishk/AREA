@@ -2,13 +2,14 @@ import React from "react";
 
 interface MaxWidthWrapperProps {
     children: React.ReactNode;
-    maxWidth?: string;
+    maxWidth: string;
 }
 
-const MaxWidthWrapper: React.FC<MaxWidthWrapperProps> = ({ children, maxWidth = "780px" }) => {
+const MaxWidthWrapper: React.FC<MaxWidthWrapperProps> = ({ children, maxWidth}) => {
     return (
         <div
-            className={`w-full mx-auto max-w-[${maxWidth}]`}
+            style={{ maxWidth }}
+            className="w-full mx-auto"
         >
             {children}
         </div>

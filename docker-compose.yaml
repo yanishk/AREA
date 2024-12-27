@@ -9,6 +9,14 @@ services:
     networks:
       - app-network
 
+  client_mobile:
+    build:
+      context: ./mobile
+    depends_on:
+      - server
+    volumes:
+      - shared:/shared
+
   client_web:
     build:
       context: ./frontend
@@ -16,19 +24,15 @@ services:
       - "8081:8081"
     depends_on:
       - server
+      - client_mobile
     volumes:
       - shared:/shared
     networks:
       - app-network
 
-  client_mobile:
-    build:
-      context: ./mobile
-    depends_on:
-      - server
-
 volumes:
   shared:
+    driver: local
 
 networks:
   app-network:

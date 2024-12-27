@@ -1,20 +1,16 @@
 definitions:
   docs_service.ActionExample:
     properties:
-      Description:
-        example: This Trigger fires every single day at a specific time set by you.
+      description:
         type: string
-      Id:
-        example: 2685fc54-d1e2-43d8-9525-56ab7a91e351
+      id:
         type: string
-      Name:
-        example: Every day at
+      name:
         type: string
-      ServiceId:
-        example: 203a1f6a-b2d7-4011-a73b-e9585907835b
-        type: string
-      nbParam:
+      nbparam:
         type: integer
+      serviceid:
+        type: string
     type: object
   docs_service.DiscordChannelExample:
     properties:
@@ -88,29 +84,24 @@ definitions:
     type: object
   docs_service.ReactionExample:
     properties:
-      Description:
-        example: Start a new context or resume current playback on the user’s active
-          device. Only available for Spotify premium accounts.
+      description:
         type: string
-      Id:
-        example: 5dccb0f3-64db-4456-8286-4678857ae394
+      id:
         type: string
-      Name:
-        example: Start playback
+      name:
         type: string
-      ServiceId:
-        example: 4f6f8655-8e0f-4f96-ba7f-d3cab1577b74
-        type: string
-      nbParam:
+      nbparam:
         type: integer
+      serviceid:
+        type: string
     type: object
   docs_service.ServiceExample:
     properties:
       color:
         type: string
-      hasActions:
+      hasactions:
         type: boolean
-      hasReactions:
+      hasreactions:
         type: boolean
       id:
         type: string
@@ -155,7 +146,7 @@ definitions:
   docs_service.ServiceOAuth2BadRequestResponse:
     properties:
       error:
-        example: Invalid callback type-Invalid app type
+        example: Invalid callback type-Invalid app type-Unknown service
         type: string
     type: object
   docs_service.ServiceOAuth2SuccessResponse:
@@ -394,22 +385,22 @@ definitions:
     type: object
   docs_workflow.WorkflowExample:
     properties:
-      actionId:
+      actionid:
         type: string
       actionparam:
         additionalProperties: true
         type: object
-      createdAt:
+      createdat:
         type: string
       id:
         type: string
-      isActivated:
+      isactivated:
         type: boolean
       name:
         type: string
-      ownerId:
+      ownerid:
         type: string
-      reactionId:
+      reactionid:
         type: string
       reactionparam:
         additionalProperties: true
@@ -607,10 +598,15 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Discord/{callback-type}/{app-type}:
+  /authentication/{service}/{callback-type}/{app-type}:
     get:
-      description: Get Discord OAuth2 URL
+      description: Get Service OAuth2 URL
       parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: path
+        name: service
+        required: true
+        type: string
       - description: Callback type (login or service)
         in: path
         name: callback-type
@@ -632,119 +628,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Discord OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Github/{callback-type}/{app-type}:
-    get:
-      description: Get Github OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Github OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Google/{callback-type}/{app-type}:
-    get:
-      description: Get Google OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Google OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Reddit/{callback-type}/{app-type}:
-    get:
-      description: Get Reddit OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Reddit OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Spotify/{callback-type}/{app-type}:
-    get:
-      description: Get Spotify OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Spotify OAuth2
+      summary: Service OAuth2
       tags:
       - Services Authentication
   /login:
@@ -1031,7 +915,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
       summary: Retrieve User's Workflows
       tags:
-      - Workflow
+      - Workflows
     post:
       description: Create a workflow
       parameters:
@@ -1062,7 +946,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
       summary: Create Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflows/{id}:
     delete:
       description: Delete a user's workflow by specifying the workflow id
@@ -1089,7 +973,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse'
       summary: Delete Workflow
       tags:
-      - Workflow
+      - Workflows
     put:
       description: Update a user's workflow by specifying the workflow id
       parameters:
@@ -1121,5 +1005,5 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
       summary: Update Workflow
       tags:
-      - Workflow
+      - Workflows
 swagger: "2.0"

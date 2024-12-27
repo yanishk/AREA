@@ -102,185 +102,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/Discord/{callback-type}/{app-type}": {
+        "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
-                "description": "Get Discord OAuth2 URL",
+                "description": "Get Service OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Services Authentication"
                 ],
-                "summary": "Discord OAuth2",
+                "summary": "Service OAuth2",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
                         "in": "path",
                         "required": true
                     },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Github/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Github OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Github OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Google/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Google OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Google OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Reddit/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Reddit OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Reddit OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Spotify/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Spotify OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Spotify OAuth2",
-                "parameters": [
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
@@ -719,7 +558,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Retrieve User's Workflows",
                 "responses": {
@@ -749,7 +588,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Create Workflow",
                 "parameters": [
@@ -798,7 +637,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Update Workflow",
                 "parameters": [
@@ -846,7 +685,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Delete Workflow",
                 "parameters": [
@@ -955,24 +794,20 @@ const docTemplate = `{
         "docs_service.ActionExample": {
             "type": "object",
             "properties": {
-                "Description": {
-                    "type": "string",
-                    "example": "This Trigger fires every single day at a specific time set by you."
+                "description": {
+                    "type": "string"
                 },
-                "Id": {
-                    "type": "string",
-                    "example": "2685fc54-d1e2-43d8-9525-56ab7a91e351"
+                "id": {
+                    "type": "string"
                 },
-                "Name": {
-                    "type": "string",
-                    "example": "Every day at"
+                "name": {
+                    "type": "string"
                 },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "203a1f6a-b2d7-4011-a73b-e9585907835b"
-                },
-                "nbParam": {
+                "nbparam": {
                     "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
                 }
             }
         },
@@ -1086,24 +921,20 @@ const docTemplate = `{
         "docs_service.ReactionExample": {
             "type": "object",
             "properties": {
-                "Description": {
-                    "type": "string",
-                    "example": "Start a new context or resume current playback on the user’s active device. Only available for Spotify premium accounts."
+                "description": {
+                    "type": "string"
                 },
-                "Id": {
-                    "type": "string",
-                    "example": "5dccb0f3-64db-4456-8286-4678857ae394"
+                "id": {
+                    "type": "string"
                 },
-                "Name": {
-                    "type": "string",
-                    "example": "Start playback"
+                "name": {
+                    "type": "string"
                 },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "4f6f8655-8e0f-4f96-ba7f-d3cab1577b74"
-                },
-                "nbParam": {
+                "nbparam": {
                     "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
                 }
             }
         },
@@ -1113,10 +944,10 @@ const docTemplate = `{
                 "color": {
                     "type": "string"
                 },
-                "hasActions": {
+                "hasactions": {
                     "type": "boolean"
                 },
-                "hasReactions": {
+                "hasreactions": {
                     "type": "boolean"
                 },
                 "id": {
@@ -1184,7 +1015,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type-Invalid app type"
+                    "example": "Invalid callback type-Invalid app type-Unknown service"
                 }
             }
         },
@@ -1538,29 +1369,29 @@ const docTemplate = `{
         "docs_workflow.WorkflowExample": {
             "type": "object",
             "properties": {
-                "actionId": {
+                "actionid": {
                     "type": "string"
                 },
                 "actionparam": {
                     "type": "object",
                     "additionalProperties": true
                 },
-                "createdAt": {
+                "createdat": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "isActivated": {
+                "isactivated": {
                     "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
-                "ownerId": {
+                "ownerid": {
                     "type": "string"
                 },
-                "reactionId": {
+                "reactionid": {
                     "type": "string"
                 },
                 "reactionparam": {

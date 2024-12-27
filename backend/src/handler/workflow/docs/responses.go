@@ -1,13 +1,13 @@
 package docs_workflow
 
 type WorkflowExample struct {
-	Id            string
-	Name          string
-	OwnerId       string
-	ActionId      string
-	ReactionId    string
-	IsActivated   bool
-	CreatedAt     string
+	Id            string                 `json:"id"`
+	Name          string                 `json:"name"`
+	OwnerId       string                 `json:"ownerid"`
+	ActionId      string                 `json:"actionid"`
+	ReactionId    string                 `json:"reactionid"`
+	IsActivated   bool                   `json:"isactivated"`
+	CreatedAt     string                 `json:"createdat"`
 	ActionParam   map[string]interface{} `json:"actionparam"`
 	ReactionParam map[string]interface{} `json:"reactionparam"`
 }
