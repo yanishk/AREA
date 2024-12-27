@@ -70,19 +70,20 @@ func (self *AboutService) GetAboutReactions(serviceId string) ([]entities.AboutR
 
 func (self *AboutService) GetAboutService(service entities.Service) (entities.AboutService, error) {
 	var aboutService entities.AboutService
-	var err error
 
-	aboutService.Actions, err = self.GetAboutActions(service.Id)
+	actions, err := self.GetAboutActions(service.Id)
 	if err != nil {
 		return aboutService, err
 	}
 
-	aboutService.Reactions, err = self.GetAboutReactions(service.Id)
+	reactions, err := self.GetAboutReactions(service.Id)
 	if err != nil {
 		return aboutService, err
 	}
 
 	aboutService.Name = service.Name
+	aboutService.Actions = actions
+	aboutService.Reactions = reactions
 	return aboutService, nil
 }
 
@@ -106,11 +107,11 @@ func (self *AboutService) GetAboutServices() ([]entities.AboutService, error) {
 
 func (self *AboutService) GetAboutServer(about entities.About) (entities.About, error) {
 	about.Server.CurrentTime = time.Now().Unix()
-	var err error
 
-	about.Server.Services, err = self.GetAboutServices()
+	services, err := self.GetAboutServices()
 	if err != nil {
 		return about, err
 	}
+	about.Server.Services = services
 	return about, nil
 }
