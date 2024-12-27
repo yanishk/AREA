@@ -152,12 +152,19 @@ func (self *ServiceService) OAuth2Spotify(callbackType string) string {
 
 func (self *ServiceService) OAuth2Discord(callbackType string) string {
 	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "DISCORD", false)
+	var scope string
+
+	if callbackType == "login" {
+		scope = "identify+email"
+	} else if callbackType == "service" {
+		scope = "identify+email+guilds+bot"
+	}
 
 	return ("https://discord.com/oauth2/authorize?client_id=" +
 		os.Getenv("DISCORD_CLIENT_ID") +
 		"&permissions=141376&response_type=code&redirect_uri=" +
 		callbackLink +
-		"&scope=identify+email+guilds+bot")
+		"&scope=" + scope)
 }
 
 func (self *ServiceService) OAuth2Github(callbackType string) string {

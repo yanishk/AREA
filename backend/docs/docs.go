@@ -804,24 +804,20 @@ const docTemplate = `{
         "docs_service.ActionExample": {
             "type": "object",
             "properties": {
-                "Description": {
-                    "type": "string",
-                    "example": "This Trigger fires every single day at a specific time set by you."
+                "description": {
+                    "type": "string"
                 },
-                "Id": {
-                    "type": "string",
-                    "example": "2685fc54-d1e2-43d8-9525-56ab7a91e351"
+                "id": {
+                    "type": "string"
                 },
-                "Name": {
-                    "type": "string",
-                    "example": "Every day at"
+                "name": {
+                    "type": "string"
                 },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "203a1f6a-b2d7-4011-a73b-e9585907835b"
-                },
-                "nbParam": {
+                "nbparam": {
                     "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
                 }
             }
         },
@@ -935,24 +931,20 @@ const docTemplate = `{
         "docs_service.ReactionExample": {
             "type": "object",
             "properties": {
-                "Description": {
-                    "type": "string",
-                    "example": "Start a new context or resume current playback on the user’s active device. Only available for Spotify premium accounts."
+                "description": {
+                    "type": "string"
                 },
-                "Id": {
-                    "type": "string",
-                    "example": "5dccb0f3-64db-4456-8286-4678857ae394"
+                "id": {
+                    "type": "string"
                 },
-                "Name": {
-                    "type": "string",
-                    "example": "Start playback"
+                "name": {
+                    "type": "string"
                 },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "4f6f8655-8e0f-4f96-ba7f-d3cab1577b74"
-                },
-                "nbParam": {
+                "nbparam": {
                     "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
                 }
             }
         },
@@ -962,10 +954,10 @@ const docTemplate = `{
                 "color": {
                     "type": "string"
                 },
-                "hasActions": {
+                "hasactions": {
                     "type": "boolean"
                 },
-                "hasReactions": {
+                "hasreactions": {
                     "type": "boolean"
                 },
                 "id": {
@@ -1396,29 +1388,29 @@ const docTemplate = `{
         "docs_workflow.WorkflowExample": {
             "type": "object",
             "properties": {
-                "actionId": {
+                "actionid": {
                     "type": "string"
                 },
                 "actionparam": {
                     "type": "object",
                     "additionalProperties": true
                 },
-                "createdAt": {
+                "createdat": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "isActivated": {
+                "isactivated": {
                     "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
-                "ownerId": {
+                "ownerid": {
                     "type": "string"
                 },
-                "reactionId": {
+                "reactionid": {
                     "type": "string"
                 },
                 "reactionparam": {
