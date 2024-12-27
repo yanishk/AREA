@@ -24,6 +24,7 @@ const SelectServicePage = () => {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
                     withCredentials: true,
                 });
+                console.log("result ici: ", result);
             } else if (type === "reaction") {
                 result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`, {
                     withCredentials: true,
@@ -32,9 +33,9 @@ const SelectServicePage = () => {
 
             if (result) {
                 const propertiesServices = result.data.map((service: any) => ({
-                    name: service.Name,
-                    color: service.Color,
-                    iconPath: service.Logo,
+                    name: service.name,
+                    color: service.color,
+                    iconPath: service.logo,
                 }));
                 setServices(propertiesServices);
             }
@@ -84,7 +85,7 @@ const SelectServicePage = () => {
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {services.map((service: any) => (
                         <button
-                            key={service.name}
+                            key={service.id}
                             style={{ backgroundColor: service.color }}
                             className="h-[240px] flex flex-col items-center cursor-pointer"
                             onClick={() => handleSelect(

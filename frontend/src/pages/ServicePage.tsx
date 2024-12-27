@@ -44,9 +44,9 @@ const ServicePage = () => {
 
                 if (Array.isArray(result.data[dataKey])) {
                     const propertiesElements = result.data[dataKey].map((element: any) => ({
-                        name: element.Name,
-                        description: element.Description,
-                        id: element.Id,
+                        name: element.name,
+                        description: element.description,
+                        id: element.id,
                     }));
                     setElements(propertiesElements);
                 } else {
