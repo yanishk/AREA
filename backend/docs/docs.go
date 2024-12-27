@@ -76,6 +76,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/about.json": {
+            "get": {
+                "description": "Get about.json file",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About.json"
+                ],
+                "summary": "About.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/actions-services": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -801,6 +827,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "docs_about.AboutGetAboutInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve informations about the server"
+                }
+            }
+        },
+        "docs_about.AboutGetAboutSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "$ref": "#/definitions/entities.About"
+                }
+            }
+        },
         "docs_service.ActionExample": {
             "type": "object",
             "properties": {
@@ -1472,6 +1515,81 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "Workflow successfully updated"
+                }
+            }
+        },
+        "entities.About": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/entities.AboutClient"
+                },
+                "server": {
+                    "$ref": "#/definitions/entities.AboutServer"
+                }
+            }
+        },
+        "entities.AboutAction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutClient": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutReaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutServer": {
+            "type": "object",
+            "properties": {
+                "current_time": {
+                    "type": "integer"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutService"
+                    }
+                }
+            }
+        },
+        "entities.AboutService": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutAction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutReaction"
+                    }
                 }
             }
         },

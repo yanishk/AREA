@@ -1,9 +1,10 @@
 package service
 
 import (
-	"backend/src/entities"
 	"io"
 	"net/http"
+
+	"backend/src/entities"
 )
 
 type UserService interface {
@@ -47,9 +48,14 @@ type WorkflowService interface {
 	CallTimeApi() error
 }
 
+type AboutService interface {
+	GetAboutServer(about entities.About) (entities.About, error)
+}
+
 type Service struct {
 	UserService        UserService
 	ServiceService     ServiceService
 	UserServiceService UserServiceService
 	WorkflowService    WorkflowService
+	AboutService       AboutService
 }

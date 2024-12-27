@@ -1,4 +1,15 @@
 definitions:
+  docs_about.AboutGetAboutInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve informations about the server
+        type: string
+    type: object
+  docs_about.AboutGetAboutSuccessResponse:
+    properties:
+      about:
+        $ref: '#/definitions/entities.About'
+    type: object
   docs_service.ActionExample:
     properties:
       description:
@@ -450,6 +461,54 @@ definitions:
         example: Workflow successfully updated
         type: string
     type: object
+  entities.About:
+    properties:
+      client:
+        $ref: '#/definitions/entities.AboutClient'
+      server:
+        $ref: '#/definitions/entities.AboutServer'
+    type: object
+  entities.AboutAction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutClient:
+    properties:
+      host:
+        type: string
+    type: object
+  entities.AboutReaction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutServer:
+    properties:
+      current_time:
+        type: integer
+      services:
+        items:
+          $ref: '#/definitions/entities.AboutService'
+        type: array
+    type: object
+  entities.AboutService:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/entities.AboutAction'
+        type: array
+      name:
+        type: string
+      reactions:
+        items:
+          $ref: '#/definitions/entities.AboutReaction'
+        type: array
+    type: object
   entities.NewWorkflow:
     properties:
       actionid:
@@ -587,6 +646,23 @@ paths:
       summary: Discord User Servers
       tags:
       - Services
+  /about.json:
+    get:
+      description: Get about.json file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
+      summary: About.json
+      tags:
+      - About.json
   /actions-services:
     get:
       description: Retrieve services with actions available

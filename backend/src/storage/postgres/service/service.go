@@ -54,6 +54,27 @@ func (self *ServiceRepository) FindServiceByName(name string) (entities.Service,
 	return retrievedService, nil
 }
 
+func (self *ServiceRepository) FindServices() ([]entities.Service, error) {
+	sqlStatement := `SELECT * FROM services`
+	var retrievedServices []entities.Service
+
+	rows, err := self.db.Query(sqlStatement)
+	if err != nil {
+		return retrievedServices, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var retrievedService entities.Service
+		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
+		if err != nil {
+			return retrievedServices, err
+		}
+		retrievedServices = append(retrievedServices, retrievedService)
+	}
+	return retrievedServices, nil
+}
+
 func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasactions = true`
 	var retrievedServices []entities.Service
