@@ -8,120 +8,27 @@ import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
 import axios from "axios";
 
-type WorkflowData = {
-    selectedAction: {
-        name: string;
-        id: string;
-        color: string;
-        icon: string;
-    } | null;
-    selectedReaction: {
-        name: string;
-        id: string;
-        color: string;
-        icon: string;
-    } | null;
-} | null;
-
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const [searchParams] = useSearchParams()
 
-    const savedData: WorkflowData = JSON.parse(localStorage.getItem("workflowData") ?? "null");
-    const serviceName: WorkflowData = JSON.parse(localStorage.getItem("serviceName") ?? "null");
-
-    const [selectedAction, setSelectedAction] = useState(
-        location.state?.selectedAction || savedData?.selectedAction || null
-    );
-
-    const [selectedReaction, setSelectedReaction] = useState(
-        location.state?.selectedReaction || savedData?.selectedReaction || null
-    );
-
-    const getAuthCode = async () => {
-        const codeAuth = searchParams.get("code");
-
-        if (codeAuth) {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
-                {
-                },
-                {
-                    withCredentials: true,
-                }
-            );
-        }
-    }
-
-    useEffect(() => {
-        getAuthCode();
-    }, [useSearchParams]);
-
-    const handleDeleteAction = () => {
-        setSelectedAction(null);
-        navigate(location.pathname, {
-            state: {
-                ...location.state,
-                selectedAction: null
-            }
-        });
-    };
-
-    const handleDeleteReaction = () => {
-        setSelectedReaction(null);
-        navigate(location.pathname, {
-            state: {
-                ...location.state,
-                selectedReaction: null
-            }
-        });
-    };
+    const [selectedAction, setSelectedAction] = useState(null);
+    const [selectedReaction, setSelectedReaction] = useState(null);
 
     const handleOnEditAction = () => {
         return;
     }
 
-    const handleOnEditReaction = () => {
+    const handleDeleteAction = () => {
         return;
     }
 
     const goHome = () => {
-        navigate("/");
+        return;
     }
 
-    const handleContinue = async () => {
-        let timeValue;
-        let quarterValue;
-
-        if (selectedAction?.fields) {
-            const { time, quarter } = selectedAction.fields;
-            timeValue = parseInt(time) || 0;
-            quarterValue = parseInt(quarter) || 0;
-        }
-
-        await axios.post(
-            `${import.meta.env.VITE_API_URL}workflow/create`,
-            {
-                actionid: selectedAction?.id || "",
-                actionparam: {
-                    hour: timeValue,
-                    minute: quarterValue,
-                },
-                name: "workfloww",
-                reactionid: selectedReaction?.id || "",
-                reactionparam: {}
-            },
-            {
-                withCredentials: true,
-            }
-        );
-
-        localStorage.removeItem("workflowData");
-        setSelectedAction(null);
-        setSelectedReaction(null);
-        navigate("/");
-    };
+    const handleContinue = () => {
+        return;
+    }
 
     return (
         <div>
@@ -146,19 +53,16 @@ const WorkflowBuilder = () => {
             <div className="flex items-center justify-center flex-col px-10 pt-[100px] py-5">
                 <div className="pt-10">
                     {selectedAction ? (
-                        <ButtonIfCustom
-                            text={selectedAction.name}
-                            color={selectedAction.color}
-                            iconPath={selectedAction.icon}
-                            onEdit={handleOnEditAction}
-                            onDelete={handleDeleteAction}
+                        <ButtonIfDefault
+                            onClick={() =>
+                                goHome()
+                            }
+                            text="If This"
                         />
                     ) : (
                         <ButtonIfDefault
                             onClick={() =>
-                                navigate("/select-service", {
-                                    state: { type: "action", selectedReaction },
-                                })
+                                goHome()
                             }
                             text="If This"
                         />
@@ -169,19 +73,17 @@ const WorkflowBuilder = () => {
 
                 <div className="mb-[50px]">
                     {selectedReaction ? (
-                        <ButtonThenCustom
-                            text={selectedReaction.name}
-                            color={selectedReaction.color}
-                            iconPath={selectedReaction.icon}
-                            onEdit={handleOnEditReaction}
-                            onDelete={handleDeleteReaction}
-                        />
+                        <ButtonThenDefault
+                        onClick={() =>
+                            goHome()
+                        }
+                        text="Then That"
+                        disabled={!selectedAction}
+                    />
                     ) : (
                         <ButtonThenDefault
                             onClick={() =>
-                                navigate("/select-service", {
-                                    state: { type: "reaction", selectedAction },
-                                })
+                                goHome()
                             }
                             text="Then That"
                             disabled={!selectedAction}
