@@ -154,7 +154,7 @@ func (self *ServiceService) OAuth2Discord(callbackType string) string {
 	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "DISCORD", false)
 	var scope string
 
-	if (callbackType == "login") {
+	if callbackType == "login" {
 		scope = "identify+email"
 	} else if callbackType == "service" {
 		scope = "identify+email+guilds+bot"
