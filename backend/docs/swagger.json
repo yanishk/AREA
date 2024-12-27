@@ -835,26 +835,6 @@
                 }
             }
         },
-        "docs_service.ActionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.DiscordChannelExample": {
             "type": "object",
             "properties": {
@@ -962,49 +942,6 @@
                 }
             }
         },
-        "docs_service.ReactionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
-        "docs_service.ServiceExample": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "hasactions": {
-                    "type": "boolean"
-                },
-                "hasreactions": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "logo": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1078,7 +1015,7 @@
                 "actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ActionExample"
+                        "$ref": "#/definitions/entities.Action"
                     }
                 }
             }
@@ -1089,7 +1026,7 @@
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceExample"
+                        "$ref": "#/definitions/entities.Service"
                     }
                 }
             }
@@ -1100,7 +1037,7 @@
                 "reactions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ReactionExample"
+                        "$ref": "#/definitions/entities.Reaction"
                     }
                 }
             }
@@ -1127,7 +1064,7 @@
             "type": "object",
             "properties": {
                 "service": {
-                    "$ref": "#/definitions/docs_service.ServiceExample"
+                    "$ref": "#/definitions/entities.Service"
                 }
             }
         },
@@ -1419,40 +1356,6 @@
                 }
             }
         },
-        "docs_workflow.WorkflowExample": {
-            "type": "object",
-            "properties": {
-                "actionid": {
-                    "type": "string"
-                },
-                "actionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "createdat": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isactivated": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ownerid": {
-                    "type": "string"
-                },
-                "reactionid": {
-                    "type": "string"
-                },
-                "reactionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1468,7 +1371,7 @@
                 "workflows": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                        "$ref": "#/definitions/entities.Workflow"
                     }
                 }
             }
@@ -1584,6 +1487,26 @@
                 }
             }
         },
+        "entities.Action": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
@@ -1603,6 +1526,49 @@
                 "reactionparam": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "entities.Reaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "hasactions": {
+                    "type": "boolean"
+                },
+                "hasreactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1650,6 +1616,40 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.Workflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isactivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerid": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

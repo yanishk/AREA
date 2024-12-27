@@ -844,26 +844,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ActionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.DiscordChannelExample": {
             "type": "object",
             "properties": {
@@ -971,49 +951,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ReactionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
-        "docs_service.ServiceExample": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "hasactions": {
-                    "type": "boolean"
-                },
-                "hasreactions": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "logo": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1087,7 +1024,7 @@ const docTemplate = `{
                 "actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ActionExample"
+                        "$ref": "#/definitions/entities.Action"
                     }
                 }
             }
@@ -1098,7 +1035,7 @@ const docTemplate = `{
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceExample"
+                        "$ref": "#/definitions/entities.Service"
                     }
                 }
             }
@@ -1109,7 +1046,7 @@ const docTemplate = `{
                 "reactions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ReactionExample"
+                        "$ref": "#/definitions/entities.Reaction"
                     }
                 }
             }
@@ -1136,7 +1073,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "service": {
-                    "$ref": "#/definitions/docs_service.ServiceExample"
+                    "$ref": "#/definitions/entities.Service"
                 }
             }
         },
@@ -1428,40 +1365,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowExample": {
-            "type": "object",
-            "properties": {
-                "actionid": {
-                    "type": "string"
-                },
-                "actionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "createdat": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isactivated": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ownerid": {
-                    "type": "string"
-                },
-                "reactionid": {
-                    "type": "string"
-                },
-                "reactionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1477,7 +1380,7 @@ const docTemplate = `{
                 "workflows": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                        "$ref": "#/definitions/entities.Workflow"
                     }
                 }
             }
@@ -1593,6 +1496,26 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.Action": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
@@ -1612,6 +1535,49 @@ const docTemplate = `{
                 "reactionparam": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "entities.Reaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "hasactions": {
+                    "type": "boolean"
+                },
+                "hasreactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1659,6 +1625,40 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.Workflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isactivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerid": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

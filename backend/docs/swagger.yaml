@@ -10,19 +10,6 @@ definitions:
       about:
         $ref: '#/definitions/entities.About'
     type: object
-  docs_service.ActionExample:
-    properties:
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      nbparam:
-        type: integer
-      serviceid:
-        type: string
-    type: object
   docs_service.DiscordChannelExample:
     properties:
       flags:
@@ -93,34 +80,6 @@ definitions:
       permissions:
         type: string
     type: object
-  docs_service.ReactionExample:
-    properties:
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      nbparam:
-        type: integer
-      serviceid:
-        type: string
-    type: object
-  docs_service.ServiceExample:
-    properties:
-      color:
-        type: string
-      hasactions:
-        type: boolean
-      hasreactions:
-        type: boolean
-      id:
-        type: string
-      logo:
-        type: string
-      name:
-        type: string
-    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -170,21 +129,21 @@ definitions:
     properties:
       actions:
         items:
-          $ref: '#/definitions/docs_service.ActionExample'
+          $ref: '#/definitions/entities.Action'
         type: array
     type: object
   docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
     properties:
       services:
         items:
-          $ref: '#/definitions/docs_service.ServiceExample'
+          $ref: '#/definitions/entities.Service'
         type: array
     type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
       reactions:
         items:
-          $ref: '#/definitions/docs_service.ReactionExample'
+          $ref: '#/definitions/entities.Reaction'
         type: array
     type: object
   docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
@@ -202,7 +161,7 @@ definitions:
   docs_service.ServiceRetrieveServiceByIdSuccessResponse:
     properties:
       service:
-        $ref: '#/definitions/docs_service.ServiceExample'
+        $ref: '#/definitions/entities.Service'
     type: object
   docs_user.UserDeleteAccountInternalServerErrorResponse:
     properties:
@@ -400,29 +359,6 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_workflow.WorkflowExample:
-    properties:
-      actionid:
-        type: string
-      actionparam:
-        additionalProperties: true
-        type: object
-      createdat:
-        type: string
-      id:
-        type: string
-      isactivated:
-        type: boolean
-      name:
-        type: string
-      ownerid:
-        type: string
-      reactionid:
-        type: string
-      reactionparam:
-        additionalProperties: true
-        type: object
-    type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
     properties:
       error:
@@ -433,7 +369,7 @@ definitions:
     properties:
       workflows:
         items:
-          $ref: '#/definitions/docs_workflow.WorkflowExample'
+          $ref: '#/definitions/entities.Workflow'
         type: array
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
@@ -509,6 +445,19 @@ definitions:
           $ref: '#/definitions/entities.AboutReaction'
         type: array
     type: object
+  entities.Action:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      serviceid:
+        type: string
+    type: object
   entities.NewWorkflow:
     properties:
       actionid:
@@ -523,6 +472,34 @@ definitions:
       reactionparam:
         additionalProperties: true
         type: object
+    type: object
+  entities.Reaction:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      serviceid:
+        type: string
+    type: object
+  entities.Service:
+    properties:
+      color:
+        type: string
+      hasactions:
+        type: boolean
+      hasreactions:
+        type: boolean
+      id:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
     type: object
   entities.UpdatedWorkflow:
     properties:
@@ -554,6 +531,29 @@ definitions:
         type: string
       password:
         type: string
+    type: object
+  entities.Workflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      createdat:
+        type: string
+      id:
+        type: string
+      isactivated:
+        type: boolean
+      name:
+        type: string
+      ownerid:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
     type: object
 host: localhost:8080
 info:
