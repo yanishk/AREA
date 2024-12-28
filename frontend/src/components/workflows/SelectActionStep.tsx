@@ -6,15 +6,10 @@ type availableActionsType = {
     id: string;
 };
 
-type selectedServiceType = {
-    name: string;
-    color: string;
-    iconPath: string;
-};
-
 interface SelectActionStepProps {
-    selectedService: selectedServiceType | null;
-    availableActions: availableActionsType[];
+    selectedService: { color: string; iconPath: string } | null;
+    // availableActions: availableActionsType[];
+    availableActions: { name: string; description: string; id: string } | null;
     goToStep: (step: number) => void;
     handleSelectAction: (name: string, id: string) => void;
 }
