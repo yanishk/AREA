@@ -9,6 +9,7 @@ import TriggerActionStep from "../components/workflows/TriggerActionStep";
 import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
 import SelectReactionStep from "../components/workflows/SelectReactionStep";
 import TriggerReactionStep from "../components/workflows/TriggerReactionStep";
+import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 
 enum Steps {
     HOME,
@@ -261,9 +262,48 @@ const WorkflowBuilder = () => {
         goToStep(Steps.SELECT_REACTION);
     };
 
+    const getConnectReactionStatus = () =>
+        selectedReactionService?.name && selectedReaction?.name
+            ? servicesData[selectedReactionService?.name]?.reactions?.[selectedReaction?.name]?.[0]?.serviceConnection
+            : undefined;
+
+    const getTiggerReactionStatus = () =>
+        selectedReactionService?.name && selectedReaction?.name
+            ? servicesData[selectedReactionService?.name]?.reactions?.[selectedReaction?.name]?.[0]?.triggerReaction
+            : undefined;
+
     const handleSelectReaction = (name: string, id: string) => {
         setSelectedReaction({name, id});
-        goToStep(Steps.TRIGGER_REACTION);
+
+        if (getConnectReactionStatus() === "yes") {
+            goToStep(Steps.CONNECT_SERVICE);
+        }
+    }
+
+    const handleConnect = async (selectedService: any) => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            const authUrl = result.data["auth-url"];
+            if (!authUrl) {
+                console.error("Error: Authentication URL not received");
+                return;
+            }
+
+            window.location.href = authUrl;
+        } catch (error) {
+            console.error("Error during authentication:", error);
+        }
+        // if (getTiggerReactionStatus() === "yes") {
+        //     goToStep(Steps.TRIGGER_REACTION);
+        // } else {
+        //     goToStep(Steps.HOME);
+        // }
     }
 
     const renderStep = () => {
@@ -341,6 +381,15 @@ const WorkflowBuilder = () => {
                         reactionFieldValues={reactionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={goToStep}
+                    />
+                )
+
+            case Steps.CONNECT_SERVICE:
+                return (
+                    <ConnectServiceStep
+                        selectedService={selectedReactionService}
+                        goBack={goHome}
+                        handleConnect={() => handleConnect(selectedReactionService)}
                     />
                 )
         }
