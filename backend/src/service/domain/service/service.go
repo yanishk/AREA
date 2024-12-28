@@ -289,6 +289,37 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
+func GetAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var asanaCallback string
+
+	if callbackType == "service" {
+		asanaCallback = os.Getenv("ASANA_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		asanaCallback = os.Getenv("ASANA_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://app.asana.com/-/oauth_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		code,
+		asanaCallback,
+		grantTypeAuthorization,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func GetSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var spotifyCallback string
 
@@ -504,6 +535,9 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		tokenRes.ExpiresIn = oneYearSecond
 	} else if serviceName == "Reddit" {
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Asana" {
+		request, errRequest = GetAsanaOAuth2AccessTokenRequest(code, callbackType)
+
 	} else {
 		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}
