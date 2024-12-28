@@ -30,6 +30,10 @@ const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
 
+const clientIdParam = "client_id="
+const redirectUriParam = "&redirect_uri="
+const stateParam = "&state="
+
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
 	ReactionRepository storage.ReactionRepository) *ServiceService {
@@ -139,17 +143,21 @@ func (self *ServiceService) OAuth2Google(callbackType string, appType string) st
 		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
 	}
 
-	return ("https://accounts.google.com/o/oauth2/auth?client_id=" +
-		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
-		callbackLink + "&scope=email")
+	return ("https://accounts.google.com/o/oauth2/auth?" +
+		clientIdParam + appTypeLink +
+		"&response_type=code&access_type=offline" +
+		redirectUriParam + callbackLink +
+		"&scope=email")
 }
 
 func (self *ServiceService) OAuth2Spotify(callbackType string) string {
 	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "SPOTIFY", false)
 
-	return ("https://accounts.spotify.com/authorize?client_id=" +
-		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+	return ("https://accounts.spotify.com/authorize?" +
+		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
+		"&response_type=code" +
+		redirectUriParam + callbackLink +
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
 }
 
 func (self *ServiceService) OAuth2Discord(callbackType string) string {
@@ -162,10 +170,10 @@ func (self *ServiceService) OAuth2Discord(callbackType string) string {
 		scope = "identify+email+guilds+bot"
 	}
 
-	return ("https://discord.com/oauth2/authorize?client_id=" +
-		os.Getenv("DISCORD_CLIENT_ID") +
-		"&permissions=141376&response_type=code&redirect_uri=" +
-		callbackLink +
+	return ("https://discord.com/oauth2/authorize?" +
+		clientIdParam + os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376&response_type=code" +
+		redirectUriParam + callbackLink +
 		"&scope=" + scope)
 }
 
@@ -173,20 +181,20 @@ func (self *ServiceService) OAuth2Github(callbackType string) string {
 	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "GITHUB", true)
 
 	return ("https://github.com/login/oauth/authorize?" +
-		"client_id=" + clientID +
-		"&redirect_uri=" + callbackLink +
+		clientIdParam + clientID +
+		redirectUriParam + callbackLink +
 		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
-		"&state=" + os.Getenv("GITHUB_STATE"))
+		stateParam + os.Getenv("GITHUB_STATE"))
 }
 
 func (self *ServiceService) OAuth2Reddit(callbackType string) string {
 	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "REDDIT", true)
 
 	return ("https://www.reddit.com/api/v1/authorize?" +
-		"client_id=" + clientID +
+		clientIdParam + clientID +
 		"&response_type=code" +
-		"&state=" + os.Getenv("REDDIT_STATE") +
-		"&redirect_uri=" + callbackLink +
+		stateParam + os.Getenv("REDDIT_STATE") +
+		redirectUriParam + callbackLink +
 		"&duration=permanent" +
 		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
 }
@@ -195,10 +203,10 @@ func (self *ServiceService) OAuth2Asana(callbackType string) string {
 	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "ASANA", false)
 
 	return ("https://app.asana.com/-/oauth_authorize?" +
-		"client_id=" + os.Getenv("ASANA_CLIENT_ID") +
-		"&redirect_uri=" + callbackLink +
+		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
+		redirectUriParam + callbackLink +
 		"&response_type=code" +
-		"&state=" + os.Getenv("ASANA_STATE") +
+		stateParam + os.Getenv("ASANA_STATE") +
 		"&scope=default email profile")
 }
 
