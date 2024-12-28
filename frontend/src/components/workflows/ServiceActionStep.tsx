@@ -11,7 +11,6 @@ const SelectServiceActionStep: React.FC<ServiceActionStepProps> = ({
     goToStep,
     handleSelectService
 }) => {
-
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="flex items-center justify-between px-10 py-5">

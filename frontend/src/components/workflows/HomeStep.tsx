@@ -25,7 +25,6 @@ const HomeStep: React.FC<HomeStepProps> = ({
     handleOnDeleteAction,
     handleContinue,
 }) => {
-
     return (
         <div>
         <div

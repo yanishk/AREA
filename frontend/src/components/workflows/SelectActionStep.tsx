@@ -13,7 +13,6 @@ const SelectActionStep: React.FC<SelectActionStepProps> = ({
     goToStep,
     handleSelectAction,
 }) => {
-
     return (
         <div className="min-h-screen bg-gray-100">
         {selectedService && (

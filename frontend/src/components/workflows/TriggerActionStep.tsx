@@ -19,7 +19,6 @@ const TriggerActionStep: React.FC<TriggerActionProps> = ({
     handleFieldChange,
     goToStep,
 }) => {
-
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div

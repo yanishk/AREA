@@ -7,6 +7,7 @@ import SelectServiceActionStep from "../components/workflows/ServiceActionStep";
 import SelectActionStep from "../components/workflows/SelectActionStep";
 import TriggerActionStep from "../components/workflows/TriggerActionStep";
 import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
+import SelectReactionStep from "../components/workflows/SelectReactionStep";
 
 enum Steps {
     HOME,
@@ -26,6 +27,12 @@ type availableActionsType = {
     id: string;
 };
 
+type availableReactionsType = {
+    name: string;
+    description: string;
+    id: string;
+};
+
 type selectedServiceType = {
     name: string;
     color: string;
@@ -37,14 +44,20 @@ type selectedActionType = {
     id: string;
 };
 
+type selectedReactionType = {
+    name: string;
+    id: string;
+};
+
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
 
     const [selectedActionService, setSelectedActionService] = useState<selectedServiceType | null>(null);
     const [selectedReactionService, setSelectedReactionService] = useState<selectedServiceType | null>(null);
     const [availableActions, setAvailableActions] = useState<availableActionsType[]>([]);
+    const [availableReactions, setAvailableReactions] = useState<availableReactionsType[]>([]);
     const [selectedAction, setSelectedAction] = useState<selectedActionType | null>(null);
-    const [selectedReaction, setSelectedReaction] = useState(null);
+    const [selectedReaction, setSelectedReaction] = useState<selectedReactionType | null>(null);
     const [actionServices, setActionServices] = useState([]);
     const [reactionServices, setReactionServices] = useState([]);
 
@@ -137,6 +150,34 @@ const WorkflowBuilder = () => {
         }
     };
 
+    const getAvailableReactions = async () => {
+        try {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}${selectedReactionService?.name}/reactions`, {
+                    withCredentials: true,
+                });
+
+            if (result) {
+                const dataKey = "reactions";
+
+                if (Array.isArray(result.data[dataKey])) {
+                    const reactions = result.data[dataKey].map((element: any) => ({
+                        name: element.name,
+                        description: element.description,
+                        id: element.id,
+                    }));
+                    setAvailableReactions(reactions);
+                } else {
+                    console.error(`Error for ${dataKey}:`, result.data[dataKey]);
+                }
+            } else {
+                console.error("Unexpected API response", result);
+            }
+        }
+        catch (err) {
+            console.error("Error fetching services:", err);
+        }
+    };
+
     useEffect(() => {
         if (currentStep === Steps.SELECT_SERVICE_ACTION) {
             getServicesWithActions();
@@ -146,6 +187,9 @@ const WorkflowBuilder = () => {
         }
         if (currentStep === Steps.SELECT_SERVICE_REACTION) {
             getServicesWithReactions();
+        }
+        if (currentStep === Steps.SELECT_REACTION) {
+            getAvailableReactions();
         }
     }, [currentStep]);
 
@@ -188,6 +232,11 @@ const WorkflowBuilder = () => {
         setSelectedReactionService({ name, color, iconPath });
         goToStep(Steps.SELECT_REACTION);
     };
+
+    const handleSelectReaction = (name: string, id: string) => {
+        setSelectedReaction({name, id});
+        goToStep(Steps.TRIGGER_REACTION);
+    }
 
     const renderStep = () => {
         switch (currentStep) {
@@ -243,6 +292,21 @@ const WorkflowBuilder = () => {
                         handleSelectService={handleSelectReactionService}
                         goToStep={goToStep}
                     />
+                )
+
+            case Steps.SELECT_REACTION:
+                return (
+                    <SelectReactionStep
+                        selectedService={selectedReactionService}
+                        availableReactions={availableReactions}
+                        handleSelectReaction={handleSelectReaction}
+                        goToStep={goToStep}
+                    />
+                )
+            
+            case Steps.TRIGGER_REACTION:
+                return (
+                    
                 )
         }
     }
