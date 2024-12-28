@@ -82,19 +82,28 @@ const WorkflowBuilder = () => {
     };
 
     const getAvailableActions = async () => {
+        console.log("ici: ", selectedService?.name);
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}${selectedService?.name}/actions`, {
                     withCredentials: true,
                 });
+            console.log("res ici: ", result);
 
             if (result) {
-                const actions = result.data.map((action: any) => ({
-                    name: action.name,
-                    description: action.description,
-                    id: action.id,
-                }));
-                console.log("actions ici", actions);
-                setAvailableActions(actions);
+                const dataKey = "actions";
+
+                if (Array.isArray(result.data[dataKey])) {
+                    const actions = result.data[dataKey].map((element: any) => ({
+                        name: element.name,
+                        description: element.description,
+                        id: element.id,
+                    }));
+                    setAvailableActions(actions);
+                } else {
+                    console.error(`Error for ${dataKey}:`, result.data[dataKey]);
+                }
+            } else {
+                console.error("Unexpected API response", result);
             }
         }
         catch (err) {
