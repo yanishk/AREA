@@ -6,6 +6,7 @@ import HomeStep from "../components/workflows/HomeStep";
 import SelectServiceActionStep from "../components/workflows/ServiceActionStep";
 import SelectActionStep from "../components/workflows/SelectActionStep";
 import TriggerActionStep from "../components/workflows/TriggerActionStep";
+import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
 
 enum Steps {
     HOME,
@@ -39,11 +40,13 @@ type selectedActionType = {
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
 
-    const [selectedService, setSelectedService] = useState<selectedServiceType | null>(null);
+    const [selectedActionService, setSelectedActionService] = useState<selectedServiceType | null>(null);
+    const [selectedReactionService, setSelectedReactionService] = useState<selectedServiceType | null>(null);
     const [availableActions, setAvailableActions] = useState<availableActionsType[]>([]);
     const [selectedAction, setSelectedAction] = useState<selectedActionType | null>(null);
     const [selectedReaction, setSelectedReaction] = useState(null);
-    const [services, setServices] = useState([]);
+    const [actionServices, setActionServices] = useState([]);
+    const [reactionServices, setReactionServices] = useState([]);
 
     const [currentStep, setCurrentStep] = useState<Steps>(Steps.HOME);
 
@@ -80,7 +83,7 @@ const WorkflowBuilder = () => {
                     color: service.color,
                     iconPath: service.logo,
                 }));
-                setServices(propertiesServices);
+                setActionServices(propertiesServices);
             }
         } catch (err) {
             console.error("Error fetching services:", err);
@@ -89,7 +92,7 @@ const WorkflowBuilder = () => {
 
     const getAvailableActions = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}${selectedService?.name}/actions`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}${selectedActionService?.name}/actions`, {
                     withCredentials: true,
                 });
 
@@ -115,6 +118,25 @@ const WorkflowBuilder = () => {
         }
     };
 
+    const getServicesWithReactions = async () => {
+        try {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`, {
+                    withCredentials: true,
+            });
+
+            if (result) {
+                const propertiesServices = result.data.map((service: any) => ({
+                    name: service.name,
+                    color: service.color,
+                    iconPath: service.logo,
+                }));
+                setReactionServices(propertiesServices);
+            }
+        } catch (err) {
+            console.error("Error fetching services:", err);
+        }
+    };
+
     useEffect(() => {
         if (currentStep === Steps.SELECT_SERVICE_ACTION) {
             getServicesWithActions();
@@ -122,10 +144,13 @@ const WorkflowBuilder = () => {
         if (currentStep === Steps.SELECT_ACTION) {
             getAvailableActions();
         }
+        if (currentStep === Steps.SELECT_SERVICE_REACTION) {
+            getServicesWithReactions();
+        }
     }, [currentStep]);
 
-    const handleSelectService = (name: string, color: string, iconPath: string) => {
-        setSelectedService({ name, color, iconPath });
+    const handleSelectActionService = (name: string, color: string, iconPath: string) => {
+        setSelectedActionService({ name, color, iconPath });
         goToStep(Steps.SELECT_ACTION);
     };
 
@@ -134,12 +159,12 @@ const WorkflowBuilder = () => {
         goToStep(Steps.TRIGGER_ACTION);
     }
 
-    const serviceName = selectedService?.name;
+    const actionServiceName = selectedActionService?.name;
     const actionName = selectedAction?.name;
 
-    const fields = serviceName && actionName &&
-    servicesData[serviceName]?.actions?.[actionName]
-    ? servicesData[serviceName].actions[actionName]
+    const fields = actionServiceName && actionName &&
+    servicesData[actionServiceName]?.actions?.[actionName]
+    ? servicesData[actionServiceName].actions[actionName]
     : [];
 
     const [actionFieldValues, setActionFieldValues] = useState<Record<string, string>>({});
@@ -159,6 +184,11 @@ const WorkflowBuilder = () => {
         setActionFieldValues(defaultValues);
     }, [fields]);
 
+    const handleSelectReactionService = (name: string, color: string, iconPath: string) => {
+        setSelectedReactionService({ name, color, iconPath });
+        goToStep(Steps.SELECT_REACTION);
+    };
+
     const renderStep = () => {
         switch (currentStep) {
             case Steps.HOME:
@@ -166,7 +196,7 @@ const WorkflowBuilder = () => {
                     <HomeStep
                         selectedAction={selectedAction}
                         selectedReaction={selectedReaction}
-                        selectedService={selectedService}
+                        selectedService={selectedActionService}
                         goToStep={goToStep}
                         goHome={goHome}
                         handleOnEditAction={handleOnEditAction}
@@ -178,8 +208,8 @@ const WorkflowBuilder = () => {
             case Steps.SELECT_SERVICE_ACTION:
                 return (
                     <SelectServiceActionStep
-                        services={services}
-                        handleSelectService={handleSelectService}
+                        services={actionServices}
+                        handleSelectService={handleSelectActionService}
                         goToStep={goToStep}
                     />
                 );
@@ -187,7 +217,7 @@ const WorkflowBuilder = () => {
             case Steps.SELECT_ACTION:
                 return (
                     <SelectActionStep
-                        selectedService={selectedService}
+                        selectedService={selectedActionService}
                         availableActions={availableActions}
                         handleSelectAction={handleSelectAction}
                         goToStep={goToStep}
@@ -197,7 +227,7 @@ const WorkflowBuilder = () => {
             case Steps.TRIGGER_ACTION:
                 return (
                     <TriggerActionStep
-                        selectedService={selectedService}
+                        selectedService={selectedActionService}
                         selectedAction={selectedAction}
                         fields={fields}
                         actionFieldValues={actionFieldValues}
@@ -205,7 +235,16 @@ const WorkflowBuilder = () => {
                         goToStep={goToStep}
                     />
                 );
-            }
+
+            case Steps.SELECT_SERVICE_REACTION:
+                return (
+                    <SelectServiceReactionStep
+                        services={reactionServices}
+                        handleSelectService={handleSelectReactionService}
+                        goToStep={goToStep}
+                    />
+                )
+        }
     }
 
     return (
