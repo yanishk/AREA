@@ -97,6 +97,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = self.OAuth2Github(callbackType)
 	} else if serviceName == "Reddit" {
 		authUrl = self.OAuth2Reddit(callbackType)
+	} else if serviceName == "Asana" {
+		authUrl = self.OAuth2Asana(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(UnknownServiceMessage)
 	}
@@ -187,6 +189,17 @@ func (self *ServiceService) OAuth2Reddit(callbackType string) string {
 		"&redirect_uri=" + callbackLink +
 		"&duration=permanent" +
 		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
+}
+
+func (self *ServiceService) OAuth2Asana(callbackType string) string {
+	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "ASANA", false)
+
+	return ("https://app.asana.com/-/oauth_authorize?" +
+		"client_id=" + os.Getenv("ASANA_CLIENT_ID") +
+		"&redirect_uri=" + callbackLink +
+		"&response_type=code" +
+		"&state=" + os.Getenv("ASANA_STATE") +
+		"&scope=default email profile")
 }
 
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
