@@ -8,6 +8,7 @@ import SelectActionStep from "../components/workflows/SelectActionStep";
 import TriggerActionStep from "../components/workflows/TriggerActionStep";
 import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
 import SelectReactionStep from "../components/workflows/SelectReactionStep";
+import TriggerReactionStep from "../components/workflows/TriggerReactionStep";
 
 enum Steps {
     HOME,
@@ -58,6 +59,8 @@ const WorkflowBuilder = () => {
     const [availableReactions, setAvailableReactions] = useState<availableReactionsType[]>([]);
     const [selectedAction, setSelectedAction] = useState<selectedActionType | null>(null);
     const [selectedReaction, setSelectedReaction] = useState<selectedReactionType | null>(null);
+    const [actionFieldValues, setActionFieldValues] = useState<Record<string, string>>({});
+    const [reactionFieldValues, setReactionFieldValues] = useState<Record<string, string>>({});
     const [actionServices, setActionServices] = useState([]);
     const [reactionServices, setReactionServices] = useState([]);
 
@@ -206,27 +209,52 @@ const WorkflowBuilder = () => {
     const actionServiceName = selectedActionService?.name;
     const actionName = selectedAction?.name;
 
-    const fields = actionServiceName && actionName &&
+    const reactionServiceName = selectedReactionService?.name;
+    const reactionName = selectedReaction?.name;
+
+    const actionFields = actionServiceName && actionName &&
     servicesData[actionServiceName]?.actions?.[actionName]
     ? servicesData[actionServiceName].actions[actionName]
     : [];
 
-    const [actionFieldValues, setActionFieldValues] = useState<Record<string, string>>({});
+    const reactionFields = reactionServiceName && reactionName &&
+    servicesData[reactionServiceName]?.actions?.[reactionName]
+    ? servicesData[reactionServiceName].actions[reactionName]
+    : [];
 
-    const handleFieldChange = (id: string, value: string) => {
-        setActionFieldValues((prev) => ({
-            ...prev,
-            [id]: value,
-        }));
+    const handleFieldChange = (id: string, value: string, type: "action" | "reaction") => {
+        if (type === "action") {
+            setActionFieldValues((prev) => ({
+                ...prev,
+                [id]: value,
+            }));
+        }
+        if (type === "reaction") {
+            setReactionFieldValues((prev) => ({
+                ...prev,
+                [id]: value,
+            }));
+        }
+        else {
+            console.error(`Invalid type parameter: ${type}`);
+        }
     };
 
     useEffect(() => {
-        const defaultValues = fields.reduce((acc, field) => {
-            acc[field.id] = field.options?.[0] ?? "";
-            return acc;
-        }, {} as Record<string, string>);
-        setActionFieldValues(defaultValues);
-    }, [fields]);
+        if (currentStep === Steps.TRIGGER_ACTION) {
+            const defaultValues = actionFields.reduce((acc, field) => {
+                acc[field.id] = field.options?.[0] ?? "";
+                return acc;
+            }, {} as Record<string, string>);
+            setActionFieldValues(defaultValues);
+        } else if (currentStep === Steps.TRIGGER_REACTION) {
+            const defaultValues = reactionFields.reduce((acc, field) => {
+                acc[field.id] = field.options?.[0] ?? "";
+                return acc;
+            }, {} as Record<string, string>);
+            setReactionFieldValues(defaultValues);
+        }
+    }, [actionFields, reactionFields, currentStep]);
 
     const handleSelectReactionService = (name: string, color: string, iconPath: string) => {
         setSelectedReactionService({ name, color, iconPath });
@@ -278,7 +306,7 @@ const WorkflowBuilder = () => {
                     <TriggerActionStep
                         selectedService={selectedActionService}
                         selectedAction={selectedAction}
-                        fields={fields}
+                        fields={actionFields}
                         actionFieldValues={actionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={goToStep}
@@ -303,10 +331,17 @@ const WorkflowBuilder = () => {
                         goToStep={goToStep}
                     />
                 )
-            
+
             case Steps.TRIGGER_REACTION:
                 return (
-                    
+                    <TriggerReactionStep
+                        selectedService={selectedReactionService}
+                        selectedReaction={selectedReaction}
+                        fields={reactionFields}
+                        reactionFieldValues={reactionFieldValues}
+                        handleFieldChange={handleFieldChange}
+                        goToStep={goToStep}
+                    />
                 )
         }
     }
