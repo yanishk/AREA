@@ -1,14 +1,8 @@
 import CancelButton from "../buttons/CancelButton";
 
-type availableActionsType = {
-    name: string;
-    description: string;
-    id: string;
-};
-
 interface SelectActionStepProps {
-    selectedService: { color: string; iconPath: string } | null;
-    availableActions: { name: string; description: string; id: string } | null;
+    selectedService: { name: string; color: string; iconPath: string } | null;
+    availableActions: { name: string; description: string; id: string } [] | null;
     goToStep: (step: number) => void;
     handleSelectAction: (name: string, id: string) => void;
 }
@@ -52,7 +46,7 @@ const SelectActionStep: React.FC<SelectActionStepProps> = ({
 
                 <div className="mt-16 ml-[35px]">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {availableActions.map((element) => (
+                        {availableActions?.map((element) => (
                             <button
                                 key={element.name}
                                 style={{ backgroundColor: selectedService.color}}
