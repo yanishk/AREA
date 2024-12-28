@@ -86,7 +86,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                 ) : (
                     <ButtonThenDefault
                         onClick={() =>
-                            goHome()
+                            goToStep(4)
                         }
                         text="Then That"
                         disabled={!selectedAction}
