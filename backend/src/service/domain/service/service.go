@@ -33,6 +33,7 @@ const oneYearSecond = 31536000
 const clientIdParam = "client_id="
 const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
+const codeResponseType = "&response_type=code"
 
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
@@ -145,7 +146,8 @@ func (self *ServiceService) OAuth2Google(callbackType string, appType string) st
 
 	return ("https://accounts.google.com/o/oauth2/auth?" +
 		clientIdParam + appTypeLink +
-		"&response_type=code&access_type=offline" +
+		codeResponseType +
+		"&access_type=offline" +
 		redirectUriParam + callbackLink +
 		"&scope=email")
 }
@@ -155,7 +157,7 @@ func (self *ServiceService) OAuth2Spotify(callbackType string) string {
 
 	return ("https://accounts.spotify.com/authorize?" +
 		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
-		"&response_type=code" +
+		codeResponseType +
 		redirectUriParam + callbackLink +
 		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
 }
@@ -172,7 +174,8 @@ func (self *ServiceService) OAuth2Discord(callbackType string) string {
 
 	return ("https://discord.com/oauth2/authorize?" +
 		clientIdParam + os.Getenv("DISCORD_CLIENT_ID") +
-		"&permissions=141376&response_type=code" +
+		"&permissions=141376" +
+		codeResponseType +
 		redirectUriParam + callbackLink +
 		"&scope=" + scope)
 }
@@ -192,7 +195,7 @@ func (self *ServiceService) OAuth2Reddit(callbackType string) string {
 
 	return ("https://www.reddit.com/api/v1/authorize?" +
 		clientIdParam + clientID +
-		"&response_type=code" +
+		codeResponseType +
 		stateParam + os.Getenv("REDDIT_STATE") +
 		redirectUriParam + callbackLink +
 		"&duration=permanent" +
@@ -205,7 +208,7 @@ func (self *ServiceService) OAuth2Asana(callbackType string) string {
 	return ("https://app.asana.com/-/oauth_authorize?" +
 		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
 		redirectUriParam + callbackLink +
-		"&response_type=code" +
+		codeResponseType +
 		stateParam + os.Getenv("ASANA_STATE") +
 		"&scope=default email profile")
 }
