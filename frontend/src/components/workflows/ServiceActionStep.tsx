@@ -35,7 +35,7 @@ const SelectServiceActionStep: React.FC<ServiceActionStepProps> = ({
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {services.map((service: any) => (
                         <button
-                            key={service.id}
+                            key={service.name}
                             style={{ backgroundColor: service.color }}
                             className="h-[240px] flex flex-col items-center cursor-pointer"
                             onClick={() =>
