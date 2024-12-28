@@ -7,6 +7,8 @@ import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
 import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
 import TriggerButton from "../components/buttons/TriggerButton";
 import axios from "axios";
+import DynamicFields from "../components/inputs/DynamicFields";
+import { ServiceDataType, servicesData } from "../ServicesData";
 
 enum Steps {
     HOME,
@@ -31,12 +33,17 @@ type selectedServiceType = {
     iconPath: string;
 };
 
+type selectedActionType = {
+    name: string;
+    id: string;
+};
+
 const WorkflowBuilder = () => {
     const navigate = useNavigate();
 
     const [selectedService, setSelectedService] = useState<selectedServiceType | null>(null);
     const [availableActions, setAvailableActions] = useState<availableActionsType[]>([]);
-    const [selectedAction, setSelectedAction] = useState(null);
+    const [selectedAction, setSelectedAction] = useState<selectedActionType | null>(null);
     const [selectedReaction, setSelectedReaction] = useState(null);
     const [services, setServices] = useState([]);
 
@@ -122,6 +129,36 @@ const WorkflowBuilder = () => {
         setSelectedService({ name, color, iconPath });
         goToStep(Steps.SELECT_ACTION);
     };
+
+    const handleSelectAction = (name: string, id: string) => {
+        setSelectedAction({name, id});
+        goToStep(Steps.TRIGGER_ACTION);
+    }
+
+    const serviceName = selectedService?.name;
+    const actionName = selectedAction?.name;
+
+    const fields = serviceName && actionName &&
+    servicesData[serviceName]?.actions?.[actionName]
+    ? servicesData[serviceName].actions[actionName]
+    : [];
+
+    const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+
+    const handleFieldChange = (id: string, value: string) => {
+        setFieldValues((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
+    };
+
+    useEffect(() => {
+        const defaultValues = fields.reduce((acc, field) => {
+            acc[field.id] = field.options?.[0] ?? "";
+            return acc;
+        }, {} as Record<string, string>);
+        setFieldValues(defaultValues);
+    }, [fields]);
 
     const renderStep = () => {
         switch (currentStep) {
@@ -295,7 +332,12 @@ const WorkflowBuilder = () => {
                                                     key={element.name}
                                                     style={{ backgroundColor: selectedService.color}}
                                                     className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px]"
-                                                    onClick={() => goToStep(Steps.TRIGGER_ACTION)}
+                                                    // onClick={() => goToStep(Steps.TRIGGER_ACTION)}
+                                                    onClick={() => handleSelectAction(
+                                                        element.name,
+                                                        element.id
+                                                    )
+                                                }
                                                 >
                                                     <div className="text-left w-full pl-[30px]">
                                                         <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">{element.name}</h2>
@@ -309,6 +351,65 @@ const WorkflowBuilder = () => {
                             )}
                         </div>
                     )
+
+                    case Steps.TRIGGER_ACTION:
+                        return (
+                            <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
+                                <div
+                                    className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
+                                >
+                                    <div>
+                                        <CancelButton
+                                            text="Back"
+                                            textColor="text-white"
+                                            borderColor="border-white"
+                                            bgColor={`bg-[${selectedService?.color}]`}
+                                            onClick={() => goToStep(Steps.SELECT_ACTION)}
+                                        />
+                                    </div>
+
+                                    <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
+                                        Complete trigger fields
+                                    </h1>
+
+                                    <div className="w-[100px]"></div>
+                                </div>
+
+                                    <div
+                                        style={{ backgroundColor: selectedService?.color }}
+                                        className="flex flex-col items-center justify-center"
+                                    >
+                                        <img
+                                            alt="icon"
+                                            src={selectedService?.iconPath}
+                                            className="w-[122px] h-[122px] mt-14"
+                                        />
+                                        <h2
+                                            className="text-white text-[52px] font-bold mt-6 mb-8"
+                                        >
+                                            {selectedAction?.name}
+                                        </h2>
+                                    </div>
+
+                                    <div
+                                        className="flex flex-col items-center"
+                                    >
+                                        <DynamicFields
+                                            fields={fields}
+                                            values={fieldValues}
+                                            onChange={handleFieldChange}
+                                        />
+                                        <TriggerButton
+                                            text="Create Trigger"
+                                            textColor="text-black"
+                                            bgColor="bg-white"
+                                            hoverColor="hover:bg-[#EEEEEE]"
+                                            onClick={() => goHome()}
+                                        />
+                                    </div>
+
+                            </div>
+                        );
             }
     }
 
