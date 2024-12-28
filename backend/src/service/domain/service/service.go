@@ -439,6 +439,26 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 	return request, nil
 }
 
+func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://app.asana.com/-/oauth_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
