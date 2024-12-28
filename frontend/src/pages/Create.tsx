@@ -12,9 +12,9 @@ enum Steps {
     HOME,
     SELECT_SERVICE_ACTION,
     SELECT_ACTION,
+    TRIGGER_ACTION,
     SELECT_SERVICE_REACTION,
     CONNECT_SERVICE,
-    TRIGGER_ACTION,
     TRIGGER_REACTION,
     SUMMARY,
 }
@@ -82,12 +82,10 @@ const WorkflowBuilder = () => {
     };
 
     const getAvailableActions = async () => {
-        console.log("ici: ", selectedService?.name);
         try {
             const result = await axios.get(`${import.meta.env.VITE_API_URL}${selectedService?.name}/actions`, {
                     withCredentials: true,
                 });
-            console.log("res ici: ", result);
 
             if (result) {
                 const dataKey = "actions";
@@ -297,7 +295,7 @@ const WorkflowBuilder = () => {
                                                     key={element.name}
                                                     style={{ backgroundColor: selectedService.color}}
                                                     className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px]"
-                                                    onClick={() => goHome()}
+                                                    onClick={() => goToStep(Steps.TRIGGER_ACTION)}
                                                 >
                                                     <div className="text-left w-full pl-[30px]">
                                                         <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">{element.name}</h2>
