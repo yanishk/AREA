@@ -1,14 +1,7 @@
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import ButtonIfCustom from "../components/buttons/ButtonIfCustom";
-import { ElementType, useEffect, useState } from "react";
-import ButtonIfDefault from "../components/buttons/ButtonIfDefault";
-import CancelButton from "../components/buttons/CancelButton";
-import ButtonThenCustom from "../components/buttons/ButtonThenCustom";
-import ButtonThenDefault from "../components/buttons/ButtonThenDefault";
-import TriggerButton from "../components/buttons/TriggerButton";
+import { useNavigate } from "react-router-dom";
+import {useEffect, useState } from "react";
 import axios from "axios";
-import DynamicFields from "../components/inputs/DynamicFields";
-import { ServiceDataType, servicesData } from "../ServicesData";
+import {servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
 import SelectServiceActionStep from "../components/workflows/ServiceActionStep";
 import SelectActionStep from "../components/workflows/SelectActionStep";
@@ -67,6 +60,7 @@ const WorkflowBuilder = () => {
     }
 
     const goHome = () => {
+        navigate(-1);
         return;
     }
 
