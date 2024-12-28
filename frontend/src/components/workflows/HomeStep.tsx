@@ -1,5 +1,6 @@
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
+import ButtonThenCustom from "../buttons/ButtonThenCustom";
 import ButtonThenDefault from "../buttons/ButtonThenDefault";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
@@ -7,7 +8,8 @@ import TriggerButton from "../buttons/TriggerButton";
 interface HomeStepProps {
     selectedAction: any | null;
     selectedReaction: any | null;
-    selectedService: { color: string; iconPath: string } | null;
+    selectedServiceAction: { color: string; iconPath: string } | null;
+    selectedServiceReaction: { color: string; iconPath: string } | null;
     goToStep: (step: number) => void;
     goHome: () => void;
     handleOnEditAction: () => void;
@@ -18,7 +20,8 @@ interface HomeStepProps {
 const HomeStep: React.FC<HomeStepProps> = ({
     selectedAction,
     selectedReaction,
-    selectedService,
+    selectedServiceAction,
+    selectedServiceReaction,
     goToStep,
     goHome,
     handleOnEditAction,
@@ -56,8 +59,8 @@ const HomeStep: React.FC<HomeStepProps> = ({
                 {selectedAction ? (
                     <ButtonIfCustom
                         text={selectedAction.name}
-                        color={selectedService?.color || ""}
-                        iconPath={selectedService?.iconPath || ""}
+                        color={selectedServiceAction?.color || ""}
+                        iconPath={selectedServiceAction?.iconPath || ""}
                         onEdit={handleOnEditAction}
                         onDelete={handleOnDeleteAction}
                     />
@@ -75,13 +78,13 @@ const HomeStep: React.FC<HomeStepProps> = ({
 
             <div className="mb-[50px]">
                 {selectedReaction ? (
-                    <ButtonThenDefault
-                    onClick={() =>
-                        goHome()
-                    }
-                    text="Then That"
-                    disabled={!selectedAction}
-                />
+                    <ButtonThenCustom
+                        text={selectedReaction.name}
+                        color={selectedServiceReaction?.color || ""}
+                        iconPath={selectedServiceReaction?.iconPath || ""}
+                        onEdit={handleOnEditAction}
+                        onDelete={handleOnDeleteAction}
+                    />
                 ) : (
                     <ButtonThenDefault
                         onClick={() =>

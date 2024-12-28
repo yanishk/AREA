@@ -295,7 +295,19 @@ const WorkflowBuilder = () => {
                 return;
             }
 
-            window.location.href = authUrl;
+            const stateData = {
+                selectedActionService,
+                selectedReactionService,
+                selectedAction,
+                selectedReaction,
+                actionFieldValues,
+                reactionFieldValues,
+            };
+            const state = encodeURIComponent(JSON.stringify(stateData));
+
+            const redirectUrl = `${authUrl}&state=${state}`;
+
+            window.location.href = redirectUrl;
         } catch (error) {
             console.error("Error during authentication:", error);
         }
@@ -306,6 +318,44 @@ const WorkflowBuilder = () => {
         // }
     }
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        const state = params.get("state");
+        if (state) {
+            try {
+                const decodedState = JSON.parse(decodeURIComponent(state));
+
+                if (decodedState.selectedActionService) {
+                    setSelectedActionService(decodedState.selectedActionService);
+                }
+                if (decodedState.selectedReactionService) {
+                    setSelectedReactionService(decodedState.selectedReactionService);
+                }
+                if (decodedState.selectedAction) {
+                    setSelectedAction(decodedState.selectedAction);
+                }
+                if (decodedState.selectedReaction) {
+                    setSelectedReaction(decodedState.selectedReaction);
+                }
+                if (decodedState.actionFieldValues) {
+                    setActionFieldValues(decodedState.actionFieldValues);
+                }
+                if (decodedState.reactionFieldValues) {
+                    setReactionFieldValues(decodedState.reactionFieldValues);
+                }
+            } catch (error) {
+                console.error("Error parsing state:", error);
+            }
+        }
+
+        // const code = params.get("code");
+
+        const url = new URL(window.location.href);
+        url.search = "";
+        window.history.replaceState({}, document.title, url.toString());
+    }, []);
+
     const renderStep = () => {
         switch (currentStep) {
             case Steps.HOME:
@@ -313,7 +363,8 @@ const WorkflowBuilder = () => {
                     <HomeStep
                         selectedAction={selectedAction}
                         selectedReaction={selectedReaction}
-                        selectedService={selectedActionService}
+                        selectedServiceAction={selectedActionService}
+                        selectedServiceReaction={selectedReactionService}
                         goToStep={goToStep}
                         goHome={goHome}
                         handleOnEditAction={handleOnEditAction}
