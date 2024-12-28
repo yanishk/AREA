@@ -8,7 +8,6 @@ type availableActionsType = {
 
 interface SelectActionStepProps {
     selectedService: { color: string; iconPath: string } | null;
-    // availableActions: availableActionsType[];
     availableActions: { name: string; description: string; id: string } | null;
     goToStep: (step: number) => void;
     handleSelectAction: (name: string, id: string) => void;
