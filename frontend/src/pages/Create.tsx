@@ -12,6 +12,7 @@ import { ServiceDataType, servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
 import SelectServiceActionStep from "../components/workflows/ServiceActionStep";
 import SelectActionStep from "../components/workflows/SelectActionStep";
+import TriggerActionStep from "../components/workflows/TriggerActionStep";
 
 enum Steps {
     HOME,
@@ -189,74 +190,27 @@ const WorkflowBuilder = () => {
                     />
                 );
 
-                case Steps.SELECT_ACTION:
-                    return (
-                        <SelectActionStep
-                            selectedService={selectedService}
-                            availableActions={availableActions}
-                            handleSelectAction={handleSelectAction}
-                            goToStep={goToStep}
-                        />
-                    )
+            case Steps.SELECT_ACTION:
+                return (
+                    <SelectActionStep
+                        selectedService={selectedService}
+                        availableActions={availableActions}
+                        handleSelectAction={handleSelectAction}
+                        goToStep={goToStep}
+                    />
+                )
 
-                    case Steps.TRIGGER_ACTION:
-                        return (
-                            <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
-                                <div
-                                    className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
-                                >
-                                    <div>
-                                        <CancelButton
-                                            text="Back"
-                                            textColor="text-white"
-                                            borderColor="border-white"
-                                            bgColor={`bg-[${selectedService?.color}]`}
-                                            onClick={() => goToStep(Steps.SELECT_ACTION)}
-                                        />
-                                    </div>
-
-                                    <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
-                                        Complete trigger fields
-                                    </h1>
-
-                                    <div className="w-[100px]"></div>
-                                </div>
-
-                                    <div
-                                        style={{ backgroundColor: selectedService?.color }}
-                                        className="flex flex-col items-center justify-center"
-                                    >
-                                        <img
-                                            alt="icon"
-                                            src={selectedService?.iconPath}
-                                            className="w-[122px] h-[122px] mt-14"
-                                        />
-                                        <h2
-                                            className="text-white text-[52px] font-bold mt-6 mb-8"
-                                        >
-                                            {selectedAction?.name}
-                                        </h2>
-                                    </div>
-
-                                    <div
-                                        className="flex flex-col items-center"
-                                    >
-                                        <DynamicFields
-                                            fields={fields}
-                                            values={actionFieldValues}
-                                            onChange={handleFieldChange}
-                                        />
-                                        <TriggerButton
-                                            text="Create Trigger"
-                                            textColor="text-black"
-                                            bgColor="bg-white"
-                                            hoverColor="hover:bg-[#EEEEEE]"
-                                            onClick={() => goToStep(Steps.HOME)}
-                                        />
-                                    </div>
-
-                            </div>
-                        );
+            case Steps.TRIGGER_ACTION:
+                return (
+                    <TriggerActionStep
+                        selectedService={selectedService}
+                        selectedAction={selectedAction}
+                        fields={fields}
+                        actionFieldValues={actionFieldValues}
+                        handleFieldChange={handleFieldChange}
+                        goToStep={goToStep}
+                    />
+                );
             }
     }
 
