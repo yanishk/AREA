@@ -1,3 +1,4 @@
+import { servicesData } from "../../ServicesData";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
@@ -11,6 +12,14 @@ interface TriggerReactionProps {
     goToStep: (step: number) => void;
 }
 
+const getTriggerStatus = (
+    serviceName?: string,
+    reactionName?: string
+): string | undefined =>
+    serviceName && reactionName
+        ? servicesData[serviceName]?.reactions?.[reactionName]?.[0]?.triggerReaction
+        : undefined;
+
 const TriggerReactionStep: React.FC<TriggerReactionProps> = ({
     selectedService,
     selectedReaction,
@@ -19,6 +28,11 @@ const TriggerReactionStep: React.FC<TriggerReactionProps> = ({
     handleFieldChange,
     goToStep,
 }) => {
+    const triggerReaction = getTriggerStatus(
+        selectedService?.name,
+        selectedReaction?.name
+    );
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -65,13 +79,15 @@ const TriggerReactionStep: React.FC<TriggerReactionProps> = ({
                         values={reactionFieldValues}
                         onChange={(id, value) => handleFieldChange(id, value, "reaction")}
                     />
-                    <TriggerButton
-                        text="Create Trigger"
-                        textColor="text-black"
-                        bgColor="bg-white"
-                        hoverColor="hover:bg-[#EEEEEE]"
-                        onClick={() => goToStep(0)}
-                    />
+                    {triggerReaction === "yes" && (
+                        <TriggerButton
+                            text="Create Trigger"
+                            textColor="text-black"
+                            bgColor="bg-white"
+                            hoverColor="hover:bg-[#EEEEEE]"
+                            onClick={() => goToStep(0)}
+                        />
+                    )}
                 </div>
 
         </div>
