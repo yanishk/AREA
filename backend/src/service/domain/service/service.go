@@ -557,7 +557,6 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Asana" {
 		request, errRequest = GetAsanaOAuth2AccessTokenRequest(code, callbackType)
-
 	} else {
 		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}
