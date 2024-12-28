@@ -7,7 +7,7 @@ interface TriggerActionProps {
     selectedAction: {name: string, id: string} | null;
     fields: any[];
     actionFieldValues: Record<string, string>;
-    handleFieldChange: (id: string, value: string) => void;
+    handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
 }
 
@@ -63,7 +63,7 @@ const TriggerActionStep: React.FC<TriggerActionProps> = ({
                     <DynamicFields
                         fields={fields}
                         values={actionFieldValues}
-                        onChange={handleFieldChange}
+                        onChange={(id, value) => handleFieldChange(id, value, "action")}
                     />
                     <TriggerButton
                         text="Create Trigger"
