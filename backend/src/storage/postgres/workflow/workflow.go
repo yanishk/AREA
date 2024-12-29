@@ -17,8 +17,8 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 }
 
 func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
-	actionParam map[string]interface{}, reactionParam map[string]interface{}) error {
-	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error {
+	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam, actiondata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
 	if errMarshallActionParam != nil {
@@ -28,13 +28,17 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	if errMarshallReactionParam != nil {
 		return errMarshallReactionParam
 	}
+	actionDataJson, errMarshallActionData := json.Marshal(actionData)
+	if errMarshallActionData != nil {
+		return errMarshallActionData
+	}
 
 	_, err := self.FindWorkflowByNameAndUserId(name, ownerId)
 	if err == nil {
 		return fmt.Errorf("Workflow already exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParamJson, reactionParamJson)
+	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParamJson, reactionParamJson, actionDataJson)
 	if err != nil {
 		return err
 	}
@@ -47,7 +51,8 @@ func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId
 
 	row := self.db.QueryRow(sqlStatement, name, ownerId)
 	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ReactionId,
-		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &retrievedWorkflow.ActionParam, &retrievedWorkflow.ReactionParam)
+		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &retrievedWorkflow.ActionParam,
+		&retrievedWorkflow.ReactionParam, &retrievedWorkflow.ActionData)
 	if err != nil {
 		return retrievedWorkflow, err
 	}
@@ -88,7 +93,7 @@ func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.
 }
 
 func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error {
-	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), isactivated = ($4), actionparam = ($5), reactionparam = ($6) WHERE id = ($7)`
+	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), isactivated = ($4), actionparam = ($5), reactionparam = ($6), reactionparam = ($7) WHERE id = ($8)`
 
 	actionParamJson, err := json.Marshal(updatedWorkflow.ActionParam)
 	if err != nil {
@@ -98,8 +103,12 @@ func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflo
 	if err != nil {
 		return err
 	}
+	actionDataJson, err := json.Marshal(updatedWorkflow.ActionData)
+	if err != nil {
+		return err
+	}
 
-	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, updatedWorkflow.IsActivated, actionParamJson, reactionParamJson, workflowId)
+	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, updatedWorkflow.IsActivated, actionParamJson, reactionParamJson, actionDataJson, workflowId)
 	if err != nil {
 		return err
 	}
@@ -111,23 +120,24 @@ func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Wo
 	var retrievedWorkflow entities.Workflow
 	var actionParamByte []byte
 	var reactionParamByte []byte
+	var actionDataByte []byte
 
 	row := self.db.QueryRow(sqlStatement, workflowId)
 
 	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ActionId,
-		&retrievedWorkflow.ReactionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &actionParamByte, &reactionParamByte)
+		&retrievedWorkflow.ReactionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &actionParamByte, &reactionParamByte, &actionDataByte)
 	if err != nil {
 		return retrievedWorkflow, err
 	}
 
-	retrievedWorkflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, retrievedWorkflow)
+	retrievedWorkflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, actionDataByte, retrievedWorkflow)
 	if errUnmarshal != nil {
 		return retrievedWorkflow, errUnmarshal
 	}
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamByte []byte, reactionParamByte []byte, retrievedWorkflow entities.Workflow) (entities.Workflow, error) {
+func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamByte []byte, reactionParamByte []byte, actionDataByte []byte, retrievedWorkflow entities.Workflow) (entities.Workflow, error) {
 	if len(actionParamByte) > 0 {
 		errActionByte := json.Unmarshal(actionParamByte, &retrievedWorkflow.ActionParam)
 		if errActionByte != nil {
@@ -140,6 +150,13 @@ func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamByte []b
 			return retrievedWorkflow, errReactionByte
 		}
 	}
+	if len(actionDataByte) > 0 {
+		errDataByte := json.Unmarshal(actionDataByte, &retrievedWorkflow.ActionData)
+		if errDataByte != nil {
+			return retrievedWorkflow, errDataByte
+		}
+	}
+
 	return retrievedWorkflow, nil
 }
 
@@ -150,14 +167,15 @@ func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entitie
 		var workflow entities.Workflow
 		var actionParamByte []byte
 		var reactionParamByte []byte
+		var actionDataByte []byte
 
 		err := rows.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ActionId,
-			&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamByte, &reactionParamByte)
+			&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamByte, &reactionParamByte, &actionDataByte)
 		if err != nil {
 			return nil, err
 		}
 
-		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, workflow)
+		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, actionDataByte, workflow)
 		if errUnmarshal != nil {
 			return retrievedWorkflows, errUnmarshal
 		}

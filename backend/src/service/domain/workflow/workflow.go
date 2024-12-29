@@ -43,7 +43,7 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType
 	}
 	errCreationWorkflow := self.WorkflowRepository.CreateWorkflow(newWorkflow.Name,
 		userFound.Id, newWorkflow.ActionId, newWorkflow.ReactionId,
-		newWorkflow.ActionParam, newWorkflow.ReactionParam)
+		newWorkflow.ActionParam, newWorkflow.ReactionParam, newWorkflow.ActionData)
 	if errCreationWorkflow != nil {
 		return errCreationWorkflow
 	}
