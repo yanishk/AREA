@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {useEffect, useState } from "react";
+import {useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
@@ -213,15 +213,19 @@ const WorkflowBuilder = () => {
     const reactionServiceName = selectedReactionService?.name;
     const reactionName = selectedReaction?.name;
 
-    const actionFields = actionServiceName && actionName &&
-    servicesData[actionServiceName]?.actions?.[actionName]
-    ? servicesData[actionServiceName].actions[actionName]
-    : [];
+    const actionFields = useMemo(() => {
+        return actionServiceName && actionName &&
+            servicesData[actionServiceName]?.actions?.[actionName]
+            ? servicesData[actionServiceName].actions[actionName]
+            : [];
+    }, [actionServiceName, actionName]);
 
-    const reactionFields = reactionServiceName && reactionName &&
-    servicesData[reactionServiceName]?.actions?.[reactionName]
-    ? servicesData[reactionServiceName].actions[reactionName]
-    : [];
+    const reactionFields = useMemo(() => {
+        return reactionServiceName && reactionName &&
+            servicesData[reactionServiceName]?.actions?.[reactionName]
+            ? servicesData[reactionServiceName].actions[reactionName]
+            : [];
+    }, [reactionServiceName, reactionName]);
 
     const handleFieldChange = (id: string, value: string, type: "action" | "reaction") => {
         if (type === "action") {
