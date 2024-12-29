@@ -10,6 +10,7 @@ import SelectServiceReactionStep from "../components/workflows/ServiceReactionSt
 import SelectReactionStep from "../components/workflows/SelectReactionStep";
 import TriggerReactionStep from "../components/workflows/TriggerReactionStep";
 import ConnectServiceStep from "../components/workflows/ConnectActionServiceStep";
+import SummaryStep from "../components/workflows/SummaryStep";
 
 enum Steps {
     HOME,
@@ -87,7 +88,7 @@ const WorkflowBuilder = () => {
     }
 
     const handleContinue = () => {
-        return;
+        goToStep(Steps.SUMMARY);
     }
 
     const getServicesWithActions = async () => {
@@ -500,6 +501,20 @@ const WorkflowBuilder = () => {
                         selectedService={selectedReactionService}
                         goBack={goHome}
                         handleConnect={() => handleConnectService(selectedReactionService)}
+                    />
+                )
+
+            case Steps.SUMMARY:
+                return (
+                    <SummaryStep
+                        selectedActionService={selectedActionService}
+                        selectedReactionService={selectedReactionService}
+                        selectedAction={selectedAction}
+                        selectedReaction={selectedReaction}
+                        actionFields={actionFieldValues}
+                        reactionFields={reactionFieldValues}
+                        goBack={goHome}
+                        handleContinue={goHome}
                     />
                 )
         }

@@ -101,7 +101,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
             >
                 {selectedAction && selectedReaction ? (
                     <TriggerButton
-                        text="Create Workflow"
+                        text="Continue"
                         textColor="text-white"
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
