@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {servicesData } from "../ServicesData";
@@ -64,6 +64,7 @@ const WorkflowBuilder = () => {
     const [reactionFieldValues, setReactionFieldValues] = useState<Record<string, string>>({});
     const [actionServices, setActionServices] = useState([]);
     const [reactionServices, setReactionServices] = useState([]);
+    const [searchParams] = useSearchParams();
 
     const [currentStep, setCurrentStep] = useState<Steps>(Steps.HOME);
 
@@ -284,7 +285,7 @@ const WorkflowBuilder = () => {
         }
     }
 
-    const handleConnect = async (selectedService: any) => {
+    const handleConnect = async (selectedService: any, serviceType: "action" | "reaction") => {
         try {
             const result = await axios.get(
                 `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
@@ -306,6 +307,7 @@ const WorkflowBuilder = () => {
                 selectedReaction,
                 actionFieldValues,
                 reactionFieldValues,
+                serviceType,
             };
             const state = encodeURIComponent(JSON.stringify(stateData));
 
@@ -323,42 +325,61 @@ const WorkflowBuilder = () => {
     }
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
+        const getDataFromUrl = async () => {
+            const params = new URLSearchParams(window.location.search);
 
-        const state = params.get("state");
-        if (state) {
-            try {
-                const decodedState = JSON.parse(decodeURIComponent(state));
+            const codeAuth = searchParams.get("code");
+            const state = params.get("state");
+            let decodedState;
 
-                if (decodedState.selectedActionService) {
-                    setSelectedActionService(decodedState.selectedActionService);
+            if (state) {
+                try {
+                    decodedState = JSON.parse(decodeURIComponent(state));
+
+                    if (decodedState.selectedActionService) {
+                        setSelectedActionService(decodedState.selectedActionService);
+                    }
+                    if (decodedState.selectedReactionService) {
+                        setSelectedReactionService(decodedState.selectedReactionService);
+                    }
+                    if (decodedState.selectedAction) {
+                        setSelectedAction(decodedState.selectedAction);
+                    }
+                    if (decodedState.selectedReaction) {
+                        setSelectedReaction(decodedState.selectedReaction);
+                    }
+                    if (decodedState.actionFieldValues) {
+                        setActionFieldValues(decodedState.actionFieldValues);
+                    }
+                    if (decodedState.reactionFieldValues) {
+                        setReactionFieldValues(decodedState.reactionFieldValues);
+                    }
+                } catch (error) {
+                    console.error("Error parsing state:", error);
                 }
-                if (decodedState.selectedReactionService) {
-                    setSelectedReactionService(decodedState.selectedReactionService);
-                }
-                if (decodedState.selectedAction) {
-                    setSelectedAction(decodedState.selectedAction);
-                }
-                if (decodedState.selectedReaction) {
-                    setSelectedReaction(decodedState.selectedReaction);
-                }
-                if (decodedState.actionFieldValues) {
-                    setActionFieldValues(decodedState.actionFieldValues);
-                }
-                if (decodedState.reactionFieldValues) {
-                    setReactionFieldValues(decodedState.reactionFieldValues);
-                }
-            } catch (error) {
-                console.error("Error parsing state:", error);
             }
+
+            if (codeAuth) {
+                try {
+                    await axios.post(
+                        `${import.meta.env.VITE_API_URL}service-callback/${decodedState.serviceType === "action" ? selectedActionService?.name : selectedReactionService?.name}/web/?code=${codeAuth}`,{},
+                        {
+                            withCredentials: true,
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error during service callback:", error);
+                }
+            }
+
+            const url = new URL(window.location.href);
+            url.search = "";
+            window.history.replaceState({}, document.title, url.toString());
         }
 
-        // const code = params.get("code");
-
-        const url = new URL(window.location.href);
-        url.search = "";
-        window.history.replaceState({}, document.title, url.toString());
+        getDataFromUrl();
     }, []);
+
 
     const renderStep = () => {
         switch (currentStep) {
@@ -444,7 +465,7 @@ const WorkflowBuilder = () => {
                     <ConnectServiceStep
                         selectedService={selectedReactionService}
                         goBack={goHome}
-                        handleConnect={() => handleConnect(selectedReactionService)}
+                        handleConnect={() => handleConnect(selectedReactionService, "reaction")}
                     />
                 )
         }

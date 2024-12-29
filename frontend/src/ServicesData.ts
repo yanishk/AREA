@@ -1,5 +1,6 @@
 export type ServiceDataType = {
     [serviceName: string]: {
+        serviceConnection: string;
         actions?: {
             [actionName: string]: {
                 id: string;
@@ -10,7 +11,6 @@ export type ServiceDataType = {
         };
         reactions?: {
             [reactionName: string]: {
-                serviceConnection: string;
                 triggerReaction: string;
             }[];
         };
@@ -19,6 +19,7 @@ export type ServiceDataType = {
 
 export const servicesData: ServiceDataType = {
     "Time & Date": {
+        serviceConnection: "no",
         actions: {
             "Every day at": [
                 {
@@ -37,10 +38,10 @@ export const servicesData: ServiceDataType = {
         },
     },
     "Spotify": {
+        serviceConnection: "yes",
         reactions: {
             "Start playback": [
                 {
-                    serviceConnection: "yes",
                     triggerReaction: "no",
                 },
             ],
