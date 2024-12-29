@@ -328,35 +328,56 @@ func (self *WorkflowService) CallTimeApi() error {
 
 var lenRepo int
 
-func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow) (bool, error) {
+func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) (bool, error) {
 	var isActionTriggered bool
-
-	user, err := self.UserRepository.FindUserById(workflow.OwnerId)
-	if err != nil {
-		return isActionTriggered, err
-	}
-
-	accessToken, err := self.UserServiceService.CallApiAndRefresh(user.Email, user.ConnectionType, "Github")
-	if err != nil {
-		return isActionTriggered, err
-	}
 
 	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/user/repos", "GET", accessBearer, accessToken, nil)
 	if err != nil {
 		return isActionTriggered, err
 	}
 
-	var githubRepositories []entities.GithubRepository
-	err = json.NewDecoder(resp.Body).Decode(&githubRepositories)
+	var repositories []entities.GithubRepository
+	err = json.NewDecoder(resp.Body).Decode(&repositories)
 	if err != nil {
 		return isActionTriggered, err
 	}
 
-	if lenRepo != 0 && lenRepo < len(githubRepositories) {
-		lenRepo = len(githubRepositories)
+	if lenRepo != 0 && lenRepo < len(repositories) {
+		lenRepo = len(repositories)
 		isActionTriggered = true
 	} else {
-		lenRepo = len(githubRepositories)
+		lenRepo = len(repositories)
+	}
+	return isActionTriggered, nil
+}
+
+var lenPullRequests int
+
+func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) (bool, error) {
+	var isActionTriggered bool
+
+	repository, ok := workflow.ActionParam["repository"]
+	if !ok {
+		return isActionTriggered, fmt.Errorf("Invalid repository")
+	}
+
+	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "pulls"
+	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	var pullRequests []entities.GithubRepository
+	err = json.NewDecoder(resp.Body).Decode(&pullRequests)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	if lenPullRequests < len(pullRequests) {
+		lenPullRequests = len(pullRequests)
+		isActionTriggered = true
+	} else {
+		lenPullRequests = len(pullRequests)
 	}
 	return isActionTriggered, nil
 }
@@ -370,8 +391,24 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 	}
 
 	for _, workflow := range workflows {
+		user, err := self.UserRepository.FindUserById(workflow.OwnerId)
+		if err != nil {
+			return err
+		}
+
+		accessToken, err := self.UserServiceService.CallApiAndRefresh(user.Email, user.ConnectionType, "Github")
+		if err != nil {
+			return err
+		}
+
 		if action.Name == "New repository" {
-			isActionTriggered, err = self.CheckGithubNewRepositoryAction(workflow)
+			isActionTriggered, err = self.CheckGithubNewRepositoryAction(workflow, accessToken)
+			if err != nil {
+				return err
+			}
+		}
+		if action.Name == "New pull request" {
+			isActionTriggered, err = self.CheckGithubNewPullRequestAction(workflow, accessToken)
 			if err != nil {
 				return err
 			}

@@ -36,3 +36,7 @@ type ChangeActivationWorkflow struct {
 type GithubRepository struct {
 	Name        string `json:"full_name"`
 }
+
+type GithubPullRequest struct {
+	Number        int `json:"number"`
+}
