@@ -4,6 +4,7 @@ export type ServiceDataType = {
         actions?: {
             [actionName: string]: {
                 auth?: string;
+                trigger?: string;
                 id: string;
                 label: string;
                 type: string;
@@ -13,7 +14,7 @@ export type ServiceDataType = {
         reactions?: {
             [reactionName: string]: {
                 auth: string;
-                triggerReaction: string;
+                trigger: string;
             }[];
         };
     };
@@ -26,6 +27,7 @@ export const servicesData: ServiceDataType = {
             "Every day at": [
                 {
                     auth: "no",
+                    trigger: "yes",
                     id: "time",
                     label: "Time",
                     type: "select",
@@ -46,7 +48,7 @@ export const servicesData: ServiceDataType = {
             "Start playback": [
                 {
                     auth: "yes",
-                    triggerReaction: "no",
+                    trigger: "no",
                 },
             ],
         },

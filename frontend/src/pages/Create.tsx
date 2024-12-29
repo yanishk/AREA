@@ -75,16 +75,27 @@ const WorkflowBuilder = () => {
     };
 
     const handleOnEditAction = () => {
-        return;
+        goToStep(Steps.TRIGGER_ACTION)
     }
 
     const handleDeleteAction = () => {
+        setSelectedActionService(null)
+        setSelectedAction(null);
+    }
+
+    const handleOnEditReaction = () => {
+        goToStep(Steps.TRIGGER_REACTION)
         return;
+    }
+
+    const handleDeleteReaction = () => {
+        setSelectedReactionService(null)
+        setSelectedReaction(null);
     }
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
-            navigate(-1)
+            navigate("/")
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
             goToStep(Steps.HOME)
@@ -488,6 +499,8 @@ const WorkflowBuilder = () => {
                         goHome={() => goBack()}
                         handleOnEditAction={handleOnEditAction}
                         handleOnDeleteAction={handleDeleteAction}
+                        handleOnEditReaction={handleOnEditReaction}
+                        handleOnDeleteReaction={handleDeleteReaction}
                         handleContinue={handleContinue}
                     />
                 )

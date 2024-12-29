@@ -18,7 +18,7 @@ const getTriggerStatus = (
     reactionName?: string
 ): string | undefined =>
     serviceName && reactionName
-        ? servicesData[serviceName]?.reactions?.[reactionName]?.[0]?.triggerReaction
+        ? servicesData[serviceName]?.reactions?.[reactionName]?.[0]?.trigger
         : undefined;
 
 const TriggerReactionStep: React.FC<TriggerReactionProps> = ({

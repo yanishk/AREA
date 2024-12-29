@@ -5,10 +5,11 @@ interface ButtonIfCustomProps {
     color: string;
     iconPath: string;
     onEdit: () => void;
+    onEditFalse?: boolean;
     onDelete: () => void;
 }
 
-const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, iconPath, onEdit, onDelete }) => {
+const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, iconPath, onEdit, onDelete, onEditFalse }) => {
     const buttonColor = color || "#222222";
 
     return (
@@ -22,12 +23,14 @@ const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, iconPath, 
                 <p className="text-[1.2rem] ml-4">{text}</p>
             </button>
 
-            <button
-                onClick={onEdit}
-                className="absolute top-[10px] right-[70px] text-sm font-extrabold text-white underline"
-            >
-                Edit
-            </button>
+            {!onEditFalse && (
+                <button
+                    onClick={onEdit}
+                    className="absolute top-[10px] right-[70px] text-sm font-extrabold text-white underline"
+                >
+                    Edit
+                </button>
+            )}
 
             <button
                 onClick={onDelete}

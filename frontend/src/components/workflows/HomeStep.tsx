@@ -1,3 +1,4 @@
+import { servicesData } from "../../ServicesData";
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
 import ButtonThenCustom from "../buttons/ButtonThenCustom";
@@ -8,12 +9,14 @@ import TriggerButton from "../buttons/TriggerButton";
 interface HomeStepProps {
     selectedAction: any | null;
     selectedReaction: any | null;
-    selectedServiceAction: { color: string; iconPath: string } | null;
-    selectedServiceReaction: { color: string; iconPath: string } | null;
+    selectedServiceAction: { name: string; color: string; iconPath: string } | null;
+    selectedServiceReaction: { name: string; color: string; iconPath: string } | null;
     goToStep: (step: number) => void;
     goHome: () => void;
     handleOnEditAction: () => void;
     handleOnDeleteAction: () => void;
+    handleOnEditReaction: () => void;
+    handleOnDeleteReaction: () => void;
     handleContinue: () => void;
 }
 
@@ -26,8 +29,51 @@ const HomeStep: React.FC<HomeStepProps> = ({
     goHome,
     handleOnEditAction,
     handleOnDeleteAction,
+    handleOnEditReaction,
+    handleOnDeleteReaction,
     handleContinue,
 }) => {
+
+    const isTriggerable = (serviceName: string, actionOrReactionName: string, type: "action" | "reaction"): boolean => {
+        const service = servicesData[serviceName];
+
+        if (!service) {
+            return false;
+        }
+
+        if (type === "action" && service.actions) {
+            const action = service.actions[actionOrReactionName];
+
+            if (!action) {
+                return false;
+            }
+
+            return action.some((actionData) => actionData.trigger === "yes");
+        }
+
+        if (type === "reaction" && service.reactions) {
+            const reaction = service.reactions[actionOrReactionName];
+
+            if (!reaction) {
+                return false;
+            }
+
+            return reaction.some((reactionData) => reactionData.trigger === "yes");
+        }
+
+        return false;
+    };
+
+    const isActionTriggerable =
+        selectedServiceAction && selectedAction
+            ? isTriggerable(selectedServiceAction.name, selectedAction.name, "action")
+            : false;
+
+    const isReactionTriggerable =
+        selectedServiceReaction && selectedReaction
+            ? isTriggerable(selectedServiceReaction.name, selectedReaction.name, "reaction")
+            : false;
+
     return (
         <div>
         <div
@@ -61,7 +107,8 @@ const HomeStep: React.FC<HomeStepProps> = ({
                         text={selectedAction.name}
                         color={selectedServiceAction?.color || ""}
                         iconPath={selectedServiceAction?.iconPath || ""}
-                        onEdit={handleOnEditAction}
+                        onEdit={isActionTriggerable ? handleOnEditAction : () => {}}
+                        onEditFalse={!isActionTriggerable}
                         onDelete={handleOnDeleteAction}
                     />
                 ) : (
@@ -82,8 +129,9 @@ const HomeStep: React.FC<HomeStepProps> = ({
                         text={selectedReaction.name}
                         color={selectedServiceReaction?.color || ""}
                         iconPath={selectedServiceReaction?.iconPath || ""}
-                        onEdit={handleOnEditAction}
-                        onDelete={handleOnDeleteAction}
+                        onEdit={handleOnEditReaction}
+                        onEditFalse={!isReactionTriggerable}
+                        onDelete={handleOnDeleteReaction}
                     />
                 ) : (
                     <ButtonThenDefault
