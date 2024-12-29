@@ -3,14 +3,14 @@ import CancelButton from "../buttons/CancelButton";
 interface SelectReactionStepProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
     availableReactions: { name: string; description: string; id: string } [] | null;
-    goToStep: (step: number) => void;
+    goBack: () => void;
     handleSelectReaction: (name: string, id: string) => void;
 }
 
 const SelectReactionStep: React.FC<SelectReactionStepProps> = ({
     selectedService,
     availableReactions,
-    goToStep,
+    goBack,
     handleSelectReaction,
 }) => {
     return (
@@ -27,7 +27,7 @@ const SelectReactionStep: React.FC<SelectReactionStepProps> = ({
                             textColor="text-white"
                             borderColor="border-white"
                             bgColor={`bg-[${selectedService.color}]`}
-                            onClick={() => goToStep(1)}
+                            onClick={() => goBack()}
                         />
                     </div>
 

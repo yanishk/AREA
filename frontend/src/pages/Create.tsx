@@ -82,8 +82,41 @@ const WorkflowBuilder = () => {
         return;
     }
 
-    const goHome = () => {
-        navigate(-1);
+    const goBack = () => {
+        if (currentStep == Steps.HOME) {
+            navigate(-1)
+        }
+        if (currentStep == Steps.SELECT_SERVICE_ACTION) {
+            goToStep(Steps.HOME)
+            setSelectedActionService(null)
+            setSelectedAction(null);
+        }
+        if (currentStep == Steps.SELECT_ACTION) {
+            goToStep(Steps.SELECT_SERVICE_ACTION)
+        }
+        if (currentStep == Steps.CONNECT_ACTION_SERVICE) {
+            goToStep(Steps.SELECT_SERVICE_ACTION)
+        }
+        if (currentStep == Steps.TRIGGER_ACTION) {
+            goToStep(Steps.SELECT_ACTION)
+        }
+        if (currentStep == Steps.SELECT_SERVICE_REACTION) {
+            goToStep(Steps.HOME)
+            setSelectedReaction(null)
+            setSelectedReaction(null);
+        }
+        if (currentStep == Steps.SELECT_REACTION) {
+            goToStep(Steps.SELECT_SERVICE_REACTION)
+        }
+        if (currentStep == Steps.CONNECT_REACTION_SERVICE) {
+            goToStep(Steps.SELECT_REACTION)
+        }
+        if (currentStep == Steps.TRIGGER_REACTION) {
+            goToStep(Steps.CONNECT_REACTION_SERVICE)
+        }
+        if (currentStep == Steps.SUMMARY) {
+            goToStep(Steps.HOME)
+        }
         return;
     }
 
@@ -452,7 +485,7 @@ const WorkflowBuilder = () => {
                         selectedServiceAction={selectedActionService}
                         selectedServiceReaction={selectedReactionService}
                         goToStep={goToStep}
-                        goHome={goHome}
+                        goHome={() => goBack()}
                         handleOnEditAction={handleOnEditAction}
                         handleOnDeleteAction={handleDeleteAction}
                         handleContinue={handleContinue}
@@ -464,7 +497,7 @@ const WorkflowBuilder = () => {
                     <SelectServiceActionStep
                         services={actionServices}
                         handleSelectService={handleSelectActionService}
-                        goToStep={goToStep}
+                        goBack={() => goBack()}
                     />
                 );
 
@@ -474,7 +507,7 @@ const WorkflowBuilder = () => {
                         selectedService={selectedActionService}
                         availableActions={availableActions}
                         handleSelectAction={handleSelectAction}
-                        goToStep={goToStep}
+                        goBack={() => goBack()}
                     />
                 )
 
@@ -486,7 +519,8 @@ const WorkflowBuilder = () => {
                         fields={actionFields}
                         actionFieldValues={actionFieldValues}
                         handleFieldChange={handleFieldChange}
-                        goToStep={goToStep}
+                        goToStep={() => goToStep(Steps.HOME)}
+                        goBack={() => goBack()}
                     />
                 );
 
@@ -495,7 +529,7 @@ const WorkflowBuilder = () => {
                     <SelectServiceReactionStep
                         services={reactionServices}
                         handleSelectService={handleSelectReactionService}
-                        goToStep={goToStep}
+                        goBack={() => goBack()}
                     />
                 )
 
@@ -505,7 +539,7 @@ const WorkflowBuilder = () => {
                         selectedService={selectedReactionService}
                         availableReactions={availableReactions}
                         handleSelectReaction={handleSelectReaction}
-                        goToStep={goToStep}
+                        goBack={() => goBack()}
                     />
                 )
 
@@ -518,6 +552,7 @@ const WorkflowBuilder = () => {
                         reactionFieldValues={reactionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={goToStep}
+                        goBack={() => goBack()}
                     />
                 )
 
@@ -525,7 +560,7 @@ const WorkflowBuilder = () => {
                     return (
                         <ConnectServiceStep
                             selectedService={selectedActionService}
-                            goBack={goHome}
+                            goBack={goBack}
                             handleConnect={() => handleConnectService(selectedActionService)}
                         />
                     )
@@ -534,7 +569,7 @@ const WorkflowBuilder = () => {
                 return (
                     <ConnectServiceStep
                         selectedService={selectedReactionService}
-                        goBack={goHome}
+                        goBack={() => goBack()}
                         handleConnect={() => handleConnectService(selectedReactionService)}
                     />
                 )
@@ -548,7 +583,7 @@ const WorkflowBuilder = () => {
                         selectedReaction={selectedReaction}
                         actionFields={actionFieldValues}
                         reactionFields={reactionFieldValues}
-                        goBack={goHome}
+                        goBack={() => goBack()}
                         handleCreateWorkflow={handleCreateWorkflow}
                     />
                 )

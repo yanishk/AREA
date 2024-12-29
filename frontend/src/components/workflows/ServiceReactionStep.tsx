@@ -2,13 +2,13 @@ import CancelButton from "../buttons/CancelButton";
 
 interface ServiceReactionStepProps {
     services: any;
-    goToStep: (step: number) => void;
+    goBack: () => void;
     handleSelectService: (name: string, color: string, icon: string) => void;
 }
 
 const SelectServiceReactionStep: React.FC<ServiceReactionStepProps> = ({
     services,
-    goToStep,
+    goBack,
     handleSelectService
 }) => {
     return (
@@ -20,7 +20,7 @@ const SelectServiceReactionStep: React.FC<ServiceReactionStepProps> = ({
                         textColor="text-[#222222]"
                         borderColor="border-[#222222]"
                         bgColor="bg-[#F9FAFB]"
-                        onClick={() => goToStep(0)}
+                        onClick={() => goBack()}
                     />
                 </div>
 

@@ -9,6 +9,7 @@ interface TriggerActionProps {
     actionFieldValues: Record<string, string>;
     handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
+    goBack: () => void;
 }
 
 const TriggerActionStep: React.FC<TriggerActionProps> = ({
@@ -18,6 +19,7 @@ const TriggerActionStep: React.FC<TriggerActionProps> = ({
     actionFieldValues,
     handleFieldChange,
     goToStep,
+    goBack,
 }) => {
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
@@ -30,7 +32,7 @@ const TriggerActionStep: React.FC<TriggerActionProps> = ({
                         textColor="text-white"
                         borderColor="border-white"
                         bgColor={`bg-[${selectedService?.color}]`}
-                        onClick={() => goToStep(2)}
+                        onClick={() => goBack()}
                     />
                 </div>
 

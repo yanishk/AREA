@@ -10,6 +10,7 @@ interface TriggerReactionProps {
     reactionFieldValues: Record<string, string>;
     handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
+    goBack: () => void;
 }
 
 const getTriggerStatus = (
@@ -27,6 +28,7 @@ const TriggerReactionStep: React.FC<TriggerReactionProps> = ({
     reactionFieldValues,
     handleFieldChange,
     goToStep,
+    goBack,
 }) => {
     const triggerReaction = getTriggerStatus(
         selectedService?.name,
@@ -44,7 +46,7 @@ const TriggerReactionStep: React.FC<TriggerReactionProps> = ({
                         textColor="text-white"
                         borderColor="border-white"
                         bgColor={`bg-[${selectedService?.color}]`}
-                        onClick={() => goToStep(2)}
+                        onClick={() => goBack()}
                     />
                 </div>
 
