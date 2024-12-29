@@ -9,16 +9,17 @@ import TriggerActionStep from "../components/workflows/TriggerActionStep";
 import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
 import SelectReactionStep from "../components/workflows/SelectReactionStep";
 import TriggerReactionStep from "../components/workflows/TriggerReactionStep";
-import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
+import ConnectServiceStep from "../components/workflows/ConnectActionServiceStep";
 
 enum Steps {
     HOME,
     SELECT_SERVICE_ACTION,
     SELECT_ACTION,
+    CONNECT_ACTION_SERVICE,
     TRIGGER_ACTION,
     SELECT_SERVICE_REACTION,
-    CONNECT_SERVICE,
     SELECT_REACTION,
+    CONNECT_REACTION_SERVICE,
     TRIGGER_REACTION,
     SUMMARY,
 }
@@ -198,15 +199,53 @@ const WorkflowBuilder = () => {
         }
     }, [currentStep]);
 
+    const isRequiredConnection = (
+        serviceName: string,
+        type: "action" | "reaction",
+        actionOrReactionName?: string
+    ): boolean => {
+        const service = servicesData[serviceName];
+        if (!service || !actionOrReactionName) {
+            return false;
+        }
+
+        if (type === "action") {
+            const action = service.actions?.[actionOrReactionName];
+
+            if (!action) {
+                return false;
+            }
+
+            return action.some((actionData) => actionData.auth === "yes");
+        }
+
+        if (type === "reaction") {
+            const reaction = service.reactions?.[actionOrReactionName];
+
+            if (!reaction) {
+                return false;
+            }
+
+            return reaction.some((reactionData) => reactionData.auth === "yes");
+        }
+
+        return false;
+    };
+
     const handleSelectActionService = (name: string, color: string, iconPath: string) => {
         setSelectedActionService({ name, color, iconPath });
         goToStep(Steps.SELECT_ACTION);
     };
 
     const handleSelectAction = (name: string, id: string) => {
-        setSelectedAction({name, id});
-        goToStep(Steps.TRIGGER_ACTION);
-    }
+        setSelectedAction({ name, id });
+
+        if (selectedActionService?.name && isRequiredConnection(selectedActionService.name, "action", name)) {
+            goToStep(Steps.CONNECT_ACTION_SERVICE);
+        } else {
+            goToStep(Steps.TRIGGER_ACTION);
+        }
+    };
 
     const actionServiceName = selectedActionService?.name;
     const actionName = selectedAction?.name;
@@ -267,25 +306,17 @@ const WorkflowBuilder = () => {
         goToStep(Steps.SELECT_REACTION);
     };
 
-    const getConnectReactionStatus = () =>
-        selectedReactionService?.name && selectedReaction?.name
-            ? servicesData[selectedReactionService?.name]?.reactions?.[selectedReaction?.name]?.[0]?.serviceConnection
-            : undefined;
-
-    const getTiggerReactionStatus = () =>
-        selectedReactionService?.name && selectedReaction?.name
-            ? servicesData[selectedReactionService?.name]?.reactions?.[selectedReaction?.name]?.[0]?.triggerReaction
-            : undefined;
-
     const handleSelectReaction = (name: string, id: string) => {
-        setSelectedReaction({name, id});
+        setSelectedReaction({ name, id });
 
-        if (getConnectReactionStatus() === "yes") {
-            goToStep(Steps.CONNECT_SERVICE);
+        if (selectedReactionService?.name && isRequiredConnection(selectedReactionService.name, "reaction", name)) {
+            goToStep(Steps.CONNECT_REACTION_SERVICE);
+        } else {
+            goToStep(Steps.TRIGGER_REACTION);
         }
-    }
+    };
 
-    const handleConnect = async (selectedService: any, serviceType: "action" | "reaction") => {
+    const handleConnectService = async (selectedService: any) => {
         try {
             const result = await axios.get(
                 `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
@@ -307,7 +338,6 @@ const WorkflowBuilder = () => {
                 selectedReaction,
                 actionFieldValues,
                 reactionFieldValues,
-                serviceType,
             };
             const state = encodeURIComponent(JSON.stringify(stateData));
 
@@ -317,11 +347,6 @@ const WorkflowBuilder = () => {
         } catch (error) {
             console.error("Error during authentication:", error);
         }
-        // if (getTiggerReactionStatus() === "yes") {
-        //     goToStep(Steps.TRIGGER_REACTION);
-        // } else {
-        //     goToStep(Steps.HOME);
-        // }
     }
 
     useEffect(() => {
@@ -460,12 +485,21 @@ const WorkflowBuilder = () => {
                     />
                 )
 
-            case Steps.CONNECT_SERVICE:
+            case Steps.CONNECT_ACTION_SERVICE:
+                    return (
+                        <ConnectServiceStep
+                            selectedService={selectedActionService}
+                            goBack={goHome}
+                            handleConnect={() => handleConnectService(selectedActionService)}
+                        />
+                    )
+
+            case Steps.CONNECT_REACTION_SERVICE:
                 return (
                     <ConnectServiceStep
                         selectedService={selectedReactionService}
                         goBack={goHome}
-                        handleConnect={() => handleConnect(selectedReactionService, "reaction")}
+                        handleConnect={() => handleConnectService(selectedReactionService)}
                     />
                 )
         }
