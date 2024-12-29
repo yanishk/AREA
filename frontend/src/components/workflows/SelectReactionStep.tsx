@@ -49,7 +49,7 @@ const SelectReactionStep: React.FC<SelectReactionStepProps> = ({
                             <button
                                 key={element.name}
                                 style={{ backgroundColor: selectedService.color}}
-                                className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px]"
+                                className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5"
                                 onClick={() => handleSelectReaction(
                                     element.name,
                                     element.id
@@ -58,7 +58,7 @@ const SelectReactionStep: React.FC<SelectReactionStepProps> = ({
                             >
                                 <div className="text-left w-full pl-[30px]">
                                     <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">{element.name}</h2>
-                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 m-0">{element.description}</h2>
+                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 mr-4">{element.description}</h2>
                                 </div>
                             </button>
                         ))}
