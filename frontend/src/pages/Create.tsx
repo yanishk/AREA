@@ -406,6 +406,41 @@ const WorkflowBuilder = () => {
         getDataFromUrl();
     }, []);
 
+    const handleCreateWorkflow = async (workflowTitle: string) =>{
+            const actionParams = Object.keys(actionFieldValues).length > 0
+            ? Object.keys(actionFieldValues).reduce((params, key) => {
+                params[key] = actionFieldValues[key];
+                return params;
+            }, {} as Record<string, any>)
+            : null;
+
+            const reactionParams = Object.keys(reactionFieldValues).length > 0
+                ? Object.keys(reactionFieldValues).reduce((params, key) => {
+                    params[key] = reactionFieldValues[key];
+                    return params;
+            }, {} as Record<string, any>)
+            : null;
+
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}workflow/create`,
+                {
+                    actionid: selectedAction?.id,
+                    actionparam: actionParams,
+                    name: workflowTitle || "My Workflow",
+                    reactionid: selectedReaction?.id,
+                    reactionparam: reactionParams
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+
+            setSelectedActionService(null)
+            setSelectedAction(null);
+            setSelectedReaction(null)
+            setSelectedReaction(null);
+            navigate("/");
+    }
 
     const renderStep = () => {
         switch (currentStep) {
@@ -514,7 +549,7 @@ const WorkflowBuilder = () => {
                         actionFields={actionFieldValues}
                         reactionFields={reactionFieldValues}
                         goBack={goHome}
-                        handleContinue={goHome}
+                        handleCreateWorkflow={handleCreateWorkflow}
                     />
                 )
         }

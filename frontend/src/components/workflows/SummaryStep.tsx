@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
-import InputField from "../inputs/InputsField";
 import BasicInput from "../inputs/BasicInput";
 import MaxWidthWrapper from "../MaxWidthWrapper";
 import axios from "axios";
@@ -14,7 +13,7 @@ interface SummaryStepProps {
     actionFields: Record<string, string>;
     reactionFields: Record<string, string>;
     goBack: () => void;
-    handleContinue: () => void;
+    handleCreateWorkflow: (workflowTitle: string) => void;
 }
 
 const SummaryStep: React.FC<SummaryStepProps> = ({
@@ -25,7 +24,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
     actionFields,
     reactionFields,
     goBack,
-    handleContinue
+    handleCreateWorkflow
 }) => {
     const actionDescription = selectedAction
         ? `${selectedAction.name} ${Object.values(actionFields).join(" ")}`
@@ -146,7 +145,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                         textColor="text-white"
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
-                        onClick={handleContinue}
+                        onClick={() => handleCreateWorkflow(workflowTitle)}
                     />
                 </div>
             </div>
