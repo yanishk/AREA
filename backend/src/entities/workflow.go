@@ -32,3 +32,7 @@ type UpdatedWorkflow struct {
 type ChangeActivationWorkflow struct {
 	WorkflowId string `json:"id"`
 }
+
+type GithubRepository struct {
+	Name        string `json:"full_name"`
+}

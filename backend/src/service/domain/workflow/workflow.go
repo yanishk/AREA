@@ -325,3 +325,81 @@ func (self *WorkflowService) CallTimeApi() error {
 	}
 	return nil
 }
+
+var lenRepo int
+
+func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow) (bool, error) {
+	var isActionTriggered bool
+
+	user, err := self.UserRepository.FindUserById(workflow.OwnerId)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	accessToken, err := self.UserServiceService.CallApiAndRefresh(user.Email, user.ConnectionType, "Github")
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/user/repos", "GET", accessBearer, accessToken, nil)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	var githubRepositories []entities.GithubRepository
+	err = json.NewDecoder(resp.Body).Decode(&githubRepositories)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	if lenRepo != 0 && lenRepo < len(githubRepositories) {
+		lenRepo = len(githubRepositories)
+		isActionTriggered = true
+	} else {
+		lenRepo = len(githubRepositories)
+	}
+	return isActionTriggered, nil
+}
+
+func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Action) error {
+	var isActionTriggered bool
+
+	workflows, err := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		if action.Name == "New repository" {
+			isActionTriggered, err = self.CheckGithubNewRepositoryAction(workflow)
+			if err != nil {
+				return err
+			}
+		}
+		if isActionTriggered {
+			self.executeSpotifyReactions(workflow)
+			self.executeDiscordReactions(workflow)
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckGithubActions() error {
+	service, err := self.ServiceService.FindServiceByName("Github")
+	if err != nil {
+		return err
+	}
+
+	actions, err := self.ActionRepository.FindActionByServiceId(service.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, action := range actions {
+		err := self.CheckWorkflowsWithGithubActions(action)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

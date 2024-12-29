@@ -24,7 +24,11 @@ func main() {
 	_, errCronCreation := cronJob.AddFunc("@every 1m", func() {
 		err := services.WorkflowService.CallTimeApi()
 		if err != nil {
-			fmt.Println("call Time API Failed")
+			fmt.Println("Call Time API Failed")
+		}
+		err = services.WorkflowService.CheckGithubActions()
+		if err != nil {
+			fmt.Println("Check Github Actions Failed")
 		}
 	})
 	if errCronCreation != nil {
