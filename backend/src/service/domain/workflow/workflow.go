@@ -366,12 +366,12 @@ func (self *WorkflowService) getUsernameReddit(accessToken string, workflow enti
 	if err != nil {
 		return result, err
 	}
+	defer resp.Body.Close()
 
 	errDecode := json.NewDecoder(resp.Body).Decode(&result)
 	if errDecode != nil {
 		return result, errDecode
 	}
-	defer resp.Body.Close()
 	return result, nil
 }
 
