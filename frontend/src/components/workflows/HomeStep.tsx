@@ -6,9 +6,18 @@ import ButtonThenDefault from "../buttons/ButtonThenDefault";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 
+interface Action {
+    name: string;
+    id: string;
+}
+
+interface Reaction {
+    name: string;
+    id: string;
+}
 interface HomeStepProps {
-    selectedAction: any | null;
-    selectedReaction: any | null;
+    selectedAction: Action | null;
+    selectedReaction: Reaction | null;
     selectedServiceAction: { name: string; color: string; iconPath: string } | null;
     selectedServiceReaction: { name: string; color: string; iconPath: string } | null;
     goToStep: (step: number) => void;

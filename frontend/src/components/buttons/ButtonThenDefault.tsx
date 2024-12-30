@@ -7,10 +7,20 @@ interface ButtonThenDefaultProps {
 }
 
 const ButtonThenDefault: React.FC<ButtonThenDefaultProps> = ({ text, onClick, disabled }) => {
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!disabled && (event.key === "Enter" || event.key === " ")) {
+            onClick();
+        }
+    };
+
     return (
         <div
-            onClick={disabled ? undefined : onClick}
-            className={`w-[730px] h-[125px] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 ${
+        onClick={disabled ? undefined : onClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        className={`w-[730px] h-[125px] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 ${
                 disabled
                     ? "cursor-not-allowed bg-[#999999] justify-center"
                     : "cursor-pointer bg-[#222222]"

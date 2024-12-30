@@ -121,15 +121,12 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                         type="text"
                         value={workflowTitle}
                         onChange={handleTitleChange}
-                        disableFocus={true}
                     />
                     <p
                         className="text-white text-[16.7px] mt-[2px] mb-[110px]"
                     >
                         by
-                        <span
-                            className="font-bold ml-1"
-                        >
+                        <span className="font-bold ml-1">
                             {userName}
                         </span>
                     </p>
