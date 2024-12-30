@@ -45,6 +45,18 @@ type RedditPostResponse struct {
 	} `json:"data"`
 }
 
+type RedditCommentResponse struct {
+	Data struct {
+		Children []struct {
+			Data struct {
+				ID     string `json:"id"`
+				Author string `json:"author"`
+				Body   string `json:"body"`
+			} `json:"data"`
+		} `json:"children"`
+	} `json:"data"`
+}
+
 type RedditUsername struct {
 	Name string `json:"name"`
 }
