@@ -393,16 +393,19 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 	return nil
 }
 
-func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.Workflow) error {
+func (self *WorkflowService) getAccessToken(workflow entities.Workflow) (string, error) {
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
 	if errUser != nil {
-		return fmt.Errorf("Error finding user")
+		return "", fmt.Errorf("Error finding user")
 	}
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
 	if errRefreshing != nil {
-		return errRefreshing
+		return "", errRefreshing
 	}
+	return accessToken, nil
+}
 
+func (self *WorkflowService) executeNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
 	subreddit, subredditExists := workflow.ActionParam["subreddit"]
 	if !subredditExists {
 		return fmt.Errorf("Could not find the subreddit field")
@@ -421,16 +424,7 @@ func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.W
 	return self.isANewPost(workflow, result)
 }
 
-func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errUser != nil {
-		return fmt.Errorf("Error finding user")
-	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
-
+func (self *WorkflowService) executeNewPostByMeAction(accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -452,11 +446,15 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 	}
 
 	for _, workflow := range allWorkflowsFound {
+		accessToken, err := self.getAccessToken(workflow)
+		if err != nil {
+			continue
+		}
 		if action.Name == "Any new post in subreddit" {
-			self.executeNewPostInSubredditAction(workflow)
+			self.executeNewPostInSubredditAction(accessToken, workflow)
 		}
 		if action.Name == "New post by you" {
-			self.executeNewPostByMeAction(workflow)
+			self.executeNewPostByMeAction(accessToken, workflow)
 		}
 	}
 	return nil
