@@ -7,18 +7,9 @@ interface ButtonIfDefaultProps {
 
 const ButtonIfDefault: React.FC<ButtonIfDefaultProps> = ({ text, onClick }) => {
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === "Enter" || event.key === " ") {
-            onClick();
-        }
-    };
-
     return (
-        <div
+        <button
             onClick={onClick}
-            onKeyDown={handleKeyDown}
-            role="button"
-            tabIndex={0}
             className="w-[730px] h-[125px] bg-[#222222] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 cursor-pointer relative"
         >
             <span className="absolute left-1/2 transform -translate-x-1/2">
@@ -30,7 +21,7 @@ const ButtonIfDefault: React.FC<ButtonIfDefaultProps> = ({ text, onClick }) => {
             >
                 Add
             </button>
-        </div>
+        </button>
     );
 };
 

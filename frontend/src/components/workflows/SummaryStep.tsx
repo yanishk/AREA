@@ -125,8 +125,8 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                     <p
                         className="text-white text-[16.7px] mt-[2px] mb-[110px]"
                     >
-                        by
-                        <span className="font-bold ml-1">
+                        by{' '}
+                        <span className="font-bold">
                             {userName}
                         </span>
                     </p>
