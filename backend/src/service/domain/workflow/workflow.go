@@ -326,15 +326,22 @@ func (self *WorkflowService) CallTimeApi() error {
 	return nil
 }
 
-func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string) (entities.RedditPostResponse, error) {
-	var result entities.RedditPostResponse
-	url := "https://oauth.reddit.com/" + subreddit + "/new.json?limit=1"
-
+func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", accessBearer+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
 	resp, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.RedditPostResponse, error) {
+	var result entities.RedditPostResponse
+
+	resp, err := self.executeGetRedditRequest(url, accessToken)
 	if err != nil {
 		return result, err
 	}
@@ -346,35 +353,29 @@ func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string
 	defer resp.Body.Close()
 
 	if len(result.Data.Children) == 0 {
-		return result, fmt.Errorf("Could not retrieve post from the specified subreddit")
+		return result, fmt.Errorf("Could not retrieve post")
 	}
 	return result, nil
 }
 
-func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.Workflow) error {
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errUser != nil {
-		return fmt.Errorf("Error finding user")
-	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
+func (self *WorkflowService) getUsernameReddit(accessToken string, workflow entities.Workflow) (entities.RedditUsername, error) {
+	var result entities.RedditUsername
+	url := "https://oauth.reddit.com/api/v1/me"
 
-	subreddit, subredditExists := workflow.ActionParam["subreddit"]
-	if !subredditExists {
-		return fmt.Errorf("Could not find the subreddit field")
-	}
-
-	result, err := self.retrieveSubredditInfo(subreddit.(string), accessToken)
+	resp, err := self.executeGetRedditRequest(url, accessToken)
 	if err != nil {
-		return err
+		return result, err
 	}
 
-	if len(result.Data.Children) == 0 {
-		return fmt.Errorf("No posts found in subreddit")
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
 	}
+	defer resp.Body.Close()
+	return result, nil
+}
 
+func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entities.RedditPostResponse) error {
 	latestPost := result.Data.Children[0].Data
 	idLatest, idLatestExist := workflow.ActionData["id"]
 
@@ -392,50 +393,32 @@ func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.W
 	return nil
 }
 
-func (self *WorkflowService) getUsernameReddit(accessToken string, workflow entities.Workflow) (entities.RedditUsername, error) {
-	var result entities.RedditUsername
-	url := "https://oauth.reddit.com/api/v1/me"
+func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.Workflow) error {
+	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
+	if errUser != nil {
+		return fmt.Errorf("Error finding user")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
 
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", accessBearer+accessToken)
-	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+	subreddit, subredditExists := workflow.ActionParam["subreddit"]
+	if !subredditExists {
+		return fmt.Errorf("Could not find the subreddit field")
+	}
 
-	resp, err := self.ServiceService.ExecuteRequest(req)
+	url := "https://oauth.reddit.com/" + subreddit.(string) + "/new.json?limit=1"
+	result, err := self.getRedditPost(url, accessToken)
 	if err != nil {
-		return result, err
+		return err
 	}
 
-	errDecode := json.NewDecoder(resp.Body).Decode(&result)
-	if errDecode != nil {
-		return result, errDecode
-	}
-	defer resp.Body.Close()
-	return result, nil
-}
-
-func (self *WorkflowService) getUserPost(username, accessToken string, workflow entities.Workflow) (entities.RedditPostResponse, error) {
-	var resultPost entities.RedditPostResponse
-
-	urlPostMe := "https://oauth.reddit.com/user/" + username + "/submitted?limit=1"
-	reqPostMe, _ := http.NewRequest("GET", urlPostMe, nil)
-	reqPostMe.Header.Add("Authorization", accessBearer+accessToken)
-	reqPostMe.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
-
-	respPostMe, err := self.ServiceService.ExecuteRequest(reqPostMe)
-	if err != nil {
-		return resultPost, err
+	if len(result.Data.Children) == 0 {
+		return fmt.Errorf("No posts found in subreddit")
 	}
 
-	errDecodeMe := json.NewDecoder(respPostMe.Body).Decode(&resultPost)
-	if errDecodeMe != nil {
-		return resultPost, errDecodeMe
-	}
-	defer respPostMe.Body.Close()
-
-	if len(resultPost.Data.Children) == 0 {
-		return resultPost, fmt.Errorf("No posts found for user")
-	}
-	return resultPost, nil
+	return self.isANewPost(workflow, result)
 }
 
 func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
@@ -453,27 +436,13 @@ func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow
 		return err
 	}
 
-	resultPost, err := self.getUserPost(resultUsername.Name, accessToken, workflow)
+	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/submitted?limit=1"
+	resultPost, err := self.getRedditPost(urlPostMe, accessToken)
 	if err != nil {
 		return err
 	}
 
-	idLatest, idLatestExist := workflow.ActionData["id"]
-	latestPost := resultPost.Data.Children[0].Data
-
-	if !idLatestExist || idLatest != latestPost.ID {
-		workflow.ActionData = make(map[string]interface{})
-		workflow.ActionData["id"] = latestPost.ID
-
-		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
-		if err != nil {
-			return fmt.Errorf("Could not update workflow")
-		}
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
-	}
-
-	return nil
+	return self.isANewPost(workflow, resultPost)
 }
 
 func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
