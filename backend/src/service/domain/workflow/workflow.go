@@ -23,7 +23,7 @@ type WorkflowService struct {
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
-const errorUpdatingWorkflows = "Could not update workflow"
+const errorUpdatingWorkflow = "Could not update workflow"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
 
@@ -115,13 +115,13 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
+	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
+
+	accessToken, err := self.getAccessToken("Spotify", workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token")
 	}
 
 	var resp *http.Response
@@ -159,14 +159,13 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 func (self *WorkflowService) executeDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
+	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
 
-	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Discord")
-	if errRefreshing != nil {
-		return errRefreshing
+	_, err := self.getAccessToken("Discord", workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token")
 	}
 
 	if reactionFound.Name == "Post a message to a channel" {
@@ -429,7 +428,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
@@ -450,7 +449,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
@@ -471,7 +470,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
@@ -482,12 +481,12 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 	return nil
 }
 
-func (self *WorkflowService) getAccessToken(workflow entities.Workflow) (string, error) {
+func (self *WorkflowService) getAccessToken(serviceName string, workflow entities.Workflow) (string, error) {
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
 	if errUser != nil {
 		return "", fmt.Errorf("Error finding user")
 	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, serviceName)
 	if errRefreshing != nil {
 		return "", errRefreshing
 	}
@@ -569,7 +568,7 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 	}
 
 	for _, workflow := range allWorkflowsFound {
-		accessToken, err := self.getAccessToken(workflow)
+		accessToken, err := self.getAccessToken("Reddit", workflow)
 		if err != nil {
 			continue
 		}
