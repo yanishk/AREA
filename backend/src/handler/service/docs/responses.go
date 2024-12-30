@@ -1,29 +1,6 @@
 package docs_service
 
-type ServiceExample struct {
-	Id           string `json:"id"`
-	Name         string `json:"name"`
-	Color        string `json:"color"`
-	Logo         string `json:"logo"`
-	HasActions   bool   `json:"hasactions"`
-	HasReactions bool   `json:"hasreactions"`
-}
-
-type ActionExample struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ServiceId   string `json:"serviceid"`
-	NbParam     int    `json:"nbparam"`
-}
-
-type ReactionExample struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ServiceId   string `json:"serviceid"`
-	NbParam     int    `json:"nbparam"`
-}
+import "backend/src/entities"
 
 type DiscordServerExample struct {
 	Banner      string
@@ -79,7 +56,7 @@ type ServiceOAuth2BadRequestResponse struct {
 
 // Retrieve Service by Id
 type ServiceRetrieveServiceByIdSuccessResponse struct {
-	Service ServiceExample
+	Service entities.Service
 }
 
 type ServiceRetrieveServiceByIdBadRequestResponse struct {
@@ -92,17 +69,17 @@ type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
 
 // Retrieve Actions/Reactions Services Responses
 type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
-	Services []ServiceExample
+	Services []entities.Service
 }
 
 // Retrieve Actions from Service Responses
 type ServiceRetrieveActionsFromServiceSuccessResponse struct {
-	Actions []ActionExample
+	Actions []entities.Action
 }
 
 // Retrieve Reactions from Service Responses
 type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
-	Reactions []ReactionExample
+	Reactions []entities.Reaction
 }
 
 // Discord Get User Servers

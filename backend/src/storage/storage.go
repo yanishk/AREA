@@ -16,6 +16,7 @@ type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
 	FindServiceById(id string) (entities.Service, error)
 	FindServiceByName(name string) (entities.Service, error)
+	FindServices() ([]entities.Service, error)
 	FindActionsServices() ([]entities.Service, error)
 	FindReactionsServices() ([]entities.Service, error)
 }
@@ -41,7 +42,7 @@ type ActionRepository interface {
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
 	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)

@@ -1,9 +1,10 @@
 package service
 
 import (
-	"backend/src/entities"
 	"io"
 	"net/http"
+
+	"backend/src/entities"
 )
 
 type UserService interface {
@@ -26,6 +27,7 @@ type ServiceService interface {
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
@@ -47,9 +49,14 @@ type WorkflowService interface {
 	CallTimeApi() error
 }
 
+type AboutService interface {
+	GetAboutServer(about entities.About) (entities.About, error)
+}
+
 type Service struct {
 	UserService        UserService
 	ServiceService     ServiceService
 	UserServiceService UserServiceService
 	WorkflowService    WorkflowService
+	AboutService       AboutService
 }
