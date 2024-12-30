@@ -108,7 +108,7 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
@@ -152,7 +152,7 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 	return fmt.Errorf("Unknown reaction")
 }
 
-func (self *WorkflowService) executeDiscordReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
@@ -189,7 +189,7 @@ func (self *WorkflowService) executeDiscordReactions(workflow entities.Workflow)
 	return fmt.Errorf("Unknown reaction")
 }
 
-func (self *WorkflowService) executeActiveActionsEveryDay(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !hourExists || !minuteExists {
@@ -197,26 +197,26 @@ func (self *WorkflowService) executeActiveActionsEveryDay(timeRes entities.TimeR
 	}
 
 	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.CheckSpotifyReactions(workflow)
+		self.CheckDiscordReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) executeActiveActionsEveryHour(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists {
 		return fmt.Errorf("Error in the minute sent")
 	}
 
 	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.CheckSpotifyReactions(workflow)
+		self.CheckDiscordReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) executeActiveActionsEveryWeekAt(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckTimeAndDateEveryWeekAtAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	days, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -232,15 +232,15 @@ func (self *WorkflowService) executeActiveActionsEveryWeekAt(timeRes entities.Ti
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
 			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			self.executeSpotifyReactions(workflow)
-			self.executeDiscordReactions(workflow)
+			self.CheckSpotifyReactions(workflow)
+			self.CheckDiscordReactions(workflow)
 		}
 	}
 
 	return nil
 }
 
-func (self *WorkflowService) executeActiveActionsEveryMonthOnThe(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckTimeAndDateEveryMonthOnTheAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	day, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -250,13 +250,13 @@ func (self *WorkflowService) executeActiveActionsEveryMonthOnThe(timeRes entitie
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.CheckSpotifyReactions(workflow)
+		self.CheckDiscordReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) executeActiveActionsEveryYearOn(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckTimeAndDateEveryYearOnAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	month, monthExists := workflow.ActionParam["month"]
 	day, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
@@ -267,13 +267,13 @@ func (self *WorkflowService) executeActiveActionsEveryYearOn(timeRes entities.Ti
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.CheckSpotifyReactions(workflow)
+		self.CheckDiscordReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) checkNameOfAction(timeRes entities.TimeResponse, action entities.Action) error {
+func (self *WorkflowService) CheckWorkflowsWithTimeAndDateActions(timeRes entities.TimeResponse, action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
@@ -281,25 +281,25 @@ func (self *WorkflowService) checkNameOfAction(timeRes entities.TimeResponse, ac
 
 	for _, workflow := range allWorkflowsFound {
 		if action.Name == "Every day at" {
-			self.executeActiveActionsEveryDay(timeRes, workflow)
+			self.CheckTimeAndDateEveryDayAction(timeRes, workflow)
 		}
 		if action.Name == "Every hour at" {
-			self.executeActiveActionsEveryHour(timeRes, workflow)
+			self.CheckTimeAndDateEveryHourAction(timeRes, workflow)
 		}
 		if action.Name == "Every day of the week at" {
-			self.executeActiveActionsEveryWeekAt(timeRes, workflow)
+			self.CheckTimeAndDateEveryWeekAtAction(timeRes, workflow)
 		}
 		if action.Name == "Every month on the" {
-			self.executeActiveActionsEveryMonthOnThe(timeRes, workflow)
+			self.CheckTimeAndDateEveryMonthOnTheAction(timeRes, workflow)
 		}
 		if action.Name == "Every year on" {
-			self.executeActiveActionsEveryYearOn(timeRes, workflow)
+			self.CheckTimeAndDateEveryYearOnAction(timeRes, workflow)
 		}
 	}
 	return nil
 }
 
-func (self *WorkflowService) CallTimeApi() error {
+func (self *WorkflowService) CheckTimeAndDateActions() error {
 	var timeRes entities.TimeResponse
 
 	timeRes, errRequest := self.ServiceService.RequestToTimeApi()
@@ -318,7 +318,7 @@ func (self *WorkflowService) CallTimeApi() error {
 	}
 
 	for _, action := range allActionsFound {
-		errCheckName := self.checkNameOfAction(timeRes, action)
+		errCheckName := self.CheckWorkflowsWithTimeAndDateActions(timeRes, action)
 		if errCheckName != nil {
 			return errCheckName
 		}
@@ -326,138 +326,129 @@ func (self *WorkflowService) CallTimeApi() error {
 	return nil
 }
 
-func (self *WorkflowService) CheckLenValue(workflow entities.Workflow, lenActualTurn float64, newData string) (bool, error) {
-	var isActionTriggered bool
-
+func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
 	workflow.ActionData = make(map[string]interface{})
 	lenLastTurn, lenLastTurnExists := workflow.ActionData["len"]
 	if !lenLastTurnExists {
 		workflow.ActionData["len"] = lenActualTurn
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return isActionTriggered, err
+			return err
 		}
-		return isActionTriggered, nil
+		return nil
 	}
 
 	if lenLastTurn.(float64) < lenActualTurn {
-		isActionTriggered = true
 		workflow.ActionData["len"] = lenActualTurn
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return isActionTriggered, err
+			return err
 		}
-		fmt.Println(newData)
+		self.CheckSpotifyReactions(workflow)
+		self.CheckDiscordReactions(workflow)
 	}
-	return isActionTriggered, nil
+	return nil
 }
 
-func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) (bool, error) {
-	var isActionTriggered bool
+func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
 	var repositories []entities.GithubRepository
 
 	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/user/repos", "GET", accessBearer, accessToken, nil)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&repositories)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
-	return self.CheckLenValue(workflow, float64(len(repositories)), "new repository!")
+	return self.CheckActionDataLen(workflow, float64(len(repositories)))
 }
 
-func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) (bool, error) {
-	var isActionTriggered bool
+func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
 	var issues []entities.GithubIssue
 
 	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/issues", "GET", accessBearer, accessToken, nil)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&issues)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
-	return self.CheckLenValue(workflow, float64(len(issues)), "new issue!")
+	return self.CheckActionDataLen(workflow, float64(len(issues)))
 }
 
-func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) (bool, error) {
-	var isActionTriggered bool
+func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) error {
 	var pullRequests []entities.GithubRepository
 
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
-		return isActionTriggered, fmt.Errorf("Invalid repository")
+		return fmt.Errorf("Invalid repository")
 	}
 
 	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "pulls"
 	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&pullRequests)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
-	return self.CheckLenValue(workflow, float64(len(pullRequests)), "new pull request!")
+	return self.CheckActionDataLen(workflow, float64(len(pullRequests)))
 }
 
-func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workflow, accessToken string) (bool, error) {
-	var isActionTriggered bool
+func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workflow, accessToken string) error {
 	var branches []entities.GithubBranch
 
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
-		return isActionTriggered, fmt.Errorf("Invalid repository")
+		return fmt.Errorf("Invalid repository")
 	}
 
 	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "branches"
 	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&branches)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
-	return self.CheckLenValue(workflow, float64(len(branches)), "new branch!")
+	return self.CheckActionDataLen(workflow, float64(len(branches)))
 }
 
-func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workflow, accessToken string) (bool, error) {
-	var isActionTriggered bool
+func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workflow, accessToken string) error {
 	var commits []entities.GithubCommit
 
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
-		return isActionTriggered, fmt.Errorf("Invalid repository")
+		return fmt.Errorf("Invalid repository")
 	}
 
 	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "commits"
 	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&commits)
 	if err != nil {
-		return isActionTriggered, err
+		return err
 	}
 
-	return self.CheckLenValue(workflow, float64(len(commits)), "new commit!")
+	return self.CheckActionDataLen(workflow, float64(len(commits)))
 }
 
 func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Action) error {
-	var isActionTriggered bool
-
 	workflows, err := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if err != nil {
 		return err
@@ -468,45 +459,25 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 		if err != nil {
 			return err
 		}
-
 		accessToken, err := self.UserServiceService.CallApiAndRefresh(user.Email, user.ConnectionType, "Github")
 		if err != nil {
 			return err
 		}
 
 		if action.Name == "New repository" {
-			isActionTriggered, err = self.CheckGithubNewRepositoryAction(workflow, accessToken)
-			if err != nil {
-				return err
-			}
+			self.CheckGithubNewRepositoryAction(workflow, accessToken)
 		}
 		if action.Name == "New issue assignated" {
-			isActionTriggered, err = self.CheckGithubNewIssueAction(workflow, accessToken)
-			if err != nil {
-				return err
-			}
+			self.CheckGithubNewIssueAction(workflow, accessToken)
 		}
 		if action.Name == "New pull request" {
-			isActionTriggered, err = self.CheckGithubNewPullRequestAction(workflow, accessToken)
-			if err != nil {
-				return err
-			}
+			self.CheckGithubNewPullRequestAction(workflow, accessToken)
 		}
 		if action.Name == "New branch" {
-			isActionTriggered, err = self.CheckGithubNewBranchAction(workflow, accessToken)
-			if err != nil {
-				return err
-			}
+			self.CheckGithubNewBranchAction(workflow, accessToken)
 		}
 		if action.Name == "New commit" {
-			isActionTriggered, err = self.CheckGithubNewCommitAction(workflow, accessToken)
-			if err != nil {
-				return err
-			}
-		}
-		if isActionTriggered {
-			self.executeSpotifyReactions(workflow)
-			self.executeDiscordReactions(workflow)
+			self.CheckGithubNewCommitAction(workflow, accessToken)
 		}
 	}
 	return nil

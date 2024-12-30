@@ -22,7 +22,7 @@ func main() {
 	cronJob := cron.New()
 
 	_, errCronCreation := cronJob.AddFunc("@every 1m", func() {
-		err := services.WorkflowService.CallTimeApi()
+		err := services.WorkflowService.CheckTimeAndDateActions()
 		if err != nil {
 			fmt.Println("Call Time API Failed")
 		}
