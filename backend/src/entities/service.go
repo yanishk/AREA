@@ -1,18 +1,12 @@
 package entities
 
 type Service struct {
-	Id           string
-	Name         string
-	Color        string
-	Logo         string
-	HasActions   bool
-	HasReactions bool
-}
-
-type ServiceUsefulInformations struct {
-	Name  string
-	Color string
-	Logo  string
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Color        string `json:"color"`
+	Logo         string `json:"logo"`
+	HasActions   bool   `json:"hasactions"`
+	HasReactions bool   `json:"hasreactions"`
 }
 
 type ResultToken struct {
@@ -36,4 +30,17 @@ type TimeResponse struct {
 	Year      int    `json:"year"`
 	Hour      int    `json:"hour"`
 	Minute    int    `json:"minute"`
+}
+
+type SubredditResponse struct {
+	Data struct {
+		Children []struct {
+			Data struct {
+				ID     string `json:"id"`
+				Title  string `json:"title"`
+				Author string `json:"author"`
+				URL    string `json:"url"`
+			} `json:"data"`
+		} `json:"children"`
+	} `json:"data"`
 }

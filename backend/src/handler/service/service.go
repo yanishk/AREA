@@ -17,19 +17,9 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const callbackTypeParamName = "callback-type"
-const appTypeParamName = "app-type"
-
-const botBearer = "Bot "
-const accessBearer = "Bearer "
-
 const InternalServerErrorMessage = "Internal server error"
-const InvalidCallbackTypeMessage = "Invalid callback type"
-const InvalidAppTypeMessage = "Invalid app type"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
-
-const authURL = "auth-url"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -49,10 +39,7 @@ func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
 func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/Spotify/:callback-type/:app-type", self.OAuth2Spotify)
-		authentication.GET("/Google/:callback-type/:app-type", self.OAuth2Google)
-		authentication.GET("/Discord/:callback-type/:app-type", self.OAuth2Discord)
-		authentication.GET("/Github/:callback-type/:app-type", self.OAuth2Github)
+		authentication.GET("/:service/:callback-type/:app-type", self.OAuth2Service)
 	}
 }
 
@@ -63,305 +50,50 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
+	private.GET("/service/retrieve", self.RetrieveServiceById)
 	private.GET("/actions-services", self.RetrieveActionsServices)
 	private.GET("/reactions-services", self.RetrieveReactionsServices)
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 }
 
-// @Summary		Discord User Servers
-// @Description	Retrieve the discord servers from the authenticated user
-// @Tags			Services
-// @Produce		json
-// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
-// @Router			/Discord/user/servers [get]
-func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
-	email := context.GetString("email")
-	connectionType := context.GetString("connectionType")
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
-	if errRefreshing != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
-		})
-		return
-	}
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", accessBearer, accessToken, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	var guilds []map[string]interface{}
-	var ownedServers []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-
-	for _, guild := range guilds {
-		if guild["owner"] == true {
-			ownedServers = append(ownedServers, guild)
-		}
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"servers": ownedServers,
-	})
-}
-
-// @Summary		Discord Server Channels
-// @Description	Retrieve the channels from the selected server
-// @Tags			Services
-// @Produce		json
-// @Param        id  query      string  true  "server id"
-// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
-// @Router /Discord/server/channels [get]
-func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
-	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	guildId := context.Query("id")
-	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", botBearer, tokenBot, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	var channels []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"channels": channels,
-	})
-}
-
-// @Summary		Google OAuth2
-// @Description	Get Google OAuth2 URL
+// @Summary		Service OAuth2
+// @Description	Get Service OAuth2 URL
 // @Tags			Services Authentication
 // @Produce		json
+// @Param        service  path      string  true  "Service name (Github, Spotify, Discord..)"
 // @Param        callback-type  path      string  true  "Callback type (login or service)"
 // @Param        app-type  path      string  true  "App type (web or mobile)"
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Google/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Google(context *gin.Context) {
-	var callbackLink string
-	var appTypeLink string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
-
-	if callbackType == "login" {
-		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
-	} else if callbackType == "service" {
-		callbackLink = os.Getenv("GOOGLE_SERVICE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
-
-	if appType == "web" {
-		appTypeLink = os.Getenv("GOOGLE_WEB_CLIENT_ID")
-	} else if appType == "mobile" {
-		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
-
-	googleAuthUrl := "https://accounts.google.com/o/oauth2/auth?client_id=" +
-		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
-		callbackLink + "&scope=email"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: googleAuthUrl,
-	})
-}
-
-// @Summary		Spotify OAuth2
-// @Description	Get Spotify OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Spotify/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Spotify(context *gin.Context) {
-	var callbackLink string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
-
-	if callbackType == "login" {
-		callbackLink = os.Getenv("SPOTIFY_LOGIN_CALLBACK")
-	} else if callbackType == "service" {
-		callbackLink = os.Getenv("SPOTIFY_SERVICE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
+// @Router			/authentication/{service}/{callback-type}/{app-type} [get]
+func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
+	serviceName := context.Param("service")
+	callbackType := context.Param("callback-type")
+	appType := context.Param("app-type")
 
 	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
+			"error": "Invalid app type",
 		})
-		return
 	}
-
-	spotifyAuthUrl := "https://accounts.spotify.com/authorize?client_id=" +
-		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: spotifyAuthUrl,
-	})
-}
-
-// @Summary		Discord OAuth2
-// @Description	Get Discord OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Discord/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Discord(context *gin.Context) {
-	var callbackLink string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
-
-	if callbackType == "login" {
-		callbackLink = os.Getenv("DISCORD_LOGIN_CALLBACK")
-	} else if callbackType == "service" {
-		callbackLink = os.Getenv("DISCORD_SERVICE_CALLBACK")
-	} else {
+	if callbackType != "login" && callbackType != "service" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
+			"error": "Invalid callback type",
 		})
-		return
 	}
 
-	if appType != "web" && appType != "mobile" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
-	discordAuthUrl := "https://discord.com/oauth2/authorize?client_id=" +
-		os.Getenv("DISCORD_CLIENT_ID") +
-		"&permissions=141376&response_type=code&redirect_uri=" +
-		callbackLink +
-		"&scope=identify+email+guilds+bot"
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: discordAuthUrl,
-	})
-}
-
-// @Summary		Github OAuth2
-// @Description	Get Github OAuth2 URL
-// @Tags			Services Authentication
-// @Produce		json
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
-// @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
-// @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/Github/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Github(context *gin.Context) {
-	var callbackLink string
-	var clientID string
-	callbackType := context.Param(callbackTypeParamName)
-	appType := context.Param(appTypeParamName)
-
-	if callbackType == "login" {
-		clientID = os.Getenv("GITHUB_LOGIN_CLIENT_ID")
-		callbackLink = os.Getenv("GITHUB_LOGIN_CALLBACK")
-	} else if callbackType == "service" {
-		clientID = os.Getenv("GITHUB_SERVICE_CLIENT_ID")
-		callbackLink = os.Getenv("GITHUB_SERVICE_CALLBACK")
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
-
-	if appType != "web" && appType != "mobile" {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidCallbackTypeMessage,
-		})
-		return
-	}
-
-	githubAuthUrl := "https://github.com/login/oauth/authorize?" +
-		"client_id=" + clientID +
-		"&redirect_uri=" + callbackLink +
-		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
-		"&state=" + os.Getenv("GITHUB_STATE")
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		authURL: githubAuthUrl,
-	})
-}
-
-// @Summary		Actions Services
-// @Description	Retrieve services with actions available
-// @Tags			Services
-// @Produce		json
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/actions-services [get]
-func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
-	actionsServices, err := self.ServiceService.RetrieveActionsServices()
+	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)
 	if err != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Unknown service",
 		})
 		return
 	}
-	context.IndentedJSON(http.StatusOK, actionsServices)
-}
 
-// @Summary		Reactions Services
-// @Description	Retrieve services with reactions available
-// @Tags			Services
-// @Produce		json
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/reactions-services [get]
-func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
-	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
-	if err != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
-		})
-		return
-	}
-	context.IndentedJSON(http.StatusOK, reactionsServices)
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"auth-url": authUrl,
+	})
 }
 
 // @Summary		Actions From Service
@@ -409,5 +141,156 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"reactions": reactions,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by id
+// @Tags			Services
+// @Produce		json
+// @Param        id     query     string  true  "Service id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/service/retrieve [get]
+func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
+	serviceId := context.Query("id")
+	if serviceId == "" {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid service id",
+		})
+		return
+	}
+
+	service, err := self.ServiceService.FindServiceById(serviceId)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve requested service",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
+	})
+}
+
+// @Summary		Actions Services
+// @Description	Retrieve services with actions available
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/actions-services [get]
+func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+	actionsServices, err := self.ServiceService.RetrieveActionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, actionsServices)
+}
+
+// @Summary		Reactions Services
+// @Description	Retrieve services with reactions available
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/reactions-services [get]
+func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": InternalServerErrorMessage,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, reactionsServices)
+}
+
+// @Summary		Discord User Servers
+// @Description	Retrieve the discord servers from the authenticated user
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
+// @Router			/Discord/user/servers [get]
+func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
+	if errRefreshing != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve or refresh the token",
+		})
+		return
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailedMessage,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var guilds []map[string]interface{}
+	var ownedServers []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getUserServersFailedMessage,
+		})
+		return
+	}
+
+	for _, guild := range guilds {
+		if guild["owner"] == true {
+			ownedServers = append(ownedServers, guild)
+		}
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"servers": ownedServers,
+	})
+}
+
+// @Summary		Discord Server Channels
+// @Description	Retrieve the channels from the selected server
+// @Tags			Services
+// @Produce		json
+// @Param        id  query      string  true  "server id"
+// @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
+// @Router /Discord/server/channels [get]
+func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
+	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
+	guildId := context.Query("id")
+	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailedMessage,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	var channels []map[string]interface{}
+	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
+	if errDecoder != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailedMessage,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"channels": channels,
 	})
 }

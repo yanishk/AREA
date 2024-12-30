@@ -41,9 +41,9 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType
 	if errFindingUser != nil {
 		return errFindingUser
 	}
-	errCreationWorkflow := self.WorkflowRepository.CreateWorkflow(newWorkflow.NameWorkflow,
+	errCreationWorkflow := self.WorkflowRepository.CreateWorkflow(newWorkflow.Name,
 		userFound.Id, newWorkflow.ActionId, newWorkflow.ReactionId,
-		newWorkflow.ActionParam, newWorkflow.ReactionParam)
+		newWorkflow.ActionParam, newWorkflow.ReactionParam, newWorkflow.ActionData)
 	if errCreationWorkflow != nil {
 		return errCreationWorkflow
 	}
@@ -63,15 +63,34 @@ func (self *WorkflowService) GetUserWorkflows(email string, connectionType strin
 	return retrievedWorkflow, nil
 }
 
-func (self *WorkflowService) ActivateDeactivateWorkflow(workflowActivation entities.ChangeActivationWorkflow) error {
-	foundWorkflow, errFetchWorkflow := self.WorkflowRepository.FindWorkflowById(workflowActivation.WorkflowId)
-	if errFetchWorkflow != nil {
-		return errFetchWorkflow
+func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error {
+	updatedWorkflow, err := self.WorkflowRepository.FindWorkflowById(workflowId)
+	if err != nil {
+		return err
 	}
 
-	errUpdate := self.WorkflowRepository.ActivateDeactivateWorkflow(workflowActivation.WorkflowId, foundWorkflow.IsActivated)
-	if errUpdate != nil {
-		return errUpdate
+	if workflow.Name != nil {
+		updatedWorkflow.Name = *workflow.Name
+	}
+	if workflow.ActionId != nil {
+		updatedWorkflow.ActionId = *workflow.ActionId
+	}
+	if workflow.ReactionId != nil {
+		updatedWorkflow.ReactionId = *workflow.ReactionId
+	}
+	if workflow.IsActivated != nil {
+		updatedWorkflow.IsActivated = *workflow.IsActivated
+	}
+	if workflow.ActionParam != nil {
+		updatedWorkflow.ActionParam = *workflow.ActionParam
+	}
+	if workflow.ReactionParam != nil {
+		updatedWorkflow.ReactionParam = *workflow.ReactionParam
+	}
+
+	err = self.WorkflowRepository.UpdateWorkflow(workflowId, updatedWorkflow)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -127,7 +146,9 @@ func (self *WorkflowService) executeSpotifyReactions(workflow entities.Workflow)
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	return fmt.Errorf("Unknown reaction")
 }
 
@@ -298,6 +319,102 @@ func (self *WorkflowService) CallTimeApi() error {
 
 	for _, action := range allActionsFound {
 		errCheckName := self.checkNameOfAction(timeRes, action)
+		if errCheckName != nil {
+			return errCheckName
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string) (entities.SubredditResponse, error) {
+	var result entities.SubredditResponse
+	url := "https://oauth.reddit.com/" + subreddit + "/new.json?limit=1"
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", accessBearer+accessToken)
+	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	resp, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
+	}
+
+	if len(result.Data.Children) == 0 {
+		return result, fmt.Errorf("Could not retrieve post from the specified subreddit")
+	}
+	return result, nil
+}
+
+func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.Workflow) error {
+	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
+	if errUser != nil {
+		return fmt.Errorf("Error finding user")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	subreddit, subredditExists := workflow.ActionParam["subreddit"]
+	if !subredditExists {
+		return fmt.Errorf("Could not find the subreddit field")
+	}
+
+	result, err := self.retrieveSubredditInfo(subreddit.(string), accessToken)
+	if err != nil {
+		return err
+	}
+
+	latestPost := result.Data.Children[0].Data
+	idLatest, idLatestExist := workflow.ActionData["id"]
+
+	if !idLatestExist || idLatest != latestPost.ID {
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["id"] = latestPost.ID
+
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return fmt.Errorf("Could not update workflow")
+		}
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
+
+	for _, workflow := range allWorkflowsFound {
+		if action.Name == "Any new post in subreddit" {
+			return self.executeNewPostInSubredditAction(workflow)
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) CallRedditApi() error {
+	serviceFound, errFindingService := self.ServiceService.FindServiceByName("Reddit")
+	if errFindingService != nil {
+		return errFindingService
+	}
+
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	if errFindingActions != nil {
+		return errFindingActions
+	}
+
+	for _, action := range allActionsFound {
+		errCheckName := self.checkNameOfActionReddit(action)
 		if errCheckName != nil {
 			return errCheckName
 		}

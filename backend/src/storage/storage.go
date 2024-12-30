@@ -14,15 +14,18 @@ type UserRepository interface {
 
 type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
+	FindServiceById(id string) (entities.Service, error)
 	FindServiceByName(name string) (entities.Service, error)
-	FindActionsServices() ([]entities.ServiceUsefulInformations, error)
-	FindReactionsServices() ([]entities.ServiceUsefulInformations, error)
+	FindServices() ([]entities.Service, error)
+	FindActionsServices() ([]entities.Service, error)
+	FindReactionsServices() ([]entities.Service, error)
 }
 
 type UserServiceRepository interface {
 	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
 	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
 	UpdateUserServiceByServiceIdAndUserId(userId string, accessToken string, refreshToken string, expiryDate string, serviceId string) error
+	DeleteUserServiceByUserId(userId string) error
 }
 
 type ReactionRepository interface {
@@ -39,13 +42,14 @@ type ActionRepository interface {
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}) error
+	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
 	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
 	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
 	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
-	ActivateDeactivateWorkflow(workflowId string, isActivated bool) error
+	UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error
 	FindWorkflowById(workflowId string) (entities.Workflow, error)
 	DeleteWorkflow(workflowId string, ownerId string) error
+	DeleteWorkflowByOwnerId(ownerId string) error
 }
 
 type Repository struct {

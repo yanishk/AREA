@@ -1,20 +1,14 @@
 definitions:
-  docs_service.ActionExample:
+  docs_about.AboutGetAboutInternalServerErrorResponse:
     properties:
-      Description:
-        example: This Trigger fires every single day at a specific time set by you.
+      error:
+        example: Could not retrieve informations about the server
         type: string
-      Id:
-        example: 2685fc54-d1e2-43d8-9525-56ab7a91e351
-        type: string
-      Name:
-        example: Every day at
-        type: string
-      ServiceId:
-        example: 203a1f6a-b2d7-4011-a73b-e9585907835b
-        type: string
-      nbParam:
-        type: integer
+    type: object
+  docs_about.AboutGetAboutSuccessResponse:
+    properties:
+      about:
+        $ref: '#/definitions/entities.About'
     type: object
   docs_service.DiscordChannelExample:
     properties:
@@ -86,36 +80,6 @@ definitions:
       permissions:
         type: string
     type: object
-  docs_service.ReactionExample:
-    properties:
-      Description:
-        example: Start a new context or resume current playback on the user’s active
-          device. Only available for Spotify premium accounts.
-        type: string
-      Id:
-        example: 5dccb0f3-64db-4456-8286-4678857ae394
-        type: string
-      Name:
-        example: Start playback
-        type: string
-      ServiceId:
-        example: 4f6f8655-8e0f-4f96-ba7f-d3cab1577b74
-        type: string
-      nbParam:
-        type: integer
-    type: object
-  docs_service.ServiceExample:
-    properties:
-      Color:
-        example: '#E84A4A'
-        type: string
-      Logo:
-        example: assets/logos/Google.webp
-        type: string
-      Name:
-        example: Google
-        type: string
-    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -152,7 +116,7 @@ definitions:
   docs_service.ServiceOAuth2BadRequestResponse:
     properties:
       error:
-        example: Invalid callback type-Invalid app type
+        example: Invalid callback type-Invalid app type-Unknown service
         type: string
     type: object
   docs_service.ServiceOAuth2SuccessResponse:
@@ -165,22 +129,39 @@ definitions:
     properties:
       actions:
         items:
-          $ref: '#/definitions/docs_service.ActionExample'
+          $ref: '#/definitions/entities.Action'
         type: array
     type: object
   docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
     properties:
       services:
         items:
-          $ref: '#/definitions/docs_service.ServiceExample'
+          $ref: '#/definitions/entities.Service'
         type: array
     type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
       reactions:
         items:
-          $ref: '#/definitions/docs_service.ReactionExample'
+          $ref: '#/definitions/entities.Reaction'
         type: array
+    type: object
+  docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
+    properties:
+      error:
+        example: Invalid service id
+        type: string
+    type: object
+  docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve requested service
+        type: string
+    type: object
+  docs_service.ServiceRetrieveServiceByIdSuccessResponse:
+    properties:
+      service:
+        $ref: '#/definitions/entities.Service'
     type: object
   docs_user.UserDeleteAccountInternalServerErrorResponse:
     properties:
@@ -378,47 +359,6 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_workflow.WorkflowExample:
-    properties:
-      actionId:
-        type: string
-      actionparam:
-        additionalProperties: true
-        type: object
-      createdAt:
-        type: string
-      id:
-        type: string
-      isActivated:
-        type: boolean
-      name:
-        type: string
-      ownerId:
-        type: string
-      reactionId:
-        type: string
-      reactionparam:
-        additionalProperties: true
-        type: object
-    type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse:
-    properties:
-      error:
-        example: Invalid request body
-        type: string
-    type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not update workflow's activation status
-        type: string
-    type: object
-  docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse:
-    properties:
-      success:
-        example: Successfully updates workflow's activation status
-        type: string
-    type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
     properties:
       error:
@@ -429,7 +369,7 @@ definitions:
     properties:
       workflows:
         items:
-          $ref: '#/definitions/docs_workflow.WorkflowExample'
+          $ref: '#/definitions/entities.Workflow'
         type: array
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
@@ -439,9 +379,83 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  entities.ChangeActivationWorkflow:
+  docs_workflow.WorkflowUpdateWorkflowBadRequestResponse:
     properties:
+      error:
+        example: Invalid workflow id-Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not update workflow
+        type: string
+    type: object
+  docs_workflow.WorkflowUpdateWorkflowSuccessResponse:
+    properties:
+      success:
+        example: Workflow successfully updated
+        type: string
+    type: object
+  entities.About:
+    properties:
+      client:
+        $ref: '#/definitions/entities.AboutClient'
+      server:
+        $ref: '#/definitions/entities.AboutServer'
+    type: object
+  entities.AboutAction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutClient:
+    properties:
+      host:
+        type: string
+    type: object
+  entities.AboutReaction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutServer:
+    properties:
+      current_time:
+        type: integer
+      services:
+        items:
+          $ref: '#/definitions/entities.AboutService'
+        type: array
+    type: object
+  entities.AboutService:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/entities.AboutAction'
+        type: array
+      name:
+        type: string
+      reactions:
+        items:
+          $ref: '#/definitions/entities.AboutReaction'
+        type: array
+    type: object
+  entities.Action:
+    properties:
+      description:
+        type: string
       id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      serviceid:
         type: string
     type: object
   entities.NewWorkflow:
@@ -451,6 +465,51 @@ definitions:
       actionparam:
         additionalProperties: true
         type: object
+      name:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
+  entities.Reaction:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      serviceid:
+        type: string
+    type: object
+  entities.Service:
+    properties:
+      color:
+        type: string
+      hasactions:
+        type: boolean
+      hasreactions:
+        type: boolean
+      id:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.UpdatedWorkflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      isactivated:
+        type: boolean
       name:
         type: string
       reactionid:
@@ -472,6 +531,29 @@ definitions:
         type: string
       password:
         type: string
+    type: object
+  entities.Workflow:
+    properties:
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      createdat:
+        type: string
+      id:
+        type: string
+      isactivated:
+        type: boolean
+      name:
+        type: string
+      ownerid:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
     type: object
 host: localhost:8080
 info:
@@ -564,6 +646,23 @@ paths:
       summary: Discord User Servers
       tags:
       - Services
+  /about.json:
+    get:
+      description: Get about.json file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
+      summary: About.json
+      tags:
+      - About.json
   /actions-services:
     get:
       description: Retrieve services with actions available
@@ -581,10 +680,15 @@ paths:
       summary: Actions Services
       tags:
       - Services
-  /authentication/Discord/{callback-type}/{app-type}:
+  /authentication/{service}/{callback-type}/{app-type}:
     get:
-      description: Get Discord OAuth2 URL
+      description: Get Service OAuth2 URL
       parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: path
+        name: service
+        required: true
+        type: string
       - description: Callback type (login or service)
         in: path
         name: callback-type
@@ -606,91 +710,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Discord OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Github/{callback-type}/{app-type}:
-    get:
-      description: Get Github OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Github OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Google/{callback-type}/{app-type}:
-    get:
-      description: Get Google OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Google OAuth2
-      tags:
-      - Services Authentication
-  /authentication/Spotify/{callback-type}/{app-type}:
-    get:
-      description: Get Spotify OAuth2 URL
-      parameters:
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Spotify OAuth2
+      summary: Service OAuth2
       tags:
       - Services Authentication
   /login:
@@ -852,6 +872,33 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
+  /service/retrieve:
+    get:
+      description: Retrieve service by id
+      parameters:
+      - description: Service id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
   /user/delete-account:
     delete:
       consumes:
@@ -961,7 +1008,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse'
       summary: Create Workflow
       tags:
-      - Workflow
+      - Workflows
   /workflow/delete:
     delete:
       description: Delete a user's workflow by specifying the workflow id
@@ -992,35 +1039,7 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse'
       summary: Delete Workflow
       tags:
-      - Workflow
-  /workflow/modify-activation:
-    put:
-      description: Modify the activation status of the specified workflow
-      parameters:
-      - description: Workflow informations
-        in: body
-        name: workflow
-        required: true
-        schema:
-          $ref: '#/definitions/entities.ChangeActivationWorkflow'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse'
-      summary: Modify Workflow Activation Status
-      tags:
-      - Workflow
+      - Workflows
   /workflow/retrieve:
     get:
       description: Retrieve the workflows of the user actually connected
@@ -1041,5 +1060,38 @@ paths:
             $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
       summary: Retrieve User's Workflows
       tags:
-      - Workflow
+      - Workflows
+  /workflow/update:
+    put:
+      description: Update a user's workflow by specifying the workflow id
+      parameters:
+      - description: Workflow id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Workflow informations
+        in: body
+        name: workflow
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UpdatedWorkflow'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowBadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse'
+      summary: Update Workflow
+      tags:
+      - Workflows
 swagger: "2.0"

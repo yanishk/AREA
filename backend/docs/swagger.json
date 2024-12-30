@@ -67,6 +67,32 @@
                 }
             }
         },
+        "/about.json": {
+            "get": {
+                "description": "Get about.json file",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About.json"
+                ],
+                "summary": "About.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/actions-services": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -93,143 +119,24 @@
                 }
             }
         },
-        "/authentication/Discord/{callback-type}/{app-type}": {
+        "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
-                "description": "Get Discord OAuth2 URL",
+                "description": "Get Service OAuth2 URL",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Services Authentication"
                 ],
-                "summary": "Discord OAuth2",
+                "summary": "Service OAuth2",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
                         "in": "path",
                         "required": true
                     },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Github/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Github OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Github OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Google/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Google OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Google OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/Spotify/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Spotify OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services Authentication"
-                ],
-                "summary": "Spotify OAuth2",
-                "parameters": [
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
@@ -501,6 +408,47 @@
                 }
             }
         },
+        "/service/retrieve": {
+            "get": {
+                "description": "Retrieve service by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/delete-account": {
             "delete": {
                 "description": "Delete the user account",
@@ -627,7 +575,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Create Workflow",
                 "parameters": [
@@ -676,7 +624,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Delete Workflow",
                 "parameters": [
@@ -716,49 +664,6 @@
                 }
             }
         },
-        "/workflow/modify-activation": {
-            "put": {
-                "description": "Modify the activation status of the specified workflow",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflow"
-                ],
-                "summary": "Modify Workflow Activation Status",
-                "parameters": [
-                    {
-                        "description": "Workflow informations",
-                        "name": "workflow",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.ChangeActivationWorkflow"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/workflow/retrieve": {
             "get": {
                 "description": "Retrieve the workflows of the user actually connected",
@@ -766,7 +671,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Workflow"
+                    "Workflows"
                 ],
                 "summary": "Retrieve User's Workflows",
                 "responses": {
@@ -786,6 +691,56 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/update": {
+            "put": {
+                "description": "Update a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Update Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Workflow informations",
+                        "name": "workflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.UpdatedWorkflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowUpdateWorkflowSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowUpdateWorkflowBadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -863,27 +818,20 @@
         }
     },
     "definitions": {
-        "docs_service.ActionExample": {
+        "docs_about.AboutGetAboutInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "Description": {
+                "error": {
                     "type": "string",
-                    "example": "This Trigger fires every single day at a specific time set by you."
-                },
-                "Id": {
-                    "type": "string",
-                    "example": "2685fc54-d1e2-43d8-9525-56ab7a91e351"
-                },
-                "Name": {
-                    "type": "string",
-                    "example": "Every day at"
-                },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "203a1f6a-b2d7-4011-a73b-e9585907835b"
-                },
-                "nbParam": {
-                    "type": "integer"
+                    "example": "Could not retrieve informations about the server"
+                }
+            }
+        },
+        "docs_about.AboutGetAboutSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "$ref": "#/definitions/entities.About"
                 }
             }
         },
@@ -994,47 +942,6 @@
                 }
             }
         },
-        "docs_service.ReactionExample": {
-            "type": "object",
-            "properties": {
-                "Description": {
-                    "type": "string",
-                    "example": "Start a new context or resume current playback on the user’s active device. Only available for Spotify premium accounts."
-                },
-                "Id": {
-                    "type": "string",
-                    "example": "5dccb0f3-64db-4456-8286-4678857ae394"
-                },
-                "Name": {
-                    "type": "string",
-                    "example": "Start playback"
-                },
-                "ServiceId": {
-                    "type": "string",
-                    "example": "4f6f8655-8e0f-4f96-ba7f-d3cab1577b74"
-                },
-                "nbParam": {
-                    "type": "integer"
-                }
-            }
-        },
-        "docs_service.ServiceExample": {
-            "type": "object",
-            "properties": {
-                "Color": {
-                    "type": "string",
-                    "example": "#E84A4A"
-                },
-                "Logo": {
-                    "type": "string",
-                    "example": "assets/logos/Google.webp"
-                },
-                "Name": {
-                    "type": "string",
-                    "example": "Google"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1089,7 +996,7 @@
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid callback type-Invalid app type"
+                    "example": "Invalid callback type-Invalid app type-Unknown service"
                 }
             }
         },
@@ -1108,7 +1015,7 @@
                 "actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ActionExample"
+                        "$ref": "#/definitions/entities.Action"
                     }
                 }
             }
@@ -1119,7 +1026,7 @@
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceExample"
+                        "$ref": "#/definitions/entities.Service"
                     }
                 }
             }
@@ -1130,8 +1037,34 @@
                 "reactions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ReactionExample"
+                        "$ref": "#/definitions/entities.Reaction"
                     }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid service id"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve requested service"
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveServiceByIdSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "$ref": "#/definitions/entities.Service"
                 }
             }
         },
@@ -1423,67 +1356,6 @@
                 }
             }
         },
-        "docs_workflow.WorkflowExample": {
-            "type": "object",
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                },
-                "actionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isActivated": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ownerId": {
-                    "type": "string"
-                },
-                "reactionId": {
-                    "type": "string"
-                },
-                "reactionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid request body"
-                }
-            }
-        },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not update workflow's activation status"
-                }
-            }
-        },
-        "docs_workflow.WorkflowModifyWorkflowActivationStatusSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Successfully updates workflow's activation status"
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1499,7 +1371,7 @@
                 "workflows": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                        "$ref": "#/definitions/entities.Workflow"
                     }
                 }
             }
@@ -1513,10 +1385,124 @@
                 }
             }
         },
-        "entities.ChangeActivationWorkflow": {
+        "docs_workflow.WorkflowUpdateWorkflowBadRequestResponse": {
             "type": "object",
             "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid workflow id-Invalid request body"
+                }
+            }
+        },
+        "docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not update workflow"
+                }
+            }
+        },
+        "docs_workflow.WorkflowUpdateWorkflowSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Workflow successfully updated"
+                }
+            }
+        },
+        "entities.About": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/entities.AboutClient"
+                },
+                "server": {
+                    "$ref": "#/definitions/entities.AboutServer"
+                }
+            }
+        },
+        "entities.AboutAction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutClient": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutReaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutServer": {
+            "type": "object",
+            "properties": {
+                "current_time": {
+                    "type": "integer"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutService"
+                    }
+                }
+            }
+        },
+        "entities.AboutService": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutAction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutReaction"
+                    }
+                }
+            }
+        },
+        "entities.Action": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
                     "type": "string"
                 }
             }
@@ -1530,6 +1516,74 @@
                 "actionparam": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "entities.Reaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "hasactions": {
+                    "type": "boolean"
+                },
+                "hasreactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.UpdatedWorkflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "isactivated": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -1562,6 +1616,40 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.Workflow": {
+            "type": "object",
+            "properties": {
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isactivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerid": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

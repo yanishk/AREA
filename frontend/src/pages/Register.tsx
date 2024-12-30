@@ -1,7 +1,7 @@
-import { faGoogle, faFacebookF, faApple, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faApple, faSpotify, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../components/errors/ErrorMessage";
 import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import SocialButton from "../components/buttons/SocialButton";
@@ -9,12 +9,14 @@ import CallToActionLink from "../components/CallToActionLink";
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { handleOAuthLogin } from '../OAuth';
 
 const RegisterForm = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [errorTrigger, setErrorTrigger] = useState(0);
 
     const navigate = useNavigate();
 
@@ -45,33 +47,24 @@ const RegisterForm = () => {
                 setEmail("");
                 setPassword("");
                 setError("The email and password don't match");
+                setErrorTrigger(Date.now());
             }
         } catch (error) {
             setEmail("");
             setPassword("");
             setError("The email and password don't match");
+            setErrorTrigger(Date.now());
         }
     }
 
-    const handleGoogleRegister = () => {
-        return;
-    };
-
-    const handleFacebookRegister = () => {
-        return;
-    };
-
-    const handleTwitterRegister = () => {
-        return;
-    };
-
-    const handleAppleRegister = () => {
-        return;
-    };
+    const handleErrorClose = () => {
+        setError("");
+        setErrorTrigger(0);
+    }
 
     return (
         <>
-            <ErrorMessage message={error} />
+            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
@@ -122,22 +115,22 @@ const RegisterForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
-                        onClick={handleGoogleRegister}
+                        onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
-                        icon={faFacebookF}
-                        bgColor="bg-[#3B579D]"
-                        hoverColor="hover:bg-[#4C6AAE]"
-                        text="Continue with Facebook"
-                        onClick={handleFacebookRegister}
+                        icon={faSpotify}
+                        bgColor="bg-[#20ca5d]"
+                        hoverColor="hover:bg-[#20d561]"
+                        text="Continue with Spotify"
+                        onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
-                        icon={faXTwitter}
-                        bgColor="bg-[#A9A9A9]"
-                        hoverColor="hover:bg-[#B8B8B8]"
-                        text="Continue with X"
+                        icon={faDiscord}
+                        bgColor="bg-[#7189DA]"
+                        hoverColor="hover:bg-[#7a90da]"
+                        text="Continue with Discord"
                         iconPosition="left-[27px]"
-                        onClick={handleTwitterRegister}
+                        onClick={() => handleOAuthLogin("Discord")}
                     />
                     <SocialButton
                         icon={faApple}
@@ -146,7 +139,7 @@ const RegisterForm = () => {
                         text="Continue with Apple"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={handleAppleRegister}
+                        onClick={() => handleOAuthLogin("")}
                     />
 
                     <div
@@ -157,7 +150,6 @@ const RegisterForm = () => {
                             underlinedText="Log in here."
                         />
                     </div>
-
 
                 </div>
             </div>
