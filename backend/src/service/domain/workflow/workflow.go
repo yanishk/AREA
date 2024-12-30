@@ -345,12 +345,12 @@ func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.Re
 	if err != nil {
 		return result, err
 	}
+	defer resp.Body.Close()
 
 	errDecode := json.NewDecoder(resp.Body).Decode(&result)
 	if errDecode != nil {
 		return result, errDecode
 	}
-	defer resp.Body.Close()
 
 	if len(result.Data.Children) == 0 {
 		return result, fmt.Errorf("Could not retrieve post")
@@ -466,9 +466,9 @@ func (self *WorkflowService) CallRedditApi() error {
 		return errFindingService
 	}
 
-	allActionsFound, errFindingaction := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
-	if errFindingaction != nil {
-		return errFindingaction
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	if errFindingActions != nil {
+		return errFindingActions
 	}
 
 	for _, action := range allActionsFound {
