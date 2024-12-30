@@ -326,8 +326,8 @@ func (self *WorkflowService) CallTimeApi() error {
 	return nil
 }
 
-func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string) (entities.SubredditResponse, error) {
-	var result entities.SubredditResponse
+func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string) (entities.RedditPostResponse, error) {
+	var result entities.RedditPostResponse
 	url := "https://oauth.reddit.com/" + subreddit + "/new.json?limit=1"
 
 	req, _ := http.NewRequest("GET", url, nil)
@@ -371,6 +371,10 @@ func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.W
 		return err
 	}
 
+	if len(result.Data.Children) == 0 {
+		return fmt.Errorf("No posts found in subreddit")
+	}
+
 	latestPost := result.Data.Children[0].Data
 	idLatest, idLatestExist := workflow.ActionData["id"]
 
@@ -388,6 +392,72 @@ func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.W
 	return nil
 }
 
+func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
+	var resultMe entities.RedditUsername
+	var resultPost entities.RedditPostResponse
+	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
+	if errUser != nil {
+		return fmt.Errorf("Error finding user")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
+	if errRefreshing != nil {
+		return errRefreshing
+	}
+
+	urlMe := "https://oauth.reddit.com/api/v1/me"
+	req, _ := http.NewRequest("GET", urlMe, nil)
+	req.Header.Add("Authorization", accessBearer+accessToken)
+	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	resp, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return err
+	}
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&resultMe)
+	if errDecode != nil {
+		return errDecode
+	}
+	defer resp.Body.Close()
+
+	urlPostMe := "https://oauth.reddit.com/user/" + resultMe.Name + "/submitted?limit=1"
+	reqPostMe, _ := http.NewRequest("GET", urlPostMe, nil)
+	reqPostMe.Header.Add("Authorization", accessBearer+accessToken)
+	reqPostMe.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	respPostMe, err := self.ServiceService.ExecuteRequest(reqPostMe)
+	if err != nil {
+		return err
+	}
+
+	errDecodeMe := json.NewDecoder(respPostMe.Body).Decode(&resultPost)
+	if errDecodeMe != nil {
+		return errDecodeMe
+	}
+	defer respPostMe.Body.Close()
+
+	if len(resultPost.Data.Children) == 0 {
+		return fmt.Errorf("No posts found for user")
+	}
+
+	idLatest, idLatestExist := workflow.ActionData["id"]
+	latestPost := resultPost.Data.Children[0].Data
+
+	if !idLatestExist || idLatest != latestPost.ID {
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["id"] = latestPost.ID
+
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return fmt.Errorf("Could not update workflow")
+		}
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
+	}
+
+	return nil
+}
+
 func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
@@ -396,7 +466,10 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 
 	for _, workflow := range allWorkflowsFound {
 		if action.Name == "Any new post in subreddit" {
-			return self.executeNewPostInSubredditAction(workflow)
+			self.executeNewPostInSubredditAction(workflow)
+		}
+		if action.Name == "New post by you" {
+			self.executeNewPostByMeAction(workflow)
 		}
 	}
 	return nil
