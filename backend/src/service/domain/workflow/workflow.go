@@ -378,6 +378,26 @@ func (self *WorkflowService) getRedditComments(url, accessToken string) (entitie
 	return result, nil
 }
 
+func (self *WorkflowService) getRedditVotes(url, accessToken string) (entities.RedditVoteResponse, error) {
+	var result entities.RedditVoteResponse
+
+	resp, err := self.executeGetRedditRequest(url, accessToken)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
+	}
+
+	if len(result.Data.Children) == 0 {
+		return result, fmt.Errorf("Could not retrieve votes")
+	}
+	return result, nil
+}
+
 func (self *WorkflowService) getUsernameReddit(accessToken string, workflow entities.Workflow) (entities.RedditUsername, error) {
 	var result entities.RedditUsername
 	url := "https://oauth.reddit.com/api/v1/me"
@@ -431,6 +451,27 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 	}
 
 	if idLatestExist && idLatest != latestComment.ID {
+		self.executeSpotifyReactions(workflow)
+		self.executeDiscordReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entities.RedditVoteResponse) error {
+	latestVote := result.Data.Children[0].Data
+	idLatest, idLatestExist := workflow.ActionData["id"]
+
+	if !idLatestExist || idLatest != latestVote.ID {
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["id"] = latestVote.ID
+
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return fmt.Errorf("Could not update workflow")
+		}
+	}
+
+	if idLatestExist && idLatest != latestVote.ID {
 		self.executeSpotifyReactions(workflow)
 		self.executeDiscordReactions(workflow)
 	}
@@ -498,6 +539,21 @@ func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, wor
 	return self.isANewComment(workflow, resultPost)
 }
 
+func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + voteType + "?limit=1"
+	resultPost, err := self.getRedditVotes(urlPostMe, accessToken)
+	if err != nil {
+		return err
+	}
+
+	return self.isANewVote(workflow, resultPost)
+}
+
 func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
@@ -518,7 +574,12 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 		if action.Name == "New comment by you" {
 			self.executeNewCommentByMeAction(accessToken, workflow)
 		}
-
+		if action.Name == "New downvoted post by you" {
+			self.executeVoteByMeAction("/downvoted", accessToken, workflow)
+		}
+		if action.Name == "New upvoted post by you" {
+			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
+		}
 	}
 	return nil
 }
