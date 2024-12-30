@@ -23,6 +23,10 @@ type WorkflowService struct {
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
+const errorUpdatingWorkflows = "Could not update workflow"
+
+const redditUserRoute = "https://oauth.reddit.com/user/"
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
@@ -425,7 +429,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -446,7 +450,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -467,7 +471,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -515,7 +519,7 @@ func (self *WorkflowService) executeNewPostByMeAction(accessToken string, workfl
 		return err
 	}
 
-	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/submitted?limit=1"
+	urlPostMe := redditUserRoute + resultUsername.Name + "/submitted?limit=1"
 	resultPost, err := self.getRedditPost(urlPostMe, accessToken)
 	if err != nil {
 		return err
@@ -530,7 +534,7 @@ func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, wor
 		return err
 	}
 
-	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/comments?limit=1"
+	urlPostMe := redditUserRoute + resultUsername.Name + "/comments?limit=1"
 	resultPost, err := self.getRedditComments(urlPostMe, accessToken)
 	if err != nil {
 		return err
@@ -545,7 +549,7 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 		return err
 	}
 
-	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + voteType + "?limit=1"
+	urlPostMe := redditUserRoute + resultUsername.Name + voteType + "?limit=1"
 	resultPost, err := self.getRedditVotes(urlPostMe, accessToken)
 	if err != nil {
 		return err
