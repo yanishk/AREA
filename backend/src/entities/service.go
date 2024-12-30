@@ -32,7 +32,7 @@ type TimeResponse struct {
 	Minute    int    `json:"minute"`
 }
 
-type SubredditResponse struct {
+type RedditPostResponse struct {
 	Data struct {
 		Children []struct {
 			Data struct {
@@ -43,4 +43,8 @@ type SubredditResponse struct {
 			} `json:"data"`
 		} `json:"children"`
 	} `json:"data"`
+}
+
+type RedditUsername struct {
+	Name string `json:"name"`
 }
