@@ -25,6 +25,8 @@ const accessBearer = "Bearer "
 
 const errorUpdatingWorkflows = "Could not update workflow"
 
+const redditUserRoute = "https://oauth.reddit.com/user/"
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
@@ -517,7 +519,7 @@ func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, wor
 		return err
 	}
 
-	url := "https://oauth.reddit.com/user/" + resultUsername.Name + "/comments?limit=1"
+	url := redditUserRoute + resultUsername.Name + "/comments?limit=1"
 	result, err := self.getRedditComments(url, accessToken)
 	if err != nil {
 		return err
@@ -532,7 +534,7 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 		return err
 	}
 
-	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + voteType + "?limit=1"
+	urlPostMe := redditUserRoute + resultUsername.Name + voteType + "?limit=1"
 	resultPost, err := self.getRedditVotes(urlPostMe, accessToken)
 	if err != nil {
 		return err
@@ -547,7 +549,7 @@ func (self *WorkflowService) executePostAction(postType, accessToken string, wor
 		return err
 	}
 
-	url := "https://oauth.reddit.com/user/" + resultUsername.Name + postType + "?limit=1"
+	url := redditUserRoute + resultUsername.Name + postType + "?limit=1"
 	result, err := self.getRedditPost(url, accessToken)
 	if err != nil {
 		return err
@@ -571,22 +573,18 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 		if err != nil {
 			continue
 		}
-		if action.Name == "Any new post in subreddit" {
+		switch action.Name {
+		case "Any new post in subreddit":
 			self.executeNewPostInSubredditAction(accessToken, workflow)
-		}
-		if action.Name == "New post by you" {
+		case "New post by you":
 			self.executePostAction("/submitted", accessToken, workflow)
-		}
-		if action.Name == "New comment by you" {
+		case "New comment by you":
 			self.executeNewCommentByMeAction(accessToken, workflow)
-		}
-		if action.Name == "New downvoted post by you" {
+		case "New downvoted post by you":
 			self.executeVoteByMeAction("/downvoted", accessToken, workflow)
-		}
-		if action.Name == "New upvoted post by you" {
+		case "New upvoted post by you":
 			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
-		}
-		if action.Name == "New post saved by you" {
+		case "New post saved by you":
 			self.executePostAction("/saved", accessToken, workflow)
 		}
 	}
