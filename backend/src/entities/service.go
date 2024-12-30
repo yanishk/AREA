@@ -31,3 +31,16 @@ type TimeResponse struct {
 	Hour      int    `json:"hour"`
 	Minute    int    `json:"minute"`
 }
+
+type SubredditResponse struct {
+	Data struct {
+		Children []struct {
+			Data struct {
+				ID     string `json:"id"`
+				Title  string `json:"title"`
+				Author string `json:"author"`
+				URL    string `json:"url"`
+			} `json:"data"`
+		} `json:"children"`
+	} `json:"data"`
+}
