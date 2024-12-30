@@ -44,18 +44,42 @@ class MyWorkflowsfunctions {
     return -1;
   }
 
+  static String getServiceIdWithActionId(String actionId) {
+    String serviceID = "";
+    for (int i = 0; i < Globaldata.actionServicesActions.length; i++) {
+      if (Globaldata.actionServicesActions[i].id == actionId) {
+        serviceID = Globaldata.actionServicesActions[i].serviceid;
+      }
+    }
+    if (serviceID != "") {
+      return serviceID;
+    }
+    for (int i = 0; i < Globaldata.reactionServicesReaction.length; i++) {
+      if (Globaldata.reactionServicesReaction[i].id == actionId) {
+        serviceID = Globaldata.reactionServicesReaction[i].serviceid;
+      }
+    }
+    return serviceID;
+  }
+
   static Color getServiceColorById (String serviceId) {
-    developer.log("Globaldata.actionServicesID: ${Globaldata.actionServicesID}");
-    int localActionId = getServiceLocalId(serviceId, Globaldata.actionServicesID);
-    int localReactionId = getServiceLocalId(serviceId, Globaldata.reactionServicesID);
+    int localActionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.actionServicesID);
     if (localActionId != -1) {
-      developer.log("serviceId : $serviceId");
       return HexColor(Globaldata.actionServicesColor[localActionId]);
     }
-    if (localReactionId != -1) {
-      return HexColor(Globaldata.reactionServicesColor[localReactionId]);
-    }
     return Colors.black;
+  }
+
+  static String getServiceLogoRoute (String serviceId) {
+    int localActionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.actionServicesID);
+    int localReactionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.reactionServicesID);
+    if (localActionId != -1) {
+      return Globaldata.actionServicesIcons[localActionId];
+    }
+    if (localReactionId != -1) {
+      return Globaldata.reactionServicesIcons[localReactionId];
+    }
+    return "";
   }
 
   static void storeServiceDescription(dynamic responseData, List<Widget> cardList, String workflowsResponseName, Future<void> onTapFunction(int index), String email) {

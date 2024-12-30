@@ -10,6 +10,7 @@ import "../globalData.dart";
 import "../explore/explorePage.dart";
 import "../apiCall/apiRequest.dart";
 import "loginNavigator.dart";
+import "loadActionOrReaction.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -36,6 +37,20 @@ class LoadService extends State<APICall> {
   bool isInit = true;
   bool hasToRetry = false;
 
+  Future<void> getWorkflows(String route, String service) async {
+    String getServiceActionOrReactionRoute = "/actions";
+    if (route != actionsServices) {
+      getServiceActionOrReactionRoute = "/reactions";
+    }
+    final response = await MyWorkflowsfunctions.getWorkflowsResponse(service + getServiceActionOrReactionRoute);
+    if (response == null) {
+      return;
+    }
+    setState(() {
+      MyWorkflowsfunctions.storeServiceDescription(response, service);
+    });
+  }
+
   void storeData(List<String> servicesName, List<String> servicesColor,
       List<String> servicesIcons, List<String> servicesID, dynamic service) {
     servicesName.add(service['name']);
@@ -50,6 +65,7 @@ class LoadService extends State<APICall> {
       final service = responseData[i];
       if (service is Map<String, dynamic>) {
         result = service['name'] ?? 'No Name';
+        getWorkflows(route, result);
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
             Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);

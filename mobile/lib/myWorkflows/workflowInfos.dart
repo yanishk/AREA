@@ -11,6 +11,7 @@ import "myWorkflowsData.dart";
 import 'workflowsWidget.dart';
 import "myWorkflowsFunctions.dart";
 import 'deleteWorkflow.dart';
+import "../globalData.dart";
 
 class WorkflowInfosPage extends StatelessWidget {
   @override
@@ -31,7 +32,7 @@ class WorkflowInfosAPICall extends StatefulWidget {
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
   String email = "";
-  Color backgroundColor = Color.fromARGB(255, 63, 68, 69);
+  Color backgroundColor = MyWorkflowsfunctions.getServiceColorById(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID);
   bool editNameMode = false;
   String editNameButtonText = "Edit name";
   String modifDate = "";
@@ -202,27 +203,33 @@ class WorkflowInfosTitle extends StatelessWidget {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            LeftWidget(
-              child: GoBackArrow(),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GoBackArrow(),
+                  EditWheel(),
+                ],
+              ),
             ),
             Padding(padding: EdgeInsets.only(top: 10)),
             LeftWidget(
                 child: Row(
               children: [
-                // SafeWebImage(
-                //   url:
-                //       "${Globaldata.domainName}${Globaldata.actionServicesIcons[Globaldata.firstService]}",
-                //   width: 30,
-                //   height: 30,
-                // ),
+                SafeWebImage(
+                  url:
+                      "${Globaldata.domainName}${MyWorkflowsfunctions.getServiceLogoRoute(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)}",
+                  width: 50,
+                  height: 50,
+                ),
                 Padding(padding: EdgeInsets.only(left: 10)),
-                // SafeWebImage(
-                //   url:
-                //       "${Globaldata.domainName}${Globaldata.reactionServicesIcons[Globaldata.secondService]}",
-                //   width: 30,
-                //   height: 30,
-                // ),
+                SafeWebImage(
+                  url:
+                      "${Globaldata.domainName}${MyWorkflowsfunctions.getServiceLogoRoute(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].reactionId)}",
+                  width: 50,
+                  height: 50,
+                ),
               ],
             )),
             Padding(padding: EdgeInsets.only(top: 5)),
@@ -232,7 +239,7 @@ class WorkflowInfosTitle extends StatelessWidget {
               child: CustomClassicForm(
                 controller: workflowTitleController,
                 maxLines: 5,
-                hint: 'Email',
+                hint: '',
                 padding:
                     EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 borderWidth: 5,
