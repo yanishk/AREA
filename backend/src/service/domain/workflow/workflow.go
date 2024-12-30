@@ -512,34 +512,19 @@ func (self *WorkflowService) executeNewPostInSubredditAction(accessToken string,
 	return self.isANewPost(workflow, result)
 }
 
-func (self *WorkflowService) executeNewPostByMeAction(accessToken string, workflow entities.Workflow) error {
-	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
-	if err != nil {
-		return err
-	}
-
-	urlPostMe := redditUserRoute + resultUsername.Name + "/submitted?limit=1"
-	resultPost, err := self.getRedditPost(urlPostMe, accessToken)
-	if err != nil {
-		return err
-	}
-
-	return self.isANewPost(workflow, resultPost)
-}
-
 func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
 	}
 
-	urlPostMe := redditUserRoute + resultUsername.Name + "/comments?limit=1"
-	resultPost, err := self.getRedditComments(urlPostMe, accessToken)
+	url := redditUserRoute + resultUsername.Name + "/comments?limit=1"
+	result, err := self.getRedditComments(url, accessToken)
 	if err != nil {
 		return err
 	}
 
-	return self.isANewComment(workflow, resultPost)
+	return self.isANewComment(workflow, result)
 }
 
 func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
@@ -557,6 +542,25 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 	return self.isANewVote(workflow, resultPost)
 }
 
+func (self *WorkflowService) executePostAction(postType, accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	url := redditUserRoute + resultUsername.Name + postType + "?limit=1"
+	result, err := self.getRedditPost(url, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if len(result.Data.Children) == 0 {
+		return fmt.Errorf("No posts found")
+	}
+
+	return self.isANewPost(workflow, result)
+}
+
 func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
@@ -568,20 +572,19 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 		if err != nil {
 			continue
 		}
-		if action.Name == "Any new post in subreddit" {
+		switch action.Name {
+		case "Any new post in subreddit":
 			self.executeNewPostInSubredditAction(accessToken, workflow)
-		}
-		if action.Name == "New post by you" {
-			self.executeNewPostByMeAction(accessToken, workflow)
-		}
-		if action.Name == "New comment by you" {
+		case "New post by you":
+			self.executePostAction("/submitted", accessToken, workflow)
+		case "New comment by you":
 			self.executeNewCommentByMeAction(accessToken, workflow)
-		}
-		if action.Name == "New downvoted post by you" {
+		case "New downvoted post by you":
 			self.executeVoteByMeAction("/downvoted", accessToken, workflow)
-		}
-		if action.Name == "New upvoted post by you" {
+		case "New upvoted post by you":
 			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
+		case "New post saved by you":
+			self.executePostAction("/saved", accessToken, workflow)
 		}
 	}
 	return nil
