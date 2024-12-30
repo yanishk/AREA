@@ -20,6 +20,7 @@ type UserInfo struct {
 	Email string `json:"email"`
 }
 
+// Time & Date
 type TimeResponse struct {
 	Timezone  string `json:"timezone"`
 	Formatted string `json:"formatted"`
@@ -30,4 +31,25 @@ type TimeResponse struct {
 	Year      int    `json:"year"`
 	Hour      int    `json:"hour"`
 	Minute    int    `json:"minute"`
+}
+
+// Github
+type GithubRepository struct {
+	Name        string `json:"full_name"`
+}
+
+type GithubPullRequest struct {
+	Number        int `json:"number"`
+}
+
+type GithubBranch struct {
+	Name        string `json:"name"`
+}
+
+type GithubCommit struct {
+	Message        string `json:"message"`
+}
+
+type GithubIssue struct {
+	Title  string `json:"title"`
 }
