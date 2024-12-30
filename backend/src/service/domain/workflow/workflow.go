@@ -407,6 +407,9 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 		if err != nil {
 			return fmt.Errorf("Could not update workflow")
 		}
+	}
+
+	if idLatestExist && idLatest != latestPost.ID {
 		self.executeSpotifyReactions(workflow)
 		self.executeDiscordReactions(workflow)
 	}
@@ -425,6 +428,9 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 		if err != nil {
 			return fmt.Errorf("Could not update workflow")
 		}
+	}
+
+	if idLatestExist && idLatest != latestComment.ID {
 		self.executeSpotifyReactions(workflow)
 		self.executeDiscordReactions(workflow)
 	}
