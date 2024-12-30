@@ -392,8 +392,28 @@ func (self *WorkflowService) executeNewPostInSubredditAction(workflow entities.W
 	return nil
 }
 
+func (self *WorkflowService) getUsernameReddit(accessToken string, workflow entities.Workflow) (entities.RedditUsername, error) {
+	var result entities.RedditUsername
+	url := "https://oauth.reddit.com/api/v1/me"
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", accessBearer+accessToken)
+	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	resp, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return result, err
+	}
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
+	}
+	defer resp.Body.Close()
+	return result, nil
+}
+
 func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
-	var resultMe entities.RedditUsername
 	var resultPost entities.RedditPostResponse
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
 	if errUser != nil {
@@ -404,23 +424,12 @@ func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow
 		return errRefreshing
 	}
 
-	urlMe := "https://oauth.reddit.com/api/v1/me"
-	req, _ := http.NewRequest("GET", urlMe, nil)
-	req.Header.Add("Authorization", accessBearer+accessToken)
-	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
-
-	resp, err := self.ServiceService.ExecuteRequest(req)
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
 	}
 
-	errDecode := json.NewDecoder(resp.Body).Decode(&resultMe)
-	if errDecode != nil {
-		return errDecode
-	}
-	defer resp.Body.Close()
-
-	urlPostMe := "https://oauth.reddit.com/user/" + resultMe.Name + "/submitted?limit=1"
+	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/submitted?limit=1"
 	reqPostMe, _ := http.NewRequest("GET", urlPostMe, nil)
 	reqPostMe.Header.Add("Authorization", accessBearer+accessToken)
 	reqPostMe.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
