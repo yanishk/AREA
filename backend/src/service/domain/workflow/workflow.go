@@ -201,8 +201,7 @@ func (self *WorkflowService) executeActiveActionsEveryDay(timeRes entities.TimeR
 	}
 
 	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -214,8 +213,7 @@ func (self *WorkflowService) executeActiveActionsEveryHour(timeRes entities.Time
 	}
 
 	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -236,8 +234,7 @@ func (self *WorkflowService) executeActiveActionsEveryWeekAt(timeRes entities.Ti
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
 			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			self.executeSpotifyReactions(workflow)
-			self.executeDiscordReactions(workflow)
+			self.executeReactions(workflow)
 		}
 	}
 
@@ -254,8 +251,7 @@ func (self *WorkflowService) executeActiveActionsEveryMonthOnThe(timeRes entitie
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -271,8 +267,7 @@ func (self *WorkflowService) executeActiveActionsEveryYearOn(timeRes entities.Ti
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -434,8 +429,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 	}
 
 	if idLatestExist && idLatest != latestPost.ID {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -455,8 +449,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 	}
 
 	if idLatestExist && idLatest != latestComment.ID {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -476,8 +469,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 	}
 
 	if idLatestExist && idLatest != latestVote.ID {
-		self.executeSpotifyReactions(workflow)
-		self.executeDiscordReactions(workflow)
+		self.executeReactions(workflow)
 	}
 	return nil
 }
@@ -609,4 +601,9 @@ func (self *WorkflowService) CallRedditApi() error {
 		}
 	}
 	return nil
+}
+
+func (self *WorkflowService) executeReactions(workflow entities.Workflow) {
+	self.executeSpotifyReactions(workflow)
+	self.executeDiscordReactions(workflow)
 }
