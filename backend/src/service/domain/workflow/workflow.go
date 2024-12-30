@@ -342,7 +342,7 @@ func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Wo
 		return isActionTriggered, err
 	}
 
-	if lenRepo != 0 && lenRepo < len(repositories) {
+	if lenRepo < len(repositories)  {
 		lenRepo = len(repositories)
 		isActionTriggered = true
 	} else {
@@ -382,6 +382,96 @@ func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.W
 	return isActionTriggered, nil
 }
 
+var lenBranches int
+
+func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workflow, accessToken string) (bool, error) {
+	var isActionTriggered bool
+
+	repository, ok := workflow.ActionParam["repository"]
+	if !ok {
+		return isActionTriggered, fmt.Errorf("Invalid repository")
+	}
+
+	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "branches"
+	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	var branches []entities.GithubBranch
+	err = json.NewDecoder(resp.Body).Decode(&branches)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	if lenBranches < len(branches) {
+		lenBranches = len(branches)
+		isActionTriggered = true
+		fmt.Println("new branch!")
+	} else {
+		lenBranches = len(branches)
+	}
+	return isActionTriggered, nil
+}
+
+var lenCommits int
+
+func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workflow, accessToken string) (bool, error) {
+	var isActionTriggered bool
+
+	repository, ok := workflow.ActionParam["repository"]
+	if !ok {
+		return isActionTriggered, fmt.Errorf("Invalid repository")
+	}
+
+	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "commits"
+	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	var commits []entities.GithubCommit
+	err = json.NewDecoder(resp.Body).Decode(&commits)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	if lenCommits < len(commits) {
+		lenCommits = len(commits)
+		isActionTriggered = true
+		fmt.Println("new commit!")
+	} else {
+		lenCommits = len(commits)
+	}
+	return isActionTriggered, nil
+}
+
+var lenIssues int
+
+func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) (bool, error) {
+	var isActionTriggered bool
+
+	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/issues", "GET", accessBearer, accessToken, nil)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	var issues []entities.GithubIssue
+	err = json.NewDecoder(resp.Body).Decode(&issues)
+	if err != nil {
+		return isActionTriggered, err
+	}
+
+	if lenIssues < len(issues) {
+		lenIssues = len(issues)
+		isActionTriggered = true
+		fmt.Println("new commit!")
+	} else {
+		lenIssues = len(issues)
+	}
+	return isActionTriggered, nil
+}
+
 func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Action) error {
 	var isActionTriggered bool
 
@@ -409,6 +499,24 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 		}
 		if action.Name == "New pull request" {
 			isActionTriggered, err = self.CheckGithubNewPullRequestAction(workflow, accessToken)
+			if err != nil {
+				return err
+			}
+		}
+		if action.Name == "New branch" {
+			isActionTriggered, err = self.CheckGithubNewBranchAction(workflow, accessToken)
+			if err != nil {
+				return err
+			}
+		}
+		if action.Name == "New commit" {
+			isActionTriggered, err = self.CheckGithubNewCommitAction(workflow, accessToken)
+			if err != nil {
+				return err
+			}
+		}
+		if action.Name == "New issue assignated" {
+			isActionTriggered, err = self.CheckGithubNewIssueAction(workflow, accessToken)
 			if err != nil {
 				return err
 			}

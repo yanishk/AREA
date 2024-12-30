@@ -40,3 +40,15 @@ type GithubRepository struct {
 type GithubPullRequest struct {
 	Number        int `json:"number"`
 }
+
+type GithubBranch struct {
+	Name        string `json:"name"`
+}
+
+type GithubCommit struct {
+	Message        string `json:"message"`
+}
+
+type GithubIssue struct {
+	Title  string `json:"title"`
+}
