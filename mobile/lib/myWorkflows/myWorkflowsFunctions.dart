@@ -66,13 +66,13 @@ class MyWorkflowsfunctions {
         final actionResponse = actions.removeLast();
         if (actionResponse is Map<String, dynamic>) {
           MyWorkflowsData.allWorkflowsData.add(WorkflowsData.optional(
-            actionResponse['Id'] ?? '',
-            actionResponse['Name'] ?? '',
-            actionResponse['OwnerId'] ?? '',
-            actionResponse['ActionId'] ?? '',
-            actionResponse['ReactionId'] ?? '',
-            actionResponse['IsActivated'] ?? false,
-            actionResponse['CreatedAt'] ?? '',
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['ownerid'] ?? '',
+            actionResponse['actionid'] ?? '',
+            actionResponse['reactionid'] ?? '',
+            actionResponse['isactivated'] ?? false,
+            actionResponse['createdat'] ?? '',
             actionResponse['actionparam'] ?? '',
             actionResponse['reactionparam'] ?? '',
           ));

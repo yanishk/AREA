@@ -38,10 +38,10 @@ class LoadService extends State<APICall> {
 
   void storeData(List<String> servicesName, List<String> servicesColor,
       List<String> servicesIcons, List<String> servicesID, dynamic service) {
-    servicesName.add(service['Name']);
-    servicesColor.add(service['Color']);
-    servicesIcons.add(service['Logo']);
-    servicesID.add(service['Id']);
+    servicesName.add(service['name']);
+    servicesColor.add(service['color']);
+    servicesIcons.add(service['logo']);
+    servicesID.add(service['id']);
   }
 
   void setStoreData(dynamic responseData, String route) {
@@ -49,7 +49,7 @@ class LoadService extends State<APICall> {
     for (int i = 0; i < allResponse.length; i++) {
       final service = responseData[i];
       if (service is Map<String, dynamic>) {
-        result = service['Name'] ?? 'No Name';
+        result = service['name'] ?? 'No Name';
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
             Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);

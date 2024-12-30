@@ -83,11 +83,11 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         if (actionResponse is Map<String, dynamic>) {
           actionDescription = actionResponse['Description'] ?? 'No Description';
           actionOrReactionList.add(ActionOrReactionData.optional(
-            actionResponse['Id'] ?? '',
-            actionResponse['Name'] ?? '',
-            actionResponse['Description'] ?? '',
-            actionResponse['ServiceId'] ?? '',
-            actionResponse['NbParam'] ?? 0,
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['description'] ?? '',
+            actionResponse['serviceid'] ?? '',
+            actionResponse['nbparam'] ?? 0,
           ));
           ActionOrReactionButtonsList.add(
             actionOrReactionButtons(actionOrReactionList.length - 1),
