@@ -27,6 +27,7 @@ type ServiceService interface {
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
