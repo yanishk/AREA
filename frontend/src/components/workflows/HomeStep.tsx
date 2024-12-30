@@ -117,7 +117,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                         color={selectedServiceAction?.color || ""}
                         iconPath={selectedServiceAction?.iconPath || ""}
                         onEdit={isActionTriggerable ? handleOnEditAction : () => {}}
-                        onEditFalse={!isActionTriggerable}
+                        isEdit={isActionTriggerable}
                         onDelete={handleOnDeleteAction}
                     />
                 ) : (
@@ -139,7 +139,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                         color={selectedServiceReaction?.color || ""}
                         iconPath={selectedServiceReaction?.iconPath || ""}
                         onEdit={handleOnEditReaction}
-                        onEditFalse={!isReactionTriggerable}
+                        isEdit={isReactionTriggerable}
                         onDelete={handleOnDeleteReaction}
                     />
                 ) : (
@@ -148,7 +148,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                             goToStep(5)
                         }
                         text="Then That"
-                        disabled={!selectedAction}
+                        isDisabled={!selectedAction}
                     />
                 )}
             </div>

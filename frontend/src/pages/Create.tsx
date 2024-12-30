@@ -134,14 +134,17 @@ const WorkflowBuilder = () => {
                     withCredentials: true,
             });
 
-            if (result) {
-                const propertiesServices = result.data.map((service: any) => ({
-                    name: service.name,
-                    color: service.color,
-                    iconPath: service.logo,
-                }));
-                setActionServices(propertiesServices);
+            if (!result) {
+                console.error("Error fetching services");
+                return;
             }
+
+            const propertiesServices = result.data.map((service: any) => ({
+                name: service.name,
+                color: service.color,
+                iconPath: service.logo,
+            }));
+            setActionServices(propertiesServices);
         } catch (err) {
             console.error("Error fetching services:", err);
         }
@@ -153,21 +156,22 @@ const WorkflowBuilder = () => {
                     withCredentials: true,
                 });
 
-            if (result) {
-                const dataKey = "actions";
-
-                if (Array.isArray(result.data[dataKey])) {
-                    const actions = result.data[dataKey].map((element: any) => ({
-                        name: element.name,
-                        description: element.description,
-                        id: element.id,
-                    }));
-                    setAvailableActions(actions);
-                } else {
-                    console.error(`Error for ${dataKey}:`, result.data[dataKey]);
-                }
-            } else {
+            if (!result) {
                 console.error("Unexpected API response", result);
+                return;
+            }
+
+            const dataKey = "actions";
+
+            if (Array.isArray(result.data[dataKey])) {
+                const actions = result.data[dataKey].map((element: any) => ({
+                    name: element.name,
+                    description: element.description,
+                    id: element.id,
+                }));
+                setAvailableActions(actions);
+            } else {
+                console.error(`Error for ${dataKey}:`, result.data[dataKey]);
             }
         }
         catch (err) {
@@ -181,14 +185,17 @@ const WorkflowBuilder = () => {
                     withCredentials: true,
             });
 
-            if (result) {
-                const propertiesServices = result.data.map((service: any) => ({
-                    name: service.name,
-                    color: service.color,
-                    iconPath: service.logo,
-                }));
-                setReactionServices(propertiesServices);
+            if (!result) {
+                console.error("Error fetching services:");
+                return;
             }
+
+            const propertiesServices = result.data.map((service: any) => ({
+                name: service.name,
+                color: service.color,
+                iconPath: service.logo,
+            }));
+            setReactionServices(propertiesServices);
         } catch (err) {
             console.error("Error fetching services:", err);
         }
@@ -200,21 +207,22 @@ const WorkflowBuilder = () => {
                     withCredentials: true,
                 });
 
-            if (result) {
-                const dataKey = "reactions";
+            if (!result) {
+                console.error("Unexpected API response");
+                return;
+            }
 
-                if (Array.isArray(result.data[dataKey])) {
-                    const reactions = result.data[dataKey].map((element: any) => ({
-                        name: element.name,
-                        description: element.description,
-                        id: element.id,
-                    }));
-                    setAvailableReactions(reactions);
-                } else {
-                    console.error(`Error for ${dataKey}:`, result.data[dataKey]);
-                }
+            const dataKey = "reactions";
+
+            if (Array.isArray(result.data[dataKey])) {
+                const reactions = result.data[dataKey].map((element: any) => ({
+                    name: element.name,
+                    description: element.description,
+                    id: element.id,
+                }));
+                setAvailableReactions(reactions);
             } else {
-                console.error("Unexpected API response", result);
+                console.error(`Error for ${dataKey}:`, result.data[dataKey]);
             }
         }
         catch (err) {
@@ -453,9 +461,12 @@ const WorkflowBuilder = () => {
             const decodedState = decodeState(state);
             updateStateFromDecoded(decodedState);
 
-            if (codeAuth) {
-                await handleServiceCallback(codeAuth, decodedState?.serviceType);
+            if (!codeAuth) {
+                console.error("Error with fetching code from url");
+                return;
             }
+
+            await handleServiceCallback(codeAuth, decodedState?.serviceType);
 
             clearUrlParams();
         };
