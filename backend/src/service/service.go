@@ -47,6 +47,7 @@ type WorkflowService interface {
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
 	CallTimeApi() error
 	CallRedditApi() error
+	CallWeatherApi() error
 }
 
 type AboutService interface {
