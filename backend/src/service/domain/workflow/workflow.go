@@ -413,8 +413,32 @@ func (self *WorkflowService) getUsernameReddit(accessToken string, workflow enti
 	return result, nil
 }
 
-func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
+func (self *WorkflowService) getUserPost(username, accessToken string, workflow entities.Workflow) (entities.RedditPostResponse, error) {
 	var resultPost entities.RedditPostResponse
+
+	urlPostMe := "https://oauth.reddit.com/user/" + username + "/submitted?limit=1"
+	reqPostMe, _ := http.NewRequest("GET", urlPostMe, nil)
+	reqPostMe.Header.Add("Authorization", accessBearer+accessToken)
+	reqPostMe.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
+
+	respPostMe, err := self.ServiceService.ExecuteRequest(reqPostMe)
+	if err != nil {
+		return resultPost, err
+	}
+
+	errDecodeMe := json.NewDecoder(respPostMe.Body).Decode(&resultPost)
+	if errDecodeMe != nil {
+		return resultPost, errDecodeMe
+	}
+	defer respPostMe.Body.Close()
+
+	if len(resultPost.Data.Children) == 0 {
+		return resultPost, fmt.Errorf("No posts found for user")
+	}
+	return resultPost, nil
+}
+
+func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow) error {
 	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
 	if errUser != nil {
 		return fmt.Errorf("Error finding user")
@@ -429,24 +453,9 @@ func (self *WorkflowService) executeNewPostByMeAction(workflow entities.Workflow
 		return err
 	}
 
-	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/submitted?limit=1"
-	reqPostMe, _ := http.NewRequest("GET", urlPostMe, nil)
-	reqPostMe.Header.Add("Authorization", accessBearer+accessToken)
-	reqPostMe.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
-
-	respPostMe, err := self.ServiceService.ExecuteRequest(reqPostMe)
+	resultPost, err := self.getUserPost(resultUsername.Name, accessToken, workflow)
 	if err != nil {
 		return err
-	}
-
-	errDecodeMe := json.NewDecoder(respPostMe.Body).Decode(&resultPost)
-	if errDecodeMe != nil {
-		return errDecodeMe
-	}
-	defer respPostMe.Body.Close()
-
-	if len(resultPost.Data.Children) == 0 {
-		return fmt.Errorf("No posts found for user")
 	}
 
 	idLatest, idLatestExist := workflow.ActionData["id"]
