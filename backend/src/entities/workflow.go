@@ -10,6 +10,7 @@ type Workflow struct {
 	CreatedAt     string                 `json:"createdat"`
 	ActionParam   map[string]interface{} `json:"actionparam"`
 	ReactionParam map[string]interface{} `json:"reactionparam"`
+	ActionData    map[string]interface{} `json:"actiondata"`
 }
 
 type NewWorkflow struct {
@@ -18,6 +19,7 @@ type NewWorkflow struct {
 	ReactionId    string                 `json:"reactionid"`
 	ActionParam   map[string]interface{} `json:"actionparam"`
 	ReactionParam map[string]interface{} `json:"reactionparam"`
+	ActionData    map[string]interface{} `json:"actiondata"`
 }
 
 type UpdatedWorkflow struct {
