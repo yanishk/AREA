@@ -29,7 +29,6 @@ const HomePage = () => {
         let serviceName = null;
 
         if (!stateParam) {
-            console.error("Failed to get state param");
             return;
         }
 

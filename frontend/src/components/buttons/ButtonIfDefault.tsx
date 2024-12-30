@@ -7,13 +7,23 @@ interface ButtonIfDefaultProps {
 
 const ButtonIfDefault: React.FC<ButtonIfDefaultProps> = ({ text, onClick }) => {
     return (
-        <button
+        <div
             onClick={onClick}
-            className="w-[600px] bg-[#222222] flex justify-center items-center text-white text-[5.2rem] rounded-lg font-[900]"
+            className="w-[730px] h-[125px] bg-[#222222] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 cursor-pointer relative"
         >
-            {text}
-        </button>
+            <span className="absolute left-1/2 transform -translate-x-1/2">
+                {text}
+            </span>
+            <button
+                onClick={onClick}
+                className="h-[60px] bg-[#F9FAFB] px-10 text-black text-[20px] rounded-[50px] font-bold ml-auto hover:bg-[#EEEEEE] cursor-pointer"
+            >
+                Add
+            </button>
+        </div>
     );
 };
 
 export default ButtonIfDefault;
+
+
