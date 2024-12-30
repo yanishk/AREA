@@ -30,8 +30,8 @@ class APICall extends StatefulWidget {
 }
 
 class _APICallState extends State<APICall> {
-  final TextEditingController emailController = new TextEditingController(text: "test@mathis.com");
-  final TextEditingController passwordController = new TextEditingController(text: "q");
+  final TextEditingController emailController = new TextEditingController(text: "");
+  final TextEditingController passwordController = new TextEditingController(text: "");
   String result = '';
   String apiRoute = 'login';
 
