@@ -48,6 +48,7 @@ type WorkflowService interface {
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
 	CheckTimeAndDateActions() error
 	CheckGithubActions() error
+	CheckRedditActions() error
 }
 
 type AboutService interface {
