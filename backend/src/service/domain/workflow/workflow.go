@@ -554,6 +554,21 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 	return self.isANewVote(workflow, resultPost)
 }
 
+func (self *WorkflowService) executeNewSavedPostByMeAction(accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	urlPostMe := "https://oauth.reddit.com/user/" + resultUsername.Name + "/saved?limit=1"
+	resultPost, err := self.getRedditPost(urlPostMe, accessToken)
+	if err != nil {
+		return err
+	}
+
+	return self.isANewPost(workflow, resultPost)
+}
+
 func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
@@ -579,6 +594,9 @@ func (self *WorkflowService) checkNameOfActionReddit(action entities.Action) err
 		}
 		if action.Name == "New upvoted post by you" {
 			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
+		}
+		if action.Name == "New post saved by you" {
+			self.executeNewSavedPostByMeAction(accessToken, workflow)
 		}
 	}
 	return nil
