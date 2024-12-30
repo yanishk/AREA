@@ -30,6 +30,11 @@ const grantTypeRefreshToken = "refresh_token"
 const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
 
+const clientIdParam = "client_id="
+const redirectUriParam = "&redirect_uri="
+const stateParam = "&state="
+const codeResponseType = "&response_type=code"
+
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
 	ReactionRepository storage.ReactionRepository) *ServiceService {
@@ -97,6 +102,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = self.OAuth2Github(callbackType)
 	} else if serviceName == "Reddit" {
 		authUrl = self.OAuth2Reddit(callbackType)
+	} else if serviceName == "Asana" {
+		authUrl = self.OAuth2Asana(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(UnknownServiceMessage)
 	}
@@ -137,17 +144,22 @@ func (self *ServiceService) OAuth2Google(callbackType string, appType string) st
 		appTypeLink = os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
 	}
 
-	return ("https://accounts.google.com/o/oauth2/auth?client_id=" +
-		appTypeLink + "&response_type=code&access_type=offline&redirect_uri=" +
-		callbackLink + "&scope=email")
+	return ("https://accounts.google.com/o/oauth2/auth?" +
+		clientIdParam + appTypeLink +
+		codeResponseType +
+		"&access_type=offline" +
+		redirectUriParam + callbackLink +
+		"&scope=email")
 }
 
 func (self *ServiceService) OAuth2Spotify(callbackType string) string {
 	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "SPOTIFY", false)
 
-	return ("https://accounts.spotify.com/authorize?client_id=" +
-		os.Getenv("SPOTIFY_CLIENT_ID") + "&response_type=code&redirect_uri=" +
-		callbackLink + "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+	return ("https://accounts.spotify.com/authorize?" +
+		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
+		codeResponseType +
+		redirectUriParam + callbackLink +
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
 }
 
 func (self *ServiceService) OAuth2Discord(callbackType string) string {
@@ -160,10 +172,11 @@ func (self *ServiceService) OAuth2Discord(callbackType string) string {
 		scope = "identify+email+guilds+bot"
 	}
 
-	return ("https://discord.com/oauth2/authorize?client_id=" +
-		os.Getenv("DISCORD_CLIENT_ID") +
-		"&permissions=141376&response_type=code&redirect_uri=" +
-		callbackLink +
+	return ("https://discord.com/oauth2/authorize?" +
+		clientIdParam + os.Getenv("DISCORD_CLIENT_ID") +
+		"&permissions=141376" +
+		codeResponseType +
+		redirectUriParam + callbackLink +
 		"&scope=" + scope)
 }
 
@@ -171,22 +184,33 @@ func (self *ServiceService) OAuth2Github(callbackType string) string {
 	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "GITHUB", true)
 
 	return ("https://github.com/login/oauth/authorize?" +
-		"client_id=" + clientID +
-		"&redirect_uri=" + callbackLink +
+		clientIdParam + clientID +
+		redirectUriParam + callbackLink +
 		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
-		"&state=" + os.Getenv("GITHUB_STATE"))
+		stateParam + os.Getenv("GITHUB_STATE"))
 }
 
 func (self *ServiceService) OAuth2Reddit(callbackType string) string {
 	callbackLink, clientID := self.GetCallbackAndClientId(callbackType, "REDDIT", true)
 
 	return ("https://www.reddit.com/api/v1/authorize?" +
-		"client_id=" + clientID +
-		"&response_type=code" +
-		"&state=" + os.Getenv("REDDIT_STATE") +
-		"&redirect_uri=" + callbackLink +
+		clientIdParam + clientID +
+		codeResponseType +
+		stateParam + os.Getenv("REDDIT_STATE") +
+		redirectUriParam + callbackLink +
 		"&duration=permanent" +
 		"&scope=identity read submit vote mysubreddits history account edit privatemessages")
+}
+
+func (self *ServiceService) OAuth2Asana(callbackType string) string {
+	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "ASANA", false)
+
+	return ("https://app.asana.com/-/oauth_authorize?" +
+		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
+		redirectUriParam + callbackLink +
+		codeResponseType +
+		stateParam + os.Getenv("ASANA_STATE") +
+		"&scope=default email profile")
 }
 
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
@@ -264,6 +288,37 @@ func GetGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 		githubClientSecret,
 		code,
 		githubCallback,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var asanaCallback string
+
+	if callbackType == "service" {
+		asanaCallback = os.Getenv("ASANA_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		asanaCallback = os.Getenv("ASANA_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://app.asana.com/-/oauth_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		code,
+		asanaCallback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -395,6 +450,26 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 	return request, nil
 }
 
+func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://app.asana.com/-/oauth_token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
@@ -491,6 +566,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		tokenRes.ExpiresIn = oneYearSecond
 	} else if serviceName == "Reddit" {
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Asana" {
+		request, errRequest = GetAsanaOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}

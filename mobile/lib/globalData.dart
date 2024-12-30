@@ -12,10 +12,14 @@ class Globaldata {
   static List<String> actionServicesName = [];
   static List<String> actionServicesColor = [];
   static List<String> actionServicesIcons = [];
+  static List<String> actionServicesID = [];
+  static List<ActionOrReactionList> actionServicesActions = [];
 
   static List<String> reactionServicesName = [];
   static List<String> reactionServicesColor = [];
   static List<String> reactionServicesIcons = [];
+  static List<String> reactionServicesID = [];
+  static List<ActionOrReactionList> reactionServicesReaction = [];
 
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
@@ -26,12 +30,31 @@ class Globaldata {
     Globaldata.actionServicesName = [];
     Globaldata.actionServicesColor = [];
     Globaldata.actionServicesIcons = [];
+    Globaldata.actionServicesID = [];
+    Globaldata.actionServicesActions = [];
+
     Globaldata.reactionServicesName = [];
     Globaldata.reactionServicesColor = [];
     Globaldata.reactionServicesIcons = [];
+    Globaldata.reactionServicesID = [];
+    Globaldata.reactionServicesReaction = [];
   }
+}
 
-  static int getActionServicesSize() {
-    return actionServicesName.length;
-  }
+class ActionOrReactionList {
+  String description = "";
+  String id = "";
+  String name = "";
+  int nbparam = 0;
+  String serviceid = "";
+  String servicename = "";
+
+  ActionOrReactionList.optional([
+    this.description = "",
+    this.id = "",
+    this.name = "",
+    this.nbparam = 0,
+    this.serviceid = "",
+    this.servicename = "",
+  ]);
 }
