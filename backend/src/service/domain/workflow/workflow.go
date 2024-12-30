@@ -365,12 +365,12 @@ func (self *WorkflowService) getRedditComments(url, accessToken string) (entitie
 	if err != nil {
 		return result, err
 	}
+	defer resp.Body.Close()
 
 	errDecode := json.NewDecoder(resp.Body).Decode(&result)
 	if errDecode != nil {
 		return result, errDecode
 	}
-	defer resp.Body.Close()
 
 	if len(result.Data.Children) == 0 {
 		return result, fmt.Errorf("Could not retrieve comments")
