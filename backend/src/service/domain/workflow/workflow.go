@@ -23,6 +23,8 @@ type WorkflowService struct {
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
+const errorUpdatingWorkflows = "Could not update workflow"
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
@@ -425,7 +427,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -446,7 +448,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -467,7 +469,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflows)
 		}
 	}
 
@@ -537,25 +539,6 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 	}
 
 	return self.isANewVote(workflow, resultPost)
-}
-
-func (self *WorkflowService) executeNewSavedPostByMeAction(accessToken string, workflow entities.Workflow) error {
-	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
-	if err != nil {
-		return err
-	}
-
-	url := "https://oauth.reddit.com/user/" + resultUsername.Name + "/saved?limit=1"
-	result, err := self.getRedditPost(url, accessToken)
-	if err != nil {
-		return err
-	}
-
-	if len(result.Data.Children) == 0 {
-		return fmt.Errorf("No posts found")
-	}
-
-	return self.isANewPost(workflow, result)
 }
 
 func (self *WorkflowService) executePostAction(postType, accessToken string, workflow entities.Workflow) error {
