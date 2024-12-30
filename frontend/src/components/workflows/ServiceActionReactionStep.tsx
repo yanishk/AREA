@@ -1,12 +1,12 @@
 import CancelButton from "../buttons/CancelButton";
 
-interface ServiceActionStepProps {
+interface SelectServiceStepProps {
     services: any;
     goBack: () => void;
     handleSelectService: (name: string, color: string, icon: string) => void;
 }
 
-const SelectServiceActionStep: React.FC<ServiceActionStepProps> = ({
+const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
     services,
     goBack,
     handleSelectService
@@ -56,4 +56,4 @@ const SelectServiceActionStep: React.FC<ServiceActionStepProps> = ({
     );
 };
 
-export default SelectServiceActionStep;
+export default SelectServiceStep;

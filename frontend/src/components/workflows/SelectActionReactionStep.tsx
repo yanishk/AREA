@@ -1,17 +1,17 @@
 import CancelButton from "../buttons/CancelButton";
 
-interface SelectActionStepProps {
+interface SelectActionReactionStepProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
-    availableActions: { name: string; description: string; id: string } [] | null;
+    availableItems: { name: string; description: string; id: string } [] | null;
     goBack: () => void;
-    handleSelectAction: (name: string, id: string) => void;
+    handleSelect: (name: string, id: string) => void;
 }
 
-const SelectActionStep: React.FC<SelectActionStepProps> = ({
+const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
     selectedService,
-    availableActions,
+    availableItems,
     goBack,
-    handleSelectAction,
+    handleSelect,
 }) => {
     return (
         <div className="min-h-screen bg-gray-100">
@@ -45,12 +45,12 @@ const SelectActionStep: React.FC<SelectActionStepProps> = ({
 
                 <div className="mt-16 ml-[35px]">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {availableActions?.map((element) => (
+                        {availableItems?.map((element) => (
                             <button
                                 key={element.name}
                                 style={{ backgroundColor: selectedService.color}}
                                 className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5"
-                                onClick={() => handleSelectAction(
+                                onClick={() => handleSelect(
                                     element.name,
                                     element.id
                                 )
@@ -70,4 +70,4 @@ const SelectActionStep: React.FC<SelectActionStepProps> = ({
     );
 };
 
-export default SelectActionStep;
+export default SelectActionReactionStep;

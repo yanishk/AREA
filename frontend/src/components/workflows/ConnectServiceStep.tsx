@@ -1,13 +1,13 @@
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 
-interface ConnectReactionServiceProps {
+interface ConnectServiceProps {
     selectedService: {name: string; color: string; iconPath: string } | null;
     goBack: () => void;
     handleConnect: () => void;
 }
 
-const ConnectReactionServiceStep: React.FC<ConnectReactionServiceProps> = ({
+const ConnectServiceStep: React.FC<ConnectServiceProps> = ({
     selectedService,
     goBack,
     handleConnect
@@ -58,4 +58,4 @@ const ConnectReactionServiceStep: React.FC<ConnectReactionServiceProps> = ({
     );
 };
 
-export default ConnectReactionServiceStep;
+export default ConnectServiceStep;

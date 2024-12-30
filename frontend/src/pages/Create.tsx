@@ -3,14 +3,11 @@ import {useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
-import SelectServiceActionStep from "../components/workflows/ServiceActionStep";
-import SelectActionStep from "../components/workflows/SelectActionStep";
-import TriggerActionStep from "../components/workflows/TriggerActionStep";
-import SelectServiceReactionStep from "../components/workflows/ServiceReactionStep";
-import SelectReactionStep from "../components/workflows/SelectReactionStep";
-import TriggerReactionStep from "../components/workflows/TriggerReactionStep";
-import ConnectServiceStep from "../components/workflows/ConnectActionServiceStep";
 import SummaryStep from "../components/workflows/SummaryStep";
+import SelectActionReactionStep from "../components/workflows/SelectActionReactionStep";
+import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
+import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
+import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
 
 enum Steps {
     HOME,
@@ -523,7 +520,7 @@ const WorkflowBuilder = () => {
 
             case Steps.SELECT_SERVICE_ACTION:
                 return (
-                    <SelectServiceActionStep
+                    <SelectServiceStep
                         services={actionServices}
                         handleSelectService={handleSelectActionService}
                         goBack={() => goBack()}
@@ -532,30 +529,31 @@ const WorkflowBuilder = () => {
 
             case Steps.SELECT_ACTION:
                 return (
-                    <SelectActionStep
+                    <SelectActionReactionStep
                         selectedService={selectedActionService}
-                        availableActions={availableActions}
-                        handleSelectAction={handleSelectAction}
-                        goBack={() => goBack()}
+                        availableItems={availableActions}
+                        handleSelect={handleSelectAction}
+                        goBack={() => goToStep(Steps.SELECT_SERVICE_ACTION)}
                     />
                 )
 
             case Steps.TRIGGER_ACTION:
                 return (
-                    <TriggerActionStep
+                    <TriggerActionReactionStep
                         selectedService={selectedActionService}
-                        selectedAction={selectedAction}
+                        selectedItem={selectedAction}
                         fields={actionFields}
-                        actionFieldValues={actionFieldValues}
+                        itemFieldValues={actionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={() => goToStep(Steps.HOME)}
                         goBack={() => goBack()}
+                        type="action"
                     />
                 );
 
             case Steps.SELECT_SERVICE_REACTION:
                 return (
-                    <SelectServiceReactionStep
+                    <SelectServiceStep
                         services={reactionServices}
                         handleSelectService={handleSelectReactionService}
                         goBack={() => goBack()}
@@ -564,24 +562,25 @@ const WorkflowBuilder = () => {
 
             case Steps.SELECT_REACTION:
                 return (
-                    <SelectReactionStep
+                    <SelectActionReactionStep
                         selectedService={selectedReactionService}
-                        availableReactions={availableReactions}
-                        handleSelectReaction={handleSelectReaction}
-                        goBack={() => goBack()}
+                        availableItems={availableReactions}
+                        handleSelect={handleSelectReaction}
+                        goBack={() => goToStep(Steps.SELECT_SERVICE_REACTION)}
                     />
                 )
 
             case Steps.TRIGGER_REACTION:
                 return (
-                    <TriggerReactionStep
+                    <TriggerActionReactionStep
                         selectedService={selectedReactionService}
-                        selectedReaction={selectedReaction}
+                        selectedItem={selectedReaction}
                         fields={reactionFields}
-                        reactionFieldValues={reactionFieldValues}
+                        itemFieldValues={reactionFieldValues}
                         handleFieldChange={handleFieldChange}
-                        goToStep={goToStep}
+                        goToStep={() => goToStep(Steps.HOME)}
                         goBack={() => goBack()}
+                        type="reaction"
                     />
                 )
 
