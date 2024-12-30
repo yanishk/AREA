@@ -23,7 +23,7 @@ type WorkflowService struct {
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
-const errorUpdatingWorkflows = "Could not update workflow"
+const errorUpdatingWorkflow = "Could not update workflow"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
 
@@ -428,7 +428,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
@@ -449,7 +449,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
@@ -470,7 +470,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf(errorUpdatingWorkflows)
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
 	}
 
