@@ -23,7 +23,6 @@ class MyWorkflowsfunctions {
     Response response = await ApiRequest.get(route);
     if (response.statusCode == 504) {
       developer.log('${response.body}');
-      developer.log('${response.body}');
       return null;
     }
     final responseData = jsonDecode(response.body);
@@ -35,49 +34,37 @@ class MyWorkflowsfunctions {
     return responseData;
   }
 
-  static int getServiceLocalId(String serviceId, List<String> seviceIdList) {
+  static int getServiceLocalId(String uuid, List<String> seviceIdList) {
+    String serviceID = "";
+    for (int i = 0; i < Globaldata.actionServicesActions.length && serviceID.isEmpty; i++) {
+      if (Globaldata.actionServicesActions[i].id == uuid) {
+        serviceID = Globaldata.actionServicesActions[i].serviceid;
+      }
+    }
+    for (int i = 0; i < Globaldata.reactionServicesReaction.length && serviceID.isEmpty; i++) {
+      if (Globaldata.reactionServicesReaction[i].id == uuid) {
+        serviceID = Globaldata.reactionServicesReaction[i].serviceid;
+      }
+    }
+    if (serviceID.isEmpty) {
+      serviceID = uuid;
+    }
     for (int i = 0; i < seviceIdList.length; i++) {
-      if (seviceIdList[i] == serviceId) {
+      if (seviceIdList[i] == serviceID) {
         return i;
       }
     }
     return -1;
   }
 
-  static String getServiceIdWithActionId(String actionId) {
-    String serviceID = "";
-    for (int i = 0; i < Globaldata.actionServicesActions.length; i++) {
-      if (Globaldata.actionServicesActions[i].id == actionId) {
-        serviceID = Globaldata.actionServicesActions[i].serviceid;
-      }
-    }
-    if (serviceID != "") {
-      return serviceID;
-    }
-    for (int i = 0; i < Globaldata.reactionServicesReaction.length; i++) {
-      if (Globaldata.reactionServicesReaction[i].id == actionId) {
-        serviceID = Globaldata.reactionServicesReaction[i].serviceid;
-      }
-    }
-    return serviceID;
-  }
-
-  static Color getServiceColorById (String serviceId) {
-    int localActionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.actionServicesID);
+  static String getServiceDataById (String serviceId, List<String> serviceActionDataList, List<String> serviceReactionDataList) {
+    int localActionId = getServiceLocalId(serviceId, Globaldata.actionServicesID);
+    int localReactionId = getServiceLocalId(serviceId, Globaldata.reactionServicesID);
     if (localActionId != -1) {
-      return HexColor(Globaldata.actionServicesColor[localActionId]);
-    }
-    return Colors.black;
-  }
-
-  static String getServiceLogoRoute (String serviceId) {
-    int localActionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.actionServicesID);
-    int localReactionId = getServiceLocalId(getServiceIdWithActionId(serviceId), Globaldata.reactionServicesID);
-    if (localActionId != -1) {
-      return Globaldata.actionServicesIcons[localActionId];
+      return serviceActionDataList[localActionId];
     }
     if (localReactionId != -1) {
-      return Globaldata.reactionServicesIcons[localReactionId];
+      return serviceReactionDataList[localReactionId];
     }
     return "";
   }
@@ -102,7 +89,13 @@ class MyWorkflowsfunctions {
           ));
           cardList.add(
             WorkflowCard(
-              color: getServiceColorById(MyWorkflowsData.allWorkflowsData[i].actionID),
+              color: HexColor(
+                MyWorkflowsfunctions.getServiceDataById(
+                  MyWorkflowsData.allWorkflowsData[i].actionID,
+                  Globaldata.actionServicesColor,
+                  Globaldata.reactionServicesColor
+                ),
+              ),
               content: WorkflowsTiles(
                 index: i,
                 onTap: () {onTapFunction(i);},

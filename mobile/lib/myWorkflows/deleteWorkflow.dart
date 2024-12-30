@@ -9,9 +9,9 @@ import "../apiCall/apiRequest.dart";
 import '../globalData.dart';
 
 class DeleteWorkflows {
-  static void deleteWorkflowToast(String text) {
+  static void deleteWorkflowToast(String msg) {
     Fluttertoast.showToast(
-      msg: text,
+      msg: msg,
       toastLength: Toast.LENGTH_SHORT,
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.red,

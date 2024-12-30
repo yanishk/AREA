@@ -39,10 +39,6 @@ class Globaldata {
     Globaldata.reactionServicesID = [];
     Globaldata.reactionServicesReaction = [];
   }
-
-  static int getActionServicesSize() {
-    return actionServicesName.length;
-  }
 }
 
 class ActionOrReactionList {

@@ -40,7 +40,6 @@ class LoadService extends State<APICall> {
     Response response = await ApiRequest.get(route);
     if (response.statusCode == 504) {
       developer.log('${response.body}');
-      developer.log('${response.body}');
       return null;
     }
     final responseData = jsonDecode(response.body);

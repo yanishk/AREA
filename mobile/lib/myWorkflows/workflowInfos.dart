@@ -32,7 +32,16 @@ class WorkflowInfosAPICall extends StatefulWidget {
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
   String email = "";
-  Color backgroundColor = MyWorkflowsfunctions.getServiceColorById(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID);
+  Color backgroundColor = HexColor(
+    MyWorkflowsfunctions.getServiceDataById(
+      MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID,
+      Globaldata.actionServicesColor,
+      Globaldata.reactionServicesColor
+    )
+  );
+
+
+
   bool editNameMode = false;
   String editNameButtonText = "Edit name";
   String modifDate = "";
@@ -219,14 +228,26 @@ class WorkflowInfosTitle extends StatelessWidget {
               children: [
                 SafeWebImage(
                   url:
-                      "${Globaldata.domainName}${MyWorkflowsfunctions.getServiceLogoRoute(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)}",
+                      "${Globaldata.domainName}${
+                        MyWorkflowsfunctions.getServiceDataById(
+                          MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID,
+                          Globaldata.actionServicesIcons,
+                          Globaldata.reactionServicesIcons
+                        )
+                      }",
                   width: 50,
                   height: 50,
                 ),
                 Padding(padding: EdgeInsets.only(left: 10)),
                 SafeWebImage(
                   url:
-                      "${Globaldata.domainName}${MyWorkflowsfunctions.getServiceLogoRoute(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].reactionId)}",
+                      "${Globaldata.domainName}${
+                        MyWorkflowsfunctions.getServiceDataById(
+                          MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].reactionId,
+                          Globaldata.actionServicesIcons,
+                          Globaldata.reactionServicesIcons
+                        )
+                      }",
                   width: 50,
                   height: 50,
                 ),
