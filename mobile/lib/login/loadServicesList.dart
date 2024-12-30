@@ -10,7 +10,6 @@ import "../globalData.dart";
 import "../explore/explorePage.dart";
 import "../apiCall/apiRequest.dart";
 import "loginNavigator.dart";
-import "loadActionOrReaction.dart";
 
 class LoadServicePage extends StatelessWidget {
   @override
@@ -37,17 +36,59 @@ class LoadService extends State<APICall> {
   bool isInit = true;
   bool hasToRetry = false;
 
+  Future<dynamic> getWorkflowsResponse(String route) async {
+    Response response = await ApiRequest.get(route);
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      developer.log('${response.body}');
+      return null;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getWorkflowsResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return null;
+    }
+    return responseData;
+  }
+
+  void storeServiceDescription(dynamic responseData, String serviceName, String route) {
+    String typeToGet = "actions";
+    List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions;
+    if (route != actionsServices) {
+      typeToGet = "reactions";
+      listActionOrReaction = Globaldata.reactionServicesReaction;
+    }
+    if (responseData is Map<String, dynamic> &&
+        responseData[typeToGet] is List) {
+      List<dynamic> actions = responseData[typeToGet];
+      for (int i = 0; !actions.isEmpty; i++) {
+        final actionResponse = actions.removeLast();
+        if (actionResponse is Map<String, dynamic>) {
+          listActionOrReaction.add(ActionOrReactionList.optional(
+            actionResponse['description'] ?? '',
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['nbparam'] ?? 0,
+            actionResponse['serviceid'] ?? '',
+            serviceName,
+          ));
+        }
+      }
+    }
+  }
+
   Future<void> getWorkflows(String route, String service) async {
     String getServiceActionOrReactionRoute = "/actions";
     if (route != actionsServices) {
       getServiceActionOrReactionRoute = "/reactions";
     }
-    final response = await MyWorkflowsfunctions.getWorkflowsResponse(service + getServiceActionOrReactionRoute);
+    final response = await getWorkflowsResponse(service + getServiceActionOrReactionRoute);
     if (response == null) {
       return;
     }
     setState(() {
-      MyWorkflowsfunctions.storeServiceDescription(response, service);
+      storeServiceDescription(response, service, route);
     });
   }
 
