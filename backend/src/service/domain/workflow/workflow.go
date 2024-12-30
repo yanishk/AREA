@@ -603,6 +603,91 @@ func (self *WorkflowService) CallRedditApi() error {
 	return nil
 }
 
+func (self *WorkflowService) currentWeather(city string, workflow entities.Workflow) (entities.WeatherResponse, error) {
+	var weatherData entities.WeatherResponse
+	baseUrl := "http://api.weatherapi.com/v1/forecast.json?key=" + os.Getenv("WEATHER_API_KEY") + "&q=" + city
+
+	req, _ := http.NewRequest("GET", baseUrl, nil)
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return weatherData, err
+	}
+	defer res.Body.Close()
+
+	errDecode := json.NewDecoder(res.Body).Decode(&weatherData)
+	if errDecode != nil {
+		return weatherData, errDecode
+	}
+	return weatherData, nil
+}
+
+func (self *WorkflowService) executeCurrentWeatherComparison(checkType string, workflow entities.Workflow) error {
+	city, cityExists := workflow.ActionParam["city"]
+	temp, tempExists := workflow.ActionParam["temperature"]
+	if !cityExists || !tempExists {
+		return fmt.Errorf("Could not retrieve the necessary fields")
+	}
+
+	weatherData, err := self.currentWeather(city.(string), workflow)
+	if err != nil {
+		return err
+	}
+
+	if checkType == "aboveCurrent" && weatherData.Current.Temperature > temp.(float64) {
+		self.executeReactions(workflow)
+	} else if checkType == "belowCurrent" && weatherData.Current.Temperature < temp.(float64) {
+		self.executeReactions(workflow)
+	} else if checkType == "aboveForecast" && weatherData.Forecast.ForecastDay[0].Day.MaxTemperature < temp.(float64) {
+		self.executeReactions(workflow)
+	} else if checkType == "belowForecast" && weatherData.Forecast.ForecastDay[0].Day.MinTemperature > temp.(float64) {
+		self.executeReactions(workflow)
+	} else {
+		fmt.Errorf("Check type isn't valid")
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNameOfActionWeather(action entities.Action) error {
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
+
+	for _, workflow := range allWorkflowsFound {
+		switch action.Name {
+		case "Current temperature rises above":
+			self.executeCurrentWeatherComparison("aboveCurrent", workflow)
+		case "Current temperature drops below":
+			self.executeCurrentWeatherComparison("belowCurrent", workflow)
+		case "Tomorrow's low drops below":
+			self.executeCurrentWeatherComparison("belowForecast", workflow)
+		case "Tomorrow's high rises above":
+			self.executeCurrentWeatherComparison("aboveForecast", workflow)
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) CallWeatherApi() error {
+	serviceFound, errFindingService := self.ServiceService.FindServiceByName("FreeWeather")
+	if errFindingService != nil {
+		return errFindingService
+	}
+
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	if errFindingActions != nil {
+		return errFindingActions
+	}
+
+	for _, action := range allActionsFound {
+		errCheckName := self.checkNameOfActionWeather(action)
+		if errCheckName != nil {
+			return errCheckName
+		}
+	}
+	return nil
+}
+
 func (self *WorkflowService) executeReactions(workflow entities.Workflow) {
 	self.executeSpotifyReactions(workflow)
 	self.executeDiscordReactions(workflow)
