@@ -114,13 +114,13 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) getReactionAndToken(service string, workflow entities.Workflow) (entities.Reaction, string, error) {
+func (self *WorkflowService) getReactionAndToken(serviceName string, workflow entities.Workflow) (entities.Reaction, string, error) {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return reactionFound, "", fmt.Errorf("Error finding reaction")
 	}
 
-	accessToken, err := self.getAccessToken(service, workflow)
+	accessToken, err := self.getAccessToken(serviceName, workflow)
 	if err != nil {
 		return reactionFound, accessToken, fmt.Errorf("Could not update token")
 	}
