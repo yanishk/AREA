@@ -76,6 +76,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/about.json": {
+            "get": {
+                "description": "Get about.json file",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About.json"
+                ],
+                "summary": "About.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Service OAuth2 URL",
@@ -801,23 +827,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "docs_service.ActionExample": {
+        "docs_about.AboutGetAboutInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve informations about the server"
+                }
+            }
+        },
+        "docs_about.AboutGetAboutSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "$ref": "#/definitions/entities.About"
                 }
             }
         },
@@ -928,49 +951,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ReactionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
-        "docs_service.ServiceExample": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "hasactions": {
-                    "type": "boolean"
-                },
-                "hasreactions": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "logo": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1044,7 +1024,7 @@ const docTemplate = `{
                 "actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ActionExample"
+                        "$ref": "#/definitions/entities.Action"
                     }
                 }
             }
@@ -1055,7 +1035,7 @@ const docTemplate = `{
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceExample"
+                        "$ref": "#/definitions/entities.Service"
                     }
                 }
             }
@@ -1066,7 +1046,7 @@ const docTemplate = `{
                 "reactions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ReactionExample"
+                        "$ref": "#/definitions/entities.Reaction"
                     }
                 }
             }
@@ -1093,7 +1073,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "service": {
-                    "$ref": "#/definitions/docs_service.ServiceExample"
+                    "$ref": "#/definitions/entities.Service"
                 }
             }
         },
@@ -1385,40 +1365,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowExample": {
-            "type": "object",
-            "properties": {
-                "actionid": {
-                    "type": "string"
-                },
-                "actionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "createdat": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isactivated": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ownerid": {
-                    "type": "string"
-                },
-                "reactionid": {
-                    "type": "string"
-                },
-                "reactionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1434,7 +1380,7 @@ const docTemplate = `{
                 "workflows": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                        "$ref": "#/definitions/entities.Workflow"
                     }
                 }
             }
@@ -1475,9 +1421,108 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.About": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/entities.AboutClient"
+                },
+                "server": {
+                    "$ref": "#/definitions/entities.AboutServer"
+                }
+            }
+        },
+        "entities.AboutAction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutClient": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutReaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutServer": {
+            "type": "object",
+            "properties": {
+                "current_time": {
+                    "type": "integer"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutService"
+                    }
+                }
+            }
+        },
+        "entities.AboutService": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutAction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutReaction"
+                    }
+                }
+            }
+        },
+        "entities.Action": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },
@@ -1494,6 +1539,49 @@ const docTemplate = `{
                 "reactionparam": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "entities.Reaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "hasactions": {
+                    "type": "boolean"
+                },
+                "hasreactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1541,6 +1629,44 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.Workflow": {
+            "type": "object",
+            "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isactivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerid": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

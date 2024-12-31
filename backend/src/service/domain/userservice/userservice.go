@@ -51,6 +51,8 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetDiscordRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Reddit" {
 		request, errRequest = self.ServiceService.GetRedditRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Asana" {
+		request, errRequest = self.ServiceService.GetAsanaRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
@@ -103,7 +105,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 		return "", errTimestamp
 	}
 
-	if expiryDate.Before(time.Now()) && serviceName != "Github" {
+	if expiryDate.Before(time.Now()) && serviceName != "Github" && serviceName != "Linkedin" {
 		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {
