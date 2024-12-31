@@ -30,89 +30,58 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 	return nil
 }
 
+func (self *ServiceRepository) FindServiceWithParam(sqlStatement string, param string) (entities.Service, error) {
+	var service entities.Service
+
+	row := self.db.QueryRow(sqlStatement, param)
+	err := row.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions)
+	if err != nil {
+		return service, err
+	}
+	return service, nil
+}
+
+func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Service, error) {
+	var services []entities.Service
+
+	rows, err := self.db.Query(sqlStatement)
+	if err != nil {
+		return services, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var service entities.Service
+		err := rows.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions)
+		if err != nil {
+			return services, err
+		}
+		services = append(services, service)
+	}
+	return services, nil
+}
+
 func (self *ServiceRepository) FindServiceById(id string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE id = ($1)`
-	var retrievedService entities.Service
-
-	row := self.db.QueryRow(sqlStatement, id)
-	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
-	if err != nil {
-		return retrievedService, err
-	}
-	return retrievedService, nil
+	return self.FindServiceWithParam(sqlStatement, id)
 }
 
 func (self *ServiceRepository) FindServiceByName(name string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE name = ($1)`
-	var retrievedService entities.Service
-
-	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
-	if err != nil {
-		return retrievedService, err
-	}
-	return retrievedService, nil
+	return self.FindServiceWithParam(sqlStatement, name)
 }
 
-func (self *ServiceRepository) FindServices() ([]entities.Service, error) {
+func (self *ServiceRepository) FindAllServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services`
-	var retrievedServices []entities.Service
-
-	rows, err := self.db.Query(sqlStatement)
-	if err != nil {
-		return retrievedServices, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var retrievedService entities.Service
-		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
-		if err != nil {
-			return retrievedServices, err
-		}
-		retrievedServices = append(retrievedServices, retrievedService)
-	}
-	return retrievedServices, nil
+	return self.FindServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasactions = true`
-	var retrievedServices []entities.Service
-
-	rows, err := self.db.Query(sqlStatement)
-	if err != nil {
-		return retrievedServices, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var retrievedService entities.Service
-		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
-		if err != nil {
-			return retrievedServices, err
-		}
-		retrievedServices = append(retrievedServices, retrievedService)
-	}
-	return retrievedServices, nil
+	return self.FindServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasreactions = true`
-	var retrievedServices []entities.Service
-
-	rows, err := self.db.Query(sqlStatement)
-	if err != nil {
-		return retrievedServices, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var retrievedService entities.Service
-		err := rows.Scan(&retrievedService.Id, &retrievedService.Name, &retrievedService.Color, &retrievedService.Logo, &retrievedService.HasActions, &retrievedService.HasReactions)
-		if err != nil {
-			return retrievedServices, err
-		}
-		retrievedServices = append(retrievedServices, retrievedService)
-	}
-	return retrievedServices, nil
+	return self.FindServices(sqlStatement)
 }

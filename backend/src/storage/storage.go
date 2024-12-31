@@ -16,7 +16,7 @@ type ServiceRepository interface {
 	CreateService(name string, color string, logo string) error
 	FindServiceById(id string) (entities.Service, error)
 	FindServiceByName(name string) (entities.Service, error)
-	FindServices() ([]entities.Service, error)
+	FindAllServices() ([]entities.Service, error)
 	FindActionsServices() ([]entities.Service, error)
 	FindReactionsServices() ([]entities.Service, error)
 }
