@@ -21,10 +21,10 @@ const ChangePasswordPage = () => {
 
     const getUserEmail = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}user/email`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}user`, {
                 withCredentials: true,
             });
-            setUserEmail(result.data.email);
+            setUserEmail(result.data.user.email);
         } catch (error) {
             console.error("Failed to get email : ", error);
         }

@@ -33,13 +33,7 @@ class SaveNewWorkflows extends State<APICall> {
       text:
           "If ${CreateData.serviceAction.name} ${CreateData.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflow/create";
-  String email = "";
-
-  @override
-  void initState() {
-    super.initState();
-    getEmail();
-  }
+  String email = Globaldata.userInfos.email;
 
   Future<void> postCreateWorkflows() async {
     Response response = await ApiRequest.post(
@@ -67,17 +61,6 @@ class SaveNewWorkflows extends State<APICall> {
         Globaldata.myContext,
         MaterialPageRoute(builder: (context) => ExplorePage(),),
       );
-    });
-  }
-
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
-    }
-    setState(() {
-      email = responseData["email"];
     });
   }
 

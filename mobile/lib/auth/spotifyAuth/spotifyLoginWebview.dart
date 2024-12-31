@@ -10,7 +10,6 @@ import "../../apiCall/apiErrorHandling.dart";
 import "../../globalData.dart";
 import "../../login/loginNavigator.dart";
 import "../../login/loadServicesList.dart";
-import "../../apiCall/apiData.dart";
 import "../authFunctions.dart";
 import "../authData.dart";
 
@@ -88,7 +87,7 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
           developer.log(url.toString());
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
-            final urlSplit = url.toString().split(ApiData.apiUrl);
+            final urlSplit = url.toString().split(apiUrl);
             final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {

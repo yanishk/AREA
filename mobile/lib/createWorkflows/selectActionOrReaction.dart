@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import "package:http/src/response.dart";
 
 import "../custom_widget.dart";
 import "../globalData.dart";
-import "../apiCall/apiRequest.dart";
-import "../apiCall/apiErrorHandling.dart";
 import 'createWidget.dart';
 import 'createWorkflowsData.dart';
 import "../auth/spotifyAuth/connectSpotify.dart";
@@ -46,7 +43,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   final int serviceIndex;
   List<ActionOrReactionData> actionOrReactionList = [];
   Color colorTheme = Colors.black;
-  String result = '';
   String apiRoute = "actions";
   String actionDescription = "";
   List<Widget> ActionOrReactionButtonsList = [];
@@ -65,38 +61,31 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> getActionsOrReactions() async {
-    Response response = await ApiRequest.get("${CreateData.serviceNameList[serviceIndex]}/$apiRoute");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getActionsOrReactions");
-    if (responseData == null) {
-      return;
-    }
+
     setState(() {
-      storeServiceDescription(responseData);
+      if (apiRoute == "actions") {
+        storeServiceDescription(Globaldata.actionServicesActions);
+      } else {
+        storeServiceDescription(Globaldata.reactionServicesReaction);
+      }
     });
   }
 
-  void storeServiceDescription(dynamic responseData) {
-    if (responseData is Map<String, dynamic> &&
-        responseData[apiRoute] is List) {
-      List<dynamic> actions = responseData[apiRoute];
-      while (!actions.isEmpty) {
-        final actionResponse = actions.removeLast();
-        if (actionResponse is Map<String, dynamic>) {
-          actionDescription = actionResponse['Description'] ?? 'No Description';
-          actionOrReactionList.add(ActionOrReactionData.optional(
-            actionResponse['id'] ?? '',
-            actionResponse['name'] ?? '',
-            actionResponse['description'] ?? '',
-            actionResponse['serviceid'] ?? '',
-            actionResponse['nbparam'] ?? 0,
-          ));
-          ActionOrReactionButtonsList.add(
-            actionOrReactionButtons(actionOrReactionList.length - 1),
-          );
-        }
+  void storeServiceDescription(List<ActionOrReactionList> allActionOrReactionList) {
+
+    for (int i = 0; i < allActionOrReactionList.length; i++) {
+      if (allActionOrReactionList[i].servicename == CreateData.serviceNameList[serviceIndex]) {
+        actionOrReactionList.add(ActionOrReactionData.optional(
+          allActionOrReactionList[i].id,
+          allActionOrReactionList[i].name,
+          allActionOrReactionList[i].description,
+          allActionOrReactionList[i].serviceid,
+          allActionOrReactionList[i].nbparam,
+        ));
+        ActionOrReactionButtonsList.add(
+          actionOrReactionButtons(actionOrReactionList.length - 1),
+        );
       }
-    } else {
-      result = 'Invalid response structure';
     }
   }
 
@@ -120,15 +109,18 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Widget selectDateTime(int index) {
-    return CustomButton(
-      backgroundColor: colorTheme,
-      text: ButtonText(text: actionOrReactionList[index].name,),
-      onPressed: () {
-        selectTimePopup(index);
-      },
-      size: buttonSize,
-      padding: EdgeInsets.symmetric(horizontal: 15.0),
-      borderCircularRadius: buttonRadius,
+    return Padding(
+      padding: EdgeInsets.only(top: 15),
+      child: CustomButton(
+        backgroundColor: HexColor(CreateData.serviceColorList[serviceIndex]),
+        text: ButtonText(text: actionOrReactionList[index].name,),
+        onPressed: () {
+          selectTimePopup(index);
+        },
+        size: buttonSize,
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+        borderCircularRadius: buttonRadius,
+      ),
     );
   }
 
