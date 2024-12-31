@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 type ServiceService struct {
@@ -610,7 +611,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request.Header.Set("Accept", "application/json")
 		tokenRes.ExpiresIn = oneYearSecond
 	} else if serviceName == "Reddit" {
-		request, errRequest = GetRedditOAuth2AccessTokenRequest(code, callbackType)
+		codeStripped := strings.TrimSuffix(code, "#_")
+		request, errRequest = GetRedditOAuth2AccessTokenRequest(codeStripped, callbackType)
 	} else if serviceName == "Asana" {
 		request, errRequest = GetAsanaOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Linkedin" {

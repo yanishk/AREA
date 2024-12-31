@@ -32,7 +32,7 @@ type ReactionRepository interface {
 	CreateReaction(name string, description string, serviceId string, nbParam int) error
 	FindReactionByName(name string) (entities.Reaction, error)
 	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
-	FindReactionByID(id string) (entities.Reaction, error)
+	FindReactionById(id string) (entities.Reaction, error)
 }
 
 type ActionRepository interface {
