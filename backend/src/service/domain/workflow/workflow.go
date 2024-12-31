@@ -114,13 +114,13 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) getReactionAndToken(workflow entities.Workflow) (entities.Reaction, string, error) {
+func (self *WorkflowService) getReactionAndToken(service string, workflow entities.Workflow) (entities.Reaction, string, error) {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return reactionFound, "", fmt.Errorf("Error finding reaction")
 	}
 
-	accessToken, err := self.getAccessToken("Spotify", workflow)
+	accessToken, err := self.getAccessToken(service, workflow)
 	if err != nil {
 		return reactionFound, accessToken, fmt.Errorf("Could not update token")
 	}
@@ -128,7 +128,7 @@ func (self *WorkflowService) getReactionAndToken(workflow entities.Workflow) (en
 }
 
 func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
-	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
+	reactionFound, accessToken, err := self.getReactionAndToken("Spotify", workflow)
 	if err != nil {
 		return fmt.Errorf("Could not update token or find reaction")
 	}
@@ -165,7 +165,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, _, err := self.getReactionAndToken(workflow)
+	reactionFound, _, err := self.getReactionAndToken("Discord", workflow)
 	if err != nil {
 		return fmt.Errorf("Could not find reaction")
 	}
@@ -306,7 +306,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 }
 
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
-	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
+	reactionFound, accessToken, err := self.getReactionAndToken("Linkedin", workflow)
 	if err != nil {
 		return fmt.Errorf("Could not update token or find reaction")
 	}
