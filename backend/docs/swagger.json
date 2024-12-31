@@ -1483,6 +1483,13 @@
                 "nbparam": {
                     "type": "integer"
                 },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
                 "serviceid": {
                     "type": "string"
                 }
@@ -1491,6 +1498,10 @@
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },
@@ -1524,6 +1535,13 @@
                 },
                 "nbparam": {
                     "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "serviceid": {
                     "type": "string"
@@ -1603,6 +1621,10 @@
         "entities.Workflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },

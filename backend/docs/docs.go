@@ -1492,6 +1492,13 @@ const docTemplate = `{
                 "nbparam": {
                     "type": "integer"
                 },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
                 "serviceid": {
                     "type": "string"
                 }
@@ -1500,6 +1507,10 @@ const docTemplate = `{
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },
@@ -1533,6 +1544,13 @@ const docTemplate = `{
                 },
                 "nbparam": {
                     "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "serviceid": {
                     "type": "string"
@@ -1612,6 +1630,10 @@ const docTemplate = `{
         "entities.Workflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },
