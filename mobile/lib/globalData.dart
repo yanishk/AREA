@@ -22,7 +22,6 @@ class Globaldata {
   static List<ActionOrReactionList> reactionServicesReaction = [];
 
   static String domainName = "https://mathisbrehm.fr/";
-  static String spotifyConnectionLink = "";
 
   static const String appType = "mobile";
 

@@ -44,4 +44,5 @@ flutter:
     - assets/icon/youtube.png
     - assets/icon/noImage.png
     - assets/icon/Spotify.webp
+    - assets/icon/Reddit.webp
     - .env
