@@ -115,7 +115,7 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 
 func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
 
-	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
@@ -159,7 +159,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}

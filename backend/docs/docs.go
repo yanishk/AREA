@@ -1511,6 +1511,13 @@ const docTemplate = `{
                 "nbparam": {
                     "type": "integer"
                 },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
                 "serviceid": {
                     "type": "string"
                 }
@@ -1556,6 +1563,13 @@ const docTemplate = `{
                 },
                 "nbparam": {
                     "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "serviceid": {
                     "type": "string"
