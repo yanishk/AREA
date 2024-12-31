@@ -20,6 +20,7 @@ type UserInfo struct {
 	Email string `json:"email"`
 }
 
+// Time & Date
 type TimeResponse struct {
 	Timezone  string `json:"timezone"`
 	Formatted string `json:"formatted"`
@@ -32,6 +33,7 @@ type TimeResponse struct {
 	Minute    int    `json:"minute"`
 }
 
+// Reddit
 type RedditPostResponse struct {
 	Data struct {
 		Children []struct {
@@ -71,6 +73,7 @@ type RedditUsername struct {
 	Name string `json:"name"`
 }
 
+// Weather
 type WeatherResponse struct {
 	Current struct {
 		Temperature float64 `json:"temp_c"`
@@ -83,4 +86,25 @@ type WeatherResponse struct {
 			} `json:"day"`
 		} `json:"forecastday"`
 	} `json:"forecast"`
+}
+
+// Github
+type GithubRepository struct {
+	Name string `json:"full_name"`
+}
+
+type GithubPullRequest struct {
+	Number int `json:"number"`
+}
+
+type GithubBranch struct {
+	Name string `json:"name"`
+}
+
+type GithubCommit struct {
+	Message string `json:"message"`
+}
+
+type GithubIssue struct {
+	Title string `json:"title"`
 }
