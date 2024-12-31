@@ -153,7 +153,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "User Authentication",
+                "description": "User authentication",
                 "consumes": [
                     "application/json"
                 ],
@@ -458,7 +458,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/delete-account": {
+        "/user": {
+            "get": {
+                "description": "Retrieve informations about the user's connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retrieve User's Informations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete the user account",
                 "consumes": [
@@ -488,32 +518,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserDeleteAccountInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/email": {
-            "get": {
-                "description": "Get the email of user connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get User Email",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse"
                         }
                     }
                 }
@@ -1104,21 +1108,46 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.UserGetUserEmailSuccessResponse": {
+        "docs_user.UserGetUserInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "email": {
+                "error": {
                     "type": "string",
-                    "example": "email@example.com"
+                    "example": "Internal server error"
                 }
             }
         },
-        "docs_user.UserGetUserEmailUnauthorizedResponse": {
+        "docs_user.UserGetUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/docs_user.UserInfosExample"
+                }
+            }
+        },
+        "docs_user.UserGetUserUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_user.UserInfosExample": {
+            "type": "object",
+            "properties": {
+                "connectiontype": {
+                    "type": "string"
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
                 }
             }
         },

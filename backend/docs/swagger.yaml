@@ -182,16 +182,32 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_user.UserGetUserEmailSuccessResponse:
+  docs_user.UserGetUserInternalServerErrorResponse:
     properties:
-      email:
-        example: email@example.com
+      error:
+        example: Internal server error
         type: string
     type: object
-  docs_user.UserGetUserEmailUnauthorizedResponse:
+  docs_user.UserGetUserSuccessResponse:
+    properties:
+      user:
+        $ref: '#/definitions/docs_user.UserInfosExample'
+    type: object
+  docs_user.UserGetUserUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.UserInfosExample:
+    properties:
+      connectiontype:
+        type: string
+      createdat:
+        type: string
+      email:
+        type: string
+      timezone:
         type: string
     type: object
   docs_user.UserInternalServerErrorResponse:
@@ -716,7 +732,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: User Authentication
+      description: User authentication
       parameters:
       - description: User credentials
         in: body
@@ -915,7 +931,7 @@ paths:
       summary: Retrieve Services With Reactions
       tags:
       - Services
-  /user/delete-account:
+  /user:
     delete:
       consumes:
       - application/json
@@ -938,21 +954,24 @@ paths:
       summary: Delete Account
       tags:
       - Users
-  /user/email:
     get:
-      description: Get the email of user connected
+      description: Retrieve informations about the user's connected
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailSuccessResponse'
+            $ref: '#/definitions/docs_user.UserGetUserSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse'
-      summary: Get User Email
+            $ref: '#/definitions/docs_user.UserGetUserUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserGetUserInternalServerErrorResponse'
+      summary: Retrieve User's Informations
       tags:
       - Users
   /user/modify-password:
