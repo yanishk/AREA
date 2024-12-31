@@ -6,4 +6,5 @@ type Action struct {
 	Description string `json:"description"`
 	ServiceId   string `json:"serviceid"`
 	NbParam     int    `json:"nbparam"`
+	Parameters  []map[string]interface{} `json:"parameters"`
 }
