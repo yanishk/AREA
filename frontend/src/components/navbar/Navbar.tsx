@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                             </li>
                             <li>
                                 <NavbarLink
-                                    href="/myworkflows"
+                                    href="/my_workflows"
                                     text="My workflows"
                                 />
                             </li>

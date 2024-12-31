@@ -9,6 +9,7 @@ import AccountPage from './pages/AccountPage'
 import { NonExistantRoute } from './pages/NonExistantRoute'
 import DownloadMobileApk from './pages/ClientMobile'
 import ChangePasswordPage from './pages/ChangePassword'
+import MyWorkflow from './pages/MyWorkflows'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               <Route path="/create" element={<CreatePage />} />
               <Route path="/register" element={<RegisterForm />} />
               <Route path="/login" element={<LoginForm />} />
+              <Route path="/my_workflows" element={<MyWorkflow />} />
               <Route path="/settings" element={<AccountPage />} />
               <Route path="/settings/change_password" element={<ChangePasswordPage />} />
               <Route path="/client.apk" element={<DownloadMobileApk />} />

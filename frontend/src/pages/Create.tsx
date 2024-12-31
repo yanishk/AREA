@@ -113,7 +113,7 @@ const WorkflowBuilder = () => {
 
     const getServicesWithActions = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}services/actions`, {
                     withCredentials: true,
             });
 
@@ -164,7 +164,7 @@ const WorkflowBuilder = () => {
 
     const getServicesWithReactions = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}reactions-services`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}services/reactions`, {
                     withCredentials: true,
             });
 
