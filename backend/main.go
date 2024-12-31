@@ -25,7 +25,7 @@ func main() {
 		panic(errCronCreationTime)
 	}
 
-	_, errCronCreationGithub := cronJob.AddFunc("@every 1m", func() {
+	_, errCronCreationGithub := cronJob.AddFunc("@every 15m", func() {
 		services.WorkflowService.CheckGithubActions()
 	})
 	if errCronCreationGithub != nil {
