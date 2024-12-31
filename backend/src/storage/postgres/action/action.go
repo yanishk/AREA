@@ -2,6 +2,7 @@ package action_repository
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"backend/src/entities"
@@ -13,6 +14,16 @@ type ActionRepository struct {
 
 func NewActionRepository(db *sql.DB) *ActionRepository {
 	return &ActionRepository{db: db}
+}
+
+func (self *ActionRepository) UnmarshalParameters(parametersBytes []byte, action entities.Action) (entities.Action, error) {
+	if len(parametersBytes) > 0 {
+		err := json.Unmarshal(parametersBytes, &action.Parameters)
+		if err != nil {
+			return action, err
+		}
+	}
+	return action, nil
 }
 
 func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
@@ -33,9 +44,15 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
 	var retrievedAction entities.Action
+	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
+	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
+	if err != nil {
+		return retrievedAction, err
+	}
+
+	retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
 	if err != nil {
 		return retrievedAction, err
 	}
@@ -48,6 +65,7 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)
 	if errQuery != nil {
+		fmt.Println("errQ:", errQuery)
 		return nil, errQuery
 	}
 
@@ -55,9 +73,15 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 
 	for rows.Next() {
 		var retrievedAction entities.Action
-		err := rows.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam)
+		var parametersBytes []byte
+
+		err := rows.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
 		if err != nil {
 			return nil, err
+		}
+		retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
+		if err != nil {
+			return actions, err
 		}
 		actions = append(actions, retrievedAction)
 	}
