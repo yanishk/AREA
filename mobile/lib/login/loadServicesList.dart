@@ -36,11 +36,67 @@ class LoadService extends State<APICall> {
   bool isInit = true;
   bool hasToRetry = false;
 
+  Future<dynamic> getWorkflowsResponse(String route) async {
+    Response response = await ApiRequest.get(route);
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      return null;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getWorkflowsResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return null;
+    }
+    return responseData;
+  }
+
+  void storeServiceDescription(dynamic responseData, String serviceName, String route) {
+    String typeToGet = "actions";
+    List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions;
+    if (route != actionsServices) {
+      typeToGet = "reactions";
+      listActionOrReaction = Globaldata.reactionServicesReaction;
+    }
+    if (responseData is Map<String, dynamic> &&
+        responseData[typeToGet] is List) {
+      List<dynamic> actions = responseData[typeToGet];
+      for (int i = 0; !actions.isEmpty; i++) {
+        final actionResponse = actions.removeLast();
+        if (actionResponse is Map<String, dynamic>) {
+          listActionOrReaction.add(ActionOrReactionList.optional(
+            actionResponse['description'] ?? '',
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['nbparam'] ?? 0,
+            actionResponse['serviceid'] ?? '',
+            serviceName,
+          ));
+        }
+      }
+    }
+  }
+
+  Future<void> getWorkflows(String route, String service) async {
+    String getServiceActionOrReactionRoute = "/actions";
+    if (route != actionsServices) {
+      getServiceActionOrReactionRoute = "/reactions";
+    }
+    final response = await getWorkflowsResponse(service + getServiceActionOrReactionRoute);
+    if (response == null) {
+      return;
+    }
+    setState(() {
+      storeServiceDescription(response, service, route);
+    });
+  }
+
   void storeData(List<String> servicesName, List<String> servicesColor,
-      List<String> servicesIcons, dynamic service) {
-    servicesName.add(service['Name']);
-    servicesColor.add(service['Color']);
-    servicesIcons.add(service['Logo']);
+      List<String> servicesIcons, List<String> servicesID, dynamic service) {
+    servicesName.add(service['name']);
+    servicesColor.add(service['color']);
+    servicesIcons.add(service['logo']);
+    servicesID.add(service['id']);
   }
 
   void setStoreData(dynamic responseData, String route) {
@@ -48,15 +104,17 @@ class LoadService extends State<APICall> {
     for (int i = 0; i < allResponse.length; i++) {
       final service = responseData[i];
       if (service is Map<String, dynamic>) {
-        result = service['Name'] ?? 'No Name';
+        result = service['name'] ?? 'No Name';
+        getWorkflows(route, result);
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, service);
+            Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);
         } else {
           storeData(
             Globaldata.reactionServicesName,
             Globaldata.reactionServicesColor,
             Globaldata.reactionServicesIcons,
+            Globaldata.reactionServicesID,
             service
           );
           LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
