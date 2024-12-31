@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -191,9 +192,67 @@ func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) e
 	return fmt.Errorf("Unknown reaction")
 }
 
+func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow entities.Workflow) (string, error) {
+	var sub entities.LinkedinSub
+	url := "https://api.linkedin.com/v2/userinfo"
+
+	res, err := self.ExecuteLinkedinRequest("GET", url, accessToken, nil)
+	if err != nil {
+		return "", nil
+	}
+
+	errDecode := json.NewDecoder(res.Body).Decode(&sub)
+	if errDecode != nil {
+		return "", errDecode
+	}
+
+	urn := "urn:li:person:" + sub.Sub
+	return urn, nil
+}
+
+func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
+
+	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf("Error finding reaction")
+	}
+
+	accessToken, err := self.getAccessToken("Linkedin", workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token")
+	}
+
+	switch reactionFound.Name {
+	case "Share an update":
+		_, err := self.getUserUrnLinkedin(accessToken, workflow)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
 	self.CheckSpotifyReactions(workflow)
 	self.CheckDiscordReactions(workflow)
+	self.CheckLinkedinReactions(workflow)
 }
 
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
