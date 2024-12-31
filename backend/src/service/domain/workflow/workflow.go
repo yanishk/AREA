@@ -690,7 +690,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	return nil
 }
 
-func  (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
+func (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
 		return nil, fmt.Errorf("Invalid repository")
@@ -726,7 +726,7 @@ func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenA
 func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
 	var repositories []entities.GithubRepository
 
-	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl + "user/repos", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"user/repos", "GET", accessBearer, accessToken, nil)
 	if err != nil {
 		return err
 	}
@@ -742,7 +742,7 @@ func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Wo
 func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
 	var issues []entities.GithubIssue
 
-	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl + "issues", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"issues", "GET", accessBearer, accessToken, nil)
 	if err != nil {
 		return err
 	}

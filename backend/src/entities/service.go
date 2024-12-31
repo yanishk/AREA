@@ -90,21 +90,21 @@ type WeatherResponse struct {
 
 // Github
 type GithubRepository struct {
-	Name        string `json:"full_name"`
+	Name string `json:"full_name"`
 }
 
 type GithubPullRequest struct {
-	Number        int `json:"number"`
+	Number int `json:"number"`
 }
 
 type GithubBranch struct {
-	Name        string `json:"name"`
+	Name string `json:"name"`
 }
 
 type GithubCommit struct {
-	Message        string `json:"message"`
+	Message string `json:"message"`
 }
 
 type GithubIssue struct {
-	Title  string `json:"title"`
+	Title string `json:"title"`
 }
