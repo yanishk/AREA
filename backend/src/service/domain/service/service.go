@@ -346,12 +346,12 @@ func GetAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 }
 
 func GetLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var asanaCallback string
+	var callback string
 
 	if callbackType == "service" {
-		asanaCallback = os.Getenv("LINKEDIN_SERVICE_CALLBACK")
+		callback = os.Getenv("LINKEDIN_SERVICE_CALLBACK")
 	} else if callbackType == "login" {
-		asanaCallback = os.Getenv("LINKEDIN_LOGIN_CALLBACK")
+		callback = os.Getenv("LINKEDIN_LOGIN_CALLBACK")
 	} else {
 		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
 	}
@@ -362,7 +362,7 @@ func GetLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
 		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
 		code,
-		asanaCallback,
+		callback,
 		grantTypeAuthorization,
 	)
 
