@@ -114,16 +114,23 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
-
+func (self *WorkflowService) getReactionAndToken(workflow entities.Workflow) (entities.Reaction, string, error) {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
-		return fmt.Errorf("Error finding reaction")
+		return reactionFound, "", fmt.Errorf("Error finding reaction")
 	}
 
 	accessToken, err := self.getAccessToken("Spotify", workflow)
 	if err != nil {
-		return fmt.Errorf("Could not update token")
+		return reactionFound, accessToken, fmt.Errorf("Could not update token")
+	}
+	return reactionFound, accessToken, nil
+}
+
+func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
+	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token or find reaction")
 	}
 
 	var resp *http.Response
@@ -158,14 +165,9 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
-	if errReaction != nil {
-		return fmt.Errorf("Error finding reaction")
-	}
-
-	_, err := self.getAccessToken("Discord", workflow)
+	reactionFound, _, err := self.getReactionAndToken(workflow)
 	if err != nil {
-		return fmt.Errorf("Could not update token")
+		return fmt.Errorf("Could not find reaction")
 	}
 
 	if reactionFound.Name == "Post a message to a channel" {
@@ -304,14 +306,9 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 }
 
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
-	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
-	if errReaction != nil {
-		return fmt.Errorf("Error finding reaction")
-	}
-
-	accessToken, err := self.getAccessToken("Linkedin", workflow)
+	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
 	if err != nil {
-		return fmt.Errorf("Could not update token")
+		return fmt.Errorf("Could not update token or find reaction")
 	}
 
 	switch reactionFound.Name {
