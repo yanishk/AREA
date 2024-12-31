@@ -278,19 +278,16 @@ func (self *WorkflowService) CheckWorkflowsWithTimeAndDateActions(timeRes entiti
 	}
 
 	for _, workflow := range allWorkflowsFound {
-		if action.Name == "Every day at" {
+		switch action.Name {
+		case "Every day at":
 			self.CheckTimeAndDateEveryDayAction(timeRes, workflow)
-		}
-		if action.Name == "Every hour at" {
+		case "Every hour at":
 			self.CheckTimeAndDateEveryHourAction(timeRes, workflow)
-		}
-		if action.Name == "Every day of the week at" {
+		case "Every day of the week at":
 			self.CheckTimeAndDateEveryWeekAtAction(timeRes, workflow)
-		}
-		if action.Name == "Every month on the" {
+		case "Every month on the":
 			self.CheckTimeAndDateEveryMonthOnTheAction(timeRes, workflow)
-		}
-		if action.Name == "Every year on" {
+		case "Every year on":
 			self.CheckTimeAndDateEveryYearOnAction(timeRes, workflow)
 		}
 	}
@@ -828,20 +825,16 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 		if err != nil {
 			return err
 		}
-
-		if action.Name == "New repository" {
+		switch action.Name {
+		case "New repository":
 			self.CheckGithubNewRepositoryAction(workflow, accessToken)
-		}
-		if action.Name == "New issue assignated" {
+		case "New issue assignated":
 			self.CheckGithubNewIssueAction(workflow, accessToken)
-		}
-		if action.Name == "New pull request" {
+		case "New pull request":
 			self.CheckGithubNewPullRequestAction(workflow, accessToken)
-		}
-		if action.Name == "New branch" {
+		case "New branch":
 			self.CheckGithubNewBranchAction(workflow, accessToken)
-		}
-		if action.Name == "New commit" {
+		case "New commit":
 			self.CheckGithubNewCommitAction(workflow, accessToken)
 		}
 	}
