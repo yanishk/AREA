@@ -4,7 +4,6 @@ import 'dart:developer' as developer;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
-import "../../apiCall/apiErrorHandling.dart";
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 import "../custom_widget.dart";
@@ -32,14 +31,8 @@ class APICall extends StatefulWidget {
 class EditAccount extends State<APICall> {
   String apiRoute = 'user/delete-account';
   final TextEditingController emailController = new TextEditingController(
-    text: "",
+    text: Globaldata.userInfos.email,
   );
-
-  @override
-  void initState() {
-    super.initState();
-    getEmail();
-  }
 
   displayToastError(String text) {
     Fluttertoast.showToast(
@@ -141,17 +134,6 @@ class EditAccount extends State<APICall> {
         );
       },
     );
-  }
-
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
-    }
-    setState(() {
-      emailController.text = responseData["email"];
-    });
   }
 
   @override
