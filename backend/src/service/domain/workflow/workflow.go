@@ -482,7 +482,7 @@ func (self *WorkflowService) getAccessToken(serviceName string, workflow entitie
 	return accessToken, nil
 }
 
-func (self *WorkflowService) executeNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckRedditNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
 	subreddit, subredditExists := workflow.ActionParam["subreddit"]
 	if !subredditExists {
 		return fmt.Errorf("Could not find the subreddit field")
@@ -501,7 +501,7 @@ func (self *WorkflowService) executeNewPostInSubredditAction(accessToken string,
 	return self.isANewPost(workflow, result)
 }
 
-func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckRedditNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -516,7 +516,7 @@ func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, wor
 	return self.isANewComment(workflow, result)
 }
 
-func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckRedditVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -531,7 +531,7 @@ func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string,
 	return self.isANewVote(workflow, resultPost)
 }
 
-func (self *WorkflowService) executePostAction(postType, accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckRedditPostAction(postType, accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -563,17 +563,17 @@ func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Act
 		}
 		switch action.Name {
 		case "Any new post in subreddit":
-			self.executeNewPostInSubredditAction(accessToken, workflow)
+			self.CheckRedditNewPostInSubredditAction(accessToken, workflow)
 		case "New post by you":
-			self.executePostAction("/submitted", accessToken, workflow)
+			self.CheckRedditPostAction("/submitted", accessToken, workflow)
 		case "New comment by you":
-			self.executeNewCommentByMeAction(accessToken, workflow)
+			self.CheckRedditNewCommentByMeAction(accessToken, workflow)
 		case "New downvoted post by you":
-			self.executeVoteByMeAction("/downvoted", accessToken, workflow)
+			self.CheckRedditVoteByMeAction("/downvoted", accessToken, workflow)
 		case "New upvoted post by you":
-			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
+			self.CheckRedditVoteByMeAction("/upvoted", accessToken, workflow)
 		case "New post saved by you":
-			self.executePostAction("/saved", accessToken, workflow)
+			self.CheckRedditPostAction("/saved", accessToken, workflow)
 		}
 	}
 	return nil
@@ -617,7 +617,7 @@ func (self *WorkflowService) currentWeather(city string, workflow entities.Workf
 	return weatherData, nil
 }
 
-func (self *WorkflowService) executeCurrentWeatherComparison(checkType string, workflow entities.Workflow) error {
+func (self *WorkflowService) CheckWeatherCurrentWeatherComparisonAction(checkType string, workflow entities.Workflow) error {
 	city, cityExists := workflow.ActionParam["city"]
 	temp, tempExists := workflow.ActionParam["temperature"]
 	if !cityExists || !tempExists {
@@ -643,7 +643,7 @@ func (self *WorkflowService) executeCurrentWeatherComparison(checkType string, w
 	return nil
 }
 
-func (self *WorkflowService) checkNameOfActionWeather(action entities.Action) error {
+func (self *WorkflowService) CheckWorkflowsWithWeatherActions(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
@@ -652,13 +652,13 @@ func (self *WorkflowService) checkNameOfActionWeather(action entities.Action) er
 	for _, workflow := range allWorkflowsFound {
 		switch action.Name {
 		case "Current temperature rises above":
-			self.executeCurrentWeatherComparison("aboveCurrent", workflow)
+			self.CheckWeatherCurrentWeatherComparisonAction("aboveCurrent", workflow)
 		case "Current temperature drops below":
-			self.executeCurrentWeatherComparison("belowCurrent", workflow)
+			self.CheckWeatherCurrentWeatherComparisonAction("belowCurrent", workflow)
 		case "Tomorrow's low drops below":
-			self.executeCurrentWeatherComparison("belowForecast", workflow)
+			self.CheckWeatherCurrentWeatherComparisonAction("belowForecast", workflow)
 		case "Tomorrow's high rises above":
-			self.executeCurrentWeatherComparison("aboveForecast", workflow)
+			self.CheckWeatherCurrentWeatherComparisonAction("aboveForecast", workflow)
 		}
 	}
 	return nil
@@ -676,7 +676,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errCheckName := self.checkNameOfActionWeather(action)
+		errCheckName := self.CheckWorkflowsWithWeatherActions(action)
 		if errCheckName != nil {
 			return errCheckName
 		}
