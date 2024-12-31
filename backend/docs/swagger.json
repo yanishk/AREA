@@ -1502,6 +1502,13 @@
                 "nbparam": {
                     "type": "integer"
                 },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
                 "serviceid": {
                     "type": "string"
                 }
@@ -1543,6 +1550,13 @@
                 },
                 "nbparam": {
                     "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "serviceid": {
                     "type": "string"

@@ -455,6 +455,11 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
         type: string
     type: object
@@ -483,6 +488,11 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
         type: string
     type: object
