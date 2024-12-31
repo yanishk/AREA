@@ -11,6 +11,7 @@ type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
 	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
 	LoginWithService(code string, serviceName string, appType string) (string, error)
+	GetUser(userEmail string, userConnectionType string) (entities.UserInfos, error)
 	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
@@ -46,7 +47,10 @@ type WorkflowService interface {
 	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
 	UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
-	CallTimeApi() error
+	CheckTimeAndDateActions() error
+	CheckGithubActions() error
+	CheckRedditActions() error
+	CheckWeatherActions() error
 }
 
 type AboutService interface {
