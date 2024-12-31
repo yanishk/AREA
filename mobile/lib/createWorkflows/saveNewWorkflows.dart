@@ -32,7 +32,7 @@ class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
           "If ${CreateData.serviceAction.name} ${CreateData.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
-  final String apiRoute = "workflow/creates";
+  final String apiRoute = "workflows";
   String email = Globaldata.userInfos.email;
 
   Future<void> postCreateWorkflows() async {
@@ -122,7 +122,7 @@ class SaveNewWorkflows extends State<APICall> {
                       child: CustomClassicForm(
                         controller: workflowTitleController,
                         maxLines: 5,
-                        hint: 'Email',
+                        hint: 'Workflow title',
                         padding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         focusedBorderColor: Colors.white,
