@@ -1,4 +1,4 @@
-import Steps from "../../Step";
+import Steps from "../../CreateSteps";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";

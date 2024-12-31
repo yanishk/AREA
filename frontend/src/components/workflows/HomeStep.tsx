@@ -1,5 +1,5 @@
 import { servicesData } from "../../ServicesData";
-import Steps from "../../Step";
+import Steps from "../../CreateSteps";
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
 import ButtonThenCustom from "../buttons/ButtonThenCustom";

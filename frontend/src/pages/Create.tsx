@@ -8,7 +8,7 @@ import SelectActionReactionStep from "../components/workflows/SelectActionReacti
 import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
-import Steps from "../Step";
+import Steps from "../CreateSteps";
 
 type availableActionsType = {
     name: string;
