@@ -27,7 +27,7 @@ func (self *ActionRepository) UnmarshalParameters(parametersBytes []byte, action
 }
 
 func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO actions_copy (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
+	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindActionByName(name)
 	if err == nil {
@@ -42,7 +42,7 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 }
 
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
-	sqlStatement := `SELECT * FROM actions_copy WHERE name = ($1)`
+	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
 	var retrievedAction entities.Action
 	var parametersBytes []byte
 
@@ -60,11 +60,12 @@ func (self *ActionRepository) FindActionByName(name string) (entities.Action, er
 }
 
 func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
-	sqlStatement := `SELECT * FROM actions_copy WHERE serviceid = ($1)`
+	sqlStatement := `SELECT * FROM actions WHERE serviceid = ($1)`
 	var actions []entities.Action
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)
 	if errQuery != nil {
+		fmt.Println("errQ:", errQuery)
 		return nil, errQuery
 	}
 

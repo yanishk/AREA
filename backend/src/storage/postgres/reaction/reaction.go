@@ -27,7 +27,7 @@ func (self *ReactionRepository) UnmarshalParameters(parametersBytes []byte, reac
 }
 
 func (self *ReactionRepository) CreateReaction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO reactions_copy (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
+	sqlStatement := `INSERT INTO reactions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindReactionByName(name)
 	if err == nil {
@@ -42,7 +42,7 @@ func (self *ReactionRepository) CreateReaction(name string, description string, 
 }
 
 func (self *ReactionRepository) FindReactionByName(name string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions_copy WHERE name = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE name = ($1)`
 	var retrievedReaction entities.Reaction
 	var parametersBytes []byte
 
@@ -60,7 +60,7 @@ func (self *ReactionRepository) FindReactionByName(name string) (entities.Reacti
 }
 
 func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions_copy WHERE id = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE id = ($1)`
 	var retrievedReaction entities.Reaction
 	var parametersBytes []byte
 
@@ -78,7 +78,7 @@ func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, 
 }
 
 func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions_copy WHERE serviceid = ($1)`
+	sqlStatement := `SELECT * FROM reactions WHERE serviceid = ($1)`
 	var reactions []entities.Reaction
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)
