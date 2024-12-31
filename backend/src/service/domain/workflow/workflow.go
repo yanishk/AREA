@@ -226,6 +226,41 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 	return urn, nil
 }
 
+func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	if !messageErr {
+		return fmt.Errorf("Failed to get message body")
+	}
+
+	url := "https://api.linkedin.com/v2/ugcPosts"
+	content := map[string]interface{}{
+		"author":         urn,
+		"lifecycleState": "PUBLISHED",
+		"specificContent": map[string]interface{}{
+			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareCommentary": map[string]interface{}{
+					"text": message,
+				},
+				"shareMediaCategory": "NONE",
+			},
+		},
+		"visibility": map[string]interface{}{
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Could not encode the body")
+	}
+
+	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	if errLinkedinRequest != nil {
+		return errLinkedinRequest
+	}
+	return nil
+}
+
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
@@ -240,10 +275,11 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 
 	switch reactionFound.Name {
 	case "Share an update":
-		_, err := self.getUserUrnLinkedin(accessToken, workflow)
+		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
 		if err != nil {
 			return err
 		}
+		return self.publishTextLinkedinPost(urn, accessToken, workflow)
 	}
 
 	return nil
