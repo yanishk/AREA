@@ -127,6 +127,15 @@ func (self *UserService) LoginWithService(code string, serviceName string, appTy
 	return token, nil
 }
 
+func (self *UserService) GetUser(userEmail string, userConnectionType string) (entities.UserInfos, error) {
+	user, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
+	if err != nil {
+		return entities.UserInfos{}, err
+	}
+
+	return entities.UserInfos{Email: user.Email, CreatedAt: user.CreatedAt, Timezone: user.Timezone, ConnectionType: user.ConnectionType}, err
+}
+
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
 	if userConnectionType != BasicConnectionType {
 		return fmt.Errorf("Could not modify the password")
