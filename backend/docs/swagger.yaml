@@ -455,11 +455,19 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
         type: string
     type: object
   entities.NewWorkflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
@@ -483,6 +491,11 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
         type: string
     type: object
@@ -534,6 +547,9 @@ definitions:
     type: object
   entities.Workflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
