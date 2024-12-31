@@ -16,7 +16,7 @@ func NewReactionRepository(db *sql.DB) *ReactionRepository {
 	return &ReactionRepository{db: db}
 }
 
-func (self *ReactionRepository) UnmarshalParameters(parametersBytes []byte, reaction entities.Reaction) (entities.Reaction, error) {
+func (self *ReactionRepository) unmarshalParameters(parametersBytes []byte, reaction entities.Reaction) (entities.Reaction, error) {
 	if len(parametersBytes) > 0 {
 		err := json.Unmarshal(parametersBytes, &reaction.Parameters)
 		if err != nil {
@@ -52,7 +52,7 @@ func (self *ReactionRepository) FindReactionByName(name string) (entities.Reacti
 		return reaction, err
 	}
 
-	reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
+	reaction, err = self.unmarshalParameters(parametersBytes, reaction)
 	if err != nil {
 		return reaction, err
 	}
@@ -70,7 +70,7 @@ func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, 
 		return reaction, err
 	}
 
-	reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
+	reaction, err = self.unmarshalParameters(parametersBytes, reaction)
 	if err != nil {
 		return reaction, err
 	}
@@ -96,7 +96,7 @@ func (self *ReactionRepository) FindReactionsByServiceId(serviceId string) ([]en
 			return nil, err
 		}
 
-		reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
+		reaction, err = self.unmarshalParameters(parametersBytes, reaction)
 		if err != nil {
 			return reactions, err
 		}

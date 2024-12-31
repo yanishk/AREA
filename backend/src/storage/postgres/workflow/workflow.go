@@ -16,7 +16,25 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 	return &WorkflowRepository{db: db}
 }
 
-func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamBytes []byte, reactionParamBytes []byte, actionDataBytes []byte, workflow entities.Workflow) (entities.Workflow, error) {
+func (self *WorkflowRepository) marshalWorkflowParameters(actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) ([]byte, []byte, []byte, error) {
+	actionParamJson, err := json.Marshal(actionParam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	reactionParamJson, err := json.Marshal(reactionParam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	actionDataJson, err := json.Marshal(actionData)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return actionParamJson, reactionParamJson, actionDataJson, nil
+}
+
+func (self *WorkflowRepository) unmarshalWorkflowParameters(actionParamBytes []byte, reactionParamBytes []byte, actionDataBytes []byte, workflow entities.Workflow) (entities.Workflow, error) {
 	if len(actionParamBytes) > 0 {
 		errActionBytes := json.Unmarshal(actionParamBytes, &workflow.ActionParam)
 		if errActionBytes != nil {
@@ -54,7 +72,7 @@ func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entitie
 			return nil, err
 		}
 
-		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
+		workflow, errUnmarshal := self.unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
 		if errUnmarshal != nil {
 			return workflows, errUnmarshal
 		}
@@ -68,20 +86,12 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam, actiondata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
-	if errMarshallActionParam != nil {
-		return errMarshallActionParam
-	}
-	reactionParamJson, errMarshallReactionParam := json.Marshal(reactionParam)
-	if errMarshallReactionParam != nil {
-		return errMarshallReactionParam
-	}
-	actionDataJson, errMarshallActionData := json.Marshal(actionData)
-	if errMarshallActionData != nil {
-		return errMarshallActionData
+	actionParamJson, reactionParamJson, actionDataJson, err := self.marshalWorkflowParameters(actionParam, reactionParam, actionData)
+	if err != nil {
+		return err
 	}
 
-	_, err := self.FindWorkflowByNameAndOwnerId(name, ownerId)
+	_, err = self.FindWorkflowByNameAndOwnerId(name, ownerId)
 	if err == nil {
 		return fmt.Errorf("Workflow already exist")
 	}
@@ -108,7 +118,7 @@ func (self *WorkflowRepository) FindWorkflowById(id string) (entities.Workflow, 
 		return workflow, err
 	}
 
-	workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
+	workflow, errUnmarshal := self.unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
 	if errUnmarshal != nil {
 		return workflow, errUnmarshal
 	}
@@ -165,15 +175,7 @@ func (self *WorkflowRepository) FindWorkflowsByOwnerId(userId string) ([]entitie
 func (self *WorkflowRepository) UpdateWorkflow(id string, updatedWorkflow entities.Workflow) error {
 	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), isactivated = ($4), actionparam = ($5), reactionparam = ($6), actiondata = ($7) WHERE id = ($8)`
 
-	actionParamJson, err := json.Marshal(updatedWorkflow.ActionParam)
-	if err != nil {
-		return err
-	}
-	reactionParamJson, err := json.Marshal(updatedWorkflow.ReactionParam)
-	if err != nil {
-		return err
-	}
-	actionDataJson, err := json.Marshal(updatedWorkflow.ActionData)
+	actionParamJson, reactionParamJson, actionDataJson, err := self.marshalWorkflowParameters(updatedWorkflow.ActionParam, updatedWorkflow.ReactionParam, updatedWorkflow.ActionData)
 	if err != nil {
 		return err
 	}
