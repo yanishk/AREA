@@ -19,21 +19,28 @@ func main() {
 
 	cronJob := cron.New()
 	_, errCronCreationTime := cronJob.AddFunc("@every 1m", func() {
-		services.WorkflowService.CallTimeApi()
+		services.WorkflowService.CheckTimeAndDateActions()
 	})
 	if errCronCreationTime != nil {
 		panic(errCronCreationTime)
 	}
 
+	_, errCronCreationGithub := cronJob.AddFunc("@every 15m", func() {
+		services.WorkflowService.CheckGithubActions()
+	})
+	if errCronCreationGithub != nil {
+		panic(errCronCreationGithub)
+	}
+
 	_, errCronCreationReddit := cronJob.AddFunc("@every 15m", func() {
-		services.WorkflowService.CallRedditApi()
+		services.WorkflowService.CheckRedditActions()
 	})
 	if errCronCreationReddit != nil {
 		panic(errCronCreationReddit)
 	}
 
 	_, errCronCreationWeather := cronJob.AddFunc("@every 12h", func() {
-		services.WorkflowService.CallWeatherApi()
+		services.WorkflowService.CheckWeatherActions()
 	})
 	if errCronCreationWeather != nil {
 		panic(errCronCreationWeather)
