@@ -35,7 +35,7 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
     getWorkflows(workflowsCardList);
   }
 
-  String apiRoute = "workflow/retrieve";
+  String apiRoute = "workflows";
   String workflowsResponseName = "workflows";
   List<Widget> workflowsCardList = [];
   String email = "";
