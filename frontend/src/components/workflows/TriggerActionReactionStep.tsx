@@ -1,3 +1,4 @@
+import Steps from "../../Step";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
@@ -74,7 +75,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         textColor="text-black"
                         bgColor="bg-white"
                         hoverColor="hover:bg-[#EEEEEE]"
-                        onClick={() => goToStep(0)}
+                        onClick={() => goToStep(Steps.HOME)}
                     />
                 </div>
 

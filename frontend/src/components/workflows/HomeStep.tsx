@@ -1,4 +1,5 @@
 import { servicesData } from "../../ServicesData";
+import Steps from "../../Step";
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
 import ButtonThenCustom from "../buttons/ButtonThenCustom";
@@ -123,7 +124,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                 ) : (
                     <ButtonIfDefault
                         onClick={() =>
-                            goToStep(1)
+                            goToStep(Steps.SELECT_SERVICE_ACTION)
                         }
                         text="If This"
                     />
@@ -145,7 +146,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
                 ) : (
                     <ButtonThenDefault
                         onClick={() =>
-                            goToStep(5)
+                            goToStep(Steps.SELECT_SERVICE_REACTION)
                         }
                         text="Then That"
                         isDisabled={!selectedAction}

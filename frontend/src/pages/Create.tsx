@@ -8,19 +8,7 @@ import SelectActionReactionStep from "../components/workflows/SelectActionReacti
 import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
-
-enum Steps {
-    HOME,
-    SELECT_SERVICE_ACTION,
-    SELECT_ACTION,
-    CONNECT_ACTION_SERVICE,
-    TRIGGER_ACTION,
-    SELECT_SERVICE_REACTION,
-    SELECT_REACTION,
-    CONNECT_REACTION_SERVICE,
-    TRIGGER_REACTION,
-    SUMMARY,
-}
+import Steps from "../Step";
 
 type availableActionsType = {
     name: string;
@@ -90,38 +78,33 @@ const WorkflowBuilder = () => {
     const goBack = () => {
         if (currentStep == Steps.HOME) {
             navigate("/")
+            return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
             goToStep(Steps.HOME)
             setSelectedActionService(null)
             setSelectedAction(null);
-        }
-        if (currentStep == Steps.SELECT_ACTION) {
-            goToStep(Steps.SELECT_SERVICE_ACTION)
-        }
-        if (currentStep == Steps.CONNECT_ACTION_SERVICE) {
-            goToStep(Steps.SELECT_SERVICE_ACTION)
-        }
-        if (currentStep == Steps.TRIGGER_ACTION) {
-            goToStep(Steps.SELECT_ACTION)
+            return;
         }
         if (currentStep == Steps.SELECT_SERVICE_REACTION) {
             goToStep(Steps.HOME)
-            setSelectedReaction(null)
+            setSelectedReactionService(null)
             setSelectedReaction(null);
-        }
-        if (currentStep == Steps.SELECT_REACTION) {
-            goToStep(Steps.SELECT_SERVICE_REACTION)
-        }
-        if (currentStep == Steps.CONNECT_REACTION_SERVICE) {
-            goToStep(Steps.SELECT_REACTION)
-        }
-        if (currentStep == Steps.TRIGGER_REACTION) {
-            goToStep(Steps.CONNECT_REACTION_SERVICE)
+            return;
         }
         if (currentStep == Steps.SUMMARY) {
             goToStep(Steps.HOME)
+            return;
         }
+        if (currentStep == Steps.CONNECT_ACTION_SERVICE) {
+            goToStep(Steps.SELECT_ACTION)
+            return;
+        }
+        if (currentStep == Steps.CONNECT_REACTION_SERVICE) {
+            goToStep(Steps.SELECT_REACTION)
+            return;
+        }
+        setCurrentStep(currentStep - 1);
     }
 
     const handleContinue = () => {
