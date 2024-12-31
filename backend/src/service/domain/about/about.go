@@ -90,7 +90,7 @@ func (self *AboutService) GetAboutService(service entities.Service) (entities.Ab
 func (self *AboutService) GetAboutServices() ([]entities.AboutService, error) {
 	var aboutServices []entities.AboutService
 
-	services, err := self.ServiceRepository.FindServices()
+	services, err := self.ServiceRepository.FindAllServices()
 	if err != nil {
 		return aboutServices, err
 	}
