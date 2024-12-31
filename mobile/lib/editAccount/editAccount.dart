@@ -4,7 +4,6 @@ import 'dart:developer' as developer;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
-import "../../apiCall/apiErrorHandling.dart";
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 import "../custom_widget.dart";
@@ -32,14 +31,8 @@ class APICall extends StatefulWidget {
 class EditAccount extends State<APICall> {
   String apiRoute = 'user/delete-account';
   final TextEditingController emailController = new TextEditingController(
-    text: "",
+    text: Globaldata.userInfos.email,
   );
-
-  @override
-  void initState() {
-    super.initState();
-    getEmail();
-  }
 
   displayToastError(String text) {
     Fluttertoast.showToast(
@@ -143,15 +136,29 @@ class EditAccount extends State<APICall> {
     );
   }
 
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
+  Widget displayChangePasswordButton() {
+    if (Globaldata.userInfos.connectiontype != "basic") {
+      return Column();
     }
-    setState(() {
-      emailController.text = responseData["email"];
-    });
+    return LeftWidget(
+      child: CustomTextButton(
+        text: Text(
+          "Change password",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 0, 160, 255),
+          ),
+        ),
+        onPressed: () {
+          Navigator.push(
+            Globaldata.myContext,
+            MaterialPageRoute(builder: (context) => EditPasswordPage()),
+          );
+        },
+        padding: EdgeInsets.zero,
+      ),
+    );
   }
 
   @override
@@ -199,25 +206,7 @@ class EditAccount extends State<APICall> {
               fillCollor: Color.fromARGB(255, 238, 238, 238),
               padding: EdgeInsets.symmetric(horizontal: 15),
             ),
-            LeftWidget(
-              child: CustomTextButton(
-                text: Text(
-                  "Change password",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 0, 160, 255),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => EditPasswordPage()),
-                  );
-                },
-                padding: EdgeInsets.zero,
-              ),
-            ),
+            displayChangePasswordButton(),
             Padding(padding: EdgeInsets.only(top: 40)),
             CustomButton(
               backgroundColor: Color.fromARGB(255, 240, 240, 240),
