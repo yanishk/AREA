@@ -32,7 +32,7 @@ class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
           "If ${CreateData.serviceAction.name} ${CreateData.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
-  final String apiRoute = "workflow/create";
+  final String apiRoute = "workflows";
   String email = "";
 
   @override
