@@ -1,14 +1,73 @@
+import { useEffect, useState } from "react";
+import ErrorMessage from "../components/errors/ErrorMessage"
 import Navbar from "../components/navbar/Navbar"
+import {useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "./AuthContext";
 
 const HomePage = () => {
+    const location = useLocation();
+    const [error, setError] = useState("");
+    const [errorTrigger, setErrorTrigger] = useState(0);
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const { login } = useAuth();
+
+    useEffect(() => {
+        if (location.state?.error) {
+            setError(location.state.error);
+        }
+        if (location.state?.errorTrigger) {
+            setErrorTrigger(location.state.errorTrigger);
+        }
+    }, [location.state]);
+
+    const getAuthCode = async () => {
+        const codeAuth = searchParams.get("code");
+        const stateParam = searchParams.get("state");
+
+        let serviceName = null;
+
+        if (!stateParam) {
+            console.error("Failed to get state param");
+            return;
+        }
+
+        try {
+            const state = JSON.parse(decodeURIComponent(stateParam));
+            serviceName = state.service;
+        } catch (error) {
+            console.error("Error to get serviceName:", error);
+        }
+
+        if (codeAuth) {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
+                {
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+            login();
+            navigate(location.pathname, { replace: true });
+        }
+    }
+
+    useEffect(() => {
+        getAuthCode();
+    }, [useSearchParams]);
+
+    const handleErrorClose = () => {
+        setError("");
+        setErrorTrigger(0);
+        navigate(location.pathname, { replace: true, state: {} });
+    };
 
     return (
         <>
-            <Navbar />
-            {/* <div
-                className="bg-red-500 w-full h-10">
-                Home
-            </div> */}
+            <Navbar bgColor="bg-white"/>
+            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose} />
         </>
     )
 }

@@ -3,10 +3,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
 
-import "custom_widget.dart";
+import "../custom_widget.dart";
 import "login_page.dart";
-import "globalData.dart";
-import 'apiCall/apiRequest.dart';
+import "../globalData.dart";
+import '../apiCall/apiRequest.dart';
 
 class SignUp extends StatelessWidget {
   @override

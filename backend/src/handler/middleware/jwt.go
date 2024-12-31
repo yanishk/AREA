@@ -36,13 +36,14 @@ func VerifyJWTCookie(context *gin.Context) {
 		return
 	}
 
-	claims, errorClaim := token.Claims.(jwt.MapClaims)
-	if !errorClaim || !token.Valid {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 		context.Abort()
 		return
 	}
 
 	context.Set("email", claims["email"])
+	context.Set("connectionType", claims["connectionType"])
 	context.Next()
 }

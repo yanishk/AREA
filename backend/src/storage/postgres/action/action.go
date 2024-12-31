@@ -16,7 +16,7 @@ func NewActionRepository(db *sql.DB) *ActionRepository {
 }
 
 func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
-	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4);`
+	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindActionByName(name)
 	if err == nil {
@@ -31,7 +31,7 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 }
 
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
-	sqlStatement := `SELECT * FROM actions where name = ($1)`
+	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
 	var retrievedAction entities.Action
 
 	row := self.db.QueryRow(sqlStatement, name)
@@ -43,7 +43,7 @@ func (self *ActionRepository) FindActionByName(name string) (entities.Action, er
 }
 
 func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
-	sqlStatement := `SELECT * FROM actions where serviceid = ($1)`
+	sqlStatement := `SELECT * FROM actions WHERE serviceid = ($1)`
 	var actions []entities.Action
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)

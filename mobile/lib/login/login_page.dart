@@ -4,12 +4,14 @@ import 'dart:convert';
 import "package:http/src/response.dart";
 import 'dart:developer' as developer;
 
-import "custom_widget.dart";
+import "../custom_widget.dart";
 import "sign_up.dart";
-import "explore/explorePage.dart";
-import "globalData.dart";
+import "../explore/explorePage.dart";
+import "../globalData.dart";
 import "loadServicesList.dart";
-import 'apiCall/apiRequest.dart';
+import '../apiCall/apiRequest.dart';
+import "loginNavigator.dart";
+import "../auth/connectSpotify.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -66,10 +68,7 @@ class _APICallState extends State<APICall> {
         result = "";
         developer.log("JWToken : {${JWToken}}");
         Globaldata.JWToken = JWToken;
-        Navigator.push(
-          Globaldata.myContext,
-          MaterialPageRoute(builder: (context) => LoadServicePage()),
-        );
+        LoginNavigator.redirectAndHandleGoBackRedirection(LoadServicePage(), LoadServicePage());
       });
       return;
     }
@@ -177,21 +176,21 @@ class _APICallState extends State<APICall> {
               ),
               Padding(padding: EdgeInsets.only(top: 10)),
               CustomButton(
-                backgroundColor: Color.fromARGB(255, 59, 87, 157),
+                backgroundColor: Color.fromARGB(255, 30, 215, 96),
                 text: AutoSizeText(
-                  "Continue with Facebook",
+                  "Continue with Spotify",
                   style: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                   maxLines: 1,
                 ),
-                onPressed: () {},
+                onPressed: () {MySpotifyAuth.connectSpotify("login");},
                 size: Size(double.infinity, 60),
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 textPaddingLeft: 30,
-                image: Image.asset('assets/icon/facebook_icon.png',
-                    width: 24, height: 24),
+                image: Image.asset('assets/icon/Spotify.webp',
+                    width: 30, height: 30),
               ),
               Padding(padding: EdgeInsets.only(top: 10)),
               CustomButton(

@@ -12,49 +12,49 @@ class Globaldata {
   static List<String> actionServicesName = [];
   static List<String> actionServicesColor = [];
   static List<String> actionServicesIcons = [];
+  static List<String> actionServicesID = [];
+  static List<ActionOrReactionList> actionServicesActions = [];
 
   static List<String> reactionServicesName = [];
   static List<String> reactionServicesColor = [];
   static List<String> reactionServicesIcons = [];
+  static List<String> reactionServicesID = [];
+  static List<ActionOrReactionList> reactionServicesReaction = [];
 
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
 
-  static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
-  static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
+  static const String appType = "mobile";
 
   static void resetActionReactionServicesList() {
     Globaldata.actionServicesName = [];
     Globaldata.actionServicesColor = [];
     Globaldata.actionServicesIcons = [];
+    Globaldata.actionServicesID = [];
+    Globaldata.actionServicesActions = [];
+
     Globaldata.reactionServicesName = [];
     Globaldata.reactionServicesColor = [];
     Globaldata.reactionServicesIcons = [];
-  }
-
-  static int getActionServicesSize() {
-    return actionServicesName.length;
+    Globaldata.reactionServicesID = [];
+    Globaldata.reactionServicesReaction = [];
   }
 }
 
-class ActionOrReactionData {
+class ActionOrReactionList {
+  String description = "";
   String id = "";
   String name = "";
-  String description = "";
-  String serviceId = "";
-  int nbParam = 0;
-  String parameter = "";
-  Map<String, dynamic> parameterList = {};
+  int nbparam = 0;
+  String serviceid = "";
+  String servicename = "";
 
-  ActionOrReactionData.optional([
+  ActionOrReactionList.optional([
+    this.description = "",
     this.id = "",
     this.name = "",
-    this.description = "",
-    this.serviceId = "",
-    this.nbParam = 0,
-    this.parameter = "",
-    Map<String, dynamic>? parameterList,
-  ]) {
-    this.parameterList = parameterList ?? {};
-  }
+    this.nbparam = 0,
+    this.serviceid = "",
+    this.servicename = "",
+  ]);
 }

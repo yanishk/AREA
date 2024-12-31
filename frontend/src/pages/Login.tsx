@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faFacebookF, faApple, faXTwitter} from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
@@ -7,9 +7,10 @@ import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import CallToActionLink from "../components/CallToActionLink";
 import SocialButton from "../components/buttons/SocialButton";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../components/errors/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
+import { handleOAuthLogin } from "../OAuth";
 
 const LoginForm = () => {
     const { login } = useAuth();
@@ -62,25 +63,14 @@ const LoginForm = () => {
         }
     }
 
-    const handleGoogleLogin = () => {
-        return;
-    };
-
-    const handleFacebookLogin = () => {
-        return;
-    };
-
-    const handleTwitterLogin = () => {
-        return;
-    };
-
-    const handleAppleLogin = () => {
-        return;
-    };
+    const handleErrorClose = () => {
+        setError("");
+        setErrorTrigger(0);
+    }
 
     return (
         <>
-            <ErrorMessage message={error} trigger={errorTrigger} />
+            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
@@ -139,31 +129,36 @@ const LoginForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
-                        onClick={handleGoogleLogin}
+                        iconSize="size-10"
+                        iconPosition="left-[20px]"
+                        onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
-                        icon={faFacebookF}
-                        bgColor="bg-[#3B579D]"
-                        hoverColor="hover:bg-[#4C6AAE]"
-                        text="Continue with Facebook"
-                        onClick={handleFacebookLogin}
+                        icon={faSpotify}
+                        bgColor="bg-[#20ca5d]"
+                        hoverColor="hover:bg-[#20d561]"
+                        text="Continue with Spotify"
+                        iconSize="size-11"
+                        iconPosition="left-[19px]"
+                        onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
-                        icon={faXTwitter}
-                        bgColor="bg-[#A9A9A9]"
-                        hoverColor="hover:bg-[#B8B8B8]"
-                        text="Continue with X"
-                        iconPosition="left-[27px]"
-                        onClick={handleTwitterLogin}
-                    />
-                    <SocialButton
-                        icon={faApple}
-                        bgColor="bg-[#222222]"
-                        hoverColor="hover:bg-[#333333]"
-                        text="Continue with Apple"
+                        icon={faDiscord}
+                        bgColor="bg-[#7189DA]"
+                        hoverColor="hover:bg-[#7a90da]"
+                        text="Continue with Discord"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={handleAppleLogin}
+                        onClick={() => handleOAuthLogin("Discord")}
+                    />
+                    <SocialButton
+                        icon={faGithub}
+                        bgColor="bg-[#222222]"
+                        hoverColor="hover:bg-[#333333]"
+                        text="Continue with Github"
+                        iconPosition="left-[20px]"
+                        iconSize="size-11"
+                        onClick={() => handleOAuthLogin("Github")}
                     />
 
                     <div

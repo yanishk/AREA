@@ -9,35 +9,62 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"backend/src/entities"
+	"backend/src/service"
 	"backend/src/storage"
 )
 
 type UserService struct {
-	UserRepository storage.UserRepository
+	UserRepository        storage.UserRepository
+	ServiceRepository     storage.ServiceRepository
+	UserServiceRepository storage.UserServiceRepository
+	WorkflowRepository    storage.WorkflowRepository
+	ServiceService        service.ServiceService
 }
 
-func NewUserService(UserRepository storage.UserRepository) *UserService {
-	return &UserService{UserRepository: UserRepository}
-}
+const ContentType = "Content-Type"
+const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
+const FormattingDate = "2006-01-02 15:04:05-07:00"
+const BasicConnectionType = "basic"
 
-func (self *UserService) CreateUser(newEmail string, newPassword string) error {
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("Internal server error")
+func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository,
+	UserServiceRepository storage.UserServiceRepository, WorkflowRepository storage.WorkflowRepository, ServiceService service.ServiceService) *UserService {
+	return &UserService{
+		UserRepository:        UserRepository,
+		ServiceRepository:     ServiceRepository,
+		UserServiceRepository: UserServiceRepository,
+		WorkflowRepository:    WorkflowRepository,
+		ServiceService:        ServiceService,
 	}
+}
 
-	errorUser := self.UserRepository.CreateUser(newEmail, string(hash))
+func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
+	var errorUser error
+
+	if userConnectionType == BasicConnectionType {
+		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
+		if err != nil {
+			return fmt.Errorf("Internal server error")
+		}
+		errorUser = self.UserRepository.CreateUser(userEmail, string(hash), userConnectionType)
+	} else {
+		_, errorService := self.ServiceRepository.FindServiceByName(userConnectionType)
+		if errorService != nil {
+			return fmt.Errorf("Connection type doesn't exist")
+		}
+		errorUser = self.UserRepository.CreateUser(userEmail, "", userConnectionType)
+	}
 	if errorUser != nil {
 		return fmt.Errorf("Email address already used")
 	}
 	return nil
 }
 
-func createToken(email string) (string, error) {
+func createToken(email string, connectionType string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"email": email,
-			"exp":   time.Now().Add(time.Hour * 24).Unix(),
+			"email":          email,
+			"connectionType": connectionType,
+			"exp":            time.Now().Add(time.Hour * 24).Unix(),
 		})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
@@ -46,25 +73,66 @@ func createToken(email string) (string, error) {
 	return tokenString, nil
 }
 
-func (self *UserService) LoginAuthentication(userEmail string, userPassword string) (string, error) {
-	foundUser, err := self.UserRepository.FindUserByEmail(userEmail)
+func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
+	if userConnectionType != BasicConnectionType && userPassword != "" {
+		return "", fmt.Errorf("Wrong password")
+	}
+
+	foundUser, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if err != nil || len(foundUser.Email) <= 0 {
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
-	if resBcrypt == nil {
-		tokenString, errToken := createToken(foundUser.Email)
-		if errToken != nil {
-			return "", fmt.Errorf("Error creating token")
+	if userConnectionType == BasicConnectionType {
+		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
+		if resBcrypt != nil {
+			return "", fmt.Errorf("Wrong password")
 		}
-		return tokenString, nil
 	}
-	return "", fmt.Errorf("Wrong password")
+	tokenString, errToken := createToken(foundUser.Email, foundUser.ConnectionType)
+	if errToken != nil {
+		return "", fmt.Errorf("Error creating token")
+	}
+	return tokenString, nil
 }
 
-func (self *UserService) ModifyPassword(userEmail string, newPassword entities.UserModifyPassword) error {
-	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(userEmail)
+func (self *UserService) LoginWithService(code string, serviceName string, appType string) (string, error) {
+	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
+	if errorService != nil {
+		return "", errorService
+	}
+
+	resultToken, errToken := self.ServiceService.GetResultTokenFromCode(code, serviceName, "login", appType)
+	if errToken != nil {
+		return "", errToken
+	}
+
+	userInfo, errUserInfo := self.ServiceService.GetUserInfoFromService(resultToken.AccessToken, serviceName)
+	if errUserInfo != nil {
+		return "", errUserInfo
+	}
+
+	_, errFindingUser := self.UserRepository.FindUserByEmail(userInfo.Email, serviceName)
+	if errFindingUser != nil {
+		errCreatingUser := self.CreateUser(userInfo.Email, "", serviceName)
+		if errCreatingUser != nil {
+			return "", fmt.Errorf("Email address already used")
+		}
+	}
+
+	token, errLogin := self.LoginAuthentication(userInfo.Email, "", serviceName)
+	if errLogin != nil {
+		return "", errLogin
+	}
+	return token, nil
+}
+
+func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
+	if userConnectionType != BasicConnectionType {
+		return fmt.Errorf("Could not modify the password")
+	}
+
+	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return fmt.Errorf("Could not find requested user")
 	}
@@ -79,15 +147,30 @@ func (self *UserService) ModifyPassword(userEmail string, newPassword entities.U
 		return fmt.Errorf("Failed to hash password")
 	}
 
-	errUpdate := self.UserRepository.UpdateUser(userEmail, string(hash))
+	errUpdate := self.UserRepository.UpdateUser(userEmail, string(hash), userConnectionType)
 	if errUpdate != nil {
 		return fmt.Errorf("Could not modify the password")
 	}
 	return nil
 }
 
-func (self *UserService) DeleteAccount(userEmail string) error {
-	err := self.UserRepository.DeleteUser(userEmail)
+func (self *UserService) DeleteAccount(userEmail string, userConnectionType string) error {
+	user, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
+	if err != nil {
+		return err
+	}
+
+	err = self.WorkflowRepository.DeleteWorkflowByOwnerId(user.Id)
+	if err != nil {
+		return err
+	}
+
+	err = self.UserServiceRepository.DeleteUserServiceByUserId(user.Id)
+	if err != nil {
+		return err
+	}
+
+	err = self.UserRepository.DeleteUser(userEmail, userConnectionType)
 	if err != nil {
 		return fmt.Errorf("Could not delete account")
 	}

@@ -1,4 +1,4 @@
-FROM openjdk:17-slim as build
+FROM openjdk:17-slim AS build
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -48,4 +48,4 @@ RUN apt-get update && apt-get install -y \
   libglu1-mesa \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/build/app/outputs/flutter-apk/app-release.apk /app/
+COPY --from=build /app/build/app/outputs/flutter-apk/app-release.apk /shared/area.apk

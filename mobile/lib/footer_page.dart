@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import "explore/explorePage.dart";
-import "edit_account.dart";
-import "create.dart";
+import "editAccount/editAccount.dart";
+import "createWorkflows/create.dart";
+import "myWorkflows/displayAllWorkflows.dart";
 import 'globalData.dart';
 
 class FooterNavigationBar extends StatelessWidget {
@@ -13,10 +14,9 @@ class FooterNavigationBar extends StatelessWidget {
 
   final int currentIndex;
   final List<Widget> _pages = [
-    ExplorePage(),
+    DisplayWorkflows(),
     ExplorePage(),
     CreateWorkflowsPage(),
-    ExplorePage(),
     EditAccountPage(),
   ];
 
@@ -31,8 +31,9 @@ class FooterNavigationBar extends StatelessWidget {
       selectedLabelStyle:
           const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       unselectedLabelStyle:
-          const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
       currentIndex: currentIndex,
+      iconSize: 28,
       onTap: (int index) {
         if (index != currentIndex) {
           Navigator.push(
@@ -53,10 +54,6 @@ class FooterNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.add_circle_outline_outlined),
           label: 'Create',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.format_list_bulleted_outlined),
-          label: 'Activity',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_2_outlined),

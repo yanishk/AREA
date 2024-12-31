@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     this.textPaddingLeft = 0,
     this.image,
     this.borderCircularRadius = 32.0,
+    this.shadowSize = 3,
   });
 
   final Color backgroundColor;
@@ -22,6 +23,7 @@ class CustomButton extends StatelessWidget {
   final double textPaddingLeft;
   final Image? image;
   final double borderCircularRadius;
+  final double shadowSize;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          elevation: 3,
+          elevation: shadowSize,
           minimumSize: size,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderCircularRadius),
@@ -70,6 +72,7 @@ class CustomClassicForm extends StatelessWidget {
     this.disabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
     this.enabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
     this.maxLines = 1,
+    this.textColor = Colors.black,
   });
 
   final String hint;
@@ -84,6 +87,7 @@ class CustomClassicForm extends StatelessWidget {
   final Color disabledBorderColor;
   final Color enabledBorderColor;
   final int maxLines;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +103,10 @@ class CustomClassicForm extends StatelessWidget {
             child: TextField(
               maxLines: maxLines,
               minLines: 1,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black),
+                  color: textColor),
               controller: controller,
               obscureText: obscureText,
               cursorColor: Colors.black,
@@ -446,16 +450,18 @@ class DoubleWidget extends StatelessWidget {
     required this.firstChild,
     required this.secondChild,
     this.padding = const EdgeInsets.only(left: 50),
+    this.mainAxisAlignment = MainAxisAlignment.spaceEvenly,
   });
 
   final Widget firstChild;
   final Widget secondChild;
   final EdgeInsetsGeometry padding;
+  final MainAxisAlignment mainAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: mainAxisAlignment,
       children: [
         firstChild,
         Padding(padding: padding),
