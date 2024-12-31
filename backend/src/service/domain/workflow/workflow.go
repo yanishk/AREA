@@ -810,13 +810,9 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 	}
 
 	for _, workflow := range workflows {
-		user, err := self.UserRepository.FindUserById(workflow.OwnerId)
+		accessToken, err := self.getAccessToken("Github", workflow)
 		if err != nil {
-			return err
-		}
-		accessToken, err := self.UserServiceService.CallApiAndRefresh(user.Email, user.ConnectionType, "Github")
-		if err != nil {
-			return err
+			continue
 		}
 		switch action.Name {
 		case "New repository":
