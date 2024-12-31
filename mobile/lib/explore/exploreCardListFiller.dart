@@ -23,7 +23,7 @@ class FillServicesAndWorkflow {
   static void fillServicesAndWorkflowList() {
     servicesAndWorkflow = [];
     int serviceIndex = 0;
-    for (int allIndex = 0; allIndex < 5; allIndex++) {
+    for (int allIndex = 0; allIndex < AllServicesList.allServiceNameList.length * 2; allIndex++) {
       servicesAndWorkflow.add(serviceAndWorkflowTiles(allIndex, serviceIndex));
       if (allIndex % 2 == 0) {
         if (serviceIndex < AllServicesList.allServiceNameList.length) {
