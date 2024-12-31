@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import "package:http/src/response.dart";
-
-import "../apiCall/apiRequest.dart";
-import "../apiCall/apiErrorHandling.dart";
 
 import "../footer_page.dart";
 import "myWorkflowsData.dart";
@@ -31,25 +27,13 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
   @override
   void initState() {
     super.initState();
-    getEmail();
     getWorkflows(workflowsCardList);
   }
 
   String apiRoute = "workflow/retrieve";
   String workflowsResponseName = "workflows";
   List<Widget> workflowsCardList = [];
-  String email = "";
-
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
-    }
-    setState(() {
-      email = responseData["email"];
-    });
-  }
+  String email = Globaldata.userInfos.email;
 
   Future<void> redirectWorkflowInfos(int index) async {
     MyWorkflowsData.selectedWorkflowsIndex = index;
