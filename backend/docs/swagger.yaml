@@ -465,6 +465,9 @@ definitions:
     type: object
   entities.NewWorkflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
@@ -544,6 +547,9 @@ definitions:
     type: object
   entities.Workflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
