@@ -182,16 +182,32 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_user.UserGetUserEmailSuccessResponse:
+  docs_user.UserGetUserInternalServerErrorResponse:
     properties:
-      email:
-        example: email@example.com
+      error:
+        example: Internal server error
         type: string
     type: object
-  docs_user.UserGetUserEmailUnauthorizedResponse:
+  docs_user.UserGetUserSuccessResponse:
+    properties:
+      user:
+        $ref: '#/definitions/docs_user.UserInfosExample'
+    type: object
+  docs_user.UserGetUserUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.UserInfosExample:
+    properties:
+      connectiontype:
+        type: string
+      createdat:
+        type: string
+      email:
+        type: string
+      timezone:
         type: string
     type: object
   docs_user.UserInternalServerErrorResponse:
@@ -590,9 +606,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions From Service
+      summary: Retrieve Actions From Service
       tags:
-      - Services
+      - Service
   /{service}/reactions:
     get:
       description: Retrieve reactions from requested service
@@ -613,9 +629,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions From Service
+      summary: Retrieve Reactions From Service
       tags:
-      - Services
+      - Service
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -636,9 +652,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
-      summary: Discord Server Channels
+      summary: Retrieve Discord Server Channels
       tags:
-      - Services
+      - Service
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -653,9 +669,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
-      summary: Discord User Servers
+      summary: Retrieve Discord User Servers
       tags:
-      - Services
+      - Service
   /about.json:
     get:
       description: Get about.json file
@@ -673,23 +689,6 @@ paths:
       summary: About.json
       tags:
       - About.json
-  /actions-services:
-    get:
-      description: Retrieve services with actions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions Services
-      tags:
-      - Services
   /authentication/{service}/{callback-type}/{app-type}:
     get:
       description: Get Service OAuth2 URL
@@ -722,12 +721,12 @@ paths:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Service OAuth2
       tags:
-      - Services Authentication
+      - Authentication
   /login:
     post:
       consumes:
       - application/json
-      description: User Authentication
+      description: User authentication
       parameters:
       - description: User credentials
         in: body
@@ -794,23 +793,6 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
-  /reactions-services:
-    get:
-      description: Retrieve services with reactions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions Services
-      tags:
-      - Services
   /register:
     post:
       consumes:
@@ -882,12 +864,12 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
-  /service/retrieve:
+  /services/{id}:
     get:
       description: Retrieve service by id
       parameters:
       - description: Service id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -909,7 +891,41 @@ paths:
       summary: Retrieve Service
       tags:
       - Services
-  /user/delete-account:
+  /services/actions:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reactions:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Reactions
+      tags:
+      - Services
+  /user:
     delete:
       consumes:
       - application/json
@@ -932,21 +948,24 @@ paths:
       summary: Delete Account
       tags:
       - Users
-  /user/email:
     get:
-      description: Get the email of user connected
+      description: Retrieve informations about the user's connected
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailSuccessResponse'
+            $ref: '#/definitions/docs_user.UserGetUserSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse'
-      summary: Get User Email
+            $ref: '#/definitions/docs_user.UserGetUserUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserGetUserInternalServerErrorResponse'
+      summary: Retrieve User's Informations
       tags:
       - Users
   /user/modify-password:

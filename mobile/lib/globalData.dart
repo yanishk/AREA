@@ -24,6 +24,8 @@ class Globaldata {
   static String domainName = "https://mathisbrehm.fr/";
   static String spotifyConnectionLink = "";
 
+  static UserInfos userInfos = UserInfos.optional();
+
   static const String appType = "mobile";
 
   static void resetActionReactionServicesList() {
@@ -38,6 +40,7 @@ class Globaldata {
     Globaldata.reactionServicesIcons = [];
     Globaldata.reactionServicesID = [];
     Globaldata.reactionServicesReaction = [];
+    Globaldata.userInfos = UserInfos.optional();
   }
 }
 
@@ -56,5 +59,19 @@ class ActionOrReactionList {
     this.nbparam = 0,
     this.serviceid = "",
     this.servicename = "",
+  ]);
+}
+
+class UserInfos {
+  String email = "";
+  String createdat = "";
+  String timezone = "";
+  String connectiontype = "";
+
+  UserInfos.optional([
+    this.email = "",
+    this.createdat = "",
+    this.timezone = "",
+    this.connectiontype = "",
   ]);
 }
