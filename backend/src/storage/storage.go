@@ -31,24 +31,24 @@ type UserServiceRepository interface {
 type ReactionRepository interface {
 	CreateReaction(name string, description string, serviceId string, nbParam int) error
 	FindReactionByName(name string) (entities.Reaction, error)
-	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
 	FindReactionById(id string) (entities.Reaction, error)
+	FindReactionsByServiceId(serviceId string) ([]entities.Reaction, error)
 }
 
 type ActionRepository interface {
 	CreateAction(name string, description string, serviceId string, nbParam int) error
 	FindActionByName(name string) (entities.Action, error)
-	FindActionByServiceId(serviceId string) ([]entities.Action, error)
+	FindActionsByServiceId(serviceId string) ([]entities.Action, error)
 }
 
 type WorkflowRepository interface {
 	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
-	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
-	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
-	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
-	UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error
-	FindWorkflowById(workflowId string) (entities.Workflow, error)
-	DeleteWorkflow(workflowId string, ownerId string) error
+	FindWorkflowById(id string) (entities.Workflow, error)
+	FindWorkflowByNameAndOwnerId(name string, ownerId string) (entities.Workflow, error)
+	FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error)
+	FindWorkflowsByOwnerId(ownerId string) ([]entities.Workflow, error)
+	UpdateWorkflow(id string, updatedWorkflow entities.Workflow) error
+	DeleteWorkflow(id string, ownerId string) error
 	DeleteWorkflowByOwnerId(ownerId string) error
 }
 

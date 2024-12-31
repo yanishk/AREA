@@ -42,7 +42,7 @@ func (self *AboutService) GetAboutReaction(reaction entities.Reaction) entities.
 func (self *AboutService) GetAboutActions(serviceId string) ([]entities.AboutAction, error) {
 	var aboutActions []entities.AboutAction
 
-	actions, err := self.ActionRepository.FindActionByServiceId(serviceId)
+	actions, err := self.ActionRepository.FindActionsByServiceId(serviceId)
 	if err != nil {
 		return aboutActions, err
 	}
@@ -56,7 +56,7 @@ func (self *AboutService) GetAboutActions(serviceId string) ([]entities.AboutAct
 func (self *AboutService) GetAboutReactions(serviceId string) ([]entities.AboutReaction, error) {
 	var aboutReactions []entities.AboutReaction
 
-	reactions, err := self.ReactionRepository.FindReactionByServiceId(serviceId)
+	reactions, err := self.ReactionRepository.FindReactionsByServiceId(serviceId)
 	if err != nil {
 		return aboutReactions, err
 	}

@@ -43,23 +43,23 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
-	var retrievedAction entities.Action
+	var action entities.Action
 	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
+	err := row.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
 	if err != nil {
-		return retrievedAction, err
+		return action, err
 	}
 
-	retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
+	action, err = self.UnmarshalParameters(parametersBytes, action)
 	if err != nil {
-		return retrievedAction, err
+		return action, err
 	}
-	return retrievedAction, nil
+	return action, nil
 }
 
-func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+func (self *ActionRepository) FindActionsByServiceId(serviceId string) ([]entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE serviceid = ($1)`
 	var actions []entities.Action
 
@@ -70,19 +70,19 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedAction entities.Action
+		var action entities.Action
 		var parametersBytes []byte
 
-		err := rows.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
+		err := rows.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
 		if err != nil {
 			return nil, err
 		}
 
-		retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
+		action, err = self.UnmarshalParameters(parametersBytes, action)
 		if err != nil {
 			return actions, err
 		}
-		actions = append(actions, retrievedAction)
+		actions = append(actions, action)
 	}
 	return actions, nil
 }

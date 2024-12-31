@@ -31,15 +31,15 @@ func (self *UserServiceRepository) CreateUserService(userId string, token string
 
 func (self *UserServiceRepository) FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error) {
 	sqlStatement := `SELECT * FROM userservices WHERE userid = ($1) AND serviceid = ($2)`
-	var retrievedUserService entities.UserService
+	var userService entities.UserService
 
 	row := self.db.QueryRow(sqlStatement, userId, serviceId)
-	err := row.Scan(&retrievedUserService.Id, &retrievedUserService.UserId, &retrievedUserService.AccessToken,
-		&retrievedUserService.RefreshToken, &retrievedUserService.ExpiryDate, &retrievedUserService.ServiceId)
+	err := row.Scan(&userService.Id, &userService.UserId, &userService.AccessToken,
+		&userService.RefreshToken, &userService.ExpiryDate, &userService.ServiceId)
 	if err != nil {
-		return retrievedUserService, err
+		return userService, err
 	}
-	return retrievedUserService, nil
+	return userService, nil
 }
 
 func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(serviceId string, userId string, accessToken string, refreshToken string, expiryToken string) error {

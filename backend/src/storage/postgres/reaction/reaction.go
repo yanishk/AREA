@@ -43,41 +43,41 @@ func (self *ReactionRepository) CreateReaction(name string, description string, 
 
 func (self *ReactionRepository) FindReactionByName(name string) (entities.Reaction, error) {
 	sqlStatement := `SELECT * FROM reactions WHERE name = ($1)`
-	var retrievedReaction entities.Reaction
+	var reaction entities.Reaction
 	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam, &parametersBytes)
+	err := row.Scan(&reaction.Id, &reaction.ServiceId, &reaction.Name, &reaction.Description, &reaction.NbParam, &parametersBytes)
 	if err != nil {
-		return retrievedReaction, err
+		return reaction, err
 	}
 
-	retrievedReaction, err = self.UnmarshalParameters(parametersBytes, retrievedReaction)
+	reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
 	if err != nil {
-		return retrievedReaction, err
+		return reaction, err
 	}
-	return retrievedReaction, nil
+	return reaction, nil
 }
 
 func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, error) {
 	sqlStatement := `SELECT * FROM reactions WHERE id = ($1)`
-	var retrievedReaction entities.Reaction
+	var reaction entities.Reaction
 	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, id)
-	err := row.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam, &parametersBytes)
+	err := row.Scan(&reaction.Id, &reaction.ServiceId, &reaction.Name, &reaction.Description, &reaction.NbParam, &parametersBytes)
 	if err != nil {
-		return retrievedReaction, err
+		return reaction, err
 	}
 
-	retrievedReaction, err = self.UnmarshalParameters(parametersBytes, retrievedReaction)
+	reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
 	if err != nil {
-		return retrievedReaction, err
+		return reaction, err
 	}
-	return retrievedReaction, nil
+	return reaction, nil
 }
 
-func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]entities.Reaction, error) {
+func (self *ReactionRepository) FindReactionsByServiceId(serviceId string) ([]entities.Reaction, error) {
 	sqlStatement := `SELECT * FROM reactions WHERE serviceid = ($1)`
 	var reactions []entities.Reaction
 
@@ -88,19 +88,19 @@ func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]ent
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedReaction entities.Reaction
+		var reaction entities.Reaction
 		var parametersBytes []byte
 
-		err := rows.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam, &parametersBytes)
+		err := rows.Scan(&reaction.Id, &reaction.ServiceId, &reaction.Name, &reaction.Description, &reaction.NbParam, &parametersBytes)
 		if err != nil {
 			return nil, err
 		}
 
-		retrievedReaction, err = self.UnmarshalParameters(parametersBytes, retrievedReaction)
+		reaction, err = self.UnmarshalParameters(parametersBytes, reaction)
 		if err != nil {
 			return reactions, err
 		}
-		reactions = append(reactions, retrievedReaction)
+		reactions = append(reactions, reaction)
 	}
 	return reactions, nil
 }
