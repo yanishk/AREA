@@ -22,9 +22,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord Server Channels",
+                "summary": "Retrieve Discord Server Channels",
                 "parameters": [
                     {
                         "type": "string",
@@ -57,9 +57,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord User Servers",
+                "summary": "Retrieve Discord User Servers",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -102,32 +102,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/actions-services": {
-            "get": {
-                "description": "Retrieve services with actions available",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Actions Services",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Service OAuth2 URL",
@@ -135,7 +109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services Authentication"
+                    "Authentication"
                 ],
                 "summary": "Service OAuth2",
                 "parameters": [
@@ -179,7 +153,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "User Authentication",
+                "description": "User authentication",
                 "consumes": [
                     "application/json"
                 ],
@@ -279,32 +253,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/reactions-services": {
-            "get": {
-                "description": "Retrieve services with reactions available",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Reactions Services",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -417,7 +365,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/service/retrieve": {
+        "/services/actions": {
+            "get": {
+                "description": "Retrieve services with actions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Actions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/reactions": {
+            "get": {
+                "description": "Retrieve services with reactions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Reactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/{id}": {
             "get": {
                 "description": "Retrieve service by id",
                 "produces": [
@@ -432,7 +432,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -458,7 +458,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/delete-account": {
+        "/user": {
+            "get": {
+                "description": "Retrieve informations about the user's connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retrieve User's Informations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete the user account",
                 "consumes": [
@@ -488,32 +518,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserDeleteAccountInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/email": {
-            "get": {
-                "description": "Get the email of user connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get User Email",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse"
                         }
                     }
                 }
@@ -752,9 +756,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Actions From Service",
+                "summary": "Retrieve Actions From Service",
                 "parameters": [
                     {
                         "type": "string",
@@ -787,9 +791,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Reactions From Service",
+                "summary": "Retrieve Reactions From Service",
                 "parameters": [
                     {
                         "type": "string",
@@ -1094,21 +1098,46 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.UserGetUserEmailSuccessResponse": {
+        "docs_user.UserGetUserInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "email": {
+                "error": {
                     "type": "string",
-                    "example": "email@example.com"
+                    "example": "Internal server error"
                 }
             }
         },
-        "docs_user.UserGetUserEmailUnauthorizedResponse": {
+        "docs_user.UserGetUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/docs_user.UserInfosExample"
+                }
+            }
+        },
+        "docs_user.UserGetUserUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_user.UserInfosExample": {
+            "type": "object",
+            "properties": {
+                "connectiontype": {
+                    "type": "string"
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
                 }
             }
         },

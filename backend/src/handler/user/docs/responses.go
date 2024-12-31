@@ -1,5 +1,12 @@
 package docs_user
 
+type UserInfosExample struct {
+	Email          string `json:"email"`
+	CreatedAt      string `json:"createdat"`
+	Timezone       string `json:"timezone"`
+	ConnectionType string `json:"connectiontype"`
+}
+
 // General Responses
 type UserInvalidBodyResponse struct {
 	Msg string `json:"error"example:"Invalid request body"`
@@ -47,6 +54,19 @@ type UserLoginCallbackInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to connect with requested service"`
 }
 
+// Get User Responses
+type UserGetUserSuccessResponse struct {
+	User UserInfosExample
+}
+
+type UserGetUserUnauthorizedResponse struct {
+	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
+}
+
+type UserGetUserInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Internal server error"`
+}
+
 // Modify Password Responses
 type UserModifyPasswordSuccessResponse struct {
 	Msg string `json:"success"example:"Password modified"`
@@ -79,13 +99,4 @@ type UserDeleteAccountUnauthorizedResponse struct {
 
 type UserDeleteAccountInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not delete account"`
-}
-
-// Get User Email Responses
-type UserGetUserEmailSuccessResponse struct {
-	Msg string `json:"email"example:"email@example.com"`
-}
-
-type UserGetUserEmailUnauthorizedResponse struct {
-	Msg string `json:"error"example:"Email not found in token-Email is not a valid string"`
 }
