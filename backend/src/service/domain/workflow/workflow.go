@@ -23,6 +23,10 @@ type WorkflowService struct {
 const botBearer = "Bot "
 const accessBearer = "Bearer "
 
+const errorUpdatingWorkflow = "Could not update workflow"
+
+const redditUserRoute = "https://oauth.reddit.com/user/"
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
@@ -111,13 +115,13 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
+	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Spotify")
-	if errRefreshing != nil {
-		return errRefreshing
+
+	accessToken, err := self.getAccessToken("Spotify", workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token")
 	}
 
 	var resp *http.Response
@@ -155,14 +159,13 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errReaction != nil || errUser != nil {
+	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
 
-	_, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Discord")
-	if errRefreshing != nil {
-		return errRefreshing
+	_, err := self.getAccessToken("Discord", workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token")
 	}
 
 	if reactionFound.Name == "Post a message to a channel" {
@@ -197,8 +200,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.Tim
 	}
 
 	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+		self.CheckReactions(workflow)
 	}
 	return nil
 }
@@ -210,8 +212,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryHourAction(timeRes entities.Ti
 	}
 
 	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+		self.CheckReactions(workflow)
 	}
 	return nil
 }
@@ -232,8 +233,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryWeekAtAction(timeRes entities.
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
 			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-			self.CheckSpotifyReactions(workflow)
-			self.CheckDiscordReactions(workflow)
+			self.CheckReactions(workflow)
 		}
 	}
 
@@ -250,8 +250,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryMonthOnTheAction(timeRes entit
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+		self.CheckReactions(workflow)
 	}
 	return nil
 }
@@ -267,8 +266,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryYearOnAction(timeRes entities.
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+		self.CheckReactions(workflow)
 	}
 	return nil
 }
@@ -326,15 +324,22 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 	return nil
 }
 
-func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string) (entities.SubredditResponse, error) {
-	var result entities.SubredditResponse
-	url := "https://oauth.reddit.com/" + subreddit + "/new.json?limit=1"
-
+func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", accessBearer+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
 	resp, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.RedditPostResponse, error) {
+	var result entities.RedditPostResponse
+
+	resp, err := self.executeGetRedditRequest(url, accessToken)
 	if err != nil {
 		return result, err
 	}
@@ -346,31 +351,69 @@ func (self *WorkflowService) retrieveSubredditInfo(subreddit, accessToken string
 	}
 
 	if len(result.Data.Children) == 0 {
-		return result, fmt.Errorf("Could not retrieve post from the specified subreddit")
+		return result, fmt.Errorf("Could not retrieve post")
 	}
 	return result, nil
 }
 
-func (self *WorkflowService) CheckRedditNewPostInSubredditAction(workflow entities.Workflow) error {
-	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
-	if errUser != nil {
-		return fmt.Errorf("Error finding user")
-	}
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, "Reddit")
-	if errRefreshing != nil {
-		return errRefreshing
-	}
+func (self *WorkflowService) getRedditComments(url, accessToken string) (entities.RedditCommentResponse, error) {
+	var result entities.RedditCommentResponse
 
-	subreddit, subredditExists := workflow.ActionParam["subreddit"]
-	if !subredditExists {
-		return fmt.Errorf("Could not find the subreddit field")
-	}
-
-	result, err := self.retrieveSubredditInfo(subreddit.(string), accessToken)
+	resp, err := self.executeGetRedditRequest(url, accessToken)
 	if err != nil {
-		return err
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
 	}
 
+	if len(result.Data.Children) == 0 {
+		return result, fmt.Errorf("Could not retrieve comments")
+	}
+	return result, nil
+}
+
+func (self *WorkflowService) getRedditVotes(url, accessToken string) (entities.RedditVoteResponse, error) {
+	var result entities.RedditVoteResponse
+
+	resp, err := self.executeGetRedditRequest(url, accessToken)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
+	}
+
+	if len(result.Data.Children) == 0 {
+		return result, fmt.Errorf("Could not retrieve votes")
+	}
+	return result, nil
+}
+
+func (self *WorkflowService) getUsernameReddit(accessToken string, workflow entities.Workflow) (entities.RedditUsername, error) {
+	var result entities.RedditUsername
+	url := "https://oauth.reddit.com/api/v1/me"
+
+	resp, err := self.executeGetRedditRequest(url, accessToken)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&result)
+	if errDecode != nil {
+		return result, errDecode
+	}
+	return result, nil
+}
+
+func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entities.RedditPostResponse) error {
 	latestPost := result.Data.Children[0].Data
 	idLatest, idLatestExist := workflow.ActionData["id"]
 
@@ -380,12 +423,134 @@ func (self *WorkflowService) CheckRedditNewPostInSubredditAction(workflow entiti
 
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
-			return fmt.Errorf("Could not update workflow")
+			return fmt.Errorf(errorUpdatingWorkflow)
 		}
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+	}
+
+	if idLatestExist && idLatest != latestPost.ID {
+		self.CheckReactions(workflow)
 	}
 	return nil
+}
+
+func (self *WorkflowService) isANewComment(workflow entities.Workflow, result entities.RedditCommentResponse) error {
+	latestComment := result.Data.Children[0].Data
+	idLatest, idLatestExist := workflow.ActionData["id"]
+
+	if !idLatestExist || idLatest != latestComment.ID {
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["id"] = latestComment.ID
+
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingWorkflow)
+		}
+	}
+
+	if idLatestExist && idLatest != latestComment.ID {
+		self.CheckReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entities.RedditVoteResponse) error {
+	latestVote := result.Data.Children[0].Data
+	idLatest, idLatestExist := workflow.ActionData["id"]
+
+	if !idLatestExist || idLatest != latestVote.ID {
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["id"] = latestVote.ID
+
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingWorkflow)
+		}
+	}
+
+	if idLatestExist && idLatest != latestVote.ID {
+		self.CheckReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) getAccessToken(serviceName string, workflow entities.Workflow) (string, error) {
+	foundUser, errUser := self.UserRepository.FindUserById(workflow.OwnerId)
+	if errUser != nil {
+		return "", fmt.Errorf("Error finding user")
+	}
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(foundUser.Email, foundUser.ConnectionType, serviceName)
+	if errRefreshing != nil {
+		return "", errRefreshing
+	}
+	return accessToken, nil
+}
+
+func (self *WorkflowService) executeNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
+	subreddit, subredditExists := workflow.ActionParam["subreddit"]
+	if !subredditExists {
+		return fmt.Errorf("Could not find the subreddit field")
+	}
+
+	url := "https://oauth.reddit.com/" + subreddit.(string) + "/new.json?limit=1"
+	result, err := self.getRedditPost(url, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if len(result.Data.Children) == 0 {
+		return fmt.Errorf("No posts found in subreddit")
+	}
+
+	return self.isANewPost(workflow, result)
+}
+
+func (self *WorkflowService) executeNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	url := redditUserRoute + resultUsername.Name + "/comments?limit=1"
+	result, err := self.getRedditComments(url, accessToken)
+	if err != nil {
+		return err
+	}
+
+	return self.isANewComment(workflow, result)
+}
+
+func (self *WorkflowService) executeVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	urlPostMe := redditUserRoute + resultUsername.Name + voteType + "?limit=1"
+	resultPost, err := self.getRedditVotes(urlPostMe, accessToken)
+	if err != nil {
+		return err
+	}
+
+	return self.isANewVote(workflow, resultPost)
+}
+
+func (self *WorkflowService) executePostAction(postType, accessToken string, workflow entities.Workflow) error {
+	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
+	if err != nil {
+		return err
+	}
+
+	url := redditUserRoute + resultUsername.Name + postType + "?limit=1"
+	result, err := self.getRedditPost(url, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if len(result.Data.Children) == 0 {
+		return fmt.Errorf("No posts found")
+	}
+
+	return self.isANewPost(workflow, result)
 }
 
 func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Action) error {
@@ -395,8 +560,23 @@ func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Act
 	}
 
 	for _, workflow := range allWorkflowsFound {
-		if action.Name == "Any new post in subreddit" {
-			return self.CheckRedditNewPostInSubredditAction(workflow)
+		accessToken, err := self.getAccessToken("Reddit", workflow)
+		if err != nil {
+			continue
+		}
+		switch action.Name {
+		case "Any new post in subreddit":
+			self.executeNewPostInSubredditAction(accessToken, workflow)
+		case "New post by you":
+			self.executePostAction("/submitted", accessToken, workflow)
+		case "New comment by you":
+			self.executeNewCommentByMeAction(accessToken, workflow)
+		case "New downvoted post by you":
+			self.executeVoteByMeAction("/downvoted", accessToken, workflow)
+		case "New upvoted post by you":
+			self.executeVoteByMeAction("/upvoted", accessToken, workflow)
+		case "New post saved by you":
+			self.executePostAction("/saved", accessToken, workflow)
 		}
 	}
 	return nil
@@ -422,6 +602,96 @@ func (self *WorkflowService) CheckRedditActions() error {
 	return nil
 }
 
+func (self *WorkflowService) currentWeather(city string, workflow entities.Workflow) (entities.WeatherResponse, error) {
+	var weatherData entities.WeatherResponse
+	baseUrl := "http://api.weatherapi.com/v1/forecast.json?key=" + os.Getenv("WEATHER_API_KEY") + "&q=" + city
+
+	req, _ := http.NewRequest("GET", baseUrl, nil)
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return weatherData, err
+	}
+	defer res.Body.Close()
+
+	errDecode := json.NewDecoder(res.Body).Decode(&weatherData)
+	if errDecode != nil {
+		return weatherData, errDecode
+	}
+	return weatherData, nil
+}
+
+func (self *WorkflowService) executeCurrentWeatherComparison(checkType string, workflow entities.Workflow) error {
+	city, cityExists := workflow.ActionParam["city"]
+	temp, tempExists := workflow.ActionParam["temperature"]
+	if !cityExists || !tempExists {
+		return fmt.Errorf("Could not retrieve the necessary fields")
+	}
+
+	weatherData, err := self.currentWeather(city.(string), workflow)
+	if err != nil {
+		return err
+	}
+
+	if checkType == "aboveCurrent" && weatherData.Current.Temperature > temp.(float64) {
+		self.CheckReactions(workflow)
+	} else if checkType == "belowCurrent" && weatherData.Current.Temperature < temp.(float64) {
+		self.CheckReactions(workflow)
+	} else if checkType == "aboveForecast" && weatherData.Forecast.ForecastDay[0].Day.MaxTemperature < temp.(float64) {
+		self.CheckReactions(workflow)
+	} else if checkType == "belowForecast" && weatherData.Forecast.ForecastDay[0].Day.MinTemperature > temp.(float64) {
+		self.CheckReactions(workflow)
+	} else {
+		fmt.Errorf("Check type isn't valid")
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNameOfActionWeather(action entities.Action) error {
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	if errWorkflow != nil {
+		return errWorkflow
+	}
+
+	for _, workflow := range allWorkflowsFound {
+		switch action.Name {
+		case "Current temperature rises above":
+			self.executeCurrentWeatherComparison("aboveCurrent", workflow)
+		case "Current temperature drops below":
+			self.executeCurrentWeatherComparison("belowCurrent", workflow)
+		case "Tomorrow's low drops below":
+			self.executeCurrentWeatherComparison("belowForecast", workflow)
+		case "Tomorrow's high rises above":
+			self.executeCurrentWeatherComparison("aboveForecast", workflow)
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckWeatherActions() error {
+	serviceFound, errFindingService := self.ServiceService.FindServiceByName("FreeWeather")
+	if errFindingService != nil {
+		return errFindingService
+	}
+
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	if errFindingActions != nil {
+		return errFindingActions
+	}
+
+	for _, action := range allActionsFound {
+		errCheckName := self.checkNameOfActionWeather(action)
+		if errCheckName != nil {
+			return errCheckName
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
+	self.CheckSpotifyReactions(workflow)
+	self.CheckDiscordReactions(workflow)
+}
+
 func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
 	workflow.ActionData = make(map[string]interface{})
 	lenLastTurn, lenLastTurnExists := workflow.ActionData["len"]
@@ -440,8 +710,7 @@ func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenA
 		if err != nil {
 			return err
 		}
-		self.CheckSpotifyReactions(workflow)
-		self.CheckDiscordReactions(workflow)
+		self.CheckReactions(workflow)
 	}
 	return nil
 }

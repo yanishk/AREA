@@ -32,8 +32,9 @@ type TimeResponse struct {
 	Hour      int    `json:"hour"`
 	Minute    int    `json:"minute"`
 }
+
 // Reddit
-type SubredditResponse struct {
+type RedditPostResponse struct {
 	Data struct {
 		Children []struct {
 			Data struct {
@@ -44,6 +45,47 @@ type SubredditResponse struct {
 			} `json:"data"`
 		} `json:"children"`
 	} `json:"data"`
+}
+
+type RedditCommentResponse struct {
+	Data struct {
+		Children []struct {
+			Data struct {
+				ID     string `json:"id"`
+				Author string `json:"author"`
+				Body   string `json:"body"`
+			} `json:"data"`
+		} `json:"children"`
+	} `json:"data"`
+}
+
+type RedditVoteResponse struct {
+	Data struct {
+		Children []struct {
+			Data struct {
+				ID string `json:"id"`
+			} `json:"data"`
+		} `json:"children"`
+	} `json:"data"`
+}
+
+type RedditUsername struct {
+	Name string `json:"name"`
+}
+
+// Weather
+type WeatherResponse struct {
+	Current struct {
+		Temperature float64 `json:"temp_c"`
+	} `json:"current"`
+	Forecast struct {
+		ForecastDay []struct {
+			Day struct {
+				MaxTemperature float64 `json:"maxtemp_c"`
+				MinTemperature float64 `json:"mintemp_c"`
+			} `json:"day"`
+		} `json:"forecastday"`
+	} `json:"forecast"`
 }
 
 // Github

@@ -39,6 +39,13 @@ func main() {
 		panic(errCronCreationReddit)
 	}
 
+	_, errCronCreationWeather := cronJob.AddFunc("@every 12h", func() {
+		services.WorkflowService.CheckWeatherActions()
+	})
+	if errCronCreationWeather != nil {
+		panic(errCronCreationWeather)
+	}
+
 	cronJob.Start()
 
 	errHandler := handlers.Run()

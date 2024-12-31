@@ -49,6 +49,7 @@ type WorkflowService interface {
 	CheckTimeAndDateActions() error
 	CheckGithubActions() error
 	CheckRedditActions() error
+	CheckWeatherActions() error
 }
 
 type AboutService interface {
