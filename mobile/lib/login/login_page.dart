@@ -159,7 +159,7 @@ class _APICallState extends State<APICall> {
               ),
               Padding(padding: EdgeInsets.only(top: 5)),
               AuthButton(
-                text: "Continue with google",
+                text: "Continue with Google",
                 color: Color.fromARGB(255, 232, 74, 74),
                 imageUrl: 'assets/icon/google_logo.webp',
                 onPressed: () {},
@@ -173,7 +173,7 @@ class _APICallState extends State<APICall> {
                 imageWidth: 30,
               ),
               AuthButton(
-                text: "Continue with reddit",
+                text: "Continue with Reddit",
                 color: Color.fromARGB(255, 255, 87, 0),
                 imageUrl: 'assets/icon/Reddit.webp',
                 onPressed: () {MyRedditAuth.connectReddit("login");},
