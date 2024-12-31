@@ -40,6 +40,7 @@ class Globaldata {
     Globaldata.reactionServicesIcons = [];
     Globaldata.reactionServicesID = [];
     Globaldata.reactionServicesReaction = [];
+    Globaldata.userInfos = UserInfos.optional();
   }
 }
 

@@ -136,6 +136,31 @@ class EditAccount extends State<APICall> {
     );
   }
 
+  Widget displayChangePasswordButton() {
+    if (Globaldata.userInfos.connectiontype != "basic") {
+      return Column();
+    }
+    return LeftWidget(
+      child: CustomTextButton(
+        text: Text(
+          "Change password",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 0, 160, 255),
+          ),
+        ),
+        onPressed: () {
+          Navigator.push(
+            Globaldata.myContext,
+            MaterialPageRoute(builder: (context) => EditPasswordPage()),
+          );
+        },
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,25 +206,7 @@ class EditAccount extends State<APICall> {
               fillCollor: Color.fromARGB(255, 238, 238, 238),
               padding: EdgeInsets.symmetric(horizontal: 15),
             ),
-            LeftWidget(
-              child: CustomTextButton(
-                text: Text(
-                  "Change password",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 0, 160, 255),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    Globaldata.myContext,
-                    MaterialPageRoute(builder: (context) => EditPasswordPage()),
-                  );
-                },
-                padding: EdgeInsets.zero,
-              ),
-            ),
+            displayChangePasswordButton(),
             Padding(padding: EdgeInsets.only(top: 40)),
             CustomButton(
               backgroundColor: Color.fromARGB(255, 240, 240, 240),
