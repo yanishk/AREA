@@ -9,6 +9,7 @@ import "../custom_widget.dart";
 import "../globalData.dart";
 import "../explore/explorePage.dart";
 import "../apiCall/apiRequest.dart";
+import "../apiCall/apiErrorHandling.dart";
 import "loginNavigator.dart";
 
 class LoadServicePage extends StatelessWidget {
@@ -29,12 +30,29 @@ class APICall extends StatefulWidget {
 
 class LoadService extends State<APICall> {
   String result = '';
-  String apiRoute = 'actions-services';
+  String apiRoute = 'services/actions';
   String title = "Select action service";
-  String actionsServices = "actions-services";
-  String reactionsServices = "reactions-services";
+  String actionsServices = "services/actions";
+  String reactionsServices = "services/reactions";
   bool isInit = true;
   bool hasToRetry = false;
+
+  String getInfosFromUserDataString(String userData, String infos) {
+    return (userData.split(infos).last).split(",").first;
+  }
+
+  Future<void> storeUserInfos() async {
+    Response response = await ApiRequest.get("user");
+    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
+    if (responseData == null) {
+      return;
+    }
+    final userDataString = (responseData.toString().split("{").last).split("}").first;
+    Globaldata.userInfos.email = getInfosFromUserDataString(userDataString, "email: ");
+    Globaldata.userInfos.createdat = getInfosFromUserDataString(userDataString, "createdat: ");
+    Globaldata.userInfos.timezone = getInfosFromUserDataString(userDataString, "timezone: ");
+    Globaldata.userInfos.connectiontype = getInfosFromUserDataString(userDataString, "connectiontype: ");
+  }
 
   Future<dynamic> getWorkflowsResponse(String route) async {
     Response response = await ApiRequest.get(route);
@@ -154,6 +172,7 @@ class LoadService extends State<APICall> {
   Widget build(BuildContext context) {
     if (isInit == true) {
       isInit = false;
+      storeUserInfos();
       getServices();
     }
 

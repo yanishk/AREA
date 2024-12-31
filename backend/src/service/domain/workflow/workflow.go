@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -113,37 +114,41 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
-
-	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
+func (self *WorkflowService) getReactionAndToken(workflow entities.Workflow) (entities.Reaction, string, error) {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
-		return fmt.Errorf("Error finding reaction")
+		return reactionFound, "", fmt.Errorf("Error finding reaction")
 	}
 
 	accessToken, err := self.getAccessToken("Spotify", workflow)
 	if err != nil {
-		return fmt.Errorf("Could not update token")
+		return reactionFound, accessToken, fmt.Errorf("Could not update token")
+	}
+	return reactionFound, accessToken, nil
+}
+
+func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
+	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token or find reaction")
 	}
 
 	var resp *http.Response
-	if reactionFound.Name == "Start playback" {
+	switch reactionFound.Name {
+	case "Start playback":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Pause playback" {
+	case "Pause playback":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Skip track" {
+	case "Skip track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Add track to playback queue" {
+	case "Add track to playback queue":
 		uri, uriErr := workflow.ReactionParam["uri"]
 		if !uriErr {
 			return fmt.Errorf("Incorrect URI")
 		}
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Save a track" {
+	case "Save a track":
 		id, idErr := workflow.ReactionParam["id"]
 		if !idErr {
 			return fmt.Errorf("Incorrect ID")
@@ -151,6 +156,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
+
 	if resp != nil {
 		defer resp.Body.Close()
 	}
@@ -159,14 +165,9 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
-	if errReaction != nil {
-		return fmt.Errorf("Error finding reaction")
-	}
-
-	_, err := self.getAccessToken("Discord", workflow)
+	reactionFound, _, err := self.getReactionAndToken(workflow)
 	if err != nil {
-		return fmt.Errorf("Could not update token")
+		return fmt.Errorf("Could not find reaction")
 	}
 
 	if reactionFound.Name == "Post a message to a channel" {
@@ -193,9 +194,144 @@ func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) e
 	return fmt.Errorf("Unknown reaction")
 }
 
+func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow entities.Workflow) (string, error) {
+	var sub entities.LinkedinSub
+	url := "https://api.linkedin.com/v2/userinfo"
+
+	res, err := self.ExecuteLinkedinRequest("GET", url, accessToken, nil)
+	if err != nil {
+		return "", nil
+	}
+
+	errDecode := json.NewDecoder(res.Body).Decode(&sub)
+	if errDecode != nil {
+		return "", errDecode
+	}
+
+	urn := "urn:li:person:" + sub.Sub
+	return urn, nil
+}
+
+func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	if !messageErr {
+		return fmt.Errorf("Failed to get message body")
+	}
+
+	url := "https://api.linkedin.com/v2/ugcPosts"
+	content := map[string]interface{}{
+		"author":         urn,
+		"lifecycleState": "PUBLISHED",
+		"specificContent": map[string]interface{}{
+			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareCommentary": map[string]interface{}{
+					"text": message,
+				},
+				"shareMediaCategory": "NONE",
+			},
+		},
+		"visibility": map[string]interface{}{
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Could not encode the body")
+	}
+
+	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	if errLinkedinRequest != nil {
+		return errLinkedinRequest
+	}
+	return nil
+}
+
+func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	urlPost, urlErr := workflow.ReactionParam["url"]
+	if !messageErr || !urlErr {
+		return fmt.Errorf("Failed to get message body or URL")
+	}
+
+	url := "https://api.linkedin.com/v2/ugcPosts"
+	content := map[string]interface{}{
+		"author":         urn,
+		"lifecycleState": "PUBLISHED",
+		"specificContent": map[string]interface{}{
+			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareMediaCategory": "ARTICLE",
+				"shareCommentary": map[string]interface{}{
+					"text": message,
+				},
+				"media": []map[string]interface{}{
+					{
+						"status":      "READY",
+						"originalUrl": urlPost,
+					},
+				},
+			},
+		},
+		"visibility": map[string]interface{}{
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Could not encode the body")
+	}
+
+	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	if errLinkedinRequest != nil {
+		return errLinkedinRequest
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
+	reactionFound, accessToken, err := self.getReactionAndToken(workflow)
+	if err != nil {
+		return fmt.Errorf("Could not update token or find reaction")
+	}
+
+	switch reactionFound.Name {
+	case "Share an update":
+		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
+		if err != nil {
+			return err
+		}
+		return self.publishTextLinkedinPost(urn, accessToken, workflow)
+	case "Share a link":
+		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
+		if err != nil {
+			return err
+		}
+		return self.publishURLLinkedinPost(urn, accessToken, workflow)
+	}
+	return nil
+}
+
 func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
 	self.CheckSpotifyReactions(workflow)
 	self.CheckDiscordReactions(workflow)
+	self.CheckLinkedinReactions(workflow)
 }
 
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {

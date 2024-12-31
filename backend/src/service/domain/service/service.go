@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -105,6 +106,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = self.OAuth2Reddit(callbackType)
 	} else if serviceName == "Asana" {
 		authUrl = self.OAuth2Asana(callbackType)
+	} else if serviceName == "Linkedin" {
+		authUrl = self.OAuth2Linkedin(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(UnknownServiceMessage)
 	}
@@ -214,6 +217,17 @@ func (self *ServiceService) OAuth2Asana(callbackType string) string {
 		"&scope=default email profile")
 }
 
+func (self *ServiceService) OAuth2Linkedin(callbackType string) string {
+	callbackLink, _ := self.GetCallbackAndClientId(callbackType, "LINKEDIN", false)
+
+	return ("https://www.linkedin.com/oauth/v2/authorization?" +
+		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType +
+		"&scope=openid email profile w_member_social") +
+		stateParam + os.Getenv("LINKEDIN_STATE")
+}
+
 func GetGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
 	return fmt.Sprintf(
 		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
@@ -319,6 +333,37 @@ func GetAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 		os.Getenv("ASANA_CLIENT_SECRET"),
 		code,
 		asanaCallback,
+		grantTypeAuthorization,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(ContentType, ContentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func GetLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var callback string
+
+	if callbackType == "service" {
+		callback = os.Getenv("LINKEDIN_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		callback = os.Getenv("LINKEDIN_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(InvalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
+		code,
+		callback,
 		grantTypeAuthorization,
 	)
 
@@ -532,7 +577,7 @@ func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Respons
 		return nil, err
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf(APICallFailedMessage)
 	}
 	return res, nil
@@ -570,6 +615,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = GetRedditOAuth2AccessTokenRequest(codeStripped, callbackType)
 	} else if serviceName == "Asana" {
 		request, errRequest = GetAsanaOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Linkedin" {
+		request, errRequest = GetLinkedinOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(UnknownServiceMessage)
 	}
