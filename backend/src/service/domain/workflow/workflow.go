@@ -192,6 +192,11 @@ func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) e
 	return fmt.Errorf("Unknown reaction")
 }
 
+func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
+	self.CheckSpotifyReactions(workflow)
+	self.CheckDiscordReactions(workflow)
+}
+
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -684,9 +689,14 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	return nil
 }
 
-func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
-	self.CheckSpotifyReactions(workflow)
-	self.CheckDiscordReactions(workflow)
+func  (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
+	repository, repositoryExists := workflow.ActionParam["repository"]
+	if !repositoryExists {
+		return nil, fmt.Errorf("Invalid repository")
+	}
+
+	url := "https://api.github.com/repos/" + repository.(string) + endpoint
+	return self.ServiceService.ExecuteApiRequest(url, "GET", accessBearer, accessToken, nil)
 }
 
 func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
@@ -747,13 +757,7 @@ func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflo
 func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) error {
 	var pullRequests []entities.GithubRepository
 
-	repository, repositoryExists := workflow.ActionParam["repository"]
-	if !repositoryExists {
-		return fmt.Errorf("Invalid repository")
-	}
-
-	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "pulls"
-	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/pulls")
 	if err != nil {
 		return err
 	}
@@ -769,13 +773,7 @@ func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.W
 func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workflow, accessToken string) error {
 	var branches []entities.GithubBranch
 
-	repository, repositoryExists := workflow.ActionParam["repository"]
-	if !repositoryExists {
-		return fmt.Errorf("Invalid repository")
-	}
-
-	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "branches"
-	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/branches")
 	if err != nil {
 		return err
 	}
@@ -791,13 +789,7 @@ func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workfl
 func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workflow, accessToken string) error {
 	var commits []entities.GithubCommit
 
-	repository, repositoryExists := workflow.ActionParam["repository"]
-	if !repositoryExists {
-		return fmt.Errorf("Invalid repository")
-	}
-
-	uri :=  "https://api.github.com/repos/" + repository.(string) + "/" + "commits"
-	resp, err := self.ServiceService.ExecuteApiRequest(uri, "GET", accessBearer, accessToken, nil)
+	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/commits")
 	if err != nil {
 		return err
 	}
