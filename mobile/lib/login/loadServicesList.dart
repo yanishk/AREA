@@ -29,10 +29,10 @@ class APICall extends StatefulWidget {
 
 class LoadService extends State<APICall> {
   String result = '';
-  String apiRoute = 'actions-services';
+  String apiRoute = 'services/actions';
   String title = "Select action service";
-  String actionsServices = "actions-services";
-  String reactionsServices = "reactions-services";
+  String actionsServices = "services/actions";
+  String reactionsServices = "services/reactions";
   bool isInit = true;
   bool hasToRetry = false;
 
