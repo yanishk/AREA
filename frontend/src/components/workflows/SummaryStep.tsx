@@ -46,11 +46,11 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
 
     const getUserName = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}user/email`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}user`, {
                 withCredentials: true,
             });
 
-            const email = result.data.email;
+            const email = result.data.user.email;
 
             const username = email.split('@')[0].replace(/\./g, '');
 
