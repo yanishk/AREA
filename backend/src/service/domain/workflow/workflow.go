@@ -26,6 +26,7 @@ const accessBearer = "Bearer "
 const errorUpdatingWorkflow = "Could not update workflow"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
+const githubBaseUrl = "https://api.github.com/"
 
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
@@ -695,7 +696,7 @@ func  (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, a
 		return nil, fmt.Errorf("Invalid repository")
 	}
 
-	url := "https://api.github.com/repos/" + repository.(string) + endpoint
+	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
 	return self.ServiceService.ExecuteApiRequest(url, "GET", accessBearer, accessToken, nil)
 }
 
@@ -725,7 +726,7 @@ func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenA
 func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
 	var repositories []entities.GithubRepository
 
-	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/user/repos", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl + "user/repos", "GET", accessBearer, accessToken, nil)
 	if err != nil {
 		return err
 	}
@@ -741,7 +742,7 @@ func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Wo
 func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
 	var issues []entities.GithubIssue
 
-	resp, err := self.ServiceService.ExecuteApiRequest("https://api.github.com/issues", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl + "issues", "GET", accessBearer, accessToken, nil)
 	if err != nil {
 		return err
 	}
