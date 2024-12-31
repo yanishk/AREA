@@ -108,3 +108,8 @@ type GithubCommit struct {
 type GithubIssue struct {
 	Title string `json:"title"`
 }
+
+// Linkedin
+type LinkedinSub struct {
+	Sub string `json:"sub"`
+}
