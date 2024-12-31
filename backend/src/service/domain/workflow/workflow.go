@@ -261,6 +261,46 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 	return nil
 }
 
+func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	urlPost, urlErr := workflow.ReactionParam["url"]
+	if !messageErr || !urlErr {
+		return fmt.Errorf("Failed to get message body")
+	}
+
+	url := "https://api.linkedin.com/v2/ugcPosts"
+	content := map[string]interface{}{
+		"author":         urn,
+		"lifecycleState": "PUBLISHED",
+		"specificContent": map[string]interface{}{
+			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareCommentary": map[string]interface{}{
+					"text": message,
+				},
+				"shareMediaCategory": "ARTICLE",
+				"media": map[string]interface{}{
+					"status":      "READY",
+					"originalUrl": urlPost,
+				},
+			},
+		},
+		"visibility": map[string]interface{}{
+			"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+		},
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Could not encode the body")
+	}
+
+	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	if errLinkedinRequest != nil {
+		return errLinkedinRequest
+	}
+	return nil
+}
+
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
 
 	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
@@ -280,6 +320,15 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 			return err
 		}
 		return self.publishTextLinkedinPost(urn, accessToken, workflow)
+	case "Share a link":
+		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
+		if err != nil {
+			return err
+		}
+		errPublish := self.publishURLLinkedinPost(urn, accessToken, workflow)
+		if errPublish != nil {
+			return errPublish
+		}
 	}
 
 	return nil
