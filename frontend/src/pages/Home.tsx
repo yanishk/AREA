@@ -29,7 +29,6 @@ const HomePage = () => {
         let serviceName = null;
 
         if (!stateParam) {
-            console.error("Failed to get state param");
             return;
         }
 
@@ -40,18 +39,20 @@ const HomePage = () => {
             console.error("Error to get serviceName:", error);
         }
 
-        if (codeAuth) {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
-                {
-                },
-                {
-                    withCredentials: true,
-                }
-            );
-            login();
-            navigate(location.pathname, { replace: true });
+        if (!codeAuth) {
+            console.error("Error with fetching code from url");
+            return;
         }
+        await axios.post(
+            `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
+            {
+            },
+            {
+                withCredentials: true,
+            }
+        );
+        login();
+        navigate(location.pathname, { replace: true });
     }
 
     useEffect(() => {
