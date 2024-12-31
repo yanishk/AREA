@@ -18,32 +18,25 @@ func main() {
 	handlers := handler.New(services)
 
 	cronJob := cron.New()
-	_, errCronCreationTime := cronJob.AddFunc("@every 1m", func() {
+	_, errCronCreationEveryMinute := cronJob.AddFunc("@every 1m", func() {
 		services.WorkflowService.CheckTimeAndDateActions()
 	})
-	if errCronCreationTime != nil {
-		panic(errCronCreationTime)
+	if errCronCreationEveryMinute != nil {
+		panic(errCronCreationEveryMinute)
 	}
-
-	_, errCronCreationGithub := cronJob.AddFunc("@every 15m", func() {
+	_, errCronCreation15Minute := cronJob.AddFunc("@every 15m", func() {
 		services.WorkflowService.CheckGithubActions()
-	})
-	if errCronCreationGithub != nil {
-		panic(errCronCreationGithub)
-	}
-
-	_, errCronCreationReddit := cronJob.AddFunc("@every 15m", func() {
 		services.WorkflowService.CheckRedditActions()
 	})
-	if errCronCreationReddit != nil {
-		panic(errCronCreationReddit)
+	if errCronCreation15Minute != nil {
+		panic(errCronCreation15Minute)
 	}
 
-	_, errCronCreationWeather := cronJob.AddFunc("@every 12h", func() {
+	_, errCronCreation12Hour := cronJob.AddFunc("@every 12h", func() {
 		services.WorkflowService.CheckWeatherActions()
 	})
-	if errCronCreationWeather != nil {
-		panic(errCronCreationWeather)
+	if errCronCreation12Hour != nil {
+		panic(errCronCreation12Hour)
 	}
 
 	cronJob.Start()
