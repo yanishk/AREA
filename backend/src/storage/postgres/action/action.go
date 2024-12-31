@@ -65,10 +65,8 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 
 	rows, errQuery := self.db.Query(sqlStatement, serviceId)
 	if errQuery != nil {
-		fmt.Println("errQ:", errQuery)
 		return nil, errQuery
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {
@@ -79,6 +77,7 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 		if err != nil {
 			return nil, err
 		}
+
 		retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
 		if err != nil {
 			return actions, err

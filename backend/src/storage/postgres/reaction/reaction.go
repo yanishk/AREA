@@ -65,7 +65,7 @@ func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, 
 	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, id)
-	err := row.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam)
+	err := row.Scan(&retrievedReaction.Id, &retrievedReaction.ServiceId, &retrievedReaction.Name, &retrievedReaction.Description, &retrievedReaction.NbParam, &parametersBytes)
 	if err != nil {
 		return retrievedReaction, err
 	}
@@ -85,7 +85,6 @@ func (self *ReactionRepository) FindReactionByServiceId(serviceId string) ([]ent
 	if errQuery != nil {
 		return nil, errQuery
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {
