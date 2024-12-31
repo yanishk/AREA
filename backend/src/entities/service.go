@@ -70,3 +70,17 @@ type RedditVoteResponse struct {
 type RedditUsername struct {
 	Name string `json:"name"`
 }
+
+type WeatherResponse struct {
+	Current struct {
+		Temperature float64 `json:"temp_c"`
+	} `json:"current"`
+	Forecast struct {
+		ForecastDay []struct {
+			Day struct {
+				MaxTemperature float64 `json:"maxtemp_c"`
+				MinTemperature float64 `json:"mintemp_c"`
+			} `json:"day"`
+		} `json:"forecastday"`
+	} `json:"forecast"`
+}
