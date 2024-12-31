@@ -265,7 +265,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 	message, messageErr := workflow.ReactionParam["message"]
 	urlPost, urlErr := workflow.ReactionParam["url"]
 	if !messageErr || !urlErr {
-		return fmt.Errorf("Failed to get message body")
+		return fmt.Errorf("Failed to get message body or URL")
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -274,13 +274,15 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 		"lifecycleState": "PUBLISHED",
 		"specificContent": map[string]interface{}{
 			"com.linkedin.ugc.ShareContent": map[string]interface{}{
+				"shareMediaCategory": "ARTICLE",
 				"shareCommentary": map[string]interface{}{
 					"text": message,
 				},
-				"shareMediaCategory": "ARTICLE",
-				"media": map[string]interface{}{
-					"status":      "READY",
-					"originalUrl": urlPost,
+				"media": []map[string]interface{}{
+					{
+						"status":      "READY",
+						"originalUrl": urlPost,
+					},
 				},
 			},
 		},
@@ -303,7 +305,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
 
-	reactionFound, errReaction := self.ReactionRepository.FindReactionByID(workflow.ReactionId)
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf("Error finding reaction")
 	}
@@ -325,12 +327,8 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 		if err != nil {
 			return err
 		}
-		errPublish := self.publishURLLinkedinPost(urn, accessToken, workflow)
-		if errPublish != nil {
-			return errPublish
-		}
+		return self.publishURLLinkedinPost(urn, accessToken, workflow)
 	}
-
 	return nil
 }
 
