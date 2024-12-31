@@ -189,7 +189,7 @@ func (self *ServiceService) OAuth2Github(callbackType string) string {
 	return ("https://github.com/login/oauth/authorize?" +
 		clientIdParam + clientID +
 		redirectUriParam + callbackLink +
-		"&scope=repo admin:repo_hook write:repo_hook read:repo_hook read:user user:email user:follow read:org" +
+		"&scope=repo admin:org user" +
 		stateParam + os.Getenv("GITHUB_STATE"))
 }
 
