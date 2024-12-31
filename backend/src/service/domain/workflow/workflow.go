@@ -126,24 +126,21 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 	}
 
 	var resp *http.Response
-	if reactionFound.Name == "Start playback" {
+	switch reactionFound.Name {
+	case "Start playback":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Pause playback" {
+	case "Pause playback":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Skip track" {
+	case "Skip track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Add track to playback queue" {
+	case "Add track to playback queue":
 		uri, uriErr := workflow.ReactionParam["uri"]
 		if !uriErr {
 			return fmt.Errorf("Incorrect URI")
 		}
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
-	}
-	if reactionFound.Name == "Save a track" {
+	case "Save a track":
 		id, idErr := workflow.ReactionParam["id"]
 		if !idErr {
 			return fmt.Errorf("Incorrect ID")
@@ -151,6 +148,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
+
 	if resp != nil {
 		defer resp.Body.Close()
 	}
