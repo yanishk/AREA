@@ -46,7 +46,10 @@ type WorkflowService interface {
 	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
 	UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
-	CallTimeApi() error
+	CheckTimeAndDateActions() error
+	CheckGithubActions() error
+	CheckRedditActions() error
+	CheckWeatherActions() error
 }
 
 type AboutService interface {

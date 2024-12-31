@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	_ "github.com/lib/pq"
 	"github.com/robfig/cron/v3"
 
@@ -20,16 +18,34 @@ func main() {
 	handlers := handler.New(services)
 
 	cronJob := cron.New()
-
-	_, errCronCreation := cronJob.AddFunc("@every 1m", func() {
-		err := services.WorkflowService.CallTimeApi()
-		if err != nil {
-			fmt.Println("call Time API Failed")
-		}
+	_, errCronCreationTime := cronJob.AddFunc("@every 1m", func() {
+		services.WorkflowService.CheckTimeAndDateActions()
 	})
-	if errCronCreation != nil {
-		panic(errCronCreation)
+	if errCronCreationTime != nil {
+		panic(errCronCreationTime)
 	}
+
+	_, errCronCreationGithub := cronJob.AddFunc("@every 15m", func() {
+		services.WorkflowService.CheckGithubActions()
+	})
+	if errCronCreationGithub != nil {
+		panic(errCronCreationGithub)
+	}
+
+	_, errCronCreationReddit := cronJob.AddFunc("@every 15m", func() {
+		services.WorkflowService.CheckRedditActions()
+	})
+	if errCronCreationReddit != nil {
+		panic(errCronCreationReddit)
+	}
+
+	_, errCronCreationWeather := cronJob.AddFunc("@every 12h", func() {
+		services.WorkflowService.CheckWeatherActions()
+	})
+	if errCronCreationWeather != nil {
+		panic(errCronCreationWeather)
+	}
+
 	cronJob.Start()
 
 	errHandler := handlers.Run()
