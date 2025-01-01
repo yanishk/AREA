@@ -25,6 +25,8 @@ const failedRetrievingTokenMessage = "Could not retrieve or refresh the token"
 
 const bearerType = "Bearer "
 
+const asanaWorkspaceRoute = "https://app.asana.com/api/1.0/workspaces/"
+
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
 		ServiceService:     ServiceService,
@@ -381,7 +383,7 @@ func (self *ServiceHandler) decodeRequiredWorkspaceInfo(url string, context *gin
 // @Router /Asana/workspace/assignees [get]
 func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/users"
+	url := asanaWorkspaceRoute + workspaceId + "/users"
 
 	assignees, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
@@ -407,7 +409,7 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 // @Router /Asana/workspace/projects [get]
 func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/projects"
+	url := asanaWorkspaceRoute + workspaceId + "/projects"
 
 	projects, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
@@ -432,7 +434,7 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 // @Router /Asana/workspace/tags [get]
 func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/tags"
+	url := asanaWorkspaceRoute + workspaceId + "/tags"
 
 	tags, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
