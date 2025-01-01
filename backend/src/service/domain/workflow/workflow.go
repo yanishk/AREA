@@ -383,10 +383,8 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 }
 
 func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
-	fmt.Println(workflow.Name)
 	reactionFound, accessToken, err := self.getReactionAndToken("Asana", workflow)
 	if err != nil {
-		fmt.Println(11, err)
 		return fmt.Errorf("Could not update token or find reaction")
 	}
 
