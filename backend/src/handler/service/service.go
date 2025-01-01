@@ -336,34 +336,37 @@ func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	})
 }
 
-func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
-	var assignees entities.AsanaUserGID
-	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/users"
+func (self *ServiceHandler) decodeRequiredWorkspaceInfo(url string, context *gin.Context) (entities.AsanaWorkspacesInfo, error) {
+	var info entities.AsanaWorkspacesInfo
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": failedRetrievingTokenMessage,
-		})
-		return
+		return info, errRefreshing
 	}
 
 	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the workspace's assignees",
-		})
-		return
+		return info, errRequest
 	}
 	defer resp.Body.Close()
 
-	errDecodeAssignee := json.NewDecoder(resp.Body).Decode(&assignees)
-	if errDecodeAssignee != nil || len(assignees.Data) == 0 {
+	errDecode := json.NewDecoder(resp.Body).Decode(&info)
+	if errDecode != nil || len(info.Data) == 0 {
+		return info, errDecode
+	}
+	return info, nil
+}
+
+func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
+	workspaceId := context.Query("id")
+	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/users"
+
+	assignees, err := self.decodeRequiredWorkspaceInfo(url, context)
+	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not decode the workspace's assignees",
+			"errpr": "Could not retrieve workspace's assignees",
 		})
 		return
 	}
@@ -374,33 +377,13 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 }
 
 func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
-	var projects entities.AsanaUserGID
 	workspaceId := context.Query("id")
 	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/projects"
-	email := context.GetString("email")
-	connectionType := context.GetString("connectionType")
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
-	if errRefreshing != nil {
+	projects, err := self.decodeRequiredWorkspaceInfo(url, context)
+	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": failedRetrievingTokenMessage,
-		})
-		return
-	}
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the workspace's assignees",
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	errDecodeAssignee := json.NewDecoder(resp.Body).Decode(&projects)
-	if errDecodeAssignee != nil || len(projects.Data) == 0 {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not decode the workspace's assignees",
+			"errpr": "Could not retrieve workspace's projects",
 		})
 		return
 	}
