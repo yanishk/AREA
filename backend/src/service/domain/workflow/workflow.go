@@ -31,8 +31,6 @@ const errorRetrievingReaction = "Error finding reaction"
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
 
-const spotifyServiceName = "Spotify"
-
 func (self *WorkflowService) spotifyReactions() []string {
 	return []string{
 		"Start playback",
@@ -141,22 +139,30 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) refreshTokenForService(serviceName, reactionFoundName string, reactionsPossible []string, workflow entities.Workflow) (string, error) {
 	var accessToken string
 	var err error
+
+	for i := range reactionsPossible {
+		if reactionFoundName == reactionsPossible[i] {
+			accessToken, err = self.getAccessToken(serviceName, workflow)
+			if err != nil {
+				return accessToken, fmt.Errorf(errorUpdatingToken)
+			}
+		}
+	}
+	return accessToken, nil
+}
+
+func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	reactionsPossible := self.spotifyReactions()
-	for i := range reactionsPossible {
-		if reactionFound.Name == reactionsPossible[i] {
-			accessToken, err = self.getAccessToken(spotifyServiceName, workflow)
-			if err != nil {
-				return fmt.Errorf(errorUpdatingToken)
-			}
-		}
+	accessToken, err := self.refreshTokenForService("Spotify", reactionFound.Name, self.spotifyReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
 	}
 
 	var resp *http.Response
@@ -337,21 +343,14 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 }
 
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
-	var accessToken string
-	var err error
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	reactionsPossible := self.linkedinReactions()
-	for i := range reactionsPossible {
-		if reactionFound.Name == reactionsPossible[i] {
-			accessToken, err = self.getAccessToken("Linkedin", workflow)
-			if err != nil {
-				return fmt.Errorf(errorUpdatingToken)
-			}
-		}
+	accessToken, err := self.refreshTokenForService("Linkedin", reactionFound.Name, self.linkedinReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
 	}
 
 	switch reactionFound.Name {
@@ -423,21 +422,14 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 }
 
 func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
-	var accessToken string
-	var err error
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	reactionsPossible := self.asanaReactions()
-	for i := range reactionsPossible {
-		if reactionFound.Name == reactionsPossible[i] {
-			accessToken, err = self.getAccessToken("Asana", workflow)
-			if err != nil {
-				return fmt.Errorf(errorUpdatingToken)
-			}
-		}
+	accessToken, err := self.refreshTokenForService("Asana", reactionFound.Name, self.asanaReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
 	}
 
 	switch reactionFound.Name {
