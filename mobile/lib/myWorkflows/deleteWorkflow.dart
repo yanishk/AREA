@@ -21,7 +21,7 @@ class DeleteWorkflows {
   }
 
   static Future<void> deleteWorkflow(String workflowID) async {
-    String apiRoute = "workflow/delete?id=$workflowID";
+    String apiRoute = "workflows/$workflowID";
     Response response = await ApiRequest.delete(
       apiRoute,
     );

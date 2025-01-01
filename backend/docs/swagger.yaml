@@ -356,12 +356,6 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_workflow.WorkflowDeleteWorkflowBadRequestResponse:
-    properties:
-      error:
-        example: Invalid workflow id
-        type: string
-    type: object
   docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse:
     properties:
       error:
@@ -404,7 +398,7 @@ definitions:
   docs_workflow.WorkflowUpdateWorkflowBadRequestResponse:
     properties:
       error:
-        example: Invalid workflow id-Invalid request body
+        example: Invalid request body
         type: string
     type: object
   docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse:
@@ -1060,9 +1054,29 @@ paths:
       summary: Modify Password
       tags:
       - Users
-  /workflow/create:
+  /workflows:
+    get:
+      description: Retrieve the workflows of the user actually connected
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
+      summary: Retrieve User's Workflows
+      tags:
+      - Workflows
     post:
-      description: Create a Workflow
+      description: Create a workflow
       parameters:
       - description: Workflow informations
         in: body
@@ -1092,12 +1106,12 @@ paths:
       summary: Create Workflow
       tags:
       - Workflows
-  /workflow/delete:
+  /workflows/{id}:
     delete:
       description: Delete a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -1108,10 +1122,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1123,33 +1133,11 @@ paths:
       summary: Delete Workflow
       tags:
       - Workflows
-  /workflow/retrieve:
-    get:
-      description: Retrieve the workflows of the user actually connected
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
-      summary: Retrieve User's Workflows
-      tags:
-      - Workflows
-  /workflow/update:
     put:
       description: Update a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string

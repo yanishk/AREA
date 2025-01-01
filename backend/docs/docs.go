@@ -645,9 +645,39 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/create": {
+        "/workflows": {
+            "get": {
+                "description": "Retrieve the workflows of the user actually connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Retrieve User's Workflows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Create a Workflow",
+                "description": "Create a workflow",
                 "produces": [
                     "application/json"
                 ],
@@ -694,86 +724,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/delete": {
-            "delete": {
-                "description": "Delete a user's workflow by specifying the workflow id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Delete Workflow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workflow id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/retrieve": {
-            "get": {
-                "description": "Retrieve the workflows of the user actually connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Retrieve User's Workflows",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/update": {
+        "/workflows/{id}": {
             "put": {
                 "description": "Update a user's workflow by specifying the workflow id",
                 "produces": [
@@ -788,7 +739,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Workflow id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -818,6 +769,45 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Delete Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -1431,15 +1421,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowDeleteWorkflowBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid workflow id"
-                }
-            }
-        },
         "docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1501,7 +1482,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid workflow id-Invalid request body"
+                    "example": "Invalid request body"
                 }
             }
         },
