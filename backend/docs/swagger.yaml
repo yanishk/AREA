@@ -358,6 +358,19 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Cannot retrieve Github user repositories
+        type: string
+    type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse:
+    properties:
+      repositories:
+        items:
+          $ref: '#/definitions/entities.GithubRepository'
+        type: array
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -535,6 +548,11 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  entities.GithubRepository:
+    properties:
+      full_name:
+        type: string
     type: object
   entities.NewWorkflow:
     properties:
@@ -821,6 +839,23 @@ paths:
       summary: Retrieve Discord User Servers
       tags:
       - Service
+  /Github/user/repositories:
+    get:
+      description: Retrieve the repositories of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse'
+      summary: Retrieve User Repositories
+      tags:
+      - Github
   /about.json:
     get:
       description: Get about.json file

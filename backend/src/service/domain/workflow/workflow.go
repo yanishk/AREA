@@ -973,18 +973,10 @@ func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenA
 }
 
 func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
-	var repositories []entities.GithubRepository
-
-	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"user/repos", "GET", accessBearer, accessToken, nil)
+	repositories, err := self.ServiceService.RequestGithubUserRepositories(accessToken)
 	if err != nil {
 		return err
 	}
-
-	err = json.NewDecoder(resp.Body).Decode(&repositories)
-	if err != nil {
-		return err
-	}
-
 	return self.CheckActionDataLen(workflow, float64(len(repositories)))
 }
 

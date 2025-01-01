@@ -207,6 +207,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/Github/user/repositories": {
+            "get": {
+                "description": "Retrieve the repositories of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Github"
+                ],
+                "summary": "Retrieve User Repositories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/about.json": {
             "get": {
                 "description": "Get about.json file",
@@ -1557,6 +1583,26 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Cannot retrieve Github user repositories"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.GithubRepository"
+                    }
+                }
+            }
+        },
         "docs_userservice.UserServiceServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1821,6 +1867,14 @@ const docTemplate = `{
                             }
                         }
                     }
+                }
+            }
+        },
+        "entities.GithubRepository": {
+            "type": "object",
+            "properties": {
+                "full_name": {
+                    "type": "string"
                 }
             }
         },

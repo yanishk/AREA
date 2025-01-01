@@ -152,3 +152,11 @@ func (self *UserServiceService) UpdateTokenForService(code string, serviceName s
 	self.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
 	return nil
 }
+
+func (self *UserServiceService) RetrieveGithubUserRepositories(email string, connectionType string) ([]entities.GithubRepository, error) {
+	accessToken, err := self.CallApiAndRefresh(email, connectionType, "Github")
+	if err != nil {
+		return []entities.GithubRepository{}, err
+	}
+	return self.ServiceService.RequestGithubUserRepositories(accessToken)
+}
