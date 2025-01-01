@@ -80,6 +80,51 @@ definitions:
       permissions:
         type: string
     type: object
+  docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve or refresh the token-Could not retrieve the user's
+          workspaces-Could not decode the user's workspaces
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse:
+    properties:
+      workspaces:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's assignees
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse:
+    properties:
+      assignees:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's projects
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse:
+    properties:
+      projects:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's tags
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse:
+    properties:
+      tags:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -313,6 +358,19 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Cannot retrieve Github user repositories
+        type: string
+    type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse:
+    properties:
+      repositories:
+        items:
+          $ref: '#/definitions/entities.GithubRepository'
+        type: array
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -479,6 +537,23 @@ definitions:
       serviceid:
         type: string
     type: object
+  entities.AsanaWorkspacesInfo:
+    properties:
+      data:
+        items:
+          properties:
+            gid:
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+    type: object
+  entities.GithubRepository:
+    properties:
+      full_name:
+        type: string
+    type: object
   entities.NewWorkflow:
     properties:
       actiondata:
@@ -638,6 +713,92 @@ paths:
       summary: Retrieve Reactions From Service
       tags:
       - Service
+  /Asana/user/workspaces:
+    get:
+      description: Retrieve the workspaces from the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse'
+      summary: Retrieve Asana Workspaces
+      tags:
+      - Service
+  /Asana/workspace/assignees:
+    get:
+      description: Retrieve the assignees from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Assignees
+      tags:
+      - Service
+  /Asana/workspace/projects:
+    get:
+      description: Retrieve the projects from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Projects
+      tags:
+      - Service
+  /Asana/workspace/tags:
+    get:
+      description: Retrieve the tags from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Tags
+      tags:
+      - Service
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -678,6 +839,23 @@ paths:
       summary: Retrieve Discord User Servers
       tags:
       - Service
+  /Github/user/repositories:
+    get:
+      description: Retrieve the repositories of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse'
+      summary: Retrieve User Repositories
+      tags:
+      - Github
   /about.json:
     get:
       description: Get about.json file

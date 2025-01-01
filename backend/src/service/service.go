@@ -37,11 +37,13 @@ type ServiceService interface {
 	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
 	RequestToTimeApi() (entities.TimeResponse, error)
 	OAuth2Service(serviceName string, callbackType string, appType string) (string, error)
+	RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error)
 }
 
 type UserServiceService interface {
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
 	UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error
+	RetrieveGithubUserRepositories(email string, connectionType string) ([]entities.GithubRepository, error)
 }
 
 type WorkflowService interface {
