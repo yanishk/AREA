@@ -25,9 +25,13 @@ const botBearer = "Bot "
 const accessBearer = "Bearer "
 
 const errorUpdatingWorkflow = "Could not update workflow"
+const errorUpdatingToken = "Could not update token"
+const errorRetrievingReaction = "Error finding reaction"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
+
+const spotifyServiceName = "Spotify"
 
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
@@ -114,45 +118,59 @@ func (self *WorkflowService) DeleteWorkflow(email string, connectionType string,
 	return nil
 }
 
-func (self *WorkflowService) getReactionAndToken(service string, workflow entities.Workflow) (entities.Reaction, string, error) {
+func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
-		return reactionFound, "", fmt.Errorf("Error finding reaction")
-	}
-
-	accessToken, err := self.getAccessToken(service, workflow)
-	if err != nil {
-		return reactionFound, accessToken, fmt.Errorf("Could not update token")
-	}
-	return reactionFound, accessToken, nil
-}
-
-func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
-	reactionFound, accessToken, err := self.getReactionAndToken("Spotify", workflow)
-	if err != nil {
-		return fmt.Errorf("Could not update token or find reaction")
+		return fmt.Errorf(errorRetrievingReaction)
 	}
 
 	var resp *http.Response
 	switch reactionFound.Name {
 	case "Start playback":
+		accessToken, err := self.getAccessToken(spotifyServiceName, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
 	case "Pause playback":
+		accessToken, err := self.getAccessToken(spotifyServiceName, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
 	case "Skip track":
+		accessToken, err := self.getAccessToken(spotifyServiceName, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
 	case "Add track to playback queue":
+		accessToken, err := self.getAccessToken(spotifyServiceName, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		uri, uriErr := workflow.ReactionParam["uri"]
 		if !uriErr {
 			return fmt.Errorf("Incorrect URI")
 		}
+
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
 	case "Save a track":
+		accessToken, err := self.getAccessToken(spotifyServiceName, workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		id, idErr := workflow.ReactionParam["id"]
 		if !idErr {
 			return fmt.Errorf("Incorrect ID")
 		}
+
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
 	}
@@ -165,9 +183,9 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 
 func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
-	reactionFound, _, err := self.getReactionAndToken("Discord", workflow)
-	if err != nil {
-		return fmt.Errorf("Could not find reaction")
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
 	}
 
 	if reactionFound.Name == "Post a message to a channel" {
@@ -199,7 +217,7 @@ func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken str
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Authorization", accessBearer+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 
@@ -218,6 +236,7 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 	if err != nil {
 		return "", nil
 	}
+	defer res.Body.Close()
 
 	errDecode := json.NewDecoder(res.Body).Decode(&sub)
 	if errDecode != nil {
@@ -256,10 +275,12 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 		return fmt.Errorf("Could not encode the body")
 	}
 
-	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	res, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
 	if errLinkedinRequest != nil {
 		return errLinkedinRequest
 	}
+	defer res.Body.Close()
+
 	return nil
 }
 
@@ -306,19 +327,29 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 }
 
 func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
-	reactionFound, accessToken, err := self.getReactionAndToken("Linkedin", workflow)
-	if err != nil {
-		return fmt.Errorf("Could not update token or find reaction")
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
 	}
 
 	switch reactionFound.Name {
 	case "Share an update":
+		accessToken, err := self.getAccessToken("Linkedin", workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
 		if err != nil {
 			return err
 		}
 		return self.publishTextLinkedinPost(urn, accessToken, workflow)
 	case "Share a link":
+		accessToken, err := self.getAccessToken("Linkedin", workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
 		urn, err := self.getUserUrnLinkedin(accessToken, workflow)
 		if err != nil {
 			return err
@@ -328,10 +359,81 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 	return nil
 }
 
+func (self *WorkflowService) createTaskAsana(accessToken string, workflow entities.Workflow) error {
+	workspace, workspaceExist := workflow.ReactionParam["workspace"]
+	project, projectExist := workflow.ReactionParam["project"]
+	taskName, taskNameExist := workflow.ReactionParam["name"]
+	notes, notesExist := workflow.ReactionParam["notes"]
+	due, dueExist := workflow.ReactionParam["due"]
+	assignee, assigneeExist := workflow.ReactionParam["assignee"]
+	tag, tagExist := workflow.ReactionParam["tag"]
+
+	if !taskNameExist || !workspaceExist {
+		return fmt.Errorf("Missing required field")
+	}
+
+	content := map[string]interface{}{
+		"data": map[string]interface{}{
+			"workspace": workspace,
+			"name":      taskName,
+		},
+	}
+
+	if projectExist {
+		content["data"].(map[string]interface{})["projects"] = project
+	}
+	if notesExist {
+		content["data"].(map[string]interface{})["notes"] = notes
+	}
+	if dueExist {
+		content["data"].(map[string]interface{})["due_on"] = due
+	}
+	if assigneeExist {
+		content["data"].(map[string]interface{})["assignee"] = assignee
+	}
+	if tagExist {
+		content["data"].(map[string]interface{})["tags"] = tag
+	}
+
+	contentBytes, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Error marshaling")
+	}
+
+	url := "https://app.asana.com/api/1.0/tasks"
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
+	}
+
+	switch reactionFound.Name {
+	case "Create task":
+		accessToken, err := self.getAccessToken("Asana", workflow)
+		if err != nil {
+			return fmt.Errorf(errorUpdatingToken)
+		}
+
+		return self.createTaskAsana(accessToken, workflow)
+	}
+
+	return nil
+}
+
 func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
 	self.CheckSpotifyReactions(workflow)
 	self.CheckDiscordReactions(workflow)
 	self.CheckLinkedinReactions(workflow)
+	self.CheckAsanaReactions(workflow)
 }
 
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {

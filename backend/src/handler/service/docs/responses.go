@@ -111,7 +111,7 @@ type ServiceGetAsanaUserWorkspacesInternalServerErrorResponse struct {
 
 // Asana Get Workspace Assignees
 type ServiceGetAsanaWorkspaceAssigneesSuccessResponse struct {
-	Assignees entities.AsanaUserGID
+	Assignees entities.AsanaWorkspacesInfo
 }
 
 type ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse struct {
