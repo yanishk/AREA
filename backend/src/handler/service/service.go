@@ -61,7 +61,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
-	private.GET("/Asana/user/workflows", self.getAsanaUserWorkspaces)
+	private.GET("/Asana/user/workspaces", self.getAsanaUserWorkspaces)
 }
 
 // @Summary		Service OAuth2
@@ -301,7 +301,7 @@ func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve or refresh the token",
@@ -312,7 +312,7 @@ func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
+			"error": "Could not retrieve the user's workspaces",
 		})
 		return
 	}
