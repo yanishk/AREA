@@ -125,6 +125,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               ),
               onPressed: () {
                 developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");
+                CreateData.selectOrUpdateWorkflow = true;
                 Navigator.pop(Globaldata.myContext);
               },
               size: Size(double.infinity, 60),

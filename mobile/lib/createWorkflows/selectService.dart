@@ -112,12 +112,16 @@ class MySquareServicesCard extends StatelessWidget {
     await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
-          builder: (context) => SelectActionOrReactionPage(
-            serviceIndex: servicesIndex,
-          )),
+        builder: (context) => SelectActionOrReactionPage(
+          serviceIndex: servicesIndex,
+        )
+      ),
     );
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
-      Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      if (CreateData.selectOrUpdateWorkflow) {
+        CreateData.selectOrUpdateWorkflow = false;
+        Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      }
     }
   }
 

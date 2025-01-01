@@ -116,6 +116,8 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
       );
       actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
+    } else {
+      CreateData.selectOrUpdateWorkflow = true;
     }
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];
