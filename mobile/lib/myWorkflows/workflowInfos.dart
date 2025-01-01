@@ -57,9 +57,9 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
       } else {
         editNameButtonText = "Edit name";
         ApiRequest.put(
-          "workflow/update?id=$workflowID",
+          "workflows/$workflowID",
           jsonEncode(<String, dynamic>{
-            'name':workflowTitleController.text,
+            'name': workflowTitleController.text,
           }),
         );
       }
@@ -107,7 +107,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
                 onToggle: (bool) {
                   changeActivationBool();
                   ApiRequest.put(
-                    "workflow/update?id=$workflowID",
+                    "workflows/$workflowID",
                     jsonEncode(<String, dynamic>{
                       'isactivated': MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].isActivated,
                     }),

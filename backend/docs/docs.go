@@ -15,6 +15,137 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Asana/user/workspaces": {
+            "get": {
+                "description": "Retrieve the workspaces from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspaces",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Asana/workspace/assignees": {
+            "get": {
+                "description": "Retrieve the assignees from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Assignees",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Asana/workspace/projects": {
+            "get": {
+                "description": "Retrieve the projects from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Projects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Asana/workspace/tags": {
+            "get": {
+                "description": "Retrieve the tags from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Tags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/Discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
@@ -671,9 +802,39 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/create": {
+        "/workflows": {
+            "get": {
+                "description": "Retrieve the workflows of the user actually connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Retrieve User's Workflows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Create a Workflow",
+                "description": "Create a workflow",
                 "produces": [
                     "application/json"
                 ],
@@ -720,86 +881,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/delete": {
-            "delete": {
-                "description": "Delete a user's workflow by specifying the workflow id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Delete Workflow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workflow id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/retrieve": {
-            "get": {
-                "description": "Retrieve the workflows of the user actually connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Retrieve User's Workflows",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/update": {
+        "/workflows/{id}": {
             "put": {
                 "description": "Update a user's workflow by specifying the workflow id",
                 "produces": [
@@ -814,7 +896,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Workflow id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -844,6 +926,45 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Delete Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
                         }
                     }
                 }
@@ -1042,6 +1163,74 @@ const docTemplate = `{
                 },
                 "permissions": {
                     "type": "string"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's workspaces-Could not decode the user's workspaces"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workspaces": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's assignees"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "assignees": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's projects"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's tags"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
                 }
             }
         },
@@ -1477,15 +1666,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowDeleteWorkflowBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid workflow id"
-                }
-            }
-        },
         "docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1547,7 +1727,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid workflow id-Invalid request body"
+                    "example": "Invalid request body"
                 }
             }
         },
@@ -1668,6 +1848,25 @@ const docTemplate = `{
                 },
                 "serviceid": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.AsanaWorkspacesInfo": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gid": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         },
