@@ -90,7 +90,7 @@ definitions:
   docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse:
     properties:
       workspaces:
-        $ref: '#/definitions/entities.AsanaUserWorkspaces'
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
     type: object
   docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
     properties:
@@ -523,18 +523,6 @@ definitions:
         type: array
       serviceid:
         type: string
-    type: object
-  entities.AsanaUserWorkspaces:
-    properties:
-      data:
-        items:
-          properties:
-            gid:
-              type: string
-            name:
-              type: string
-          type: object
-        type: array
     type: object
   entities.AsanaWorkspacesInfo:
     properties:

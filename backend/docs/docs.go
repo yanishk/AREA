@@ -1153,7 +1153,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "workspaces": {
-                    "$ref": "#/definitions/entities.AsanaUserWorkspaces"
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
                 }
             }
         },
@@ -1802,25 +1802,6 @@ const docTemplate = `{
                 },
                 "serviceid": {
                     "type": "string"
-                }
-            }
-        },
-        "entities.AsanaUserWorkspaces": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "gid": {
-                                "type": "string"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        }
-                    }
                 }
             }
         },
