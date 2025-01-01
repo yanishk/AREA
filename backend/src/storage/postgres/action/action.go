@@ -52,7 +52,7 @@ func (self *ActionRepository) FindActionById(id string) (entities.Action, error)
 		return action, err
 	}
 
-	action, err = self.UnmarshalParameters(parametersBytes, action)
+	action, err = self.unmarshalParameters(parametersBytes, action)
 	if err != nil {
 		return action, err
 	}
