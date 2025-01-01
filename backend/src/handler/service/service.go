@@ -388,7 +388,7 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	assignees, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"errpr": "Could not retrieve workspace's assignees",
+			"error": "Could not retrieve workspace's assignees",
 		})
 		return
 	}
@@ -413,7 +413,7 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	projects, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"errpr": "Could not retrieve workspace's projects",
+			"error": "Could not retrieve workspace's projects",
 		})
 		return
 	}
@@ -438,7 +438,7 @@ func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	tags, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"errpr": "Could not retrieve workspace's tags",
+			"error": "Could not retrieve workspace's tags",
 		})
 		return
 	}
