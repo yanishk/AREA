@@ -59,10 +59,17 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		services.GET("/reactions", self.RetrieveReactionsServices)
 	}
 
-	private.GET("/Discord/user/servers", self.getDiscordUserServers)
-	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
-	private.GET("/Asana/user/workspaces", self.getAsanaUserWorkspaces)
-	private.GET("/Asana/workspace/assignees", self.getAsanaWorkspaceAssignees)
+	discord := private.Group("/Discord")
+	{
+		discord.GET("/user/servers", self.getDiscordUserServers)
+		discord.GET("/server/channels", self.getDiscordGuildChannels)
+	}
+
+	asana := private.Group("/Asana")
+	{
+		asana.GET("/user/workspaces", self.getAsanaUserWorkspaces)
+		asana.GET("/workspace/assignees", self.getAsanaWorkspaceAssignees)
+	}
 }
 
 // @Summary		Service OAuth2
