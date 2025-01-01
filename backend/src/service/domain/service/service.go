@@ -37,6 +37,8 @@ const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
 const codeResponseType = "&response_type=code"
 
+const githubBaseUrl = "https://api.github.com/"
+
 func NewServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, WorkflowRepository storage.WorkflowRepository,
 	ReactionRepository storage.ReactionRepository) *ServiceService {
@@ -676,7 +678,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceNa
 	} else if serviceName == "Discord" {
 		request, err = GetOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
 	} else if serviceName == "Github" {
-		request, err = GetOAuth2UserEmailRequest("https://api.github.com/user/emails", accessToken)
+		request, err = GetOAuth2UserEmailRequest(githubBaseUrl+"user/emails", accessToken)
 	} else {
 		return userInfo, fmt.Errorf(UnknownServiceMessage)
 	}
@@ -726,4 +728,19 @@ func (self *ServiceService) RequestToTimeApi() (entities.TimeResponse, error) {
 		return timeRes, errDecoder
 	}
 	return timeRes, nil
+}
+
+func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error) {
+	var repositories []entities.GithubRepository
+
+	resp, err := self.ExecuteApiRequest(githubBaseUrl+"user/repos", "GET", "Bearer ", accessToken, nil)
+	if err != nil {
+		return repositories, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&repositories)
+	if err != nil {
+		return repositories, err
+	}
+	return repositories, nil
 }
