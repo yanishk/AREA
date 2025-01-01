@@ -732,8 +732,9 @@ func (self *ServiceService) RequestToTimeApi() (entities.TimeResponse, error) {
 
 func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error) {
 	var repositories []entities.GithubRepository
+	url := githubBaseUrl + "user/repos"
 
-	resp, err := self.ExecuteApiRequest(githubBaseUrl+"user/repos", "GET", "Bearer ", accessToken, nil)
+	resp, err := self.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
 	if err != nil {
 		return repositories, err
 	}
