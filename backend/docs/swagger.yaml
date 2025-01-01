@@ -95,14 +95,35 @@ definitions:
   docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
     properties:
       error:
-        example: Could not retrieve or refresh the token-Could not retrieve the workspace's
-          assignees-Could not decode the workspace's assignees
+        example: Could not retrieve workspace's assignees
         type: string
     type: object
   docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse:
     properties:
       assignees:
-        $ref: '#/definitions/entities.AsanaUserGID'
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's projects
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse:
+    properties:
+      projects:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's tags
+        type: string
+    type: object
+  docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse:
+    properties:
+      tags:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
     type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
@@ -503,17 +524,19 @@ definitions:
       serviceid:
         type: string
     type: object
-  entities.AsanaUserGID:
+  entities.AsanaUserWorkspaces:
     properties:
       data:
         items:
           properties:
             gid:
               type: string
+            name:
+              type: string
           type: object
         type: array
     type: object
-  entities.AsanaUserWorkspaces:
+  entities.AsanaWorkspacesInfo:
     properties:
       data:
         items:
@@ -722,6 +745,52 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse'
       summary: Retrieve Asana Workspace Assignees
+      tags:
+      - Service
+  /Asana/workspace/projects:
+    get:
+      description: Retrieve the projects from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Projects
+      tags:
+      - Service
+  /Asana/workspace/tags:
+    get:
+      description: Retrieve the tags from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Tags
       tags:
       - Service
   /Discord/server/channels:

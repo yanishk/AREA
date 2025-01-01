@@ -115,5 +115,23 @@ type ServiceGetAsanaWorkspaceAssigneesSuccessResponse struct {
 }
 
 type ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the workspace's assignees-Could not decode the workspace's assignees"`
+	Msg string `json:"error"example:"Could not retrieve workspace's assignees"`
+}
+
+// Asana Get Workspace Projects
+type ServiceGetAsanaWorkspaceProjectsSuccessResponse struct {
+	Projects entities.AsanaWorkspacesInfo
+}
+
+type ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve workspace's projects"`
+}
+
+// Asana Get Workspace Tags
+type ServiceGetAsanaWorkspaceTagsSuccessResponse struct {
+	Tags entities.AsanaWorkspacesInfo
+}
+
+type ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve workspace's tags"`
 }

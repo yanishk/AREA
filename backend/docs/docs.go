@@ -76,6 +76,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/Asana/workspace/projects": {
+            "get": {
+                "description": "Retrieve the projects from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Projects",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Asana/workspace/tags": {
+            "get": {
+                "description": "Retrieve the tags from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Tags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/Discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
@@ -1038,7 +1108,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Could not retrieve or refresh the token-Could not retrieve the workspace's assignees-Could not decode the workspace's assignees"
+                    "example": "Could not retrieve workspace's assignees"
                 }
             }
         },
@@ -1046,7 +1116,41 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "assignees": {
-                    "$ref": "#/definitions/entities.AsanaUserGID"
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's projects"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's tags"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
                 }
             }
         },
@@ -1647,7 +1751,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entities.AsanaUserGID": {
+        "entities.AsanaUserWorkspaces": {
             "type": "object",
             "properties": {
                 "data": {
@@ -1657,13 +1761,16 @@ const docTemplate = `{
                         "properties": {
                             "gid": {
                                 "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
                             }
                         }
                     }
                 }
             }
         },
-        "entities.AsanaUserWorkspaces": {
+        "entities.AsanaWorkspacesInfo": {
             "type": "object",
             "properties": {
                 "data": {

@@ -396,6 +396,15 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	})
 }
 
+
+// @Summary		Retrieve Asana Workspace Projects
+// @Description	Retrieve the projects from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse
+// @Router /Asana/workspace/projects [get]
 func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	workspaceId := context.Query("id")
 	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/projects"
@@ -413,6 +422,14 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspace Tags
+// @Description	Retrieve the tags from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse
+// @Router /Asana/workspace/tags [get]
 func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	workspaceId := context.Query("id")
 	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/tags"
@@ -420,7 +437,7 @@ func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	tags, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"errpr": "Could not retrieve workspace's projects",
+			"errpr": "Could not retrieve workspace's tags",
 		})
 		return
 	}
