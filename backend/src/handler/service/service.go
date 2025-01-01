@@ -398,7 +398,6 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	})
 }
 
-
 // @Summary		Retrieve Asana Workspace Projects
 // @Description	Retrieve the projects from the selected workspace
 // @Tags			Service
