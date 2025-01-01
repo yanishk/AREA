@@ -99,3 +99,21 @@ type ServiceGetDiscordGuildChannelsSuccessResponse struct {
 type ServiceGetDiscordGuildChannelsInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve the server's channels"`
 }
+
+// Asana Get User Workspaces
+type ServiceGetAsanaUserWorkspacesSuccessResponse struct {
+	Workspaces entities.AsanaUserWorkspaces
+}
+
+type ServiceGetAsanaUserWorkspacesInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the user's workspaces-Could not decode the user's workspaces"`
+}
+
+// Asana Get Workspace Assignees
+type ServiceGetAsanaWorkspaceAssigneesSuccessResponse struct {
+	Assignees entities.AsanaUserGID
+}
+
+type ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the workspace's assignees-Could not decode the workspace's assignees"`
+}

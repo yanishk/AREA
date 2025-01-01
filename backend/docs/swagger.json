@@ -6,6 +6,67 @@
     },
     "host": "localhost:8080",
     "paths": {
+        "/Asana/user/workspaces": {
+            "get": {
+                "description": "Retrieve the workspaces from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspaces",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/Asana/workspace/assignees": {
+            "get": {
+                "description": "Retrieve the assignees from the selected workspace",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve Asana Workspace Assignees",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "workspace id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/Discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
@@ -946,6 +1007,40 @@
                 }
             }
         },
+        "docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's workspaces-Could not decode the user's workspaces"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workspaces": {
+                    "$ref": "#/definitions/entities.AsanaUserWorkspaces"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve or refresh the token-Could not retrieve the workspace's assignees-Could not decode the workspace's assignees"
+                }
+            }
+        },
+        "docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "assignees": {
+                    "$ref": "#/definitions/entities.AsanaUserGID"
+                }
+            }
+        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1540,6 +1635,41 @@
                 },
                 "serviceid": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.AsanaUserGID": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gid": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "entities.AsanaUserWorkspaces": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gid": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         },

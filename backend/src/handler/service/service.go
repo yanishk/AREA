@@ -18,7 +18,7 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const InternalServerErrorMessage = "Internal server error"
+const internalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
 
@@ -51,20 +51,17 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-
 	services := private.Group("/services")
 	{
 		services.GET("/:id", self.RetrieveServiceById)
 		services.GET("/actions", self.RetrieveActionsServices)
 		services.GET("/reactions", self.RetrieveReactionsServices)
 	}
-
 	discord := private.Group("/Discord")
 	{
 		discord.GET("/user/servers", self.getDiscordUserServers)
 		discord.GET("/server/channels", self.getDiscordGuildChannels)
 	}
-
 	asana := private.Group("/Asana")
 	{
 		asana.GET("/user/workspaces", self.getAsanaUserWorkspaces)
@@ -125,7 +122,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -149,7 +146,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -194,7 +191,7 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -212,7 +209,7 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -303,6 +300,13 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspaces
+// @Description	Retrieve the workspaces from the authenticated user
+// @Tags			Service
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse
+// @Router /Asana/user/workspaces [get]
 func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	var workspaces entities.AsanaUserWorkspaces
 	url := "https://app.asana.com/api/1.0/workspaces"
@@ -339,6 +343,14 @@ func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspace Assignees
+// @Description	Retrieve the assignees from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse
+// @Router /Asana/workspace/assignees [get]
 func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	var assignees entities.AsanaUserGID
 	workspaceId := context.Query("id")
