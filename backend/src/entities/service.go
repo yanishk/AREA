@@ -115,6 +115,12 @@ type LinkedinSub struct {
 }
 
 // Asana
+type AsanaUserGID struct {
+	Data []struct {
+		Gid string `json:"gid"`
+	} `json:"data"`
+}
+
 type AsanaUserWorkspaces struct {
 	Data []struct {
 		Gid  string `json:"gid"`
