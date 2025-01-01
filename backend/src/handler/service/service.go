@@ -1,6 +1,7 @@
 package service_handler
 
 import (
+	"backend/src/entities"
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
@@ -60,6 +61,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
+	private.GET("/Asana/user/workflows", self.getAsanaUserWorkspaces)
 }
 
 // @Summary		Service OAuth2
@@ -290,5 +292,41 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"channels": channels,
+	})
+}
+
+func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
+	var workspaces entities.AsanaUserWorkspaces
+	url := "https://app.asana.com/api/1.0/workspaces"
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
+	if errRefreshing != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve or refresh the token",
+		})
+		return
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": getServerChannelsFailedMessage,
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	errDecodeWorkspace := json.NewDecoder(resp.Body).Decode(&workspaces)
+	if errDecodeWorkspace != nil || len(workspaces.Data) == 0 {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not decode the user's workspaces",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"workspaces": workspaces,
 	})
 }
