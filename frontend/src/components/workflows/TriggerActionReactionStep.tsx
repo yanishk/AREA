@@ -3,10 +3,17 @@ import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 
+type Parameters = {
+    isexhaustive: boolean;
+    name: string;
+    type: string;
+    route: string | null;
+    values: string[];
+};
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
-    selectedItem: {name: string, id: string} | null;
-    fields: any[];
+    selectedItem: {name: string, id: string, parameters: Parameters[]} | null;
+    // fields: any[];
     itemFieldValues: Record<string, string>;
     handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
@@ -17,13 +24,32 @@ interface TriggerActionReactionProps {
 const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     selectedService,
     selectedItem,
-    fields,
     itemFieldValues,
     handleFieldChange,
     goToStep,
     goBack,
     type,
 }) => {
+
+    const getFieldType = (param: Parameters) => {
+        if (param.isexhaustive === true) {
+            return "select";
+        }
+
+        if (param.isexhaustive === false && param.route === null) {
+            return "input";
+        }
+
+        return "text";
+    };
+
+    const fields = selectedItem?.parameters.map((param) => ({
+        id: param.name,
+        label: param.name,
+        type: getFieldType(param),
+        options: param.values.length > 0 ? param.values : undefined,
+    })) || [];
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -70,6 +96,11 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         values={itemFieldValues}
                         onChange={(id, value) => handleFieldChange(id, value, type)}
                     />
+                    {/* <DynamicFields
+                        fields={fields}
+                        values={itemFieldValues}
+                        onChange={(id, value) => handleFieldChange(id, value, type)}
+                    /> */}
                     <TriggerButton
                         text="Create Trigger"
                         textColor="text-black"
