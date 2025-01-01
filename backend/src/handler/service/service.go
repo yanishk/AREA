@@ -18,12 +18,14 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const InternalServerErrorMessage = "Internal server error"
+const internalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
 const failedRetrievingTokenMessage = "Could not retrieve or refresh the token"
 
 const bearerType = "Bearer "
+
+const asanaWorkspaceRoute = "https://app.asana.com/api/1.0/workspaces/"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -54,20 +56,24 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 		service.GET("/actions", self.RetrieveActionsFromService)
 		service.GET("/reactions", self.RetrieveReactionsFromService)
 	}
-
 	services := private.Group("/services")
 	{
 		services.GET("/:id", self.RetrieveServiceById)
 		services.GET("/actions", self.RetrieveActionsServices)
 		services.GET("/reactions", self.RetrieveReactionsServices)
 	}
-
-	private.GET("/Discord/user/servers", self.getDiscordUserServers)
-	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
-	private.GET("/Asana/user/workspaces", self.getAsanaUserWorkspaces)
-	private.GET("/Asana/workspace/assignees", self.getAsanaWorkspaceAssignees)
-	private.GET("/Asana/workspace/projects", self.getAsanaWorkspaceProjects)
-	private.GET("/Asana/workspace/tags", self.getAsanaWorkspaceTags)
+	discord := private.Group("/Discord")
+	{
+		discord.GET("/user/servers", self.getDiscordUserServers)
+		discord.GET("/server/channels", self.getDiscordGuildChannels)
+	}
+	asana := private.Group("/Asana")
+	{
+		asana.GET("/user/workspaces", self.getAsanaUserWorkspaces)
+		asana.GET("/workspace/assignees", self.getAsanaWorkspaceAssignees)
+		asana.GET("/workspace/projects", self.getAsanaWorkspaceProjects)
+		asana.GET("/workspace/tags", self.getAsanaWorkspaceTags)
+	}
 }
 
 // @Summary		Service OAuth2
@@ -123,7 +129,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -147,7 +153,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -192,7 +198,7 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -210,7 +216,7 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -301,6 +307,13 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspaces
+// @Description	Retrieve the workspaces from the authenticated user
+// @Tags			Service
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse
+// @Router /Asana/user/workspaces [get]
 func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	var workspaces entities.AsanaUserWorkspaces
 	url := "https://app.asana.com/api/1.0/workspaces"
@@ -360,9 +373,17 @@ func (self *ServiceHandler) decodeRequiredWorkspaceInfo(url string, context *gin
 	return info, nil
 }
 
+// @Summary		Retrieve Asana Workspace Assignees
+// @Description	Retrieve the assignees from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse
+// @Router /Asana/workspace/assignees [get]
 func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/users"
+	url := asanaWorkspaceRoute + workspaceId + "/users"
 
 	assignees, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
@@ -377,9 +398,17 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspace Projects
+// @Description	Retrieve the projects from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse
+// @Router /Asana/workspace/projects [get]
 func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/projects"
+	url := asanaWorkspaceRoute + workspaceId + "/projects"
 
 	projects, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
@@ -394,14 +423,22 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve Asana Workspace Tags
+// @Description	Retrieve the tags from the selected workspace
+// @Tags			Service
+// @Produce		json
+// @Param        id  query      string  true  "workspace id"
+// @Success		200		{object}	docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse
+// @Router /Asana/workspace/tags [get]
 func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	workspaceId := context.Query("id")
-	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/tags"
+	url := asanaWorkspaceRoute + workspaceId + "/tags"
 
 	tags, err := self.decodeRequiredWorkspaceInfo(url, context)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"errpr": "Could not retrieve workspace's projects",
+			"errpr": "Could not retrieve workspace's tags",
 		})
 		return
 	}
