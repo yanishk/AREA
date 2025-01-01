@@ -174,16 +174,16 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 	case "Skip track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
 	case "Add track to playback queue":
-		uri, err := workflow.ReactionParam["uri"]
-		if !err {
+		uri, uriExists := workflow.ReactionParam["uri"]
+		if !uriExists {
 			return fmt.Errorf("Incorrect URI")
 		}
 
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
 		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
 	case "Save a track":
-		id, err := workflow.ReactionParam["id"]
-		if !err {
+		id, idExists := workflow.ReactionParam["id"]
+		if !idExists {
 			return fmt.Errorf("Incorrect ID")
 		}
 
@@ -371,15 +371,15 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 }
 
 func (self *WorkflowService) createTaskAsana(accessToken string, workflow entities.Workflow) error {
-	workspace, workspaceExist := workflow.ReactionParam["workspace"]
-	project, projectExist := workflow.ReactionParam["project"]
-	taskName, taskNameExist := workflow.ReactionParam["name"]
-	notes, notesExist := workflow.ReactionParam["notes"]
-	due, dueExist := workflow.ReactionParam["due"]
-	assignee, assigneeExist := workflow.ReactionParam["assignee"]
-	tag, tagExist := workflow.ReactionParam["tag"]
+	workspace, workspaceExists := workflow.ReactionParam["workspace"]
+	project, projectExists := workflow.ReactionParam["project"]
+	taskName, taskNameExists := workflow.ReactionParam["name"]
+	notes, notesExists := workflow.ReactionParam["notes"]
+	due, dueExists := workflow.ReactionParam["due"]
+	assignee, assigneeExists := workflow.ReactionParam["assignee"]
+	tag, tagExists := workflow.ReactionParam["tag"]
 
-	if !taskNameExist || !workspaceExist {
+	if !taskNameExists || !workspaceExists {
 		return fmt.Errorf("Missing required field")
 	}
 
@@ -390,19 +390,19 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 		},
 	}
 
-	if projectExist {
+	if projectExists {
 		content["data"].(map[string]interface{})["projects"] = project
 	}
-	if notesExist {
+	if notesExists {
 		content["data"].(map[string]interface{})["notes"] = notes
 	}
-	if dueExist {
+	if dueExists {
 		content["data"].(map[string]interface{})["due_on"] = due
 	}
-	if assigneeExist {
+	if assigneeExists {
 		content["data"].(map[string]interface{})["assignee"] = assignee
 	}
-	if tagExist {
+	if tagExists {
 		content["data"].(map[string]interface{})["tags"] = tag
 	}
 
