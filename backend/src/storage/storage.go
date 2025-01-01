@@ -42,9 +42,8 @@ type ActionRepository interface {
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
+	CreateWorkflow(name, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
 	FindWorkflowById(id string) (entities.Workflow, error)
-	FindWorkflowByNameAndOwnerId(name string, ownerId string) (entities.Workflow, error)
 	FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error)
 	FindWorkflowsByOwnerId(ownerId string) ([]entities.Workflow, error)
 	UpdateWorkflow(id string, updatedWorkflow entities.Workflow) error

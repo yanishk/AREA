@@ -53,7 +53,6 @@ func (self *WorkflowRepository) unmarshalWorkflowParameters(actionParamBytes []b
 			return workflow, errDataBytes
 		}
 	}
-
 	return workflow, nil
 }
 
@@ -91,11 +90,6 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 		return err
 	}
 
-	_, err = self.FindWorkflowByNameAndOwnerId(name, ownerId)
-	if err == nil {
-		return fmt.Errorf("Workflow already exist")
-	}
-
 	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParamJson, reactionParamJson, actionDataJson)
 	if err != nil {
 		return err
@@ -121,20 +115,6 @@ func (self *WorkflowRepository) FindWorkflowById(id string) (entities.Workflow, 
 	workflow, errUnmarshal := self.unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
 	if errUnmarshal != nil {
 		return workflow, errUnmarshal
-	}
-	return workflow, nil
-}
-
-func (self *WorkflowRepository) FindWorkflowByNameAndOwnerId(name string, ownerId string) (entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows WHERE name = ($1) AND ownerid = ($2)`
-	var workflow entities.Workflow
-
-	row := self.db.QueryRow(sqlStatement, name, ownerId)
-	err := row.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ReactionId,
-		&workflow.ActionId, &workflow.IsActivated, &workflow.CreatedAt, &workflow.ActionParam,
-		&workflow.ReactionParam, &workflow.ActionData)
-	if err != nil {
-		return workflow, err
 	}
 	return workflow, nil
 }
