@@ -109,6 +109,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Future<void> saveSelectedActionOrReaction(int index) async {
+    CreateData.selectedServiceId = serviceIndex;
     if (actionOrReactionList[index].nbParam != 0) {
       CreateData.selectedActionOrReactionData = actionOrReactionList[index];
       await Navigator.push(
