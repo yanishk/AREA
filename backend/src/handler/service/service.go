@@ -167,7 +167,7 @@ func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 	service, err := self.ServiceService.FindServiceById(serviceId)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": cantRetrieveServiceMessage,
+			"error": cannotRetrieveServiceMessage,
 		})
 		return
 	}
@@ -191,7 +191,7 @@ func (self *ServiceHandler) RetrieveServiceByActionId(context *gin.Context) {
 	service, err := self.ServiceService.FindServiceByActionId(id)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": cantRetrieveServiceMessage,
+			"error": cannotRetrieveServiceMessage,
 		})
 		return
 	}
@@ -215,7 +215,7 @@ func (self *ServiceHandler) RetrieveServiceByReactionId(context *gin.Context) {
 	service, err := self.ServiceService.FindServiceByReactionId(id)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": cantRetrieveServiceMessage,
+			"error": cannotRetrieveServiceMessage,
 		})
 		return
 	}
