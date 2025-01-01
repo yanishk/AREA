@@ -496,6 +496,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/services/action/{actionid}": {
+            "get": {
+                "description": "Retrieve service by action id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action id",
+                        "name": "actionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/services/actions": {
             "get": {
                 "description": "Retrieve services with actions available",
@@ -517,6 +552,41 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/reaction/{reactionid}": {
+            "get": {
+                "description": "Retrieve service by reaction id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reaction id",
+                        "name": "reactionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse"
                         }
                     }
                 }
@@ -572,12 +642,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse"
                         }
                     },
                     "500": {
@@ -712,9 +776,39 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/create": {
+        "/workflows": {
+            "get": {
+                "description": "Retrieve the workflows of the user actually connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Retrieve User's Workflows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Create a Workflow",
+                "description": "Create a workflow",
                 "produces": [
                     "application/json"
                 ],
@@ -761,86 +855,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workflow/delete": {
-            "delete": {
-                "description": "Delete a user's workflow by specifying the workflow id",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Delete Workflow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workflow id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/retrieve": {
-            "get": {
-                "description": "Retrieve the workflows of the user actually connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workflows"
-                ],
-                "summary": "Retrieve User's Workflows",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/workflow/update": {
+        "/workflows/{id}": {
             "put": {
                 "description": "Update a user's workflow by specifying the workflow id",
                 "produces": [
@@ -855,7 +870,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Workflow id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -888,6 +903,45 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete a user's workflow by specifying the workflow id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflows"
+                ],
+                "summary": "Delete Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workflow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/{service}/actions": {
@@ -916,10 +970,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse"
                         }
                     }
                 }
@@ -951,10 +1005,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse"
                         }
                     }
                 }
@@ -1221,6 +1275,15 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Unknown service"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
             "type": "object",
             "properties": {
@@ -1243,6 +1306,15 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Unknown service"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse": {
             "type": "object",
             "properties": {
@@ -1251,15 +1323,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entities.Reaction"
                     }
-                }
-            }
-        },
-        "docs_service.ServiceRetrieveServiceByIdBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid service id"
                 }
             }
         },
@@ -1557,15 +1620,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowDeleteWorkflowBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid workflow id"
-                }
-            }
-        },
         "docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1627,7 +1681,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid workflow id-Invalid request body"
+                    "example": "Invalid request body"
                 }
             }
         },

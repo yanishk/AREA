@@ -59,10 +59,6 @@ type ServiceRetrieveServiceByIdSuccessResponse struct {
 	Service entities.Service
 }
 
-type ServiceRetrieveServiceByIdBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid service id"`
-}
-
 type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve requested service"`
 }
@@ -77,9 +73,17 @@ type ServiceRetrieveActionsFromServiceSuccessResponse struct {
 	Actions []entities.Action
 }
 
+type ServiceRetrieveActionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
+}
+
 // Retrieve Reactions from Service Responses
 type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 	Reactions []entities.Reaction
+}
+
+type ServiceRetrieveReactionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
 }
 
 // Discord Get User Servers

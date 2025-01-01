@@ -16,26 +16,78 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 	return &WorkflowRepository{db: db}
 }
 
+func (self *WorkflowRepository) marshalWorkflowParameters(actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) ([]byte, []byte, []byte, error) {
+	actionParamJson, err := json.Marshal(actionParam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	reactionParamJson, err := json.Marshal(reactionParam)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	actionDataJson, err := json.Marshal(actionData)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return actionParamJson, reactionParamJson, actionDataJson, nil
+}
+
+func (self *WorkflowRepository) unmarshalWorkflowParameters(actionParamBytes []byte, reactionParamBytes []byte, actionDataBytes []byte, workflow entities.Workflow) (entities.Workflow, error) {
+	if len(actionParamBytes) > 0 {
+		errActionBytes := json.Unmarshal(actionParamBytes, &workflow.ActionParam)
+		if errActionBytes != nil {
+			return workflow, errActionBytes
+		}
+	}
+	if len(reactionParamBytes) > 0 {
+		errReactionBytes := json.Unmarshal(reactionParamBytes, &workflow.ReactionParam)
+		if errReactionBytes != nil {
+			return workflow, errReactionBytes
+		}
+	}
+	if len(actionDataBytes) > 0 {
+		errDataBytes := json.Unmarshal(actionDataBytes, &workflow.ActionData)
+		if errDataBytes != nil {
+			return workflow, errDataBytes
+		}
+	}
+	return workflow, nil
+}
+
+func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entities.Workflow, error) {
+	var workflows []entities.Workflow
+
+	for rows.Next() {
+		var workflow entities.Workflow
+		var actionParamBytes []byte
+		var reactionParamBytes []byte
+		var actionDataBytes []byte
+
+		err := rows.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ActionId,
+			&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamBytes, &reactionParamBytes, &actionDataBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		workflow, errUnmarshal := self.unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
+		if errUnmarshal != nil {
+			return workflows, errUnmarshal
+		}
+
+		workflows = append(workflows, workflow)
+	}
+	return workflows, nil
+}
+
 func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
 	actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam, actiondata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	actionParamJson, errMarshallActionParam := json.Marshal(actionParam)
-	if errMarshallActionParam != nil {
-		return errMarshallActionParam
-	}
-	reactionParamJson, errMarshallReactionParam := json.Marshal(reactionParam)
-	if errMarshallReactionParam != nil {
-		return errMarshallReactionParam
-	}
-	actionDataJson, errMarshallActionData := json.Marshal(actionData)
-	if errMarshallActionData != nil {
-		return errMarshallActionData
-	}
-
-	_, err := self.FindWorkflowByNameAndUserId(name, ownerId)
-	if err == nil {
-		return fmt.Errorf("Workflow already exist")
+	actionParamJson, reactionParamJson, actionDataJson, err := self.marshalWorkflowParameters(actionParam, reactionParam, actionData)
+	if err != nil {
+		return err
 	}
 
 	_, err = self.db.Exec(sqlStatement, name, ownerId, actionId, reactionId, true, actionParamJson, reactionParamJson, actionDataJson)
@@ -45,21 +97,29 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 	return nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows WHERE name = ($1) AND ownerid = ($2)`
-	var retrievedWorkflow entities.Workflow
+func (self *WorkflowRepository) FindWorkflowById(id string) (entities.Workflow, error) {
+	sqlStatement := `SELECT * FROM workflows WHERE id = ($1)`
+	var workflow entities.Workflow
+	var actionParamBytes []byte
+	var reactionParamBytes []byte
+	var actionDataBytes []byte
 
-	row := self.db.QueryRow(sqlStatement, name, ownerId)
-	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ReactionId,
-		&retrievedWorkflow.ActionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &retrievedWorkflow.ActionParam,
-		&retrievedWorkflow.ReactionParam, &retrievedWorkflow.ActionData)
+	row := self.db.QueryRow(sqlStatement, id)
+
+	err := row.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ActionId,
+		&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamBytes, &reactionParamBytes, &actionDataBytes)
 	if err != nil {
-		return retrievedWorkflow, err
+		return workflow, err
 	}
-	return retrievedWorkflow, nil
+
+	workflow, errUnmarshal := self.unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes, workflow)
+	if errUnmarshal != nil {
+		return workflow, errUnmarshal
+	}
+	return workflow, nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entities.Workflow, error) {
+func (self *WorkflowRepository) FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows WHERE actionid = ($1)`
 
 	rows, errQuery := self.db.Query(sqlStatement, actionId)
@@ -68,14 +128,14 @@ func (self *WorkflowRepository) FindWorkflowByActionId(actionId string) ([]entit
 	}
 	defer rows.Close()
 
-	retrievedWorkflows, err := self.appendWorkflowsSlices(rows)
+	workflows, err := self.appendWorkflowsSlices(rows)
 	if err != nil {
 		return nil, err
 	}
-	return retrievedWorkflows, nil
+	return workflows, nil
 }
 
-func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.Workflow, error) {
+func (self *WorkflowRepository) FindWorkflowsByOwnerId(userId string) ([]entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows WHERE ownerid = ($1)`
 
 	rows, errQuery := self.db.Query(sqlStatement, userId)
@@ -84,111 +144,33 @@ func (self *WorkflowRepository) FindWorkflowByUserId(userId string) ([]entities.
 	}
 	defer rows.Close()
 
-	retrievedWorkflows, err := self.appendWorkflowsSlices(rows)
+	workflows, err := self.appendWorkflowsSlices(rows)
 	if err != nil {
 		return nil, err
 	}
 
-	return retrievedWorkflows, nil
+	return workflows, nil
 }
 
-func (self *WorkflowRepository) UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error {
+func (self *WorkflowRepository) UpdateWorkflow(id string, updatedWorkflow entities.Workflow) error {
 	sqlStatement := `UPDATE workflows SET name = ($1), actionid = ($2), reactionid = ($3), isactivated = ($4), actionparam = ($5), reactionparam = ($6), actiondata = ($7) WHERE id = ($8)`
 
-	actionParamJson, err := json.Marshal(updatedWorkflow.ActionParam)
-	if err != nil {
-		return err
-	}
-	reactionParamJson, err := json.Marshal(updatedWorkflow.ReactionParam)
-	if err != nil {
-		return err
-	}
-	actionDataJson, err := json.Marshal(updatedWorkflow.ActionData)
+	actionParamJson, reactionParamJson, actionDataJson, err := self.marshalWorkflowParameters(updatedWorkflow.ActionParam, updatedWorkflow.ReactionParam, updatedWorkflow.ActionData)
 	if err != nil {
 		return err
 	}
 
-	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, updatedWorkflow.IsActivated, actionParamJson, reactionParamJson, actionDataJson, workflowId)
+	_, err = self.db.Exec(sqlStatement, updatedWorkflow.Name, updatedWorkflow.ActionId, updatedWorkflow.ReactionId, updatedWorkflow.IsActivated, actionParamJson, reactionParamJson, actionDataJson, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (self *WorkflowRepository) FindWorkflowById(workflowId string) (entities.Workflow, error) {
-	sqlStatement := `SELECT * FROM workflows WHERE id = ($1)`
-	var retrievedWorkflow entities.Workflow
-	var actionParamByte []byte
-	var reactionParamByte []byte
-	var actionDataByte []byte
-
-	row := self.db.QueryRow(sqlStatement, workflowId)
-
-	err := row.Scan(&retrievedWorkflow.Id, &retrievedWorkflow.Name, &retrievedWorkflow.OwnerId, &retrievedWorkflow.ActionId,
-		&retrievedWorkflow.ReactionId, &retrievedWorkflow.IsActivated, &retrievedWorkflow.CreatedAt, &actionParamByte, &reactionParamByte, &actionDataByte)
-	if err != nil {
-		return retrievedWorkflow, err
-	}
-
-	retrievedWorkflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, actionDataByte, retrievedWorkflow)
-	if errUnmarshal != nil {
-		return retrievedWorkflow, errUnmarshal
-	}
-	return retrievedWorkflow, nil
-}
-
-func (self *WorkflowRepository) unmarshalActionReactionParam(actionParamByte []byte, reactionParamByte []byte, actionDataByte []byte, retrievedWorkflow entities.Workflow) (entities.Workflow, error) {
-	if len(actionParamByte) > 0 {
-		errActionByte := json.Unmarshal(actionParamByte, &retrievedWorkflow.ActionParam)
-		if errActionByte != nil {
-			return retrievedWorkflow, errActionByte
-		}
-	}
-	if len(reactionParamByte) > 0 {
-		errReactionByte := json.Unmarshal(reactionParamByte, &retrievedWorkflow.ReactionParam)
-		if errReactionByte != nil {
-			return retrievedWorkflow, errReactionByte
-		}
-	}
-	if len(actionDataByte) > 0 {
-		errDataByte := json.Unmarshal(actionDataByte, &retrievedWorkflow.ActionData)
-		if errDataByte != nil {
-			return retrievedWorkflow, errDataByte
-		}
-	}
-
-	return retrievedWorkflow, nil
-}
-
-func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entities.Workflow, error) {
-	var retrievedWorkflows []entities.Workflow
-
-	for rows.Next() {
-		var workflow entities.Workflow
-		var actionParamByte []byte
-		var reactionParamByte []byte
-		var actionDataByte []byte
-
-		err := rows.Scan(&workflow.Id, &workflow.Name, &workflow.OwnerId, &workflow.ActionId,
-			&workflow.ReactionId, &workflow.IsActivated, &workflow.CreatedAt, &actionParamByte, &reactionParamByte, &actionDataByte)
-		if err != nil {
-			return nil, err
-		}
-
-		workflow, errUnmarshal := self.unmarshalActionReactionParam(actionParamByte, reactionParamByte, actionDataByte, workflow)
-		if errUnmarshal != nil {
-			return retrievedWorkflows, errUnmarshal
-		}
-
-		retrievedWorkflows = append(retrievedWorkflows, workflow)
-	}
-	return retrievedWorkflows, nil
-}
-
-func (self *WorkflowRepository) DeleteWorkflow(workflowId string, ownerId string) error {
+func (self *WorkflowRepository) DeleteWorkflow(id string, ownerId string) error {
 	sqlStatement := `DELETE FROM workflows WHERE id = ($1) AND ownerid = ($2)`
 
-	res, err := self.db.Exec(sqlStatement, workflowId, ownerId)
+	res, err := self.db.Exec(sqlStatement, id, ownerId)
 	if err != nil {
 		return err
 	}
