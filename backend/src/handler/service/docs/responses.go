@@ -77,9 +77,17 @@ type ServiceRetrieveActionsFromServiceSuccessResponse struct {
 	Actions []entities.Action
 }
 
+type ServiceRetrieveActionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
+}
+
 // Retrieve Reactions from Service Responses
 type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 	Reactions []entities.Reaction
+}
+
+type ServiceRetrieveReactionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
 }
 
 // Discord Get User Servers

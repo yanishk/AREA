@@ -776,10 +776,10 @@
                             "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse"
                         }
                     }
                 }
@@ -811,10 +811,10 @@
                             "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse"
                         }
                     }
                 }
@@ -1013,6 +1013,15 @@
                 }
             }
         },
+        "docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Unknown service"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveActionsFromServiceSuccessResponse": {
             "type": "object",
             "properties": {
@@ -1032,6 +1041,15 @@
                     "items": {
                         "$ref": "#/definitions/entities.Service"
                     }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Unknown service"
                 }
             }
         },
