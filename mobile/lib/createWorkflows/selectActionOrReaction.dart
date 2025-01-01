@@ -5,8 +5,9 @@ import "../custom_widget.dart";
 import "../globalData.dart";
 import 'createWidget.dart';
 import 'createWorkflowsData.dart';
-import "../auth/connectSpotify.dart";
-import 'selectActionOrReactionParam.dart';
+import "../auth/spotifyAuth/connectSpotify.dart";
+import "../auth/redditAuth/connectReddit.dart";
+import "selectActionOrReactionParam.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -134,9 +135,18 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         padding: EdgeInsets.symmetric(horizontal: 15.0),
         borderCircularRadius: buttonRadius,
       );
-    } else {
-      return SizedBox();
     }
+    if (CreateData.serviceNameList[serviceIndex] == "Reddit") {
+      return CustomButton(
+        backgroundColor: colorTheme,
+        text: ButtonText(text: "Connect",),
+        onPressed: () {MyRedditAuth.connectReddit("service");},
+        size: buttonSize,
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+        borderCircularRadius: buttonRadius,
+      );
+    }
+    return SizedBox();
   }
 
   @override
