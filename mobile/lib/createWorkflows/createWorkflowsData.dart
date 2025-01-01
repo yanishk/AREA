@@ -18,7 +18,6 @@ class ActionOrReactionData {
   String description;
   String id;
   String name;
-  int nbParam;
   String serviceId;
   List<ActionOrReactionsParameter> parameter = [];
   Map<String, dynamic> parameterList = {};
@@ -28,7 +27,6 @@ class ActionOrReactionData {
     this.name = "",
     this.description = "",
     this.serviceId = "",
-    this.nbParam = 0,
     List<ActionOrReactionsParameter> ?parameter,
     Map<String, dynamic>? parameterList,
   ]) {

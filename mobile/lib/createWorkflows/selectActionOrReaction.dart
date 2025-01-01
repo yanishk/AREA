@@ -81,7 +81,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           allActionOrReactionList[i].name,
           allActionOrReactionList[i].description,
           allActionOrReactionList[i].serviceid,
-          allActionOrReactionList[i].nbparam,
           allActionOrReactionList[i].parameter,
         ));
         actionDescription = allActionOrReactionList[i].description;
@@ -110,7 +109,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
 
   Future<void> saveSelectedActionOrReaction(int index) async {
     CreateData.selectedServiceId = serviceIndex;
-    if (actionOrReactionList[index].nbParam != 0) {
+    if (actionOrReactionList[index].parameter.isNotEmpty) {
       CreateData.selectedActionOrReactionData = actionOrReactionList[index];
       await Navigator.push(
         Globaldata.myContext,

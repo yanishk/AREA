@@ -47,7 +47,6 @@ class ActionOrReactionList {
   String description = "";
   String id = "";
   String name = "";
-  int nbparam = 0;
   String serviceid = "";
   String servicename = "";
   List<ActionOrReactionsParameter> parameter = [];
@@ -56,7 +55,6 @@ class ActionOrReactionList {
     this.description = "",
     this.id = "",
     this.name = "",
-    this.nbparam = 0,
     this.serviceid = "",
     this.servicename = "",
     List<ActionOrReactionsParameter> ?parameter,

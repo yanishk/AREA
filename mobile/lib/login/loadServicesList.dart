@@ -115,7 +115,6 @@ class LoadService extends State<APICall> {
             actionResponse['description'] ?? '',
             actionResponse['id'] ?? '',
             actionResponse['name'] ?? '',
-            actionResponse['nbparam'] ?? 0,
             actionResponse['serviceid'] ?? '',
             serviceName,
             storeActionReactionParameter(actionResponse["parameters"] ?? []),
