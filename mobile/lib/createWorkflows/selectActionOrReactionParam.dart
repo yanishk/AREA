@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/services.dart';
 import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
@@ -27,6 +28,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   String apiRoute = "actions";
   List<Widget> parameterFiledList = [];
   Map<int, String> selectedItems = {};
+  Map<int, TextEditingController> textInputControler = {};
 
   @override
   void initState() {
@@ -93,6 +95,24 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         dropdownName: "${parameterList[index].name} : "
       );
     }
+    if (parameterList[index].route.isEmpty) {
+      textInputControler[index] = new TextEditingController(text: "");
+      return Container(
+        padding: EdgeInsets.all(0.0),
+        constraints: BoxConstraints(maxHeight: 200.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
+        child: SingleChildScrollView(
+          child: CustomClassicForm(
+            hint: "${parameterList[index].name} : ",
+            controller: textInputControler[index],
+            maxLines: 5,
+            padding:
+                EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+            focusedBorderColor: Colors.white,
+            borderWidth: 0,
+          ),
+        ),
+      );
+    }
     return Column();
   }
 
@@ -124,6 +144,17 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
+                for (int i = 0; i < textInputControler.length; i++) {
+                  if (textInputControler[i] != null) {
+                    String controlerText = textInputControler[i]!.text;
+                    if (CreateData.selectedActionOrReactionData.parameter[i].type == "int") {
+                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = int.parse(controlerText);
+                    } else {
+                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = controlerText;
+                    }
+                    developer.log("text input content : ${textInputControler[i]?.text}");
+                  }
+                }
                 developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");
                 CreateData.selectOrUpdateWorkflow = true;
                 Navigator.pop(Globaldata.myContext);
