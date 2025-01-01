@@ -57,6 +57,22 @@ func (self *ServiceService) FindServiceById(id string) (entities.Service, error)
 	return self.ServiceRepository.FindServiceById(id)
 }
 
+func (self *ServiceService) FindServiceByActionId(id string) (entities.Service, error) {
+	action, err := self.ActionRepository.FindActionById(id)
+	if err != nil {
+		return entities.Service{}, err
+	}
+	return self.ServiceRepository.FindServiceById(action.ServiceId)
+}
+
+func (self *ServiceService) FindServiceByReactionId(id string) (entities.Service, error) {
+	reaction, err := self.ReactionRepository.FindReactionById(id)
+	if err != nil {
+		return entities.Service{}, err
+	}
+	return self.ServiceRepository.FindServiceById(reaction.ServiceId)
+}
+
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
 	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errFoundService != nil {

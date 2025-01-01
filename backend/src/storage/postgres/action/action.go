@@ -41,6 +41,24 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 	return nil
 }
 
+func (self *ActionRepository) FindActionById(id string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM actions WHERE id = ($1)`
+	var action entities.Action
+	var parametersBytes []byte
+
+	row := self.db.QueryRow(sqlStatement, id)
+	err := row.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
+	if err != nil {
+		return action, err
+	}
+
+	action, err = self.UnmarshalParameters(parametersBytes, action)
+	if err != nil {
+		return action, err
+	}
+	return action, nil
+}
+
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
 	var retrievedAction entities.Action

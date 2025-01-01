@@ -17,8 +17,9 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
-const UnknownServiceMessage = "Unknown service"
-const InternalServerErrorMessage = "Internal server error"
+const unknownServiceMessage = "Unknown service"
+const cannotRetrieveServiceMessage = "Could not retrieve requested service"
+const internalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
 
@@ -55,6 +56,8 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	services := private.Group("/services")
 	{
 		services.GET("/:id", self.RetrieveServiceById)
+		services.GET("/action/:actionid", self.RetrieveServiceByActionId)
+		services.GET("/reaction/:reactionid", self.RetrieveServiceByReactionId)
 		services.GET("/actions", self.RetrieveActionsServices)
 		services.GET("/reactions", self.RetrieveReactionsServices)
 	}
@@ -92,7 +95,7 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -116,7 +119,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -140,7 +143,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -156,15 +159,63 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 // @Produce		json
 // @Param        id     path     string  true  "Service id"
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
 // @Router			/services/{id} [get]
 func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 	serviceId := context.Param("id")
+
 	service, err := self.ServiceService.FindServiceById(serviceId)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve requested service",
+			"error": cannotRetrieveServiceMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by action id
+// @Tags			Services
+// @Produce		json
+// @Param        actionid     path     string  true  "Action id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/services/action/{actionid} [get]
+func (self *ServiceHandler) RetrieveServiceByActionId(context *gin.Context) {
+	id := context.Param("actionid")
+
+	service, err := self.ServiceService.FindServiceByActionId(id)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": cannotRetrieveServiceMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by reaction id
+// @Tags			Services
+// @Produce		json
+// @Param        reactionid     path     string  true  "Reaction id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/services/reaction/{reactionid} [get]
+func (self *ServiceHandler) RetrieveServiceByReactionId(context *gin.Context) {
+	id := context.Param("reactionid")
+
+	service, err := self.ServiceService.FindServiceByReactionId(id)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": cannotRetrieveServiceMessage,
 		})
 		return
 	}
@@ -185,7 +236,7 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -203,7 +254,7 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
