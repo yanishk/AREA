@@ -21,6 +21,9 @@ type ServiceHandler struct {
 const InternalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
+const failedRetrievingTokenMessage = "Could not retrieve or refresh the token"
+
+const bearerType = "Bearer "
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -227,12 +230,12 @@ func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
+			"error": failedRetrievingTokenMessage,
 		})
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", bearerType, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": getUserServersFailedMessage,
@@ -306,12 +309,12 @@ func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
+			"error": failedRetrievingTokenMessage,
 		})
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve the user's workspaces",
@@ -343,12 +346,12 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
+			"error": failedRetrievingTokenMessage,
 		})
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve the workspace's assignees",
@@ -380,12 +383,12 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
+			"error": failedRetrievingTokenMessage,
 		})
 		return
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 	if errRequest != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not retrieve the workspace's assignees",
