@@ -63,6 +63,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
 	private.GET("/Asana/user/workspaces", self.getAsanaUserWorkspaces)
 	private.GET("/Asana/workspace/assignees", self.getAsanaWorkspaceAssignees)
+	private.GET("/Asana/workspace/projects", self.getAsanaWorkspaceProjects)
 }
 
 // @Summary		Service OAuth2
@@ -366,5 +367,42 @@ func (self *ServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"assignees": assignees,
+	})
+}
+
+func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
+	var projects entities.AsanaUserGID
+	workspaceId := context.Query("id")
+	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/projects"
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Asana")
+	if errRefreshing != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve or refresh the token",
+		})
+		return
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	if errRequest != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve the workspace's assignees",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	errDecodeAssignee := json.NewDecoder(resp.Body).Decode(&projects)
+	if errDecodeAssignee != nil || len(projects.Data) == 0 {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not decode the workspace's assignees",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"projects": projects,
 	})
 }
