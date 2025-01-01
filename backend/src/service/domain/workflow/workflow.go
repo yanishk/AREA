@@ -62,7 +62,7 @@ func (self *WorkflowService) GetUserWorkflows(email string, connectionType strin
 		return nil, errUserFound
 	}
 
-	retrievedWorkflow, err := self.WorkflowRepository.FindWorkflowByUserId(userFound.Id)
+	retrievedWorkflow, err := self.WorkflowRepository.FindWorkflowsByOwnerId(userFound.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -414,7 +414,7 @@ func (self *WorkflowService) CheckTimeAndDateEveryYearOnAction(timeRes entities.
 }
 
 func (self *WorkflowService) CheckWorkflowsWithTimeAndDateActions(timeRes entities.TimeResponse, action entities.Action) error {
-	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
 	}
@@ -449,7 +449,7 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 		return errFindingService
 	}
 
-	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionsByServiceId(serviceFound.Id)
 	if errFindingActions != nil {
 		return errFindingActions
 	}
@@ -693,7 +693,7 @@ func (self *WorkflowService) CheckRedditPostAction(postType, accessToken string,
 }
 
 func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Action) error {
-	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
 	}
@@ -727,7 +727,7 @@ func (self *WorkflowService) CheckRedditActions() error {
 		return errFindingService
 	}
 
-	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionsByServiceId(serviceFound.Id)
 	if errFindingActions != nil {
 		return errFindingActions
 	}
@@ -786,7 +786,7 @@ func (self *WorkflowService) CheckWeatherCurrentWeatherComparisonAction(checkTyp
 }
 
 func (self *WorkflowService) CheckWorkflowsWithWeatherActions(action entities.Action) error {
-	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
 	}
@@ -812,7 +812,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 		return errFindingService
 	}
 
-	allActionsFound, errFindingActions := self.ActionRepository.FindActionByServiceId(serviceFound.Id)
+	allActionsFound, errFindingActions := self.ActionRepository.FindActionsByServiceId(serviceFound.Id)
 	if errFindingActions != nil {
 		return errFindingActions
 	}
@@ -940,7 +940,7 @@ func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workfl
 }
 
 func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Action) error {
-	workflows, err := self.WorkflowRepository.FindWorkflowByActionId(action.Id)
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if err != nil {
 		return err
 	}
@@ -972,7 +972,7 @@ func (self *WorkflowService) CheckGithubActions() error {
 		return err
 	}
 
-	actions, err := self.ActionRepository.FindActionByServiceId(service.Id)
+	actions, err := self.ActionRepository.FindActionsByServiceId(service.Id)
 	if err != nil {
 		return err
 	}

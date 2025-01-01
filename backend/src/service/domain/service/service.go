@@ -79,7 +79,7 @@ func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]en
 		return nil, errFoundService
 	}
 
-	actions, errFindActions := self.ActionRepository.FindActionByServiceId(foundService.Id)
+	actions, errFindActions := self.ActionRepository.FindActionsByServiceId(foundService.Id)
 	if errFindActions != nil {
 		return nil, errFindActions
 	}
@@ -92,7 +92,7 @@ func (self *ServiceService) RetrieveReactionsFromService(serviceName string) ([]
 		return nil, errFoundService
 	}
 
-	reactions, errFindReactions := self.ReactionRepository.FindReactionByServiceId(foundService.Id)
+	reactions, errFindReactions := self.ReactionRepository.FindReactionsByServiceId(foundService.Id)
 	if errFindReactions != nil {
 		return nil, errFindReactions
 	}

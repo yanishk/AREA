@@ -32,26 +32,26 @@ func (self *UserRepository) CreateUser(email string, password string, connection
 
 func (self *UserRepository) FindUserByEmail(email string, connectionType string) (entities.User, error) {
 	sqlStatement := `SELECT * FROM users WHERE email = ($1) AND connectiontype = ($2)`
-	var retrievedUser entities.User
+	var user entities.User
 
 	row := self.db.QueryRow(sqlStatement, email, connectionType)
-	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone, &retrievedUser.ConnectionType)
+	err := row.Scan(&user.Email, &user.Password, &user.Id, &user.CreatedAt, &user.Timezone, &user.ConnectionType)
 	if err != nil {
-		return retrievedUser, err
+		return user, err
 	}
-	return retrievedUser, nil
+	return user, nil
 }
 
 func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
 	sqlStatement := `SELECT * FROM users WHERE id = ($1)`
-	var retrievedUser entities.User
+	var user entities.User
 
 	row := self.db.QueryRow(sqlStatement, userId)
-	err := row.Scan(&retrievedUser.Email, &retrievedUser.Password, &retrievedUser.Id, &retrievedUser.CreatedAt, &retrievedUser.Timezone, &retrievedUser.ConnectionType)
+	err := row.Scan(&user.Email, &user.Password, &user.Id, &user.CreatedAt, &user.Timezone, &user.ConnectionType)
 	if err != nil {
-		return retrievedUser, err
+		return user, err
 	}
-	return retrievedUser, nil
+	return user, nil
 }
 
 func (self *UserRepository) UpdateUser(email string, password string, connectionType string) error {
