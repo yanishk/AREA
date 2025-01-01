@@ -125,6 +125,12 @@ definitions:
         example: url-example.com
         type: string
     type: object
+  docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
     properties:
       actions:
@@ -138,6 +144,12 @@ definitions:
         items:
           $ref: '#/definitions/entities.Service'
         type: array
+    type: object
+  docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
     type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
@@ -608,10 +620,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse'
       summary: Retrieve Actions From Service
       tags:
       - Service
@@ -631,10 +643,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse'
       summary: Retrieve Reactions From Service
       tags:
       - Service
