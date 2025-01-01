@@ -5,66 +5,55 @@ import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
 import 'dart:convert';
 import "package:http/src/response.dart";
+import "package:namer_app/auth/authFunctions.dart";
 
-import "../apiCall/apiErrorHandling.dart";
-import "../globalData.dart";
-import "../login/loginNavigator.dart";
-import "../login/loadServicesList.dart";
+import "../../apiCall/apiErrorHandling.dart";
+import "../../globalData.dart";
+import "../../login/loginNavigator.dart";
+import "../../login/loadServicesList.dart";
+import "../../apiCall/apiData.dart";
+import "../authData.dart";
 
-String spotifyAuthType = "";
+String redditAuthType = "";
 
-class SpotifyAuthPage extends StatelessWidget {
-  SpotifyAuthPage({
+class RedditAuthPage extends StatelessWidget {
+  RedditAuthPage({
     super.key,
     required this.callBackType,
   });
   final String callBackType;
   @override
   Widget build(BuildContext context) {
-    spotifyAuthType = callBackType;
+    redditAuthType = callBackType;
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: SpotifyAuthAPICall(),
+      home: RedditAuthAPICall(),
     );
   }
 }
 
-class SpotifyAuthAPICall extends StatefulWidget {
+class RedditAuthAPICall extends StatefulWidget {
   @override
-  SpotifyAuth createState() => SpotifyAuth();
+  RedditAuth createState() => RedditAuth();
 }
 
-class SpotifyAuth extends State<SpotifyAuthAPICall> {
+class RedditAuth extends State<RedditAuthAPICall> {
   late InAppWebViewController webViewController;
   final String apiUrl = dotenv.get('SERVER_LINK',
       fallback: 'Cannot find .env variable "SERVER_LINK"');
   String newUrl = "";
-  String apiRoute = "service-callback/Spotify";
+  String apiRoute = "service-callback/Reddit";
 
   @override
   void initState() {
     super.initState();
-    if (spotifyAuthType == "login") {
-      developer.log("spotifyAuthType : $spotifyAuthType");
+    if (redditAuthType == "login") {
+      developer.log("redditAuthType : $redditAuthType");
       setState(() {
-        apiRoute = "login-callback/Spotify";
+        apiRoute = "login-callback/Reddit";
       });
     }
-  }
-
-  Future<void> _setCookiesAndNavigate() async {
-    if (Globaldata.JWToken.isEmpty) {
-      return;
-    }
-    final cookieManager = CookieManager();
-    await cookieManager.setCookie(
-      url: WebUri(apiUrl),
-      name: "JWToken",
-      value: Globaldata.JWToken.split('=').last,
-      isSecure: true,
-      isHttpOnly: true,
-    );
   }
 
   Future<void> saveJWToken(Response response) async {
@@ -81,10 +70,12 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     }
   }
 
-  String insertAppTypeInUrl(String url) {
-    final splitUrl = url.split("?code=");
-    String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
-    return finalUrl;
+  String removeUrlState(String url) {
+    final splitState = url.split("?state=");
+    developer.log("removeUrlState splitState : $splitState");
+    final splitCode = splitState.last.split("&code=");
+    developer.log("removeUrlState splitCode : $splitCode");
+    return "${splitState.first}?code=${splitCode.last}";
   }
 
   @override
@@ -92,21 +83,22 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     return Scaffold(
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: WebUri(Globaldata.spotifyConnectionLink),
+          url: WebUri(AuthData.redditConnectionLink),
         ),
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           domStorageEnabled: true,
         ),
         onLoadStart: (controller, url) {
-          _setCookiesAndNavigate();
+          AuthFunctions.setCookiesAndNavigate(apiUrl);
         },
         onLoadStop: (controller, url) async {
-          developer.log(url.toString());
+          developer.log("onLoadStop url : ${url.toString()}");
           if (url != null &&
               url.toString().contains(apiUrl + apiRoute)) {
-            final urlSplit = url.toString().split(apiUrl);
-            final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
+            final urlSplit = url.toString().split(ApiData.apiUrl);
+            String callBackUrl = removeUrlState(urlSplit.last);
+            final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(callBackUrl), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
               developer.log("User connected");
