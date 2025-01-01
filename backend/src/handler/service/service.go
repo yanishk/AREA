@@ -119,7 +119,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -143,7 +143,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
