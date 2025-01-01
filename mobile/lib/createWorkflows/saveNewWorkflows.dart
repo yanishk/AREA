@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
+import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
 import "../globalData.dart";
@@ -31,11 +32,12 @@ class APICall extends StatefulWidget {
 class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
-          "If ${CreateData.serviceAction.name} ${CreateData.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
+          "If ${CreateData.serviceAction.name}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflows";
   String email = Globaldata.userInfos.email;
 
   Future<void> postCreateWorkflows() async {
+    developer.log("${CreateData.serviceAction.parameterList}");
     Response response = await ApiRequest.post(
       apiRoute,
       jsonEncode(<String, dynamic>{

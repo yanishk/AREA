@@ -9,15 +9,18 @@ class CreateData {
 
   static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
   static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
+
+  static ActionOrReactionData selectedActionOrReactionData = ActionOrReactionData.optional();
+  static int selectedServiceId = 0;
 }
 
 class ActionOrReactionData {
+  String description;
   String id;
   String name;
-  String description;
-  String serviceId;
   int nbParam;
-  String parameter;
+  String serviceId;
+  List<ActionOrReactionsParameter> parameter = [];
   Map<String, dynamic> parameterList = {};
 
   ActionOrReactionData.optional([
@@ -26,9 +29,10 @@ class ActionOrReactionData {
     this.description = "",
     this.serviceId = "",
     this.nbParam = 0,
-    this.parameter = "",
+    List<ActionOrReactionsParameter> ?parameter,
     Map<String, dynamic>? parameterList,
   ]) {
     this.parameterList = parameterList ?? {};
+    this.parameter = parameter ?? [];
   }
 }

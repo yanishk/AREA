@@ -59,7 +59,6 @@ class SelectService extends State<APICall> {
         ],
       );
     }
-    developer.log("index : $index");
     return Row(
       children: [
         MySquareServicesCard(

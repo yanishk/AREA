@@ -51,6 +51,7 @@ class ActionOrReactionList {
   int nbparam = 0;
   String serviceid = "";
   String servicename = "";
+  List<ActionOrReactionsParameter> parameter = [];
 
   ActionOrReactionList.optional([
     this.description = "",
@@ -59,6 +60,25 @@ class ActionOrReactionList {
     this.nbparam = 0,
     this.serviceid = "",
     this.servicename = "",
+    List<ActionOrReactionsParameter> ?parameter,
+  ]) {
+    this.parameter = parameter ?? [];
+  }
+}
+
+class ActionOrReactionsParameter {
+  bool isexhaustive;
+  String name = "";
+  String route = "";
+  String type = "";
+  List<String> values = [];
+
+  ActionOrReactionsParameter.optional([
+    this.isexhaustive = false,
+    this.name = "",
+    this.route = "",
+    this.type = "",
+    this.values = const [],
   ]);
 }
 

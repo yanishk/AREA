@@ -69,6 +69,35 @@ class LoadService extends State<APICall> {
     return responseData;
   }
 
+  List<String> getValueListe(List<dynamic> values) {
+    List<String> valuesList = [];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] != null) {
+        valuesList.add(values[i]);
+      }
+    }
+    return valuesList;
+  }
+
+  List<ActionOrReactionsParameter> storeActionReactionParameter(List<dynamic> parameter) {
+    List<ActionOrReactionsParameter> parameterList = [];
+    if (parameter.isEmpty) {
+      return parameterList;
+    }
+    for (int i = 0; i < parameter.length; i++) {
+      parameterList.add(
+        ActionOrReactionsParameter.optional(
+          parameter[i]["isexhaustive"] ?? true,
+          parameter[i]["name"] ?? "",
+          parameter[i]["route"] ?? "",
+          parameter[i]["type"] ?? "",
+          getValueListe(parameter[i]["values"]),
+        )
+      );
+    }
+    return parameterList;
+  }
+
   void storeServiceDescription(dynamic responseData, String serviceName, String route) {
     String typeToGet = "actions";
     List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions;
@@ -89,6 +118,7 @@ class LoadService extends State<APICall> {
             actionResponse['nbparam'] ?? 0,
             actionResponse['serviceid'] ?? '',
             serviceName,
+            storeActionReactionParameter(actionResponse["parameters"] ?? []),
           ));
         }
       }
