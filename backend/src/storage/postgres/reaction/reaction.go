@@ -41,12 +41,12 @@ func (self *ReactionRepository) CreateReaction(name string, description string, 
 	return nil
 }
 
-func (self *ReactionRepository) FindReactionByName(name string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions WHERE name = ($1)`
+func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, error) {
+	sqlStatement := `SELECT * FROM reactions WHERE id = ($1)`
 	var reaction entities.Reaction
 	var parametersBytes []byte
 
-	row := self.db.QueryRow(sqlStatement, name)
+	row := self.db.QueryRow(sqlStatement, id)
 	err := row.Scan(&reaction.Id, &reaction.ServiceId, &reaction.Name, &reaction.Description, &reaction.NbParam, &parametersBytes)
 	if err != nil {
 		return reaction, err
@@ -59,12 +59,12 @@ func (self *ReactionRepository) FindReactionByName(name string) (entities.Reacti
 	return reaction, nil
 }
 
-func (self *ReactionRepository) FindReactionById(id string) (entities.Reaction, error) {
-	sqlStatement := `SELECT * FROM reactions WHERE id = ($1)`
+func (self *ReactionRepository) FindReactionByName(name string) (entities.Reaction, error) {
+	sqlStatement := `SELECT * FROM reactions WHERE name = ($1)`
 	var reaction entities.Reaction
 	var parametersBytes []byte
 
-	row := self.db.QueryRow(sqlStatement, id)
+	row := self.db.QueryRow(sqlStatement, name)
 	err := row.Scan(&reaction.Id, &reaction.ServiceId, &reaction.Name, &reaction.Description, &reaction.NbParam, &parametersBytes)
 	if err != nil {
 		return reaction, err

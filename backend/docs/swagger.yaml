@@ -125,6 +125,12 @@ definitions:
         example: url-example.com
         type: string
     type: object
+  docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
     properties:
       actions:
@@ -139,18 +145,18 @@ definitions:
           $ref: '#/definitions/entities.Service'
         type: array
     type: object
+  docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
+    type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
       reactions:
         items:
           $ref: '#/definitions/entities.Reaction'
         type: array
-    type: object
-  docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
-    properties:
-      error:
-        example: Invalid service id
-        type: string
     type: object
   docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse:
     properties:
@@ -608,10 +614,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse'
       summary: Retrieve Actions From Service
       tags:
       - Service
@@ -631,10 +637,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse'
       summary: Retrieve Reactions From Service
       tags:
       - Service
@@ -886,10 +892,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
+  /services/action/{actionid}:
+    get:
+      description: Retrieve service by action id
+      parameters:
+      - description: Action id
+        in: path
+        name: actionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -912,6 +937,29 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
       summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reaction/{reactionid}:
+    get:
+      description: Retrieve service by reaction id
+      parameters:
+      - description: Reaction id
+        in: path
+        name: reactionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
       tags:
       - Services
   /services/reactions:

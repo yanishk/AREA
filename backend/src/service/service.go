@@ -22,6 +22,8 @@ type ServiceService interface {
 	RetrieveReactionsServices() ([]entities.Service, error)
 	FindServiceByName(name string) (entities.Service, error)
 	FindServiceById(id string) (entities.Service, error)
+	FindServiceByActionId(id string) (entities.Service, error)
+	FindServiceByReactionId(id string) (entities.Service, error)
 	RetrieveActionsFromService(serviceName string) ([]entities.Action, error)
 	RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error)
 	GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error)
