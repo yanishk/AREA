@@ -18,7 +18,7 @@ type ServiceHandler struct {
 }
 
 const unknownServiceMessage = "Unknown service"
-const cantRetrieveServiceMessage = "Could not retrieve requested service"
+const cannotRetrieveServiceMessage = "Could not retrieve requested service"
 const internalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
 const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
