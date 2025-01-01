@@ -199,7 +199,7 @@ func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken str
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Authorization", accessBearer+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 
@@ -218,6 +218,7 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 	if err != nil {
 		return "", nil
 	}
+	defer res.Body.Close()
 
 	errDecode := json.NewDecoder(res.Body).Decode(&sub)
 	if errDecode != nil {
@@ -256,10 +257,12 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 		return fmt.Errorf("Could not encode the body")
 	}
 
-	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	res, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
 	if errLinkedinRequest != nil {
 		return errLinkedinRequest
 	}
+	defer res.Body.Close()
+
 	return nil
 }
 
@@ -328,10 +331,78 @@ func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) 
 	return nil
 }
 
+func (self *WorkflowService) createTaskAsana(accessToken string, workflow entities.Workflow) error {
+	workspace, workspaceExist := workflow.ReactionParam["workspace"]
+	project, projectExist := workflow.ReactionParam["project"]
+	taskName, taskNameExist := workflow.ReactionParam["name"]
+	notes, notesExist := workflow.ReactionParam["notes"]
+	due, dueExist := workflow.ReactionParam["due"]
+	assignee, assigneeExist := workflow.ReactionParam["assignee"]
+	tag, tagExist := workflow.ReactionParam["tag"]
+
+	if !taskNameExist || !workspaceExist {
+		return fmt.Errorf("Missing required field")
+	}
+
+	content := map[string]interface{}{
+		"data": map[string]interface{}{
+			"workspace": workspace,
+			"name":      taskName,
+		},
+	}
+
+	if projectExist {
+		content["data"].(map[string]interface{})["projects"] = project
+	}
+	if notesExist {
+		content["data"].(map[string]interface{})["notes"] = notes
+	}
+	if dueExist {
+		content["data"].(map[string]interface{})["due_on"] = due
+	}
+	if assigneeExist {
+		content["data"].(map[string]interface{})["assignee"] = assignee
+	}
+	if tagExist {
+		content["data"].(map[string]interface{})["tags"] = tag
+	}
+
+	contentBytes, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Error marshaling")
+	}
+
+	url := "https://app.asana.com/api/1.0/tasks"
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
+	fmt.Println(workflow.Name)
+	reactionFound, accessToken, err := self.getReactionAndToken("Asana", workflow)
+	if err != nil {
+		fmt.Println(11, err)
+		return fmt.Errorf("Could not update token or find reaction")
+	}
+
+	switch reactionFound.Name {
+	case "Create task":
+		return self.createTaskAsana(accessToken, workflow)
+	}
+
+	return nil
+}
+
 func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
 	self.CheckSpotifyReactions(workflow)
 	self.CheckDiscordReactions(workflow)
 	self.CheckLinkedinReactions(workflow)
+	self.CheckAsanaReactions(workflow)
 }
 
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
