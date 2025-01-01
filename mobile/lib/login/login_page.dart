@@ -161,7 +161,7 @@ class _APICallState extends State<APICall> {
               AuthButton(
                 text: "Continue with Google",
                 color: Color.fromARGB(255, 232, 74, 74),
-                imageUrl: 'assets/icon/google_logo.webp',
+                imageUrl: 'assets/icon/Google.webp',
                 onPressed: () {},
               ),
               AuthButton(
@@ -210,7 +210,7 @@ class AuthButton extends StatelessWidget {
     super.key,
     required this.text,
     this.color = Colors.black,
-    this.imageUrl = "assets/icon/noImage.png",
+    this.imageUrl = "assets/icon/NoImage.webp",
     this.imageWidth = 24,
     this.imageHeight = 24,
     required this.onPressed,

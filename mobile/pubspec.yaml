@@ -35,9 +35,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/icon/google_logo.webp
-    - assets/icon/github.png
-    - assets/icon/noImage.png
+    - assets/icon/Google.webp
+    - assets/icon/Github.webp
+    - assets/icon/NoImage.webp
     - assets/icon/Spotify.webp
     - assets/icon/Reddit.webp
     - .env

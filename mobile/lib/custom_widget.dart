@@ -487,10 +487,10 @@ class SafeWebImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return FadeInImage(
       image: NetworkImage(url),
-      placeholder: AssetImage('assets/icon/noImage.png'),
+      placeholder: AssetImage('assets/icon/NoImage.webp'),
       imageErrorBuilder: (context, error, stackTrace) {
         return Image.asset(
-          'assets/icon/noImage.png',
+          'assets/icon/NoImage.webp',
           width: width,
           height: height,
         );
