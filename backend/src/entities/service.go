@@ -121,10 +121,3 @@ type AsanaWorkspacesInfo struct {
 		Name string `json:"name"`
 	} `json:"data"`
 }
-
-type AsanaUserWorkspaces struct {
-	Data []struct {
-		Gid  string `json:"gid"`
-		Name string `json:"name"`
-	} `json:"data"`
-}

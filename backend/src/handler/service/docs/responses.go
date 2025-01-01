@@ -106,7 +106,7 @@ type ServiceGetDiscordGuildChannelsInternalServerErrorResponse struct {
 
 // Asana Get User Workspaces
 type ServiceGetAsanaUserWorkspacesSuccessResponse struct {
-	Workspaces entities.AsanaUserWorkspaces
+	Workspaces entities.AsanaWorkspacesInfo
 }
 
 type ServiceGetAsanaUserWorkspacesInternalServerErrorResponse struct {

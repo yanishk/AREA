@@ -367,7 +367,7 @@ func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 // @Failure		500		{object}	docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse
 // @Router /Asana/user/workspaces [get]
 func (self *ServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
-	var workspaces entities.AsanaUserWorkspaces
+	var workspaces entities.AsanaWorkspacesInfo
 	url := "https://app.asana.com/api/1.0/workspaces"
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
