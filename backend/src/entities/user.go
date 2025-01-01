@@ -9,6 +9,13 @@ type User struct {
 	ConnectionType string
 }
 
+type UserInfos struct {
+	Email          string `json:"email"`
+	CreatedAt      string `json:"createdat"`
+	Timezone       string `json:"timezone"`
+	ConnectionType string `json:"connectiontype"`
+}
+
 type UserCredentials struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

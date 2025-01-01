@@ -72,6 +72,7 @@ class CustomClassicForm extends StatelessWidget {
     this.disabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
     this.enabledBorderColor = const Color.fromARGB(255, 238, 238, 238),
     this.maxLines = 1,
+    this.textColor = Colors.black,
   });
 
   final String hint;
@@ -86,6 +87,7 @@ class CustomClassicForm extends StatelessWidget {
   final Color disabledBorderColor;
   final Color enabledBorderColor;
   final int maxLines;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +103,10 @@ class CustomClassicForm extends StatelessWidget {
             child: TextField(
               maxLines: maxLines,
               minLines: 1,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black),
+                  color: textColor),
               controller: controller,
               obscureText: obscureText,
               cursorColor: Colors.black,
@@ -448,16 +450,18 @@ class DoubleWidget extends StatelessWidget {
     required this.firstChild,
     required this.secondChild,
     this.padding = const EdgeInsets.only(left: 50),
+    this.mainAxisAlignment = MainAxisAlignment.spaceEvenly,
   });
 
   final Widget firstChild;
   final Widget secondChild;
   final EdgeInsetsGeometry padding;
+  final MainAxisAlignment mainAxisAlignment;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: mainAxisAlignment,
       children: [
         firstChild,
         Padding(padding: padding),

@@ -22,9 +22,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord Server Channels",
+                "summary": "Retrieve Discord Server Channels",
                 "parameters": [
                     {
                         "type": "string",
@@ -57,9 +57,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Discord User Servers",
+                "summary": "Retrieve Discord User Servers",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -76,27 +76,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/actions-services": {
+        "/about.json": {
             "get": {
-                "description": "Retrieve services with actions available",
+                "description": "Get about.json file",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "About.json"
                 ],
-                "summary": "Actions Services",
+                "summary": "About.json",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
                         }
                     }
                 }
@@ -109,7 +109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services Authentication"
+                    "Authentication"
                 ],
                 "summary": "Service OAuth2",
                 "parameters": [
@@ -153,7 +153,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "User Authentication",
+                "description": "User authentication",
                 "consumes": [
                     "application/json"
                 ],
@@ -253,32 +253,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/reactions-services": {
-            "get": {
-                "description": "Retrieve services with reactions available",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Services"
-                ],
-                "summary": "Reactions Services",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -391,7 +365,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/service/retrieve": {
+        "/services/actions": {
+            "get": {
+                "description": "Retrieve services with actions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Actions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/reactions": {
+            "get": {
+                "description": "Retrieve services with reactions available",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services With Reactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/{id}": {
             "get": {
                 "description": "Retrieve service by id",
                 "produces": [
@@ -406,7 +432,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -432,7 +458,37 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/delete-account": {
+        "/user": {
+            "get": {
+                "description": "Retrieve informations about the user's connected",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Retrieve User's Informations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserSuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserUnauthorizedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserGetUserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete the user account",
                 "consumes": [
@@ -462,32 +518,6 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserDeleteAccountInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/email": {
-            "get": {
-                "description": "Get the email of user connected",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get User Email",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailSuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse"
                         }
                     }
                 }
@@ -726,9 +756,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Actions From Service",
+                "summary": "Retrieve Actions From Service",
                 "parameters": [
                     {
                         "type": "string",
@@ -761,9 +791,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Services"
+                    "Service"
                 ],
-                "summary": "Reactions From Service",
+                "summary": "Retrieve Reactions From Service",
                 "parameters": [
                     {
                         "type": "string",
@@ -791,23 +821,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "docs_service.ActionExample": {
+        "docs_about.AboutGetAboutInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve informations about the server"
+                }
+            }
+        },
+        "docs_about.AboutGetAboutSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "about": {
+                    "$ref": "#/definitions/entities.About"
                 }
             }
         },
@@ -918,49 +945,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ReactionExample": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbparam": {
-                    "type": "integer"
-                },
-                "serviceid": {
-                    "type": "string"
-                }
-            }
-        },
-        "docs_service.ServiceExample": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "hasactions": {
-                    "type": "boolean"
-                },
-                "hasreactions": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "logo": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1034,7 +1018,7 @@ const docTemplate = `{
                 "actions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ActionExample"
+                        "$ref": "#/definitions/entities.Action"
                     }
                 }
             }
@@ -1045,7 +1029,7 @@ const docTemplate = `{
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ServiceExample"
+                        "$ref": "#/definitions/entities.Service"
                     }
                 }
             }
@@ -1056,7 +1040,7 @@ const docTemplate = `{
                 "reactions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_service.ReactionExample"
+                        "$ref": "#/definitions/entities.Reaction"
                     }
                 }
             }
@@ -1083,7 +1067,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "service": {
-                    "$ref": "#/definitions/docs_service.ServiceExample"
+                    "$ref": "#/definitions/entities.Service"
                 }
             }
         },
@@ -1114,21 +1098,46 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_user.UserGetUserEmailSuccessResponse": {
+        "docs_user.UserGetUserInternalServerErrorResponse": {
             "type": "object",
             "properties": {
-                "email": {
+                "error": {
                     "type": "string",
-                    "example": "email@example.com"
+                    "example": "Internal server error"
                 }
             }
         },
-        "docs_user.UserGetUserEmailUnauthorizedResponse": {
+        "docs_user.UserGetUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/docs_user.UserInfosExample"
+                }
+            }
+        },
+        "docs_user.UserGetUserUnauthorizedResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string"
+                }
+            }
+        },
+        "docs_user.UserInfosExample": {
+            "type": "object",
+            "properties": {
+                "connectiontype": {
+                    "type": "string"
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
                 }
             }
         },
@@ -1366,40 +1375,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_workflow.WorkflowExample": {
-            "type": "object",
-            "properties": {
-                "actionid": {
-                    "type": "string"
-                },
-                "actionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                },
-                "createdat": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "isactivated": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ownerid": {
-                    "type": "string"
-                },
-                "reactionid": {
-                    "type": "string"
-                },
-                "reactionparam": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        },
         "docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1415,7 +1390,7 @@ const docTemplate = `{
                 "workflows": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/docs_workflow.WorkflowExample"
+                        "$ref": "#/definitions/entities.Workflow"
                     }
                 }
             }
@@ -1456,9 +1431,115 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.About": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/entities.AboutClient"
+                },
+                "server": {
+                    "$ref": "#/definitions/entities.AboutServer"
+                }
+            }
+        },
+        "entities.AboutAction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutClient": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutReaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.AboutServer": {
+            "type": "object",
+            "properties": {
+                "current_time": {
+                    "type": "integer"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutService"
+                    }
+                }
+            }
+        },
+        "entities.AboutService": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutAction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.AboutReaction"
+                    }
+                }
+            }
+        },
+        "entities.Action": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.NewWorkflow": {
             "type": "object",
             "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "actionid": {
                     "type": "string"
                 },
@@ -1475,6 +1556,56 @@ const docTemplate = `{
                 "reactionparam": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "entities.Reaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nbparam": {
+                    "type": "integer"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "serviceid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "hasactions": {
+                    "type": "boolean"
+                },
+                "hasreactions": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1522,6 +1653,44 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.Workflow": {
+            "type": "object",
+            "properties": {
+                "actiondata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "actionid": {
+                    "type": "string"
+                },
+                "actionparam": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "createdat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isactivated": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerid": {
+                    "type": "string"
+                },
+                "reactionid": {
+                    "type": "string"
+                },
+                "reactionparam": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

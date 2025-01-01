@@ -1,15 +1,17 @@
 package service
 
 import (
-	"backend/src/entities"
 	"io"
 	"net/http"
+
+	"backend/src/entities"
 )
 
 type UserService interface {
 	CreateUser(userEmail string, userPassword string, userConnectionType string) error
 	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
 	LoginWithService(code string, serviceName string, appType string) (string, error)
+	GetUser(userEmail string, userConnectionType string) (entities.UserInfos, error)
 	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
 	DeleteAccount(userEmail string, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
@@ -26,6 +28,7 @@ type ServiceService interface {
 	GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
 	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
@@ -44,7 +47,14 @@ type WorkflowService interface {
 	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
 	UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error
 	DeleteWorkflow(email string, connectionType string, workflowId string) error
-	CallTimeApi() error
+	CheckTimeAndDateActions() error
+	CheckGithubActions() error
+	CheckRedditActions() error
+	CheckWeatherActions() error
+}
+
+type AboutService interface {
+	GetAboutServer(about entities.About) (entities.About, error)
 }
 
 type Service struct {
@@ -52,4 +62,5 @@ type Service struct {
 	ServiceService     ServiceService
 	UserServiceService UserServiceService
 	WorkflowService    WorkflowService
+	AboutService       AboutService
 }

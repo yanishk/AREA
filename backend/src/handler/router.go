@@ -9,6 +9,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	about_handler "backend/src/handler/about"
 	service_handler "backend/src/handler/service"
 	user_handler "backend/src/handler/user"
 	user_service_handler "backend/src/handler/userservice"
@@ -28,11 +29,15 @@ type UserServiceHandler interface {
 type WorkflowHandler interface {
 }
 
+type AboutHandler interface {
+}
+
 type Handler struct {
 	UserHandler        UserHandler
 	ServiceHandler     ServiceHandler
 	UserServiceHandler UserServiceHandler
 	WorkflowHandler    WorkflowHandler
+	AboutHandler       AboutHandler
 	router             *gin.Engine
 }
 
@@ -44,6 +49,7 @@ func New(services *service.Service) *Handler {
 		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
 		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserServiceService, services.UserService, router),
 		WorkflowHandler:    workflow_handler.NewWorkflowHandler(services.WorkflowService, services.UserService, router),
+		AboutHandler:       about_handler.NewAboutHandler(services.AboutService, router),
 		router:             router,
 	}
 }

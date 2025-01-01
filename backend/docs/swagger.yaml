@@ -1,16 +1,14 @@
 definitions:
-  docs_service.ActionExample:
+  docs_about.AboutGetAboutInternalServerErrorResponse:
     properties:
-      description:
+      error:
+        example: Could not retrieve informations about the server
         type: string
-      id:
-        type: string
-      name:
-        type: string
-      nbparam:
-        type: integer
-      serviceid:
-        type: string
+    type: object
+  docs_about.AboutGetAboutSuccessResponse:
+    properties:
+      about:
+        $ref: '#/definitions/entities.About'
     type: object
   docs_service.DiscordChannelExample:
     properties:
@@ -82,34 +80,6 @@ definitions:
       permissions:
         type: string
     type: object
-  docs_service.ReactionExample:
-    properties:
-      description:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      nbparam:
-        type: integer
-      serviceid:
-        type: string
-    type: object
-  docs_service.ServiceExample:
-    properties:
-      color:
-        type: string
-      hasactions:
-        type: boolean
-      hasreactions:
-        type: boolean
-      id:
-        type: string
-      logo:
-        type: string
-      name:
-        type: string
-    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -159,21 +129,21 @@ definitions:
     properties:
       actions:
         items:
-          $ref: '#/definitions/docs_service.ActionExample'
+          $ref: '#/definitions/entities.Action'
         type: array
     type: object
   docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse:
     properties:
       services:
         items:
-          $ref: '#/definitions/docs_service.ServiceExample'
+          $ref: '#/definitions/entities.Service'
         type: array
     type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
       reactions:
         items:
-          $ref: '#/definitions/docs_service.ReactionExample'
+          $ref: '#/definitions/entities.Reaction'
         type: array
     type: object
   docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
@@ -191,7 +161,7 @@ definitions:
   docs_service.ServiceRetrieveServiceByIdSuccessResponse:
     properties:
       service:
-        $ref: '#/definitions/docs_service.ServiceExample'
+        $ref: '#/definitions/entities.Service'
     type: object
   docs_user.UserDeleteAccountInternalServerErrorResponse:
     properties:
@@ -212,16 +182,32 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_user.UserGetUserEmailSuccessResponse:
+  docs_user.UserGetUserInternalServerErrorResponse:
     properties:
-      email:
-        example: email@example.com
+      error:
+        example: Internal server error
         type: string
     type: object
-  docs_user.UserGetUserEmailUnauthorizedResponse:
+  docs_user.UserGetUserSuccessResponse:
+    properties:
+      user:
+        $ref: '#/definitions/docs_user.UserInfosExample'
+    type: object
+  docs_user.UserGetUserUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.UserInfosExample:
+    properties:
+      connectiontype:
+        type: string
+      createdat:
+        type: string
+      email:
+        type: string
+      timezone:
         type: string
     type: object
   docs_user.UserInternalServerErrorResponse:
@@ -383,29 +369,6 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_workflow.WorkflowExample:
-    properties:
-      actionid:
-        type: string
-      actionparam:
-        additionalProperties: true
-        type: object
-      createdat:
-        type: string
-      id:
-        type: string
-      isactivated:
-        type: boolean
-      name:
-        type: string
-      ownerid:
-        type: string
-      reactionid:
-        type: string
-      reactionparam:
-        additionalProperties: true
-        type: object
-    type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
     properties:
       error:
@@ -416,7 +379,7 @@ definitions:
     properties:
       workflows:
         items:
-          $ref: '#/definitions/docs_workflow.WorkflowExample'
+          $ref: '#/definitions/entities.Workflow'
         type: array
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse:
@@ -444,8 +407,77 @@ definitions:
         example: Workflow successfully updated
         type: string
     type: object
+  entities.About:
+    properties:
+      client:
+        $ref: '#/definitions/entities.AboutClient'
+      server:
+        $ref: '#/definitions/entities.AboutServer'
+    type: object
+  entities.AboutAction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutClient:
+    properties:
+      host:
+        type: string
+    type: object
+  entities.AboutReaction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  entities.AboutServer:
+    properties:
+      current_time:
+        type: integer
+      services:
+        items:
+          $ref: '#/definitions/entities.AboutService'
+        type: array
+    type: object
+  entities.AboutService:
+    properties:
+      actions:
+        items:
+          $ref: '#/definitions/entities.AboutAction'
+        type: array
+      name:
+        type: string
+      reactions:
+        items:
+          $ref: '#/definitions/entities.AboutReaction'
+        type: array
+    type: object
+  entities.Action:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+      serviceid:
+        type: string
+    type: object
   entities.NewWorkflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
@@ -458,6 +490,39 @@ definitions:
       reactionparam:
         additionalProperties: true
         type: object
+    type: object
+  entities.Reaction:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      nbparam:
+        type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+      serviceid:
+        type: string
+    type: object
+  entities.Service:
+    properties:
+      color:
+        type: string
+      hasactions:
+        type: boolean
+      hasreactions:
+        type: boolean
+      id:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
     type: object
   entities.UpdatedWorkflow:
     properties:
@@ -490,6 +555,32 @@ definitions:
       password:
         type: string
     type: object
+  entities.Workflow:
+    properties:
+      actiondata:
+        additionalProperties: true
+        type: object
+      actionid:
+        type: string
+      actionparam:
+        additionalProperties: true
+        type: object
+      createdat:
+        type: string
+      id:
+        type: string
+      isactivated:
+        type: boolean
+      name:
+        type: string
+      ownerid:
+        type: string
+      reactionid:
+        type: string
+      reactionparam:
+        additionalProperties: true
+        type: object
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -515,9 +606,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions From Service
+      summary: Retrieve Actions From Service
       tags:
-      - Services
+      - Service
   /{service}/reactions:
     get:
       description: Retrieve reactions from requested service
@@ -538,9 +629,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions From Service
+      summary: Retrieve Reactions From Service
       tags:
-      - Services
+      - Service
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -561,9 +652,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
-      summary: Discord Server Channels
+      summary: Retrieve Discord Server Channels
       tags:
-      - Services
+      - Service
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -578,26 +669,26 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
-      summary: Discord User Servers
+      summary: Retrieve Discord User Servers
       tags:
-      - Services
-  /actions-services:
+      - Service
+  /about.json:
     get:
-      description: Retrieve services with actions available
+      description: Get about.json file
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions Services
+            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
+      summary: About.json
       tags:
-      - Services
+      - About.json
   /authentication/{service}/{callback-type}/{app-type}:
     get:
       description: Get Service OAuth2 URL
@@ -630,12 +721,12 @@ paths:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Service OAuth2
       tags:
-      - Services Authentication
+      - Authentication
   /login:
     post:
       consumes:
       - application/json
-      description: User Authentication
+      description: User authentication
       parameters:
       - description: User credentials
         in: body
@@ -702,23 +793,6 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
-  /reactions-services:
-    get:
-      description: Retrieve services with reactions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions Services
-      tags:
-      - Services
   /register:
     post:
       consumes:
@@ -790,12 +864,12 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
-  /service/retrieve:
+  /services/{id}:
     get:
       description: Retrieve service by id
       parameters:
       - description: Service id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -817,7 +891,41 @@ paths:
       summary: Retrieve Service
       tags:
       - Services
-  /user/delete-account:
+  /services/actions:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reactions:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Reactions
+      tags:
+      - Services
+  /user:
     delete:
       consumes:
       - application/json
@@ -840,21 +948,24 @@ paths:
       summary: Delete Account
       tags:
       - Users
-  /user/email:
     get:
-      description: Get the email of user connected
+      description: Retrieve informations about the user's connected
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailSuccessResponse'
+            $ref: '#/definitions/docs_user.UserGetUserSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse'
-      summary: Get User Email
+            $ref: '#/definitions/docs_user.UserGetUserUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserGetUserInternalServerErrorResponse'
+      summary: Retrieve User's Informations
       tags:
       - Users
   /user/modify-password:
