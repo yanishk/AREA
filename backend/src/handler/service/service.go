@@ -67,6 +67,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 	private.GET("/Asana/user/workspaces", self.getAsanaUserWorkspaces)
 	private.GET("/Asana/workspace/assignees", self.getAsanaWorkspaceAssignees)
 	private.GET("/Asana/workspace/projects", self.getAsanaWorkspaceProjects)
+	private.GET("/Asana/workspace/tags", self.getAsanaWorkspaceTags)
 }
 
 // @Summary		Service OAuth2
@@ -390,5 +391,22 @@ func (self *ServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"projects": projects,
+	})
+}
+
+func (self *ServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
+	workspaceId := context.Query("id")
+	url := "https://app.asana.com/api/1.0/workspaces/" + workspaceId + "/tags"
+
+	tags, err := self.decodeRequiredWorkspaceInfo(url, context)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"errpr": "Could not retrieve workspace's projects",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"tags": tags,
 	})
 }
