@@ -59,10 +59,6 @@ type ServiceRetrieveServiceByIdSuccessResponse struct {
 	Service entities.Service
 }
 
-type ServiceRetrieveServiceByIdBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid service id"`
-}
-
 type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve requested service"`
 }

@@ -146,12 +146,6 @@ definitions:
           $ref: '#/definitions/entities.Reaction'
         type: array
     type: object
-  docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
-    properties:
-      error:
-        example: Invalid service id
-        type: string
-    type: object
   docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse:
     properties:
       error:
@@ -886,10 +880,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse'
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
+  /services/action/{actionid}:
+    get:
+      description: Retrieve service by action id
+      parameters:
+      - description: Action id
+        in: path
+        name: actionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -912,6 +925,29 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
       summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reaction/{reactionid}:
+    get:
+      description: Retrieve service by reaction id
+      parameters:
+      - description: Reaction id
+        in: path
+        name: reactionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
       tags:
       - Services
   /services/reactions:

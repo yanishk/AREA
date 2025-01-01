@@ -30,13 +30,14 @@ type UserServiceRepository interface {
 
 type ReactionRepository interface {
 	CreateReaction(name string, description string, serviceId string, nbParam int) error
+	FindReactionById(id string) (entities.Reaction, error)
 	FindReactionByName(name string) (entities.Reaction, error)
 	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
-	FindReactionById(id string) (entities.Reaction, error)
 }
 
 type ActionRepository interface {
 	CreateAction(name string, description string, serviceId string, nbParam int) error
+	FindActionById(id string) (entities.Action, error)
 	FindActionByName(name string) (entities.Action, error)
 	FindActionByServiceId(serviceId string) ([]entities.Action, error)
 }
