@@ -17,6 +17,7 @@ type ServiceHandler struct {
 	UserService        service.UserService
 }
 
+const unknownServiceMessage = "Unknown service"
 const cantRetrieveServiceMessage = "Could not retrieve requested service"
 const internalServerErrorMessage = "Internal server error"
 const getUserServersFailedMessage = "Could not retrieve the user's servers"
@@ -94,7 +95,7 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Unknown service",
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -110,15 +111,15 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse
 // @Router			/{service}/actions [get]
 func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": internalServerErrorMessage,
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": UnknownServiceMessage,
 		})
 		return
 	}
@@ -134,15 +135,15 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Produce		json
 // @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse
 // @Router			/{service}/reactions [get]
 func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": internalServerErrorMessage,
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": UnknownServiceMessage,
 		})
 		return
 	}
