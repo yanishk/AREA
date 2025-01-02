@@ -58,6 +58,8 @@ func (self *UserServiceService) refreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetRedditRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Asana" {
 		request, errRequest = self.ServiceService.GetAsanaRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Dropbox" {
+		request, errRequest = self.ServiceService.GetDropboxRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}

@@ -224,6 +224,15 @@ func oauth2Linkedin(callbackType string) string {
 		stateParam + os.Getenv("LINKEDIN_STATE")
 }
 
+func oauth2Dropbox(callbackType string) string {
+	callbackLink, _ := getCallbackAndClientId(callbackType, "DROPBOX", false)
+
+	return ("https://www.dropbox.com/oauth2/authorize?" +
+		clientIdParam + url.QueryEscape(os.Getenv("DROPBOX_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType)
+}
+
 func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
 	var authUrl string
 
@@ -241,6 +250,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = oauth2Asana(callbackType)
 	} else if serviceName == "Linkedin" {
 		authUrl = oauth2Linkedin(callbackType)
+	} else if serviceName == "Dropbox" {
+		authUrl = oauth2Dropbox(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(unknownServiceMessage)
 	}
@@ -411,6 +422,28 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 	return request, nil
 }
 
+func getDropboxOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var dropboxCallback string
+
+	if callbackType == "service" {
+		dropboxCallback = os.Getenv("DROPBOX_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		dropboxCallback = os.Getenv("DROPBOX_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(invalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://api.dropboxapi.com/oauth2/token", code, dropboxCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"))
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var spotifyCallback string
 
@@ -498,15 +531,19 @@ func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshT
 	return request, nil
 }
 
-func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
-	tokenUrl := "https://oauth2.googleapis.com/token"
-	jsonBody := fmt.Sprintf(
+func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string {
+	return fmt.Sprintf(
 		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
-		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		clientId,
+		secretId,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
+}
+
+func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GOOGLE_WEB_CLIENT_ID"), os.Getenv("GOOGLE_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -520,13 +557,21 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 
 func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://app.asana.com/-/oauth_token"
-	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("ASANA_CLIENT_ID"),
-		os.Getenv("ASANA_CLIENT_SECRET"),
-		grantTypeRefreshToken,
-		refreshToken,
-	)
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("ASANA_CLIENT_ID"), os.Getenv("ASANA_CLIENT_SECRET"), refreshToken)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func (self *ServiceService) GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://api.dropbox.com/oauth2/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -625,6 +670,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = getAsanaOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Linkedin" {
 		request, errRequest = getLinkedinOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Dropbox" {
+		request, errRequest = getDropboxOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(unknownServiceMessage)
 	}
