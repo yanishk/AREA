@@ -21,10 +21,10 @@ type UserService struct {
 	ServiceService        service.ServiceService
 }
 
-const ContentType = "Content-Type"
-const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
-const FormattingDate = "2006-01-02 15:04:05-07:00"
-const BasicConnectionType = "basic"
+const contentType = "Content-Type"
+const contentTypeUrlEncoded = "application/x-www-form-urlencoded"
+const formattingDate = "2006-01-02 15:04:05-07:00"
+const basicConnectionType = "basic"
 
 func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository,
 	UserServiceRepository storage.UserServiceRepository, WorkflowRepository storage.WorkflowRepository, ServiceService service.ServiceService) *UserService {
@@ -40,7 +40,7 @@ func NewUserService(UserRepository storage.UserRepository, ServiceRepository sto
 func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
 	var errorUser error
 
-	if userConnectionType == BasicConnectionType {
+	if userConnectionType == basicConnectionType {
 		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("Internal server error")
@@ -74,7 +74,7 @@ func createToken(email string, connectionType string) (string, error) {
 }
 
 func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
-	if userConnectionType != BasicConnectionType && userPassword != "" {
+	if userConnectionType != basicConnectionType && userPassword != "" {
 		return "", fmt.Errorf("Wrong password")
 	}
 
@@ -83,7 +83,7 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	if userConnectionType == BasicConnectionType {
+	if userConnectionType == basicConnectionType {
 		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
 		if resBcrypt != nil {
 			return "", fmt.Errorf("Wrong password")
@@ -137,7 +137,7 @@ func (self *UserService) GetUser(userEmail string, userConnectionType string) (e
 }
 
 func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
-	if userConnectionType != BasicConnectionType {
+	if userConnectionType != basicConnectionType {
 		return fmt.Errorf("Could not modify the password")
 	}
 

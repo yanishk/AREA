@@ -1,66 +1,61 @@
 package service_handler
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
 	"backend/src/service"
-	"encoding/json"
-	"net/http"
-	"os"
-
-	"github.com/gin-gonic/gin"
 )
 
 type ServiceHandler struct {
-	ServiceService     service.ServiceService
-	UserServiceService service.UserServiceService
-	UserService        service.UserService
+	ServiceService service.ServiceService
+	UserService    service.UserService
 }
 
-const UnknownServiceMessage = "Unknown service"
-const InternalServerErrorMessage = "Internal server error"
-const getUserServersFailedMessage = "Could not retrieve the user's servers"
-const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
+const unknownServiceMessage = "Unknown service"
+const cannotRetrieveServiceMessage = "Could not retrieve requested service"
+const internalServerErrorMessage = "Internal server error"
 
-func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
+func NewServiceHandler(ServiceService service.ServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
-		ServiceService:     ServiceService,
-		UserServiceService: UserServiceService,
-		UserService:        UserService,
+		ServiceService: ServiceService,
+		UserService:    UserService,
 	}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
-	self.PublicRoutes(router)
-	self.PrivateRoutes(router)
+func (self *ServiceHandler) setupRoutes(router *gin.Engine) {
+	self.publicRoutes(router)
+	self.privateRoutes(router)
 }
 
-func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
+func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/:service/:callback-type/:app-type", self.OAuth2Service)
+		authentication.GET("/:service/:callback-type/:app-type", self.oauth2Service)
 	}
 }
 
-func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
+func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	service := private.Group("/:service")
 	{
-		service.GET("/actions", self.RetrieveActionsFromService)
-		service.GET("/reactions", self.RetrieveReactionsFromService)
+		service.GET("/actions", self.retrieveActionsFromService)
+		service.GET("/reactions", self.retrieveReactionsFromService)
 	}
-
 	services := private.Group("/services")
 	{
-		services.GET("/:id", self.RetrieveServiceById)
-		services.GET("/actions", self.RetrieveActionsServices)
-		services.GET("/reactions", self.RetrieveReactionsServices)
+		services.GET("/:id", self.retrieveServiceById)
+		services.GET("/action/:actionid", self.retrieveServiceByActionId)
+		services.GET("/reaction/:reactionid", self.retrieveServiceByReactionId)
+		services.GET("/actions", self.retrieveActionsServices)
+		services.GET("/reactions", self.retrieveReactionsServices)
 	}
-
-	private.GET("/Discord/user/servers", self.getDiscordUserServers)
-	private.GET("/Discord/server/channels", self.getDiscordGuildChannels)
+	private.GET("Discord/server/channels", self.getDiscordGuildChannels)
 }
 
 // @Summary		Service OAuth2
@@ -73,7 +68,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
 // @Router			/authentication/{service}/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
+func (self *ServiceHandler) oauth2Service(context *gin.Context) {
 	serviceName := context.Param("service")
 	callbackType := context.Param("callback-type")
 	appType := context.Param("app-type")
@@ -92,7 +87,7 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -110,13 +105,13 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse
 // @Router			/{service}/actions [get]
-func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
+func (self *ServiceHandler) retrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
 	if errActions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -134,13 +129,13 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse
 // @Router			/{service}/reactions [get]
-func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
+func (self *ServiceHandler) retrieveReactionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
 	if errReactions != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": UnknownServiceMessage,
+			"error": unknownServiceMessage,
 		})
 		return
 	}
@@ -156,15 +151,63 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 // @Produce		json
 // @Param        id     path     string  true  "Service id"
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveServiceByIdBadRequestResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
 // @Router			/services/{id} [get]
-func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
+func (self *ServiceHandler) retrieveServiceById(context *gin.Context) {
 	serviceId := context.Param("id")
+
 	service, err := self.ServiceService.FindServiceById(serviceId)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve requested service",
+			"error": cannotRetrieveServiceMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by action id
+// @Tags			Services
+// @Produce		json
+// @Param        actionid     path     string  true  "Action id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/services/action/{actionid} [get]
+func (self *ServiceHandler) retrieveServiceByActionId(context *gin.Context) {
+	id := context.Param("actionid")
+
+	service, err := self.ServiceService.FindServiceByActionId(id)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": cannotRetrieveServiceMessage,
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"service": service,
+	})
+}
+
+// @Summary		Retrieve Service
+// @Description	Retrieve service by reaction id
+// @Tags			Services
+// @Produce		json
+// @Param        reactionid     path     string  true  "Reaction id"
+// @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
+// @Router			/services/reaction/{reactionid} [get]
+func (self *ServiceHandler) retrieveServiceByReactionId(context *gin.Context) {
+	id := context.Param("reactionid")
+
+	service, err := self.ServiceService.FindServiceByReactionId(id)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": cannotRetrieveServiceMessage,
 		})
 		return
 	}
@@ -181,11 +224,11 @@ func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/services/actions [get]
-func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+func (self *ServiceHandler) retrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
@@ -199,96 +242,36 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/services/reactions [get]
-func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+func (self *ServiceHandler) retrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": InternalServerErrorMessage,
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
 	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
-// @Summary		Retrieve Discord User Servers
-// @Description	Retrieve the discord servers from the authenticated user
-// @Tags			Service
-// @Produce		json
-// @Success		200		{object}	docs_service.ServiceGetDiscordUserServersSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse
-// @Router			/Discord/user/servers [get]
-func (self *ServiceHandler) getDiscordUserServers(context *gin.Context) {
-	email := context.GetString("email")
-	connectionType := context.GetString("connectionType")
-
-	accessToken, errRefreshing := self.UserServiceService.CallApiAndRefresh(email, connectionType, "Discord")
-	if errRefreshing != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve or refresh the token",
-		})
-		return
-	}
-
-	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", accessToken, nil)
-	if errRequest != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-	defer resp.Body.Close()
-
-	var guilds []map[string]interface{}
-	var ownedServers []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getUserServersFailedMessage,
-		})
-		return
-	}
-
-	for _, guild := range guilds {
-		if guild["owner"] == true {
-			ownedServers = append(ownedServers, guild)
-		}
-	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"servers": ownedServers,
-	})
-}
-
 // @Summary		Retrieve Discord Server Channels
 // @Description	Retrieve the channels from the selected server
-// @Tags			Service
+// @Tags			Discord
 // @Produce		json
 // @Param        id  query      string  true  "server id"
 // @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
 // @Router /Discord/server/channels [get]
 func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
-	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	guildId := context.Query("id")
-	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
-	if errRequest != nil {
+	channels, err := self.ServiceService.RetrieveDiscordGuildChannels(guildId)
+	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
+			"error": "Could not retrieve the server's channels",
 		})
 		return
 	}
-	defer resp.Body.Close()
 
-	var channels []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"channels": channels,
 	})

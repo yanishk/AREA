@@ -15,16 +15,16 @@ type AboutHandler struct {
 
 func NewAboutHandler(AboutService service.AboutService, router *gin.Engine) *AboutHandler {
 	handler := &AboutHandler{AboutService: AboutService}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *AboutHandler) SetupRoutes(router *gin.Engine) {
-	self.PublicRoutes(router)
+func (self *AboutHandler) setupRoutes(router *gin.Engine) {
+	self.publicRoutes(router)
 }
 
-func (self *AboutHandler) PublicRoutes(router *gin.Engine) {
-	router.GET("/about.json", self.GetAbout)
+func (self *AboutHandler) publicRoutes(router *gin.Engine) {
+	router.GET("/about.json", self.getAbout)
 }
 
 // @Summary		About.json
@@ -34,7 +34,7 @@ func (self *AboutHandler) PublicRoutes(router *gin.Engine) {
 // @Success		200		{object}	docs_about.AboutGetAboutSuccessResponse
 // @Failure		500		{object}	docs_about.AboutGetAboutInternalServerErrorResponse
 // @Router			/about.json [get]
-func (self *AboutHandler) GetAbout(context *gin.Context) {
+func (self *AboutHandler) getAbout(context *gin.Context) {
 	var about entities.About
 
 	about.Client.Host = context.ClientIP()

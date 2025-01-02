@@ -113,3 +113,11 @@ type GithubIssue struct {
 type LinkedinSub struct {
 	Sub string `json:"sub"`
 }
+
+// Asana
+type AsanaWorkspacesInfo struct {
+	Data []struct {
+		Gid  string `json:"gid"`
+		Name string `json:"name"`
+	} `json:"data"`
+}

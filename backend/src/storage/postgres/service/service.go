@@ -30,7 +30,7 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 	return nil
 }
 
-func (self *ServiceRepository) FindServiceWithParam(sqlStatement string, param string) (entities.Service, error) {
+func (self *ServiceRepository) findServiceWithParam(sqlStatement string, param string) (entities.Service, error) {
 	var service entities.Service
 
 	row := self.db.QueryRow(sqlStatement, param)
@@ -41,7 +41,7 @@ func (self *ServiceRepository) FindServiceWithParam(sqlStatement string, param s
 	return service, nil
 }
 
-func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Service, error) {
+func (self *ServiceRepository) findServices(sqlStatement string) ([]entities.Service, error) {
 	var services []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
@@ -63,25 +63,25 @@ func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Ser
 
 func (self *ServiceRepository) FindServiceById(id string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE id = ($1)`
-	return self.FindServiceWithParam(sqlStatement, id)
+	return self.findServiceWithParam(sqlStatement, id)
 }
 
 func (self *ServiceRepository) FindServiceByName(name string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE name = ($1)`
-	return self.FindServiceWithParam(sqlStatement, name)
+	return self.findServiceWithParam(sqlStatement, name)
 }
 
 func (self *ServiceRepository) FindAllServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasactions = true`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasreactions = true`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }
