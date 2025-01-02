@@ -15,7 +15,7 @@ type UserHandler struct {
 	UserService service.UserService
 }
 
-const InvalidRequestBodyMessage = "Invalid request body"
+const invalidRequestBodyMessage = "Invalid request body"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
@@ -61,7 +61,7 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 	err := context.ShouldBindJSON(&newUser)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -106,7 +106,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -220,7 +220,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}

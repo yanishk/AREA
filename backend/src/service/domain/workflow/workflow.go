@@ -24,7 +24,7 @@ type WorkflowService struct {
 }
 
 const botBearer = "Bot "
-const accessBearer = "Bearer "
+const bearerType = "Bearer "
 
 const errorUpdatingWorkflow = "Could not update workflow"
 const errorUpdatingToken = "Could not update token"
@@ -173,11 +173,11 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 	var resp *http.Response
 	switch reactionFound.Name {
 	case "Start playback":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", bearerType, accessToken, nil)
 	case "Pause playback":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", bearerType, accessToken, nil)
 	case "Skip track":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", bearerType, accessToken, nil)
 	case "Add track to playback queue":
 		uri, uriExists := workflow.ReactionParam["uri"]
 		if !uriExists {
@@ -185,7 +185,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		}
 
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", bearerType, accessToken, nil)
 	case "Save a track":
 		id, idExists := workflow.ReactionParam["id"]
 		if !idExists {
@@ -193,7 +193,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		}
 
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
-		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", bearerType, accessToken, nil)
 	}
 
 	if resp != nil {
@@ -238,7 +238,7 @@ func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken str
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", accessBearer+accessToken)
+	req.Header.Set("Authorization", bearerType+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 
@@ -417,7 +417,7 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 	}
 
 	url := "https://app.asana.com/api/1.0/tasks"
-	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -456,7 +456,7 @@ func (self *WorkflowService) createProjectAsana(accessToken string, workflow ent
 	}
 
 	url := "https://app.asana.com/api/1.0/projects"
-	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -578,7 +578,7 @@ func (self *WorkflowService) sendMeEmail(workflow entities.Workflow) error {
 
 	url := "https://api.sendgrid.com/v3/mail/send"
 
-	res, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, os.Getenv("API_KEY"), bytes.NewBuffer(contentBytes))
+	res, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, os.Getenv("API_KEY"), bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -740,7 +740,7 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 
 func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", accessBearer+accessToken)
+	req.Header.Add("Authorization", bearerType+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
 	resp, err := self.ServiceService.ExecuteRequest(req)
@@ -1108,7 +1108,7 @@ func (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, ac
 	}
 
 	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
-	return self.ServiceService.ExecuteApiRequest(url, "GET", accessBearer, accessToken, nil)
+	return self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 }
 
 func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
@@ -1145,7 +1145,7 @@ func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Wo
 func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
 	var issues []entities.GithubIssue
 
-	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"issues", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"issues", "GET", bearerType, accessToken, nil)
 	if err != nil {
 		return err
 	}

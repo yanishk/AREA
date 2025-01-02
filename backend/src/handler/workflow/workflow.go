@@ -15,7 +15,7 @@ type WorkflowHandler struct {
 	UserService     service.UserService
 }
 
-const InvalidRequestBodyMessage = "Invalid request body"
+const invalidRequestBodyMessage = "Invalid request body"
 
 func NewWorkflowHandler(WorkflowService service.WorkflowService, UserService service.UserService, router *gin.Engine) *WorkflowHandler {
 	handler := &WorkflowHandler{
@@ -59,7 +59,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	err := context.ShouldBindJSON(&newWorkflow)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -118,7 +118,7 @@ func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 	err := context.ShouldBindJSON(&workflow)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
