@@ -1056,7 +1056,7 @@ func (self *WorkflowService) checkWeatherCurrentWeatherComparisonAction(checkTyp
 	} else if checkType == "belowForecast" && weatherData.Forecast.ForecastDay[0].Day.MinTemperature > temp.(float64) {
 		self.checkReactions(workflow)
 	} else {
-		fmt.Errorf("check type isn't valid")
+		fmt.Errorf("Check type isn't valid")
 	}
 	return nil
 }
