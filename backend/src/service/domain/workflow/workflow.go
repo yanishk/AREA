@@ -63,6 +63,7 @@ func (self *WorkflowService) asanaReactions() []string {
 func (self *WorkflowService) dropboxReactions() []string {
 	return []string{
 		"Move file or folder",
+		"Create a text file",
 	}
 }
 
@@ -645,6 +646,42 @@ func (self *WorkflowService) moveFileOrFolder(accessToken string, workflow entit
 	return nil
 }
 
+func (self *WorkflowService) createTextFile(accessToken string, workflow entities.Workflow) error {
+	name, nameExists := workflow.ReactionParam["name"]
+	content, contentExists := workflow.ReactionParam["content"]
+	path, pathExists := workflow.ReactionParam["path"]
+	if !nameExists || !contentExists || !pathExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	if path.(string)[0] != '/' {
+		path = "/" + path.(string)
+	}
+	if path.(string)[len(path.(string))-1] != '/' {
+		path = path.(string) + "/"
+	}
+
+	filePath := path.(string) + name.(string) + ".txt"
+	url := "https://content.dropboxapi.com/2/files/upload"
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(content.(string))))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", bearerType+accessToken)
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("Dropbox-API-Arg", fmt.Sprintf(`{"autorename":false,"mode":"add","mute":false,"path":"%s","strict_conflict":false}`, filePath))
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
 func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -659,6 +696,8 @@ func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) e
 	switch reactionFound.Name {
 	case "Move file or folder":
 		return self.moveFileOrFolder(accessToken, workflow)
+	case "Create a text file":
+		return self.createTextFile(accessToken, workflow)
 	}
 	return nil
 }
