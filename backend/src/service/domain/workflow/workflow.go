@@ -1,9 +1,6 @@
 package workflow_service
 
 import (
-	"backend/src/entities"
-	"backend/src/service"
-	"backend/src/storage"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,6 +9,10 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"backend/src/entities"
+	"backend/src/service"
+	"backend/src/storage"
 )
 
 type WorkflowService struct {
@@ -24,7 +25,7 @@ type WorkflowService struct {
 }
 
 const botBearer = "Bot "
-const accessBearer = "Bearer "
+const bearerType = "Bearer "
 
 const errorUpdatingWorkflow = "Could not update workflow"
 const errorUpdatingToken = "Could not update token"
@@ -159,7 +160,7 @@ func (self *WorkflowService) refreshTokenForService(serviceName, reactionFoundNa
 	return accessToken, nil
 }
 
-func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
@@ -173,11 +174,11 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 	var resp *http.Response
 	switch reactionFound.Name {
 	case "Start playback":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/play", "PUT", bearerType, accessToken, nil)
 	case "Pause playback":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/pause", "PUT", bearerType, accessToken, nil)
 	case "Skip track":
-		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", bearerType, accessToken, nil)
 	case "Add track to playback queue":
 		uri, uriExists := workflow.ReactionParam["uri"]
 		if !uriExists {
@@ -185,7 +186,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		}
 
 		urlQueue := "https://api.spotify.com/v1/me/player/queue?uri=" + uri.(string)
-		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlQueue, "POST", bearerType, accessToken, nil)
 	case "Save a track":
 		id, idExists := workflow.ReactionParam["id"]
 		if !idExists {
@@ -193,7 +194,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 		}
 
 		urlSave := "https://api.spotify.com/v1/me/tracks?ids=" + id.(string)
-		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", accessBearer, accessToken, nil)
+		resp, _ = self.ServiceService.ExecuteApiRequest(urlSave, "PUT", bearerType, accessToken, nil)
 	}
 
 	if resp != nil {
@@ -202,7 +203,7 @@ func (self *WorkflowService) CheckSpotifyReactions(workflow entities.Workflow) e
 	return fmt.Errorf("Unknown reaction")
 }
 
-func (self *WorkflowService) CheckDiscordReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) error {
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -238,7 +239,7 @@ func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken str
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", accessBearer+accessToken)
+	req.Header.Set("Authorization", bearerType+accessToken)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 
@@ -347,7 +348,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 	return nil
 }
 
-func (self *WorkflowService) CheckLinkedinReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkLinkedinReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
@@ -417,7 +418,7 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 	}
 
 	url := "https://app.asana.com/api/1.0/tasks"
-	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -456,7 +457,7 @@ func (self *WorkflowService) createProjectAsana(accessToken string, workflow ent
 	}
 
 	url := "https://app.asana.com/api/1.0/projects"
-	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -465,7 +466,7 @@ func (self *WorkflowService) createProjectAsana(accessToken string, workflow ent
 	return nil
 }
 
-func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkAsanaReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
@@ -517,7 +518,7 @@ func (self *WorkflowService) sendAnSMS(workflow entities.Workflow) error {
 	return nil
 }
 
-func (self *WorkflowService) CheckSMSReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkSMSReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
@@ -578,7 +579,7 @@ func (self *WorkflowService) sendMeEmail(workflow entities.Workflow) error {
 
 	url := "https://api.sendgrid.com/v3/mail/send"
 
-	res, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, os.Getenv("API_KEY"), bytes.NewBuffer(contentBytes))
+	res, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, os.Getenv("API_KEY"), bytes.NewBuffer(contentBytes))
 	if err != nil {
 		return err
 	}
@@ -587,7 +588,7 @@ func (self *WorkflowService) sendMeEmail(workflow entities.Workflow) error {
 	return nil
 }
 
-func (self *WorkflowService) CheckSendEmailReactions(workflow entities.Workflow) error {
+func (self *WorkflowService) checkSendEmailReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
 		return fmt.Errorf(errorRetrievingReaction)
@@ -600,16 +601,16 @@ func (self *WorkflowService) CheckSendEmailReactions(workflow entities.Workflow)
 	return nil
 }
 
-func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
-	self.CheckSpotifyReactions(workflow)
-	self.CheckDiscordReactions(workflow)
-	self.CheckLinkedinReactions(workflow)
-	self.CheckAsanaReactions(workflow)
-	self.CheckSMSReactions(workflow)
-	self.CheckSendEmailReactions(workflow)
+func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
+	self.checkSpotifyReactions(workflow)
+	self.checkDiscordReactions(workflow)
+	self.checkLinkedinReactions(workflow)
+	self.checkAsanaReactions(workflow)
+	self.checkSMSReactions(workflow)
+	self.checkSendEmailReactions(workflow)
 }
 
-func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !hourExists || !minuteExists {
@@ -617,24 +618,24 @@ func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.Tim
 	}
 
 	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists {
 		return fmt.Errorf("Error in the minute sent")
 	}
 
 	if int(minute.(float64)) == timeRes.Minute {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckTimeAndDateEveryWeekAtAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	days, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -650,14 +651,14 @@ func (self *WorkflowService) CheckTimeAndDateEveryWeekAtAction(timeRes entities.
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
 			int(minute.(float64)) == timeRes.Minute {
-			self.CheckReactions(workflow)
+			self.checkReactions(workflow)
 		}
 	}
 
 	return nil
 }
 
-func (self *WorkflowService) CheckTimeAndDateEveryMonthOnTheAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	day, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -667,12 +668,12 @@ func (self *WorkflowService) CheckTimeAndDateEveryMonthOnTheAction(timeRes entit
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckTimeAndDateEveryYearOnAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	month, monthExists := workflow.ActionParam["month"]
 	day, dayExists := workflow.ActionParam["day"]
 	hour, hourExists := workflow.ActionParam["hour"]
@@ -683,12 +684,12 @@ func (self *WorkflowService) CheckTimeAndDateEveryYearOnAction(timeRes entities.
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
 		int(minute.(float64)) == timeRes.Minute {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckWorkflowsWithTimeAndDateActions(timeRes entities.TimeResponse, action entities.Action) error {
+func (self *WorkflowService) checkWorkflowsWithTimeAndDateActions(timeRes entities.TimeResponse, action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
@@ -701,15 +702,15 @@ func (self *WorkflowService) CheckWorkflowsWithTimeAndDateActions(timeRes entiti
 
 		switch action.Name {
 		case "Every day at":
-			self.CheckTimeAndDateEveryDayAction(timeRes, workflow)
+			self.checkTimeAndDateEveryDayAction(timeRes, workflow)
 		case "Every hour at":
-			self.CheckTimeAndDateEveryHourAction(timeRes, workflow)
+			self.checkTimeAndDateEveryHourAction(timeRes, workflow)
 		case "Every day of the week at":
-			self.CheckTimeAndDateEveryWeekAtAction(timeRes, workflow)
+			self.checkTimeAndDateEveryWeekAtAction(timeRes, workflow)
 		case "Every month on the":
-			self.CheckTimeAndDateEveryMonthOnTheAction(timeRes, workflow)
+			self.checkTimeAndDateEveryMonthOnTheAction(timeRes, workflow)
 		case "Every year on":
-			self.CheckTimeAndDateEveryYearOnAction(timeRes, workflow)
+			self.checkTimeAndDateEveryYearOnAction(timeRes, workflow)
 		}
 	}
 	return nil
@@ -734,7 +735,7 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errCheckName := self.CheckWorkflowsWithTimeAndDateActions(timeRes, action)
+		errCheckName := self.checkWorkflowsWithTimeAndDateActions(timeRes, action)
 		if errCheckName != nil {
 			return errCheckName
 		}
@@ -744,7 +745,7 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 
 func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", accessBearer+accessToken)
+	req.Header.Add("Authorization", bearerType+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
 	resp, err := self.ServiceService.ExecuteRequest(req)
@@ -846,7 +847,7 @@ func (self *WorkflowService) isANewPost(workflow entities.Workflow, result entit
 	}
 
 	if idLatestExist && idLatest != latestPost.ID {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
@@ -866,7 +867,7 @@ func (self *WorkflowService) isANewComment(workflow entities.Workflow, result en
 	}
 
 	if idLatestExist && idLatest != latestComment.ID {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
@@ -886,7 +887,7 @@ func (self *WorkflowService) isANewVote(workflow entities.Workflow, result entit
 	}
 
 	if idLatestExist && idLatest != latestVote.ID {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
@@ -903,7 +904,7 @@ func (self *WorkflowService) getAccessToken(serviceName string, workflow entitie
 	return accessToken, nil
 }
 
-func (self *WorkflowService) CheckRedditNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) checkRedditNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
 	subreddit, subredditExists := workflow.ActionParam["subreddit"]
 	if !subredditExists {
 		return fmt.Errorf("Could not find the subreddit field")
@@ -922,7 +923,7 @@ func (self *WorkflowService) CheckRedditNewPostInSubredditAction(accessToken str
 	return self.isANewPost(workflow, result)
 }
 
-func (self *WorkflowService) CheckRedditNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) checkRedditNewCommentByMeAction(accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -937,7 +938,7 @@ func (self *WorkflowService) CheckRedditNewCommentByMeAction(accessToken string,
 	return self.isANewComment(workflow, result)
 }
 
-func (self *WorkflowService) CheckRedditVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) checkRedditVoteByMeAction(voteType, accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -952,7 +953,7 @@ func (self *WorkflowService) CheckRedditVoteByMeAction(voteType, accessToken str
 	return self.isANewVote(workflow, resultPost)
 }
 
-func (self *WorkflowService) CheckRedditPostAction(postType, accessToken string, workflow entities.Workflow) error {
+func (self *WorkflowService) checkRedditPostAction(postType, accessToken string, workflow entities.Workflow) error {
 	resultUsername, err := self.getUsernameReddit(accessToken, workflow)
 	if err != nil {
 		return err
@@ -971,7 +972,7 @@ func (self *WorkflowService) CheckRedditPostAction(postType, accessToken string,
 	return self.isANewPost(workflow, result)
 }
 
-func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Action) error {
+func (self *WorkflowService) checkWorkflowsWithRedditActions(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
@@ -988,17 +989,17 @@ func (self *WorkflowService) CheckWorkflowsWithRedditActions(action entities.Act
 		}
 		switch action.Name {
 		case "Any new post in subreddit":
-			self.CheckRedditNewPostInSubredditAction(accessToken, workflow)
+			self.checkRedditNewPostInSubredditAction(accessToken, workflow)
 		case "New post by you":
-			self.CheckRedditPostAction("/submitted", accessToken, workflow)
+			self.checkRedditPostAction("/submitted", accessToken, workflow)
 		case "New comment by you":
-			self.CheckRedditNewCommentByMeAction(accessToken, workflow)
+			self.checkRedditNewCommentByMeAction(accessToken, workflow)
 		case "New downvoted post by you":
-			self.CheckRedditVoteByMeAction("/downvoted", accessToken, workflow)
+			self.checkRedditVoteByMeAction("/downvoted", accessToken, workflow)
 		case "New upvoted post by you":
-			self.CheckRedditVoteByMeAction("/upvoted", accessToken, workflow)
+			self.checkRedditVoteByMeAction("/upvoted", accessToken, workflow)
 		case "New post saved by you":
-			self.CheckRedditPostAction("/saved", accessToken, workflow)
+			self.checkRedditPostAction("/saved", accessToken, workflow)
 		}
 	}
 	return nil
@@ -1016,7 +1017,7 @@ func (self *WorkflowService) CheckRedditActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errCheckName := self.CheckWorkflowsWithRedditActions(action)
+		errCheckName := self.checkWorkflowsWithRedditActions(action)
 		if errCheckName != nil {
 			return errCheckName
 		}
@@ -1042,7 +1043,7 @@ func (self *WorkflowService) currentWeather(city string, workflow entities.Workf
 	return weatherData, nil
 }
 
-func (self *WorkflowService) CheckWeatherCurrentWeatherComparisonAction(checkType string, workflow entities.Workflow) error {
+func (self *WorkflowService) checkWeatherCurrentWeatherComparisonAction(checkType string, workflow entities.Workflow) error {
 	city, cityExists := workflow.ActionParam["city"]
 	temp, tempExists := workflow.ActionParam["temperature"]
 	if !cityExists || !tempExists {
@@ -1055,20 +1056,20 @@ func (self *WorkflowService) CheckWeatherCurrentWeatherComparisonAction(checkTyp
 	}
 
 	if checkType == "aboveCurrent" && weatherData.Current.Temperature > temp.(float64) {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	} else if checkType == "belowCurrent" && weatherData.Current.Temperature < temp.(float64) {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	} else if checkType == "aboveForecast" && weatherData.Forecast.ForecastDay[0].Day.MaxTemperature < temp.(float64) {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	} else if checkType == "belowForecast" && weatherData.Forecast.ForecastDay[0].Day.MinTemperature > temp.(float64) {
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	} else {
 		fmt.Errorf("Check type isn't valid")
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckWorkflowsWithWeatherActions(action entities.Action) error {
+func (self *WorkflowService) checkWorkflowsWithWeatherActions(action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
 		return errWorkflow
@@ -1081,13 +1082,13 @@ func (self *WorkflowService) CheckWorkflowsWithWeatherActions(action entities.Ac
 
 		switch action.Name {
 		case "Current temperature rises above":
-			self.CheckWeatherCurrentWeatherComparisonAction("aboveCurrent", workflow)
+			self.checkWeatherCurrentWeatherComparisonAction("aboveCurrent", workflow)
 		case "Current temperature drops below":
-			self.CheckWeatherCurrentWeatherComparisonAction("belowCurrent", workflow)
+			self.checkWeatherCurrentWeatherComparisonAction("belowCurrent", workflow)
 		case "Tomorrow's low drops below":
-			self.CheckWeatherCurrentWeatherComparisonAction("belowForecast", workflow)
+			self.checkWeatherCurrentWeatherComparisonAction("belowForecast", workflow)
 		case "Tomorrow's high rises above":
-			self.CheckWeatherCurrentWeatherComparisonAction("aboveForecast", workflow)
+			self.checkWeatherCurrentWeatherComparisonAction("aboveForecast", workflow)
 		}
 	}
 	return nil
@@ -1105,7 +1106,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errCheckName := self.CheckWorkflowsWithWeatherActions(action)
+		errCheckName := self.checkWorkflowsWithWeatherActions(action)
 		if errCheckName != nil {
 			return errCheckName
 		}
@@ -1113,17 +1114,17 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	return nil
 }
 
-func (self *WorkflowService) ExecuteGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
+func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
 		return nil, fmt.Errorf("Invalid repository")
 	}
 
 	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
-	return self.ServiceService.ExecuteApiRequest(url, "GET", accessBearer, accessToken, nil)
+	return self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 }
 
-func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
+func (self *WorkflowService) checkActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
 	workflow.ActionData = make(map[string]interface{})
 	lenLastTurn, lenLastTurnExists := workflow.ActionData["len"]
 	if !lenLastTurnExists {
@@ -1141,23 +1142,23 @@ func (self *WorkflowService) CheckActionDataLen(workflow entities.Workflow, lenA
 		if err != nil {
 			return err
 		}
-		self.CheckReactions(workflow)
+		self.checkReactions(workflow)
 	}
 	return nil
 }
 
-func (self *WorkflowService) CheckGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
+func (self *WorkflowService) checkGithubNewRepositoryAction(workflow entities.Workflow, accessToken string) error {
 	repositories, err := self.ServiceService.RequestGithubUserRepositories(accessToken)
 	if err != nil {
 		return err
 	}
-	return self.CheckActionDataLen(workflow, float64(len(repositories)))
+	return self.checkActionDataLen(workflow, float64(len(repositories)))
 }
 
-func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
+func (self *WorkflowService) checkGithubNewIssueAction(workflow entities.Workflow, accessToken string) error {
 	var issues []entities.GithubIssue
 
-	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"issues", "GET", accessBearer, accessToken, nil)
+	resp, err := self.ServiceService.ExecuteApiRequest(githubBaseUrl+"issues", "GET", bearerType, accessToken, nil)
 	if err != nil {
 		return err
 	}
@@ -1167,13 +1168,13 @@ func (self *WorkflowService) CheckGithubNewIssueAction(workflow entities.Workflo
 		return err
 	}
 
-	return self.CheckActionDataLen(workflow, float64(len(issues)))
+	return self.checkActionDataLen(workflow, float64(len(issues)))
 }
 
-func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) error {
+func (self *WorkflowService) checkGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) error {
 	var pullRequests []entities.GithubRepository
 
-	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/pulls")
+	resp, err := self.executeGithubRequest(workflow, accessToken, "/pulls")
 	if err != nil {
 		return err
 	}
@@ -1183,13 +1184,13 @@ func (self *WorkflowService) CheckGithubNewPullRequestAction(workflow entities.W
 		return err
 	}
 
-	return self.CheckActionDataLen(workflow, float64(len(pullRequests)))
+	return self.checkActionDataLen(workflow, float64(len(pullRequests)))
 }
 
-func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workflow, accessToken string) error {
+func (self *WorkflowService) checkGithubNewBranchAction(workflow entities.Workflow, accessToken string) error {
 	var branches []entities.GithubBranch
 
-	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/branches")
+	resp, err := self.executeGithubRequest(workflow, accessToken, "/branches")
 	if err != nil {
 		return err
 	}
@@ -1199,13 +1200,13 @@ func (self *WorkflowService) CheckGithubNewBranchAction(workflow entities.Workfl
 		return err
 	}
 
-	return self.CheckActionDataLen(workflow, float64(len(branches)))
+	return self.checkActionDataLen(workflow, float64(len(branches)))
 }
 
-func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workflow, accessToken string) error {
+func (self *WorkflowService) checkGithubNewCommitAction(workflow entities.Workflow, accessToken string) error {
 	var commits []entities.GithubCommit
 
-	resp, err := self.ExecuteGithubRequest(workflow, accessToken, "/commits")
+	resp, err := self.executeGithubRequest(workflow, accessToken, "/commits")
 	if err != nil {
 		return err
 	}
@@ -1215,10 +1216,10 @@ func (self *WorkflowService) CheckGithubNewCommitAction(workflow entities.Workfl
 		return err
 	}
 
-	return self.CheckActionDataLen(workflow, float64(len(commits)))
+	return self.checkActionDataLen(workflow, float64(len(commits)))
 }
 
-func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Action) error {
+func (self *WorkflowService) checkWorkflowsWithGithubActions(action entities.Action) error {
 	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if err != nil {
 		return err
@@ -1234,15 +1235,15 @@ func (self *WorkflowService) CheckWorkflowsWithGithubActions(action entities.Act
 		}
 		switch action.Name {
 		case "New repository":
-			self.CheckGithubNewRepositoryAction(workflow, accessToken)
+			self.checkGithubNewRepositoryAction(workflow, accessToken)
 		case "New issue assignated":
-			self.CheckGithubNewIssueAction(workflow, accessToken)
+			self.checkGithubNewIssueAction(workflow, accessToken)
 		case "New pull request":
-			self.CheckGithubNewPullRequestAction(workflow, accessToken)
+			self.checkGithubNewPullRequestAction(workflow, accessToken)
 		case "New branch":
-			self.CheckGithubNewBranchAction(workflow, accessToken)
+			self.checkGithubNewBranchAction(workflow, accessToken)
 		case "New commit":
-			self.CheckGithubNewCommitAction(workflow, accessToken)
+			self.checkGithubNewCommitAction(workflow, accessToken)
 		}
 	}
 	return nil
@@ -1260,7 +1261,7 @@ func (self *WorkflowService) CheckGithubActions() error {
 	}
 
 	for _, action := range actions {
-		err := self.CheckWorkflowsWithGithubActions(action)
+		err := self.checkWorkflowsWithGithubActions(action)
 		if err != nil {
 			return err
 		}

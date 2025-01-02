@@ -1,13 +1,14 @@
 package workflow_handler
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"backend/src/entities"
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/workflow/docs"
 	"backend/src/service"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type WorkflowHandler struct {
@@ -15,29 +16,29 @@ type WorkflowHandler struct {
 	UserService     service.UserService
 }
 
-const InvalidRequestBodyMessage = "Invalid request body"
+const invalidRequestBodyMessage = "Invalid request body"
 
 func NewWorkflowHandler(WorkflowService service.WorkflowService, UserService service.UserService, router *gin.Engine) *WorkflowHandler {
 	handler := &WorkflowHandler{
 		WorkflowService: WorkflowService,
 		UserService:     UserService,
 	}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *WorkflowHandler) SetupRoutes(router *gin.Engine) {
-	self.PrivateRoutes(router)
+func (self *WorkflowHandler) setupRoutes(router *gin.Engine) {
+	self.privateRoutes(router)
 }
 
-func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
+func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	workflow := private.Group("/workflows")
 	{
-		workflow.POST("", self.CreateWorkflow)
-		workflow.GET("", self.GetUserWorkflows)
-		workflow.PUT("/:id", self.UpdateWorkflow)
-		workflow.DELETE("/:id", self.DeleteWorkflow)
+		workflow.POST("", self.createWorkflow)
+		workflow.GET("", self.getUserWorkflows)
+		workflow.PUT("/:id", self.updateWorkflow)
+		workflow.DELETE("/:id", self.deleteWorkflow)
 	}
 }
 
@@ -51,7 +52,7 @@ func (self *WorkflowHandler) PrivateRoutes(router *gin.Engine) {
 // @Failure		401		{object}	docs_workflow.WorkflowCreateWorkflowUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowCreateWorkflowInternalServerErrorResponse
 // @Router			/workflows [post]
-func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
+func (self *WorkflowHandler) createWorkflow(context *gin.Context) {
 	var newWorkflow entities.NewWorkflow
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -59,7 +60,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 	err := context.ShouldBindJSON(&newWorkflow)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -84,7 +85,7 @@ func (self *WorkflowHandler) CreateWorkflow(context *gin.Context) {
 // @Failure		401		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse
 // @Router			/workflows [get]
-func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
+func (self *WorkflowHandler) getUserWorkflows(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 	retrievedWorkflow, errRetrievedWorkflow := self.WorkflowService.GetUserWorkflows(email, connectionType)
@@ -111,14 +112,14 @@ func (self *WorkflowHandler) GetUserWorkflows(context *gin.Context) {
 // @Success		400		{object}	docs_workflow.WorkflowUpdateWorkflowBadRequestResponse
 // @Success		500		{object}	docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse
 // @Router			/workflows/{id} [put]
-func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
+func (self *WorkflowHandler) updateWorkflow(context *gin.Context) {
 	var workflow entities.UpdatedWorkflow
 	workflowId := context.Param("id")
 
 	err := context.ShouldBindJSON(&workflow)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -145,7 +146,7 @@ func (self *WorkflowHandler) UpdateWorkflow(context *gin.Context) {
 // @Failure		401 	{object}	docs_workflow.WorkflowDeleteWorkflowUnauthorizedResponse
 // @Failure		500		{object}	docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse
 // @Router			/workflows/{id} [delete]
-func (self *WorkflowHandler) DeleteWorkflow(context *gin.Context) {
+func (self *WorkflowHandler) deleteWorkflow(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 	workflowId := context.Param("id")
