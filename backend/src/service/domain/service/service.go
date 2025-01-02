@@ -224,6 +224,15 @@ func oauth2Linkedin(callbackType string) string {
 		stateParam + os.Getenv("LINKEDIN_STATE")
 }
 
+func oauth2Dropbox(callbackType string) string {
+	callbackLink, _ := getCallbackAndClientId(callbackType, "DROPBOX", false)
+
+	return ("https://www.dropbox.com/oauth2/authorize?" +
+		clientIdParam + url.QueryEscape(os.Getenv("DROPBOX_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType)
+}
+
 func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
 	var authUrl string
 
@@ -241,6 +250,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = oauth2Asana(callbackType)
 	} else if serviceName == "Linkedin" {
 		authUrl = oauth2Linkedin(callbackType)
+	} else if serviceName == "Dropbox" {
+		authUrl = oauth2Dropbox(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(unknownServiceMessage)
 	}
