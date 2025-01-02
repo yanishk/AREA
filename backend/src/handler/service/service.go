@@ -24,36 +24,36 @@ func NewServiceHandler(ServiceService service.ServiceService, UserService servic
 		ServiceService: ServiceService,
 		UserService:    UserService,
 	}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *ServiceHandler) SetupRoutes(router *gin.Engine) {
-	self.PublicRoutes(router)
-	self.PrivateRoutes(router)
+func (self *ServiceHandler) setupRoutes(router *gin.Engine) {
+	self.publicRoutes(router)
+	self.privateRoutes(router)
 }
 
-func (self *ServiceHandler) PublicRoutes(router *gin.Engine) {
+func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
-		authentication.GET("/:service/:callback-type/:app-type", self.OAuth2Service)
+		authentication.GET("/:service/:callback-type/:app-type", self.oauth2Service)
 	}
 }
 
-func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
+func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	service := private.Group("/:service")
 	{
-		service.GET("/actions", self.RetrieveActionsFromService)
-		service.GET("/reactions", self.RetrieveReactionsFromService)
+		service.GET("/actions", self.retrieveActionsFromService)
+		service.GET("/reactions", self.retrieveReactionsFromService)
 	}
 	services := private.Group("/services")
 	{
-		services.GET("/:id", self.RetrieveServiceById)
-		services.GET("/action/:actionid", self.RetrieveServiceByActionId)
-		services.GET("/reaction/:reactionid", self.RetrieveServiceByReactionId)
-		services.GET("/actions", self.RetrieveActionsServices)
-		services.GET("/reactions", self.RetrieveReactionsServices)
+		services.GET("/:id", self.retrieveServiceById)
+		services.GET("/action/:actionid", self.retrieveServiceByActionId)
+		services.GET("/reaction/:reactionid", self.retrieveServiceByReactionId)
+		services.GET("/actions", self.retrieveActionsServices)
+		services.GET("/reactions", self.retrieveReactionsServices)
 	}
 	private.GET("Discord/server/channels", self.getDiscordGuildChannels)
 }
@@ -68,7 +68,7 @@ func (self *ServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
 // @Router			/authentication/{service}/{callback-type}/{app-type} [get]
-func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
+func (self *ServiceHandler) oauth2Service(context *gin.Context) {
 	serviceName := context.Param("service")
 	callbackType := context.Param("callback-type")
 	appType := context.Param("app-type")
@@ -105,7 +105,7 @@ func (self *ServiceHandler) OAuth2Service(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse
 // @Router			/{service}/actions [get]
-func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
+func (self *ServiceHandler) retrieveActionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
@@ -129,7 +129,7 @@ func (self *ServiceHandler) RetrieveActionsFromService(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
 // @Failure		400		{object}	docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse
 // @Router			/{service}/reactions [get]
-func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
+func (self *ServiceHandler) retrieveReactionsFromService(context *gin.Context) {
 	serviceName := context.Param("service")
 
 	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
@@ -153,7 +153,7 @@ func (self *ServiceHandler) RetrieveReactionsFromService(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
 // @Router			/services/{id} [get]
-func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
+func (self *ServiceHandler) retrieveServiceById(context *gin.Context) {
 	serviceId := context.Param("id")
 
 	service, err := self.ServiceService.FindServiceById(serviceId)
@@ -177,7 +177,7 @@ func (self *ServiceHandler) RetrieveServiceById(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
 // @Router			/services/action/{actionid} [get]
-func (self *ServiceHandler) RetrieveServiceByActionId(context *gin.Context) {
+func (self *ServiceHandler) retrieveServiceByActionId(context *gin.Context) {
 	id := context.Param("actionid")
 
 	service, err := self.ServiceService.FindServiceByActionId(id)
@@ -201,7 +201,7 @@ func (self *ServiceHandler) RetrieveServiceByActionId(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveServiceByIdSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse
 // @Router			/services/reaction/{reactionid} [get]
-func (self *ServiceHandler) RetrieveServiceByReactionId(context *gin.Context) {
+func (self *ServiceHandler) retrieveServiceByReactionId(context *gin.Context) {
 	id := context.Param("reactionid")
 
 	service, err := self.ServiceService.FindServiceByReactionId(id)
@@ -224,7 +224,7 @@ func (self *ServiceHandler) RetrieveServiceByReactionId(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/services/actions [get]
-func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
+func (self *ServiceHandler) retrieveActionsServices(context *gin.Context) {
 	actionsServices, err := self.ServiceService.RetrieveActionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
@@ -242,7 +242,7 @@ func (self *ServiceHandler) RetrieveActionsServices(context *gin.Context) {
 // @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
 // @Router			/services/reactions [get]
-func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
+func (self *ServiceHandler) retrieveReactionsServices(context *gin.Context) {
 	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{

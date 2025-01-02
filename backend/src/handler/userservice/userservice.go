@@ -16,17 +16,17 @@ type UserServiceHandler struct {
 
 func NewUserServiceHandler(UserServiceService service.UserServiceService, router *gin.Engine) *UserServiceHandler {
 	handler := &UserServiceHandler{UserServiceService: UserServiceService}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *UserServiceHandler) SetupRoutes(router *gin.Engine) {
-	self.PrivateRoutes(router)
+func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
+	self.privateRoutes(router)
 }
 
-func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
+func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
-	private.POST("/service-callback/:service/:app-type", self.ServiceCallback)
+	private.POST("/service-callback/:service/:app-type", self.serviceCallback)
 	private.GET("/Github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	asana := private.Group("/Asana")
@@ -49,7 +49,7 @@ func (self *UserServiceHandler) PrivateRoutes(router *gin.Engine) {
 // @Failure		400		{object}	docs_userservice.UserServiceServiceCallbackBadRequestResponse
 // @Failure		500		{object}	docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse
 // @Router       /service-callback/{service}/{app-type} [post]
-func (self *UserServiceHandler) ServiceCallback(context *gin.Context) {
+func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 	appType := context.Param("app-type")
 	serviceName := context.Param("service")
 	code := context.Query("code")
