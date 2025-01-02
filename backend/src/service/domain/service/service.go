@@ -422,6 +422,28 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 	return request, nil
 }
 
+func getDropboxOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var dropboxCallback string
+
+	if callbackType == "service" {
+		dropboxCallback = os.Getenv("DROPBOX_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		dropboxCallback = os.Getenv("DROPBOX_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(invalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://api.dropboxapi.com/oauth2/token", code, dropboxCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"))
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var spotifyCallback string
 
@@ -636,6 +658,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = getAsanaOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Linkedin" {
 		request, errRequest = getLinkedinOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Dropbox" {
+		request, errRequest = getDropboxOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(unknownServiceMessage)
 	}
