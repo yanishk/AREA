@@ -14,8 +14,6 @@ type UserServiceHandler struct {
 	UserServiceService service.UserServiceService
 }
 
-const getUserServersFailedMessage = "Could not retrieve the user's servers"
-
 func NewUserServiceHandler(UserServiceService service.UserServiceService, router *gin.Engine) *UserServiceHandler {
 	handler := &UserServiceHandler{UserServiceService: UserServiceService}
 	handler.SetupRoutes(router)
