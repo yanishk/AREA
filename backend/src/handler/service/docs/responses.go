@@ -2,16 +2,6 @@ package docs_service
 
 import "backend/src/entities"
 
-type DiscordServerExample struct {
-	Banner      string
-	Features    []string
-	Icon        string
-	Id          string
-	Name        string
-	Owner       bool
-	Permissions string
-}
-
 type DiscordChannelIconEmojiExample struct {
 	Id   string
 	Name string
@@ -86,15 +76,6 @@ type ServiceRetrieveReactionsFromServiceBadRequestResponse struct {
 	Msg string `json:"error"example:"Unknown service"`
 }
 
-// Discord Get User Servers
-type ServiceGetDiscordUserServersSuccessResponse struct {
-	Servers []DiscordServerExample
-}
-
-type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the user's servers"`
-}
-
 // Discord Get Guild Channels
 type ServiceGetDiscordGuildChannelsSuccessResponse struct {
 	Channels []DiscordChannelExample
@@ -102,40 +83,4 @@ type ServiceGetDiscordGuildChannelsSuccessResponse struct {
 
 type ServiceGetDiscordGuildChannelsInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve the server's channels"`
-}
-
-// Asana Get User Workspaces
-type ServiceGetAsanaUserWorkspacesSuccessResponse struct {
-	Workspaces entities.AsanaWorkspacesInfo
-}
-
-type ServiceGetAsanaUserWorkspacesInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the user's workspaces-Could not decode the user's workspaces"`
-}
-
-// Asana Get Workspace Assignees
-type ServiceGetAsanaWorkspaceAssigneesSuccessResponse struct {
-	Assignees entities.AsanaWorkspacesInfo
-}
-
-type ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve workspace's assignees"`
-}
-
-// Asana Get Workspace Projects
-type ServiceGetAsanaWorkspaceProjectsSuccessResponse struct {
-	Projects entities.AsanaWorkspacesInfo
-}
-
-type ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve workspace's projects"`
-}
-
-// Asana Get Workspace Tags
-type ServiceGetAsanaWorkspaceTagsSuccessResponse struct {
-	Tags entities.AsanaWorkspacesInfo
-}
-
-type ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve workspace's tags"`
 }

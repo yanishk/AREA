@@ -47,7 +47,7 @@ func New(services *service.Service) *Handler {
 	return &Handler{
 		UserHandler:        user_handler.NewUserHandler(services.UserService, router),
 		UserServiceHandler: user_service_handler.NewUserServiceHandler(services.UserServiceService, router),
-		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserServiceService, services.UserService, router),
+		ServiceHandler:     service_handler.NewServiceHandler(services.ServiceService, services.UserService, router),
 		WorkflowHandler:    workflow_handler.NewWorkflowHandler(services.WorkflowService, services.UserService, router),
 		AboutHandler:       about_handler.NewAboutHandler(services.AboutService, router),
 		router:             router,

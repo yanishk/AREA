@@ -745,3 +745,21 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 	}
 	return repositories, nil
 }
+
+func (self *ServiceService) RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error) {
+	var channels []map[string]interface{}
+	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
+	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
+
+	resp, errRequest := self.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
+	if errRequest != nil {
+		return channels, errRequest
+	}
+	defer resp.Body.Close()
+
+	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
+	if errDecoder != nil {
+		return channels, errDecoder
+	}
+	return channels, nil
+}

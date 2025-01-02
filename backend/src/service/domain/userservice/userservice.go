@@ -17,7 +17,11 @@ type UserServiceService struct {
 	ServiceService        service.ServiceService
 }
 
-const FormattingDate = "2006-01-02 15:04:05-07:00"
+const asanaWorkspaceRoute = "https://app.asana.com/api/1.0/workspaces/"
+
+const formattingDate = "2006-01-02 15:04:05-07:00"
+
+const bearerType = "Bearer "
 
 func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
@@ -72,7 +76,7 @@ func (self *UserServiceService) RefreshToken(refreshToken string, userId string,
 	}
 
 	currentTime := time.Now()
-	expiryDate := currentTime.Add(time.Duration(tokenRes.ExpiresIn) * time.Second).Format(FormattingDate)
+	expiryDate := currentTime.Add(time.Duration(tokenRes.ExpiresIn) * time.Second).Format(formattingDate)
 
 	serviceFound, errServiceFound := self.ServiceRepository.FindServiceByName(serviceName)
 	if errServiceFound != nil {
@@ -100,7 +104,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 		return "", errUserService
 	}
 
-	expiryDate, errTimestamp := time.Parse(FormattingDate, foundUserService.ExpiryDate)
+	expiryDate, errTimestamp := time.Parse(formattingDate, foundUserService.ExpiryDate)
 	if errTimestamp != nil {
 		return "", errTimestamp
 	}
@@ -117,7 +121,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 
 func (self *UserServiceService) CreateOrUpdateUserService(userId string, serviceId string, token entities.ResultToken) {
 	currentTime := time.Now()
-	expiryDate := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format(FormattingDate)
+	expiryDate := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format(formattingDate)
 
 	_, errUserService := self.UserServiceRepository.FindUserServiceByServiceIdandUserId(userId, serviceId)
 
@@ -159,4 +163,88 @@ func (self *UserServiceService) RetrieveGithubUserRepositories(email string, con
 		return []entities.GithubRepository{}, err
 	}
 	return self.ServiceService.RequestGithubUserRepositories(accessToken)
+}
+
+func (self *UserServiceService) RetrieveDiscordUserServers(email string, connectionType string) ([]map[string]interface{}, error) {
+	var ownedServers []map[string]interface{}
+	var guilds []map[string]interface{}
+
+	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Discord")
+	if errRefreshing != nil {
+		return ownedServers, errRefreshing
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest("https://discord.com/api/v10/users/@me/guilds", "GET", bearerType, accessToken, nil)
+	if errRequest != nil {
+		return ownedServers, errRequest
+	}
+	defer resp.Body.Close()
+
+	errDecoder := json.NewDecoder(resp.Body).Decode(&guilds)
+	if errDecoder != nil {
+		return ownedServers, errDecoder
+	}
+
+	for _, guild := range guilds {
+		if guild["owner"] == true {
+			ownedServers = append(ownedServers, guild)
+		}
+	}
+	return ownedServers, nil
+}
+
+func (self *UserServiceService) RetrieveAsanaUserWorkspaces(email string, connectionType string) (entities.AsanaWorkspacesInfo, error) {
+	var workspaces entities.AsanaWorkspacesInfo
+	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Asana")
+	if errRefreshing != nil {
+		return workspaces, errRefreshing
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(asanaWorkspaceRoute, "GET", bearerType, accessToken, nil)
+	if errRequest != nil {
+		return workspaces, errRequest
+	}
+	defer resp.Body.Close()
+
+	errDecodeWorkspace := json.NewDecoder(resp.Body).Decode(&workspaces)
+	if errDecodeWorkspace != nil {
+		return workspaces, errDecodeWorkspace
+	}
+	return workspaces, nil
+}
+
+func (self *UserServiceService) decodeRequiredWorkspaceInfo(email string, connectionType string, url string) (entities.AsanaWorkspacesInfo, error) {
+	var info entities.AsanaWorkspacesInfo
+
+	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Asana")
+	if errRefreshing != nil {
+		return info, errRefreshing
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
+	if errRequest != nil {
+		return info, errRequest
+	}
+	defer resp.Body.Close()
+
+	errDecode := json.NewDecoder(resp.Body).Decode(&info)
+	if errDecode != nil || len(info.Data) == 0 {
+		return info, errDecode
+	}
+	return info, nil
+}
+
+func (self *UserServiceService) RetrieveAsanaWorkspaceAssignees(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	url := asanaWorkspaceRoute + workspaceId + "/users"
+	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
+}
+
+func (self *UserServiceService) RetrieveAsanaWorkspaceProjects(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	url := asanaWorkspaceRoute + workspaceId + "/projects"
+	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
+}
+
+func (self *UserServiceService) RetrieveAsanaWorkspaceTags(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	url := asanaWorkspaceRoute + workspaceId + "/tags"
+	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
 }

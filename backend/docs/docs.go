@@ -22,20 +22,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Asana"
                 ],
                 "summary": "Retrieve Asana Workspaces",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse"
                         }
                     }
                 }
@@ -48,7 +48,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Asana"
                 ],
                 "summary": "Retrieve Asana Workspace Assignees",
                 "parameters": [
@@ -64,13 +64,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse"
                         }
                     }
                 }
@@ -83,7 +83,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Asana"
                 ],
                 "summary": "Retrieve Asana Workspace Projects",
                 "parameters": [
@@ -99,13 +99,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse"
                         }
                     }
                 }
@@ -118,7 +118,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Asana"
                 ],
                 "summary": "Retrieve Asana Workspace Tags",
                 "parameters": [
@@ -134,13 +134,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse"
                         }
                     }
                 }
@@ -153,7 +153,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord Server Channels",
                 "parameters": [
@@ -188,20 +188,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord User Servers",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse"
                         }
                     }
                 }
@@ -1137,103 +1137,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.DiscordServerExample": {
-            "type": "object",
-            "properties": {
-                "banner": {
-                    "type": "string"
-                },
-                "features": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "icon": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owner": {
-                    "type": "boolean"
-                },
-                "permissions": {
-                    "type": "string"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's workspaces-Could not decode the user's workspaces"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "workspaces": {
-                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve workspace's assignees"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "assignees": {
-                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve workspace's projects"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "projects": {
-                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve workspace's tags"
-                }
-            }
-        },
-        "docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "tags": {
-                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
-                }
-            }
-        },
         "docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -1250,26 +1153,6 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/docs_service.DiscordChannelExample"
-                    }
-                }
-            }
-        },
-        "docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not retrieve or refresh the token-Could not retrieve the user's servers"
-                }
-            }
-        },
-        "docs_service.ServiceGetDiscordUserServersSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "servers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/docs_service.DiscordServerExample"
                     }
                 }
             }
@@ -1583,12 +1466,129 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.DiscordServerExample": {
+            "type": "object",
+            "properties": {
+                "banner": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "boolean"
+                },
+                "permissions": {
+                    "type": "string"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the user's workspaces"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "workspaces": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's assignees"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "assignees": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's projects"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve workspace's tags"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/entities.AsanaWorkspacesInfo"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the user's servers"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetDiscordUserServersSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "servers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/docs_userservice.DiscordServerExample"
+                    }
+                }
+            }
+        },
         "docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Cannot retrieve Github user repositories"
+                    "example": "Could not retrieve the user's repositories"
                 }
             }
         },
