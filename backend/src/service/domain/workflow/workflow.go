@@ -60,6 +60,12 @@ func (self *WorkflowService) asanaReactions() []string {
 	}
 }
 
+func (self *WorkflowService) dropboxReactions() []string {
+	return []string{
+		"Move file or folder",
+	}
+}
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
@@ -601,6 +607,62 @@ func (self *WorkflowService) checkSendEmailReactions(workflow entities.Workflow)
 	return nil
 }
 
+func (self *WorkflowService) moveFileOrFolder(accessToken string, workflow entities.Workflow) error {
+	path, pathExists := workflow.ReactionParam["path"]
+	destination, destinationExists := workflow.ReactionParam["destination"]
+	if !pathExists || !destinationExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	if path.(string)[0] != '/' {
+		path = "/" + path.(string)
+	}
+	if destination.(string)[0] != '/' {
+		destination = "/" + destination.(string)
+	}
+
+	url := "https://api.dropboxapi.com/2/files/move_v2"
+
+	content := map[string]interface{}{
+		"allow_ownership_transfer": false,
+		"allow_shared_folder":      false,
+		"autorename":               false,
+		"from_path":                path,
+		"to_path":                  destination,
+	}
+
+	contentBytes, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling)
+	}
+
+	res, err := self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, bytes.NewBuffer(contentBytes))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
+	}
+
+	accessToken, err := self.refreshTokenForService("Dropbox", reactionFound.Name, self.dropboxReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
+	}
+
+	switch reactionFound.Name {
+	case "Move file or folder":
+		return self.moveFileOrFolder(accessToken, workflow)
+	}
+	return nil
+}
+
 func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSpotifyReactions(workflow)
 	self.checkDiscordReactions(workflow)
@@ -608,6 +670,7 @@ func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkAsanaReactions(workflow)
 	self.checkSMSReactions(workflow)
 	self.checkSendEmailReactions(workflow)
+	self.checkDropboxReactions(workflow)
 }
 
 func checkEveryHourParamValidity(minute interface{}) (float64, error) {
