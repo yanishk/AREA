@@ -731,9 +731,9 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errcheckName := self.checkWorkflowsWithTimeAndDateActions(timeRes, action)
-		if errcheckName != nil {
-			return errcheckName
+		errCheckName := self.checkWorkflowsWithTimeAndDateActions(timeRes, action)
+		if errCheckName != nil {
+			return errCheckName
 		}
 	}
 	return nil
@@ -1009,9 +1009,9 @@ func (self *WorkflowService) CheckRedditActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errcheckName := self.checkWorkflowsWithRedditActions(action)
-		if errcheckName != nil {
-			return errcheckName
+		errCheckName := self.checkWorkflowsWithRedditActions(action)
+		if errCheckName != nil {
+			return errCheckName
 		}
 	}
 	return nil
@@ -1094,9 +1094,9 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	}
 
 	for _, action := range allActionsFound {
-		errcheckName := self.checkWorkflowsWithWeatherActions(action)
-		if errcheckName != nil {
-			return errcheckName
+		errCheckName := self.checkWorkflowsWithWeatherActions(action)
+		if errCheckName != nil {
+			return errCheckName
 		}
 	}
 	return nil
