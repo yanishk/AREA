@@ -610,18 +610,66 @@ func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSendEmailReactions(workflow)
 }
 
-func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
-	hour, hourExists := workflow.ActionParam["hour"]
-	minute, minuteExists := workflow.ActionParam["minute"]
-	if !hourExists || !minuteExists {
-		return fmt.Errorf("Error in the hour and minute sent")
+func checkEveryHourParamValidity(minute interface{}) (float64, error) {
+	minuteNumber, minuteIsNumber := minute.(float64)
+	if !minuteIsNumber {
+		return minuteNumber, fmt.Errorf("Error in the minute sent")
+	}
+	return minuteNumber, nil
+}
+
+func checkEveryDayParamValidity(hour interface{}, minute interface{}) (float64, float64, error) {
+	var hourNumber, minuteNumber float64
+
+	hourNumber, hourIsNumber := hour.(float64)
+	if !hourIsNumber {
+		return hourNumber, minuteNumber, fmt.Errorf("Error in the hour sent")
 	}
 
-	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
-		self.checkReactions(workflow)
+	minuteNumber, err := checkEveryHourParamValidity(minute)
+	if err != nil {
+		return hourNumber, minuteNumber, err
 	}
-	return nil
+
+	return hourNumber, minuteNumber, nil
 }
+
+func checkEveryMonthOnTheParamValidity(day interface{}, hour interface{}, minute interface{}) (float64, float64, float64, error) {
+	var dayNumber, hourNumber, minuteNumber float64
+
+	dayNumber, dayIsNumber := day.(float64)
+	if !dayIsNumber {
+		return dayNumber, hourNumber, minuteNumber, fmt.Errorf("Error in the day sent")
+	}
+
+	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
+	if err != nil {
+		return dayNumber, hourNumber, minuteNumber, err
+	}
+
+	return dayNumber, hourNumber, minuteNumber, nil
+}
+
+func checkEveryWeekAtParamValidity(day interface{}, hour interface{}, minute interface{}) (float64, float64, float64, error) {
+	return checkEveryMonthOnTheParamValidity(day, hour, minute)
+}
+
+func checkEveryYearParamValidity(month interface{}, day interface{}, hour interface{}, minute interface{}) (float64, float64, float64, float64, error) {
+	var monthNumber, dayNumber, hourNumber, minuteNumber float64
+
+	monthNumber, monthIsNumber := month.(float64)
+	if !monthIsNumber {
+		return monthNumber, dayNumber, hourNumber, minuteNumber, fmt.Errorf("Error in the month sent")
+	}
+
+	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
+	if err != nil {
+		return monthNumber, dayNumber, hourNumber, minuteNumber, err
+	}
+
+	return monthNumber, dayNumber, hourNumber, minuteNumber, nil
+}
+
 
 func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	minute, minuteExists := workflow.ActionParam["minute"]
@@ -629,7 +677,30 @@ func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.Ti
 		return fmt.Errorf("Error in the minute sent")
 	}
 
-	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	minuteNumber, err := checkEveryHourParamValidity(minute)
+	if err != nil {
+		return err
+	}
+
+	if int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
+		self.checkReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
+	hour, hourExists := workflow.ActionParam["hour"]
+	minute, minuteExists := workflow.ActionParam["minute"]
+	if !hourExists || !minuteExists {
+		return fmt.Errorf("Error in the hour and minute sent")
+	}
+
+	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
+	if err != nil {
+		return err
+	}
+
+	if int(hourNumber) == timeRes.Hour && int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -649,8 +720,13 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 	}
 
 	for _, day := range dayArray {
-		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
-			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		dayNumber, hourNumber, minuteNumber, err := checkEveryWeekAtParamValidity(day, hour, minute)
+		if err != nil {
+			return err
+		}
+
+		if int(dayNumber) == timeRes.WeekDay && int(hourNumber) == timeRes.Hour &&
+			int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
 			self.checkReactions(workflow)
 		}
 	}
@@ -666,8 +742,13 @@ func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entit
 		return fmt.Errorf("Error in the minute, hour or day sent")
 	}
 
-	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
+	if err != nil {
+		return err
+	}
+
+	if int(dayNumber) == timeRes.Day && int(hourNumber) == timeRes.Hour &&
+		int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -682,8 +763,13 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 		return fmt.Errorf("Error in the minute, hour, day or month sent")
 	}
 
-	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	monthNumber, dayNumber, hourNumber, minuteNumber, err := checkEveryYearParamValidity(month, day, hour, minute)
+	if err != nil {
+		return err
+	}
+
+	if int(monthNumber) == timeRes.Month && int(dayNumber) == timeRes.Day && int(hourNumber) == timeRes.Hour &&
+		int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
 		self.checkReactions(workflow)
 	}
 	return nil
