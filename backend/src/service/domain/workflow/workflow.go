@@ -29,6 +29,7 @@ const accessBearer = "Bearer "
 const errorUpdatingWorkflow = "Could not update workflow"
 const errorUpdatingToken = "Could not update token"
 const errorRetrievingReaction = "Error finding reaction"
+const errorMissingField = "Missing required field"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
@@ -383,7 +384,7 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 	tag, tagExists := workflow.ReactionParam["tag"]
 
 	if !taskNameExists || !workspaceExists {
-		return fmt.Errorf("Missing required field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	content := map[string]interface{}{
@@ -431,7 +432,7 @@ func (self *WorkflowService) createProjectAsana(accessToken string, workflow ent
 	due, dueExists := workflow.ReactionParam["due"]
 
 	if !workspaceExists || !nameExists {
-		return fmt.Errorf("Missing required field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	content := map[string]interface{}{
@@ -488,7 +489,7 @@ func (self *WorkflowService) sendAnSMS(workflow entities.Workflow) error {
 	receiver, receiverExists := workflow.ReactionParam["to"]
 	body, bodyExists := workflow.ReactionParam["body"]
 	if !receiverExists || !bodyExists {
-		return fmt.Errorf("Missing required field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	urlBase := "https://api.twilio.com/2010-04-01/Accounts/" + os.Getenv("SMS_ACCOUNT_SID") + "/Messages.json"
