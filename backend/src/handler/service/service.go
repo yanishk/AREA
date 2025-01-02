@@ -12,7 +12,6 @@ import (
 
 type ServiceHandler struct {
 	ServiceService     service.ServiceService
-	UserServiceService service.UserServiceService // à sauter
 	UserService        service.UserService
 }
 
@@ -20,10 +19,9 @@ const unknownServiceMessage = "Unknown service"
 const cannotRetrieveServiceMessage = "Could not retrieve requested service"
 const internalServerErrorMessage = "Internal server error"
 
-func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
+func NewServiceHandler(ServiceService service.ServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
 		ServiceService:     ServiceService,
-		UserServiceService: UserServiceService,
 		UserService:        UserService,
 	}
 	handler.SetupRoutes(router)
