@@ -598,6 +598,8 @@ definitions:
         type: boolean
       id:
         type: string
+      isauthneeded:
+        type: boolean
       logo:
         type: string
       name:
