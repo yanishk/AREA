@@ -51,6 +51,7 @@ func (self *WorkflowService) linkedinReactions() []string {
 func (self *WorkflowService) asanaReactions() []string {
 	return []string{
 		"Create task",
+		"Create project",
 	}
 }
 
@@ -421,6 +422,45 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 	return nil
 }
 
+func (self *WorkflowService) createProjectAsana(accessToken string, workflow entities.Workflow) error {
+	workspace, workspaceExists := workflow.ReactionParam["workspace"]
+	name, nameExists := workflow.ReactionParam["name"]
+	description, descriptionExists := workflow.ReactionParam["description"]
+	due, dueExists := workflow.ReactionParam["due"]
+
+	if !workspaceExists || !nameExists {
+		return fmt.Errorf("Missing required field")
+	}
+
+	content := map[string]interface{}{
+		"data": map[string]interface{}{
+			"workspace": workspace,
+			"name":      name,
+		},
+	}
+
+	if descriptionExists {
+		content["data"].(map[string]interface{})["notes"] = description
+	}
+	if dueExists {
+		content["data"].(map[string]interface{})["due_on"] = due
+	}
+
+	contentBytes, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf("Error marshaling")
+	}
+
+	url := "https://app.asana.com/api/1.0/projects"
+	resp, err := self.ServiceService.ExecuteApiRequest(url, "POST", accessBearer, accessToken, bytes.NewBuffer(contentBytes))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
 func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -435,6 +475,8 @@ func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) err
 	switch reactionFound.Name {
 	case "Create task":
 		return self.createTaskAsana(accessToken, workflow)
+	case "Create project":
+		return self.createProjectAsana(accessToken, workflow)
 	}
 
 	return nil
