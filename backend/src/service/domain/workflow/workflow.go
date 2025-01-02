@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 )
 
 type WorkflowService struct {
@@ -27,6 +29,7 @@ const accessBearer = "Bearer "
 const errorUpdatingWorkflow = "Could not update workflow"
 const errorUpdatingToken = "Could not update token"
 const errorRetrievingReaction = "Error finding reaction"
+const errorMissingField = "Missing required field"
 
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
@@ -381,7 +384,7 @@ func (self *WorkflowService) createTaskAsana(accessToken string, workflow entiti
 	tag, tagExists := workflow.ReactionParam["tag"]
 
 	if !taskNameExists || !workspaceExists {
-		return fmt.Errorf("Missing required field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	content := map[string]interface{}{
@@ -429,7 +432,7 @@ func (self *WorkflowService) createProjectAsana(accessToken string, workflow ent
 	due, dueExists := workflow.ReactionParam["due"]
 
 	if !workspaceExists || !nameExists {
-		return fmt.Errorf("Missing required field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	content := map[string]interface{}{
@@ -482,11 +485,56 @@ func (self *WorkflowService) CheckAsanaReactions(workflow entities.Workflow) err
 	return nil
 }
 
+func (self *WorkflowService) sendAnSMS(workflow entities.Workflow) error {
+	receiver, receiverExists := workflow.ReactionParam["to"]
+	body, bodyExists := workflow.ReactionParam["body"]
+	if !receiverExists || !bodyExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	urlBase := "https://api.twilio.com/2010-04-01/Accounts/" + os.Getenv("SMS_ACCOUNT_SID") + "/Messages.json"
+
+	data := url.Values{}
+	data.Set("To", receiver.(string))
+	data.Set("From", os.Getenv("TWILIO_VIRT_NUMBER"))
+	data.Set("Body", body.(string))
+
+	req, err := http.NewRequest("POST", urlBase, strings.NewReader(data.Encode()))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(os.Getenv("SMS_ACCOUNT_SID"), os.Getenv("AUTH_TOKEN"))
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) CheckSMSReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
+	}
+
+	switch reactionFound.Name {
+	case "Send an SMS":
+		return self.sendAnSMS(workflow)
+	}
+	return nil
+}
+
 func (self *WorkflowService) CheckReactions(workflow entities.Workflow) {
 	self.CheckSpotifyReactions(workflow)
 	self.CheckDiscordReactions(workflow)
 	self.CheckLinkedinReactions(workflow)
 	self.CheckAsanaReactions(workflow)
+	self.CheckSMSReactions(workflow)
 }
 
 func (self *WorkflowService) CheckTimeAndDateEveryDayAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
