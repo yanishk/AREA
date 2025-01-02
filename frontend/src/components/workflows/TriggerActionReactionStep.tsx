@@ -1,3 +1,4 @@
+import { faL } from "@fortawesome/free-solid-svg-icons";
 import Steps from "../../CreateSteps";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
@@ -36,18 +37,36 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             return "select";
         }
 
+        if (param.isexhaustive === false && param.values.length === 1) {
+            return "select"
+        }
+
         if (param.isexhaustive === false && param.route === null) {
             return "input";
         }
 
-        return "text";
+        return "input"
+    };
+
+    const getFieldValues = (param: Parameters) => {
+        if (param.isexhaustive === true && param.values.length > 1) {
+            return param.values;
+        }
+
+        if (param.isexhaustive === false && param.values.length === 1) {
+            const value = param.values[0];
+            const [start, end] = value.split("-").map(Number);
+            const newArray = Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
+            return newArray;
+        }
+        return undefined;
     };
 
     const fields = selectedItem?.parameters.map((param) => ({
         id: param.name,
         label: param.name,
         type: getFieldType(param),
-        options: param.values.length > 0 ? param.values : undefined,
+        options: getFieldValues(param),
     })) || [];
 
     return (
