@@ -571,6 +571,26 @@ func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*h
 	return request, nil
 }
 
+func (self *ServiceService) GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://api.dropbox.com/oauth2/token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
+		os.Getenv("DROPBOX_CLIENT_ID"),
+		os.Getenv("DROPBOX_CLIENT_SECRET"),
+		grantTypeRefreshToken,
+		refreshToken,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) GetSpotifyRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://accounts.spotify.com/api/token"
 	request, err := self.genericRefreshTokenRequest(tokenUrl, refreshToken)
