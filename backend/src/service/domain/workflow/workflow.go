@@ -670,7 +670,6 @@ func checkEveryYearParamValidity(month interface{}, day interface{}, hour interf
 	return monthNumber, dayNumber, hourNumber, minuteNumber, nil
 }
 
-
 func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists {
