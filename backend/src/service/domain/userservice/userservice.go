@@ -23,7 +23,6 @@ const formattingDate = "2006-01-02 15:04:05-07:00"
 
 const bearerType = "Bearer "
 
-
 func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepository storage.UserRepository,
 	UserServiceRepository storage.UserServiceRepository, ServiceService service.ServiceService) *UserServiceService {
 	return &UserServiceService{
@@ -249,4 +248,3 @@ func (self *UserServiceService) RetrieveAsanaWorkspaceTags(email string, connect
 	url := asanaWorkspaceRoute + workspaceId + "/tags"
 	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
 }
-

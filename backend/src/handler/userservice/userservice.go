@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"backend/src/service"
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/userservice/docs"
+	"backend/src/service"
 )
 
 type UserServiceHandler struct {

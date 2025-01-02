@@ -5,14 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"backend/src/service"
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/service/docs"
+	"backend/src/service"
 )
 
 type ServiceHandler struct {
-	ServiceService     service.ServiceService
-	UserService        service.UserService
+	ServiceService service.ServiceService
+	UserService    service.UserService
 }
 
 const unknownServiceMessage = "Unknown service"
@@ -21,8 +21,8 @@ const internalServerErrorMessage = "Internal server error"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
-		ServiceService:     ServiceService,
-		UserService:        UserService,
+		ServiceService: ServiceService,
+		UserService:    UserService,
 	}
 	handler.SetupRoutes(router)
 	return handler
