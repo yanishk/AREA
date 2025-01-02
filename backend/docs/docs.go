@@ -153,7 +153,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord Server Channels",
                 "parameters": [
@@ -188,7 +188,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord User Servers",
                 "responses": {

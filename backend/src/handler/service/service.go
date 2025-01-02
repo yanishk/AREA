@@ -2,8 +2,6 @@ package service_handler
 
 import (
 	"net/http"
-	"os"
-	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 
@@ -21,7 +19,6 @@ type ServiceHandler struct {
 const unknownServiceMessage = "Unknown service"
 const cannotRetrieveServiceMessage = "Could not retrieve requested service"
 const internalServerErrorMessage = "Internal server error"
-const getServerChannelsFailedMessage = "Could not retrieve the server's channels"
 
 func NewServiceHandler(ServiceService service.ServiceService, UserServiceService service.UserServiceService, UserService service.UserService, router *gin.Engine) *ServiceHandler {
 	handler := &ServiceHandler{
@@ -260,37 +257,24 @@ func (self *ServiceHandler) RetrieveReactionsServices(context *gin.Context) {
 
 // @Summary		Retrieve Discord Server Channels
 // @Description	Retrieve the channels from the selected server
-// @Tags			Service
+// @Tags			Discord
 // @Produce		json
 // @Param        id  query      string  true  "server id"
 // @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
 // @Router /Discord/server/channels [get]
 func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
-	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")
 	guildId := context.Query("id")
-	getChannelUrl := "https://discord.com/api/v10/guilds/" + guildId + "/channels"
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(getChannelUrl, "GET", "Bot ", tokenBot, nil)
-	if errRequest != nil {
+	channels, err := self.ServiceService.RetrieveDiscordGuildChannels(guildId)
+	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
+			"error": "Could not retrieve the server's channels",
 		})
 		return
 	}
-	defer resp.Body.Close()
 
-	var channels []map[string]interface{}
-	errDecoder := json.NewDecoder(resp.Body).Decode(&channels)
-	if errDecoder != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": getServerChannelsFailedMessage,
-		})
-		return
-	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"channels": channels,
 	})
 }
-
-// à modif

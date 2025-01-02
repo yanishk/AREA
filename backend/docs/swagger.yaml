@@ -819,7 +819,7 @@ paths:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
       summary: Retrieve Discord Server Channels
       tags:
-      - Service
+      - Discord
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -836,7 +836,7 @@ paths:
             $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse'
       summary: Retrieve Discord User Servers
       tags:
-      - Service
+      - Discord
   /Github/user/repositories:
     get:
       description: Retrieve the repositories of the authenticated user

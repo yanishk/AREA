@@ -144,7 +144,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord Server Channels",
                 "parameters": [
@@ -179,7 +179,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Discord"
                 ],
                 "summary": "Retrieve Discord User Servers",
                 "responses": {

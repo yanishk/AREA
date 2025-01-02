@@ -111,7 +111,7 @@ func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) 
 
 // @Summary		Retrieve Discord User Servers
 // @Description	Retrieve the discord servers from the authenticated user
-// @Tags			Service
+// @Tags			Discord
 // @Produce		json
 // @Success		200		{object}	docs_userservice.UserServiceGetDiscordUserServersSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse

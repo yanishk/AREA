@@ -38,6 +38,7 @@ type ServiceService interface {
 	RequestToTimeApi() (entities.TimeResponse, error)
 	OAuth2Service(serviceName string, callbackType string, appType string) (string, error)
 	RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error)
+	RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error)
 }
 
 type UserServiceService interface {
