@@ -61,70 +61,6 @@ definitions:
       type:
         type: integer
     type: object
-  docs_service.DiscordServerExample:
-    properties:
-      banner:
-        type: string
-      features:
-        items:
-          type: string
-        type: array
-      icon:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      owner:
-        type: boolean
-      permissions:
-        type: string
-    type: object
-  docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve or refresh the token-Could not retrieve the user's
-          workspaces-Could not decode the user's workspaces
-        type: string
-    type: object
-  docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse:
-    properties:
-      workspaces:
-        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve workspace's assignees
-        type: string
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse:
-    properties:
-      assignees:
-        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve workspace's projects
-        type: string
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse:
-    properties:
-      projects:
-        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve workspace's tags
-        type: string
-    type: object
-  docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse:
-    properties:
-      tags:
-        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
-    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -136,20 +72,6 @@ definitions:
       channels:
         items:
           $ref: '#/definitions/docs_service.DiscordChannelExample'
-        type: array
-    type: object
-  docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve or refresh the token-Could not retrieve the user's
-          servers
-        type: string
-    type: object
-  docs_service.ServiceGetDiscordUserServersSuccessResponse:
-    properties:
-      servers:
-        items:
-          $ref: '#/definitions/docs_service.DiscordServerExample'
         type: array
     type: object
   docs_service.ServiceInternalServerErrorResponse:
@@ -358,10 +280,86 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.DiscordServerExample:
+    properties:
+      banner:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: boolean
+      permissions:
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's workspaces
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse:
+    properties:
+      workspaces:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's assignees
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse:
+    properties:
+      assignees:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's projects
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse:
+    properties:
+      projects:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's tags
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse:
+    properties:
+      tags:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's servers
+        type: string
+    type: object
+  docs_userservice.UserServiceGetDiscordUserServersSuccessResponse:
+    properties:
+      servers:
+        items:
+          $ref: '#/definitions/docs_userservice.DiscordServerExample'
+        type: array
+    type: object
   docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse:
     properties:
       error:
-        example: Cannot retrieve Github user repositories
+        example: Could not retrieve the user's repositories
         type: string
     type: object
   docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse:
@@ -600,6 +598,8 @@ definitions:
         type: boolean
       id:
         type: string
+      isauthneeded:
+        type: boolean
       logo:
         type: string
       name:
@@ -722,14 +722,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaUserWorkspacesSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaUserWorkspacesInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse'
       summary: Retrieve Asana Workspaces
       tags:
-      - Service
+      - Asana
   /Asana/workspace/assignees:
     get:
       description: Retrieve the assignees from the selected workspace
@@ -745,14 +745,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse'
       summary: Retrieve Asana Workspace Assignees
       tags:
-      - Service
+      - Asana
   /Asana/workspace/projects:
     get:
       description: Retrieve the projects from the selected workspace
@@ -768,14 +768,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse'
       summary: Retrieve Asana Workspace Projects
       tags:
-      - Service
+      - Asana
   /Asana/workspace/tags:
     get:
       description: Retrieve the tags from the selected workspace
@@ -791,14 +791,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetAsanaWorkspaceTagsInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse'
       summary: Retrieve Asana Workspace Tags
       tags:
-      - Service
+      - Asana
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -821,7 +821,7 @@ paths:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
       summary: Retrieve Discord Server Channels
       tags:
-      - Service
+      - Discord
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -831,14 +831,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse'
       summary: Retrieve Discord User Servers
       tags:
-      - Service
+      - Discord
   /Github/user/repositories:
     get:
       description: Retrieve the repositories of the authenticated user

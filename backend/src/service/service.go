@@ -31,19 +31,25 @@ type ServiceService interface {
 	GetDiscordRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error)
-	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
-	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
 	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
+	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
+	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
 	RequestToTimeApi() (entities.TimeResponse, error)
 	OAuth2Service(serviceName string, callbackType string, appType string) (string, error)
 	RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error)
+	RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error)
 }
 
 type UserServiceService interface {
 	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
 	UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error
 	RetrieveGithubUserRepositories(email string, connectionType string) ([]entities.GithubRepository, error)
+	RetrieveDiscordUserServers(email string, connectionType string) ([]map[string]interface{}, error)
+	RetrieveAsanaUserWorkspaces(email string, connectionType string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceAssignees(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceProjects(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceTags(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
 }
 
 type WorkflowService interface {
