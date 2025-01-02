@@ -595,7 +595,7 @@ func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Respons
 		return nil, err
 	}
 
-	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated && res.StatusCode != http.StatusAccepted {
 		return nil, fmt.Errorf(APICallFailedMessage)
 	}
 	return res, nil
