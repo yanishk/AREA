@@ -97,18 +97,21 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
     if (parameterList[index].route.isEmpty) {
       textInputControler[index] = new TextEditingController(text: "");
-      return Container(
-        padding: EdgeInsets.all(0.0),
-        constraints: BoxConstraints(maxHeight: 200.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
-        child: SingleChildScrollView(
-          child: CustomClassicForm(
-            hint: "${parameterList[index].name} : ",
-            controller: textInputControler[index],
-            maxLines: 5,
-            padding:
-                EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-            focusedBorderColor: Colors.white,
-            borderWidth: 0,
+      return Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: Container(
+          padding: EdgeInsets.all(0.0),
+          constraints: BoxConstraints(maxHeight: 200.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
+          child: SingleChildScrollView(
+            child: CustomClassicForm(
+              hint: "${parameterList[index].name} : ",
+              controller: textInputControler[index],
+              maxLines: 5,
+              padding:
+                  EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+              focusedBorderColor: Colors.white,
+              borderWidth: 0,
+            ),
           ),
         ),
       );
@@ -271,4 +274,3 @@ class CreateDropdown extends StatelessWidget {
     );
   }
 }
-
