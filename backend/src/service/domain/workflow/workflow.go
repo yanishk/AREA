@@ -617,7 +617,7 @@ func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.Tim
 		return fmt.Errorf("Error in the hour and minute sent")
 	}
 
-	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	if int(hour.(float64)) == timeRes.Hour && int(minute.(float64)) == timeRes.Minute {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -629,7 +629,7 @@ func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.Ti
 		return fmt.Errorf("Error in the minute sent")
 	}
 
-	if int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+	if int(minute.(float64)) == timeRes.Minute {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -650,7 +650,7 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 
 	for _, day := range dayArray {
 		if int(day.(float64)) == timeRes.WeekDay && int(hour.(float64)) == timeRes.Hour &&
-			int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+			int(minute.(float64)) == timeRes.Minute {
 			self.checkReactions(workflow)
 		}
 	}
@@ -667,7 +667,7 @@ func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entit
 	}
 
 	if int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		int(minute.(float64)) == timeRes.Minute {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -683,7 +683,7 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 	}
 
 	if int(month.(float64)) == timeRes.Month && int(day.(float64)) == timeRes.Day && int(hour.(float64)) == timeRes.Hour &&
-		int(minute.(float64)) == timeRes.Minute && workflow.IsActivated {
+		int(minute.(float64)) == timeRes.Minute {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -696,6 +696,10 @@ func (self *WorkflowService) checkWorkflowsWithTimeAndDateActions(timeRes entiti
 	}
 
 	for _, workflow := range allWorkflowsFound {
+		if !workflow.IsActivated {
+			continue
+		}
+
 		switch action.Name {
 		case "Every day at":
 			self.checkTimeAndDateEveryDayAction(timeRes, workflow)
@@ -975,6 +979,10 @@ func (self *WorkflowService) checkWorkflowsWithRedditActions(action entities.Act
 	}
 
 	for _, workflow := range allWorkflowsFound {
+		if !workflow.IsActivated {
+			continue
+		}
+
 		accessToken, err := self.getAccessToken("Reddit", workflow)
 		if err != nil {
 			continue
@@ -1068,6 +1076,10 @@ func (self *WorkflowService) checkWorkflowsWithWeatherActions(action entities.Ac
 	}
 
 	for _, workflow := range allWorkflowsFound {
+		if !workflow.IsActivated {
+			continue
+		}
+
 		switch action.Name {
 		case "Current temperature rises above":
 			self.checkWeatherCurrentWeatherComparisonAction("aboveCurrent", workflow)
@@ -1214,6 +1226,9 @@ func (self *WorkflowService) checkWorkflowsWithGithubActions(action entities.Act
 	}
 
 	for _, workflow := range workflows {
+		if !workflow.IsActivated {
+			continue
+		}
 		accessToken, err := self.getAccessToken("Github", workflow)
 		if err != nil {
 			continue
