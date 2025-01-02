@@ -1946,6 +1946,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "isauthneeded": {
+                    "type": "boolean"
+                },
                 "logo": {
                     "type": "string"
                 },
