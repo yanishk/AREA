@@ -531,15 +531,19 @@ func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshT
 	return request, nil
 }
 
-func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
-	tokenUrl := "https://oauth2.googleapis.com/token"
-	jsonBody := fmt.Sprintf(
+func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string {
+	return fmt.Sprintf(
 		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
-		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		clientId,
+		secretId,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
+}
+
+func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GOOGLE_WEB_CLIENT_ID"), os.Getenv("GOOGLE_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -553,13 +557,7 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 
 func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://app.asana.com/-/oauth_token"
-	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("ASANA_CLIENT_ID"),
-		os.Getenv("ASANA_CLIENT_SECRET"),
-		grantTypeRefreshToken,
-		refreshToken,
-	)
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("ASANA_CLIENT_ID"), os.Getenv("ASANA_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -573,13 +571,7 @@ func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*h
 
 func (self *ServiceService) GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://api.dropbox.com/oauth2/token"
-	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("DROPBOX_CLIENT_ID"),
-		os.Getenv("DROPBOX_CLIENT_SECRET"),
-		grantTypeRefreshToken,
-		refreshToken,
-	)
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
