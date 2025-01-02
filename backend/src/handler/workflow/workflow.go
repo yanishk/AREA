@@ -1,13 +1,14 @@
 package workflow_handler
 
 import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
 	"backend/src/entities"
 	"backend/src/handler/middleware"
 	_ "backend/src/handler/workflow/docs"
 	"backend/src/service"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type WorkflowHandler struct {

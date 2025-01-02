@@ -1,9 +1,10 @@
 package userservice_repository
 
 import (
-	"backend/src/entities"
 	"database/sql"
 	"fmt"
+
+	"backend/src/entities"
 )
 
 type UserServiceRepository struct {

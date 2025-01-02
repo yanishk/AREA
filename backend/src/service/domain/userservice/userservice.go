@@ -1,13 +1,14 @@
 package userservice_service
 
 import (
-	"backend/src/entities"
-	"backend/src/service"
-	"backend/src/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"backend/src/entities"
+	"backend/src/service"
+	"backend/src/storage"
 )
 
 type UserServiceService struct {

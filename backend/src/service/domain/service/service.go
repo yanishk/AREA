@@ -1,8 +1,6 @@
 package service_service
 
 import (
-	"backend/src/entities"
-	"backend/src/storage"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -11,6 +9,9 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"backend/src/entities"
+	"backend/src/storage"
 )
 
 type ServiceService struct {
