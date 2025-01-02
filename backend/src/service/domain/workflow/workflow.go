@@ -775,7 +775,6 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 	return nil
 }
 
-
 func (self *WorkflowService) checkWorkflowsWithTimeAndDateActions(timeRes entities.TimeResponse, action entities.Action) error {
 	allWorkflowsFound, errWorkflow := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
 	if errWorkflow != nil {
