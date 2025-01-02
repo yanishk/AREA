@@ -1,13 +1,14 @@
 package userservice_service
 
 import (
-	"backend/src/entities"
-	"backend/src/service"
-	"backend/src/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+
+	"backend/src/entities"
+	"backend/src/service"
+	"backend/src/storage"
 )
 
 type UserServiceService struct {
@@ -41,7 +42,7 @@ func (self *UserServiceService) GetUser(emailStr string, connectionTypeStr strin
 	return foundUser, nil
 }
 
-func (self *UserServiceService) RefreshToken(refreshToken string, userId string, serviceName string) (entities.ResultToken, error) {
+func (self *UserServiceService) refreshToken(refreshToken string, userId string, serviceName string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var serviceFound entities.Service
 	var request *http.Request
@@ -110,7 +111,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 	}
 
 	if expiryDate.Before(time.Now()) && serviceName != "Github" && serviceName != "Linkedin" {
-		tokenFromRefresh, errRefresh := self.RefreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
+		tokenFromRefresh, errRefresh := self.refreshToken(foundUserService.RefreshToken, foundUser.Id, serviceName)
 		token = tokenFromRefresh.AccessToken
 		if errRefresh != nil {
 			return "", errRefresh
@@ -119,7 +120,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 	return token, nil
 }
 
-func (self *UserServiceService) CreateOrUpdateUserService(userId string, serviceId string, token entities.ResultToken) {
+func (self *UserServiceService) createOrUpdateUserService(userId string, serviceId string, token entities.ResultToken) {
 	currentTime := time.Now()
 	expiryDate := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format(formattingDate)
 
@@ -153,7 +154,7 @@ func (self *UserServiceService) UpdateTokenForService(code string, serviceName s
 		return errFoundService
 	}
 
-	self.CreateOrUpdateUserService(foundUser.Id, foundService.Id, token)
+	self.createOrUpdateUserService(foundUser.Id, foundService.Id, token)
 	return nil
 }
 
