@@ -2,6 +2,16 @@ package docs_userservice
 
 import "backend/src/entities"
 
+type DiscordServerExample struct {
+	Banner      string
+	Features    []string
+	Icon        string
+	Id          string
+	Name        string
+	Owner       bool
+	Permissions string
+}
+
 // Service Callback Responses
 type UserServiceServiceCallbackSuccessResponse struct {
 	Msg string `json:"success"example:"Token generated"`
@@ -20,5 +30,50 @@ type UserServiceGetGithubUserRepositoriesSuccessResponse struct {
 	Repositories []entities.GithubRepository
 }
 type UserServiceGetGithubUserRepositoriesInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Cannot retrieve Github user repositories"`
+	Msg string `json:"error"example:"Could not retrieve the user's repositories"`
+}
+
+// Discord Get User Servers
+type UserServiceGetDiscordUserServersSuccessResponse struct {
+	Servers []DiscordServerExample
+}
+
+type UserServiceGetDiscordUserServersInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve the user's servers"`
+}
+
+// Asana Get User Workspaces
+type UserServiceGetAsanaUserWorkspacesSuccessResponse struct {
+	Workspaces entities.AsanaWorkspacesInfo
+}
+
+type UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve the user's workspaces"`
+}
+
+// Asana Get Workspace Assignees
+type UserServiceGetAsanaWorkspaceAssigneesSuccessResponse struct {
+	Assignees entities.AsanaWorkspacesInfo
+}
+
+type UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve workspace's assignees"`
+}
+
+// Asana Get Workspace Projects
+type UserServiceGetAsanaWorkspaceProjectsSuccessResponse struct {
+	Projects entities.AsanaWorkspacesInfo
+}
+
+type UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve workspace's projects"`
+}
+
+// Asana Get Workspace Tags
+type UserServiceGetAsanaWorkspaceTagsSuccessResponse struct {
+	Tags entities.AsanaWorkspacesInfo
+}
+
+type UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve workspace's tags"`
 }
