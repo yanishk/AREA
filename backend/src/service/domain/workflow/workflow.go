@@ -82,35 +82,35 @@ func redditReactions() []string {
 
 func webhooksEventsToActions() map[string]string {
 	return map[string]string{
-		"Push Hook": "New push",
+		"Push Hook":          "New push",
 		"Merge Request Hook": "Merge request update",
-		"Issue Hook": "Issue update",
-		"Note Hook": "Comment update",
-		"Tag Push Hook": "New tag push",
-		"Wiki Page Hook": "Wiki page update",
-		"Release Hook": "Release update",
-		"Feature Flag Hook": "Feature flag update",
-		"Pipeline Hook": "Pipeline update",
-		"Job Hook": "Job update",
-		"Deployment Hook": "Deployment update",
-		"Emoji Hook": "Emoji update",
+		"Issue Hook":         "Issue update",
+		"Note Hook":          "Comment update",
+		"Tag Push Hook":      "New tag push",
+		"Wiki Page Hook":     "Wiki page update",
+		"Release Hook":       "Release update",
+		"Feature Flag Hook":  "Feature flag update",
+		"Pipeline Hook":      "Pipeline update",
+		"Job Hook":           "Job update",
+		"Deployment Hook":    "Deployment update",
+		"Emoji Hook":         "Emoji update",
 	}
 }
 
 func gitlabWebhookEventsToState() map[string]string {
 	return map[string]string{
-		"push_events": "true",
-		"issues_events": "true",
+		"push_events":           "true",
+		"issues_events":         "true",
 		"merge_requests_events": "true",
-		"tag_push_events": "true",
-		"note_events": "true",
-		"job_events": "true",
-		"pipeline_events": "true",
-		"wiki_page_events": "true",
-		"deployment_events": "true",
-		"releases_events": "true",
-		"feature_flag_events": "true",
-		"emoji_events": "true",
+		"tag_push_events":       "true",
+		"note_events":           "true",
+		"job_events":            "true",
+		"pipeline_events":       "true",
+		"wiki_page_events":      "true",
+		"deployment_events":     "true",
+		"releases_events":       "true",
+		"feature_flag_events":   "true",
+		"emoji_events":          "true",
 	}
 }
 
@@ -1750,7 +1750,7 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflow(workflow entities.Workf
 		return err
 	}
 
-	if (userProjectIdString == webhookProjectIdString) {
+	if userProjectIdString == webhookProjectIdString {
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -1764,7 +1764,7 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, w
 			return err
 		}
 	}
-	if (webhookResponse.Project.Id == 0) {
+	if webhookResponse.Project.Id == 0 {
 		return fmt.Errorf("Incorrect project id")
 	}
 
@@ -1812,8 +1812,8 @@ func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, request 
 
 	switch serviceName {
 	case "Gitlab":
-        return self.checkGitlabWebhooksWorkflows(request.Header, webhookJsonDataBytes, webhooksEventsToActions())
-    }
+		return self.checkGitlabWebhooksWorkflows(request.Header, webhookJsonDataBytes, webhooksEventsToActions())
+	}
 	return nil
 }
 
@@ -1832,7 +1832,7 @@ func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken strin
 	return res, nil
 }
 
-func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessToken string) error {
+func (self *WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessToken string) error {
 	createWebhookUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
 	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
 	params := url.Values{}
@@ -1871,7 +1871,7 @@ func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken stri
 		return false, err
 	}
 
-	if (len(webhooksJsonData) == 0) {
+	if len(webhooksJsonData) == 0 {
 		return false, nil
 	}
 
@@ -1886,7 +1886,7 @@ func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken stri
 			return false, fmt.Errorf("Error in the url received")
 		}
 
-		if (urlString == webhookUrl) {
+		if urlString == webhookUrl {
 			return true, nil
 		}
 	}

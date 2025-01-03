@@ -58,9 +58,9 @@ func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 // @Success		400		{object}	docs_service.WorkflowReceiveServiceWeebhookBadRequestResponse
 // // @Router		/webhooks/{service} [post]
 func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
-    serviceName := context.Param("service")
+	serviceName := context.Param("service")
 
-	err := self.WorkflowService.CheckWebhooksWorkflows(serviceName,  context.Request)
+	err := self.WorkflowService.CheckWebhooksWorkflows(serviceName, context.Request)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": invalidRequestBodyMessage,
@@ -68,9 +68,9 @@ func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
 		return
 	}
 
-    context.IndentedJSON(http.StatusOK, gin.H{
-        "success": "Webhook received",
-    })
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Webhook received",
+	})
 }
 
 // @Summary		Create Workflow
