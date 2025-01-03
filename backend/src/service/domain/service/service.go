@@ -743,7 +743,6 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 
 	res, err := self.ExecuteRequest(request)
 	if err != nil {
-		fmt.Println("err 1 result token form code:", err)
 		return tokenRes, err
 	}
 	defer res.Body.Close()
