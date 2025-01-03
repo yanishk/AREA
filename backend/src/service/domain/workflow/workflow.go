@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"backend/src/entities"
@@ -1515,6 +1516,116 @@ func (self *WorkflowService) CheckGithubActions() error {
 	return nil
 }
 
+func getGitlabIdActionParam(workflow entities.Workflow) (string, error) {
+	projectId, projectIdExists := workflow.ActionParam["id"]
+	if !projectIdExists {
+		return "", fmt.Errorf("Error in the id sent")
+	}
+
+	projectIdString, projectIdIsString := projectId.(string)
+	if !projectIdIsString {
+		return "", fmt.Errorf("Error in the project id sent")
+	}
+	return projectIdString, nil
+}
+
+func checkGitlabWebhookParamsValidity(webhookJsonData map[string]interface{}) (string, float64, error) {
+	var eventNameString string
+	var projectIdNumber float64
+
+	eventName, eventNameExists := webhookJsonData["event_name"]
+	if !eventNameExists {
+		return eventNameString, projectIdNumber, fmt.Errorf("Error in the event_name sent")
+	}
+
+	eventNameString, eventNameIsString := eventName.(string)
+	if !eventNameIsString {
+		return eventNameString, projectIdNumber, fmt.Errorf("Error in the event_name sent")
+	}
+
+
+	projectId, projectIdExists := webhookJsonData["project_id"]
+	if !projectIdExists {
+		return eventNameString, projectIdNumber, fmt.Errorf("Error in the project_id sent")
+	}
+
+	projectIdNumber, projectIdIsNumber := projectId.(float64)
+	if !projectIdIsNumber {
+		return eventNameString, projectIdNumber, fmt.Errorf("Error in the project_id sent")
+	}
+	return eventNameString, projectIdNumber, nil
+}
+
+func (self *WorkflowService) checkGitlabWebhooksWorkflow(workflow entities.Workflow, webhookProjectId int) error {
+	webhookProjectIdString := strconv.Itoa(webhookProjectId)
+	userProjectIdString, err := getGitlabIdActionParam(workflow)
+	if err != nil {
+		return err
+	}
+
+	if (userProjectIdString == webhookProjectIdString) {
+		self.checkReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkGitlabWebhooksWorkflows(webhookJsonData map[string]interface{}, eventsToActions map[string]string) error {
+	eventNameString, projectIdNumber, err := checkGitlabWebhookParamsValidity(webhookJsonData)
+	if err != nil {
+		return err
+	}
+
+	actionName, actionNameExists := eventsToActions[eventNameString]
+	if !actionNameExists {
+		return fmt.Errorf("No action mapped with this event")
+	}
+
+	action, err := self.ActionRepository.FindActionByName(actionName)
+	if err != nil {
+		return err
+	}
+
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		if !workflow.IsActivated {
+			continue
+		}
+		self.checkGitlabWebhooksWorkflow(workflow, int(projectIdNumber))
+	}
+	return nil
+}
+
+func unmarshalWebhookJsonDataBytes(webhookJsonDataBytes []byte) (map[string]interface{}, error) {
+	webhookJsonData := make(map[string]interface{})
+	if len(webhookJsonDataBytes) > 0 {
+		err := json.Unmarshal(webhookJsonDataBytes, &webhookJsonData)
+		if err != nil {
+			return webhookJsonData, err
+		}
+	}
+	return webhookJsonData, nil
+}
+
+func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, webhookJsonDataBytes []byte) error {
+	eventsToActions := map[string]string{
+		"push": "New push",
+	}
+	webhookJsonData, err := unmarshalWebhookJsonDataBytes(webhookJsonDataBytes)
+	if err != nil {
+		return err
+	}
+
+	switch serviceName {
+	case "Gitlab":
+        return self.checkGitlabWebhooksWorkflows(webhookJsonData, eventsToActions)
+    }
+	return nil
+}
+
 func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -1548,14 +1659,9 @@ func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, acc
 
 func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Workflow, accessToken string) error {
 	_, webhookActivatedExists := workflow.ActionData["webhook_activated"]
-	projectId, projectIdExists := workflow.ActionParam["id"]
-	if !projectIdExists {
-		return fmt.Errorf("Error in the id sent")
-	}
-
-	projectIdString, projectIdIsString := projectId.(string)
-	if !projectIdIsString {
-		return fmt.Errorf("Error in the project id sent")
+	projectIdString, err := getGitlabIdActionParam(workflow)
+	if err != nil {
+		return err
 	}
 
 	if !webhookActivatedExists {

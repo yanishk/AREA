@@ -1,8 +1,8 @@
 package workflow_handler
 
 import (
-	"fmt"
 	"net/http"
+	"io"
 
 	"github.com/gin-gonic/gin"
 
@@ -56,13 +56,20 @@ func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 // // @Tags			Webhooks
 // // @Produce		json
 // @Success		200		{object}	docs_service.WorkflowReceiveServiceWeebhookSuccessResponse
+// @Success		400		{object}	docs_service.WorkflowReceiveServiceWeebhookBadRequestResponse
 // // @Router		/webhooks/{service} [post]
 func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
     serviceName := context.Param("service")
 
-    if serviceName == "Gitlab" {
-        fmt.Println("Gitlab webhook received!")
-    }
+	webhookJsonDataBytes, err := io.ReadAll(context.Request.Body)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": invalidRequestBodyMessage,
+		})
+		return
+	}
+
+	self.WorkflowService.CheckWebhooksWorkflows(serviceName, webhookJsonDataBytes)
     context.IndentedJSON(http.StatusOK, gin.H{
         "success": "Webhook received",
     })
