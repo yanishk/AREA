@@ -16,7 +16,7 @@ func NewWorkflowRepository(db *sql.DB) *WorkflowRepository {
 	return &WorkflowRepository{db: db}
 }
 
-func (self *WorkflowRepository) marshalWorkflowParameters(actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) ([]byte, []byte, []byte, error) {
+func (self *WorkflowRepository) marshalWorkflowParameters(actionParam, reactionParam, actionData map[string]interface{}) ([]byte, []byte, []byte, error) {
 	actionParamJson, err := json.Marshal(actionParam)
 	if err != nil {
 		return nil, nil, nil, err
@@ -34,7 +34,7 @@ func (self *WorkflowRepository) marshalWorkflowParameters(actionParam map[string
 	return actionParamJson, reactionParamJson, actionDataJson, nil
 }
 
-func (self *WorkflowRepository) unmarshalWorkflowParameters(actionParamBytes []byte, reactionParamBytes []byte, actionDataBytes []byte, workflow entities.Workflow) (entities.Workflow, error) {
+func (self *WorkflowRepository) unmarshalWorkflowParameters(actionParamBytes, reactionParamBytes, actionDataBytes []byte, workflow entities.Workflow) (entities.Workflow, error) {
 	if len(actionParamBytes) > 0 {
 		errActionBytes := json.Unmarshal(actionParamBytes, &workflow.ActionParam)
 		if errActionBytes != nil {
@@ -81,8 +81,7 @@ func (self *WorkflowRepository) appendWorkflowsSlices(rows *sql.Rows) ([]entitie
 	return workflows, nil
 }
 
-func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, actionId string, reactionId string,
-	actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error {
+func (self *WorkflowRepository) CreateWorkflow(name, ownerId, actionId, reactionId string, actionParam, reactionParam, actionData map[string]interface{}) error {
 	sqlStatement := `INSERT INTO workflows (name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam, actiondata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	actionParamJson, reactionParamJson, actionDataJson, err := self.marshalWorkflowParameters(actionParam, reactionParam, actionData)
@@ -100,9 +99,7 @@ func (self *WorkflowRepository) CreateWorkflow(name string, ownerId string, acti
 func (self *WorkflowRepository) FindWorkflowById(id string) (entities.Workflow, error) {
 	sqlStatement := `SELECT * FROM workflows WHERE id = ($1)`
 	var workflow entities.Workflow
-	var actionParamBytes []byte
-	var reactionParamBytes []byte
-	var actionDataBytes []byte
+	var actionParamBytes, reactionParamBytes, actionDataBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, id)
 
@@ -167,7 +164,7 @@ func (self *WorkflowRepository) UpdateWorkflow(id string, updatedWorkflow entiti
 	return nil
 }
 
-func (self *WorkflowRepository) DeleteWorkflow(id string, ownerId string) error {
+func (self *WorkflowRepository) DeleteWorkflow(id, ownerId string) error {
 	sqlStatement := `DELETE FROM workflows WHERE id = ($1) AND ownerid = ($2)`
 
 	res, err := self.db.Exec(sqlStatement, id, ownerId)

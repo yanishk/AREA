@@ -15,7 +15,7 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 	return &ServiceRepository{db: db}
 }
 
-func (self *ServiceRepository) CreateService(name string, color string, logo string) error {
+func (self *ServiceRepository) CreateService(name, color, logo string) error {
 	sqlStatement := `INSERT INTO services (name, color, logo) VALUES ($1, $2, $3)`
 
 	_, err := self.FindServiceByName(name)
@@ -30,7 +30,7 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 	return nil
 }
 
-func (self *ServiceRepository) findServiceWithParam(sqlStatement string, param string) (entities.Service, error) {
+func (self *ServiceRepository) findServiceWithParam(sqlStatement, param string) (entities.Service, error) {
 	var service entities.Service
 
 	row := self.db.QueryRow(sqlStatement, param)

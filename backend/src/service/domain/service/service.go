@@ -113,9 +113,8 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.Service, err
 	return self.ServiceRepository.FindReactionsServices()
 }
 
-func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessary bool) (string, string) {
-	var callbackLink string
-	var clientID string
+func getCallbackAndClientId(callbackType, serviceName string, isIdNecessary bool) (string, string) {
+	var callbackLink, clientID string
 
 	if callbackType == "login" {
 		if isIdNecessary {
@@ -131,9 +130,8 @@ func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessa
 	return callbackLink, clientID
 }
 
-func oauth2Google(callbackType string, appType string) string {
-	var callbackLink string
-	var appTypeLink string
+func oauth2Google(callbackType, appType string) string {
+	var callbackLink, appTypeLink string
 
 	if callbackType == "login" {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
@@ -247,7 +245,7 @@ func oauth2Gitlab(callbackType string) string {
 		"&scope=api read_api read_user read_repository write_repository")
 }
 
-func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
+func (self *ServiceService) OAuth2Service(serviceName, callbackType, appType string) (string, error) {
 	var authUrl string
 
 	if serviceName == "Google" {
@@ -274,7 +272,7 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 	return authUrl, nil
 }
 
-func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
+func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&code=%s&redirect_uri=%s",
 		grantTypeAuthorization,
@@ -289,7 +287,7 @@ func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string)
 	return request, nil
 }
 
-func getGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
+func getGoogleOAuth2AccessTokenWebRequestBody(code, callback string) string {
 	return fmt.Sprintf(
 		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
 		code,
@@ -300,7 +298,7 @@ func getGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) stri
 	)
 }
 
-func getGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) string {
+func getGoogleOAuth2AccessTokenMobileRequestBody(code, callback string) string {
 	return fmt.Sprintf(
 		"code=%s&client_id=%s&redirect_uri=%s&grant_type=%s",
 		code,
@@ -310,9 +308,8 @@ func getGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) s
 	)
 }
 
-func getGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType string) (*http.Request, error) {
-	var googleCallback string
-	var jsonBody string
+func getGoogleOAuth2AccessTokenRequest(code, callbackType, appType string) (*http.Request, error) {
+	var googleCallback, jsonBody string
 
 	if callbackType == "service" {
 		googleCallback = os.Getenv("GOOGLE_SERVICE_CALLBACK")
@@ -340,10 +337,8 @@ func getGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType
 	return request, nil
 }
 
-func getGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var githubCallback string
-	var githubClientID string
-	var githubClientSecret string
+func getGithubOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var githubCallback, githubClientID, githubClientSecret string
 
 	if callbackType == "service" {
 		githubCallback = os.Getenv("GITHUB_SERVICE_CALLBACK")
@@ -376,7 +371,7 @@ func getGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func getGitlabOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getGitlabOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var gitlabCallback string
 
 	if callbackType == "service" {
@@ -406,7 +401,7 @@ func getGitlabOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getAsanaOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var asanaCallback string
 
 	if callbackType == "service" {
@@ -436,7 +431,7 @@ func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 	return request, nil
 }
 
-func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getLinkedinOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var callback string
 
 	if callbackType == "service" {
@@ -466,7 +461,7 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 	return request, nil
 }
 
-func getDropboxOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getDropboxOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var dropboxCallback string
 
 	if callbackType == "service" {
@@ -488,7 +483,7 @@ func getDropboxOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getSpotifyOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var spotifyCallback string
 
 	if callbackType == "service" {
@@ -510,7 +505,7 @@ func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func getDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getDiscordOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var discordCallback string
 
 	if callbackType == "service" {
@@ -532,10 +527,8 @@ func getDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func getRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var redditCallback string
-	var redditClientID string
-	var redditClientSecret string
+func getRedditOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var redditCallback, redditClientID, redditClientSecret string
 
 	if callbackType == "service" {
 		redditCallback = os.Getenv("REDDIT_SERVICE_CALLBACK")
@@ -561,7 +554,7 @@ func getRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshToken string) (*http.Request, error) {
+func (self *ServiceService) genericRefreshTokenRequest(tokenUrl, refreshToken string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&refresh_token=%s",
 		grantTypeRefreshToken,
@@ -695,7 +688,7 @@ func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Respons
 	return res, nil
 }
 
-func (self *ServiceService) ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
+func (self *ServiceService) ExecuteApiRequest(url, method, typeToken, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
@@ -707,7 +700,7 @@ func (self *ServiceService) ExecuteApiRequest(url string, method string, typeTok
 	return self.ExecuteRequest(req)
 }
 
-func (self *ServiceService) GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error) {
+func (self *ServiceService) GetResultTokenFromCode(code, serviceName, callbackType, appType string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var request *http.Request
 	var errRequest error
@@ -754,7 +747,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	return tokenRes, nil
 }
 
-func getOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
+func getOAuth2UserEmailRequest(userInfoUrl, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
 		return request, errRequest
@@ -775,7 +768,7 @@ func decodeUserInfoWithGithub(res *http.Response) (entities.UserInfo, error) {
 	return userInfos[0], nil
 }
 
-func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error) {
+func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName string) (entities.UserInfo, error) {
 	var userInfo entities.UserInfo
 	var request *http.Request
 	var err error

@@ -70,6 +70,16 @@ func dropboxReactions() []string {
 	}
 }
 
+func redditReactions() []string {
+	return []string{
+		"Submit a comment on a post ",
+		"Upvote a post",
+		"Downvote a post",
+		"Submit a post",
+		"Submit a post with a link",
+	}
+}
+
 func webhooksEventsToActions() map[string]string {
 	return map[string]string{
 		"Push Hook": "New push",
@@ -117,7 +127,7 @@ func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepos
 	}
 }
 
-func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error {
+func (self *WorkflowService) CreateWorkflow(userEmail, userConnectionType string, newWorkflow entities.NewWorkflow) error {
 	userFound, errFindingUser := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errFindingUser != nil {
 		return errFindingUser
@@ -131,7 +141,7 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType
 	return nil
 }
 
-func (self *WorkflowService) GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error) {
+func (self *WorkflowService) GetUserWorkflows(email, connectionType string) ([]entities.Workflow, error) {
 	userFound, errUserFound := self.UserRepository.FindUserByEmail(email, connectionType)
 	if errUserFound != nil {
 		return nil, errUserFound
@@ -176,7 +186,7 @@ func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities
 	return nil
 }
 
-func (self *WorkflowService) DeleteWorkflow(email string, connectionType string, workflowId string) error {
+func (self *WorkflowService) DeleteWorkflow(email, connectionType, workflowId string) error {
 	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
 	if err != nil {
 		return err
@@ -243,8 +253,62 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 
 	if resp != nil {
 		defer resp.Body.Close()
+		return nil
 	}
 	return fmt.Errorf("Unknown reaction")
+}
+
+func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !messageErr || !channelErr {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
+	content := map[string]string{
+		"content": message.(string),
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) createDiscordThread(tokenBot string, workflow entities.Workflow) error {
+	title, titleErr := workflow.ReactionParam["title"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !titleErr || !channelErr {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/threads"
+	content := map[string]interface{}{
+		"name": title,
+		"type": 11,
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling, err)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) error {
@@ -254,27 +318,13 @@ func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	if reactionFound.Name == "Post a message to a channel" {
-		message, messageErr := workflow.ReactionParam["message"]
-		channelID, channelErr := workflow.ReactionParam["channelid"]
-		if !messageErr || !channelErr {
-			return fmt.Errorf("Failed to get message body or channel id")
-		}
-
-		urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
-		content, errContent := json.Marshal(map[string]string{
-			"content": message.(string),
-		})
-		if errContent != nil {
-			return fmt.Errorf("Failed to marshall message content")
-		}
-
-		resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
-		if errRequest != nil {
-			return errRequest
-		}
-		defer resp.Body.Close()
+	switch reactionFound.Name {
+	case "Post a message to a channel":
+		return self.postDiscordMessage(tokenBot, workflow)
+	case "Create a thread in a channel":
+		return self.createDiscordThread(tokenBot, workflow)
 	}
+
 	return fmt.Errorf("Unknown reaction")
 }
 
@@ -316,7 +366,7 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
 	message, messageErr := workflow.ReactionParam["message"]
 	if !messageErr {
-		return fmt.Errorf("Failed to get message body")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -338,7 +388,7 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	res, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
@@ -354,7 +404,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 	message, messageErr := workflow.ReactionParam["message"]
 	urlPost, urlErr := workflow.ReactionParam["url"]
 	if !messageErr || !urlErr {
-		return fmt.Errorf("Failed to get message body or URL")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -382,7 +432,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
@@ -728,7 +778,7 @@ func (self *WorkflowService) createTextFile(accessToken string, workflow entitie
 	return self.requestFileCreationModificationDropbox(url, accessToken, arg, bytes.NewBuffer([]byte(content.(string))), workflow)
 }
 
-func (self *WorkflowService) downloadFileFromDropbox(accessToken string, filePath string) (string, error) {
+func (self *WorkflowService) downloadFileFromDropbox(accessToken, filePath string) (string, error) {
 	url := "https://content.dropboxapi.com/2/files/download"
 
 	req, err := http.NewRequest("POST", url, nil)
@@ -796,6 +846,135 @@ func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) e
 	return nil
 }
 
+func (self *WorkflowService) postRedditComment(accessToken string, workflow entities.Workflow) error {
+	comment, commentExists := workflow.ReactionParam["comment"]
+	id, idExists := workflow.ReactionParam["id"]
+	if !commentExists || !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("thing_id", "t3_"+id.(string))
+	body.Set("text", comment.(string))
+	url := "https://oauth.reddit.com/api/comment"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) upvoteDowvoteRedditPost(postId, accessToken string, vote int) error {
+	body := url.Values{}
+	body.Set("id", "t3_"+postId)
+	body.Set("dir", strconv.Itoa(vote))
+
+	url := "https://oauth.reddit.com/api/vote"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) upvoteRedditPost(accessToken string, workflow entities.Workflow) error {
+	id, idExists := workflow.ReactionParam["id"]
+	if !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	return self.upvoteDowvoteRedditPost(id.(string), accessToken, 1)
+}
+
+func (self *WorkflowService) downvoteRedditPost(accessToken string, workflow entities.Workflow) error {
+	id, idExists := workflow.ReactionParam["id"]
+	if !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	return self.upvoteDowvoteRedditPost(id.(string), accessToken, -1)
+}
+
+func (self *WorkflowService) submitRedditPost(accessToken string, workflow entities.Workflow) error {
+	title, titleExists := workflow.ReactionParam["title"]
+	content, contentExists := workflow.ReactionParam["content"]
+	subreddit, subredditExists := workflow.ReactionParam["subreddit"]
+	if !titleExists || !contentExists || !subredditExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("title", title.(string))
+	body.Set("text", content.(string))
+	body.Set("sr", subreddit.(string))
+	body.Set("kind", "self")
+	url := "https://oauth.reddit.com/api/submit"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) submitRedditPostLink(accessToken string, workflow entities.Workflow) error {
+	title, titleExists := workflow.ReactionParam["title"]
+	link, linkExists := workflow.ReactionParam["link"]
+	subreddit, subredditExists := workflow.ReactionParam["subreddit"]
+	if !titleExists || !linkExists || !subredditExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("title", title.(string))
+	body.Set("url", link.(string))
+	body.Set("sr", subreddit.(string))
+	body.Set("kind", "link")
+	url := "https://oauth.reddit.com/api/submit"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
+	}
+
+	accessToken, err := self.refreshTokenForService("Reddit", reactionFound.Name, redditReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
+	}
+
+	switch reactionFound.Name {
+	case "Submit a comment on a post ":
+		return self.postRedditComment(accessToken, workflow)
+	case "Downvote a post":
+		return self.downvoteRedditPost(accessToken, workflow)
+	case "Upvote a post":
+		return self.upvoteRedditPost(accessToken, workflow)
+	case "Submit a post":
+		return self.submitRedditPost(accessToken, workflow)
+	case "Submit a post with a link":
+		return self.submitRedditPostLink(accessToken, workflow)
+	}
+	return nil
+}
+
 func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSpotifyReactions(workflow)
 	self.checkDiscordReactions(workflow)
@@ -804,6 +983,7 @@ func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSMSReactions(workflow)
 	self.checkSendEmailReactions(workflow)
 	self.checkDropboxReactions(workflow)
+	self.checkRedditReactions(workflow)
 }
 
 func checkEveryHourParamValidity(minute interface{}) (float64, error) {
@@ -887,7 +1067,7 @@ func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.Tim
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !hourExists || !minuteExists {
-		return fmt.Errorf("Error in the hour and minute sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
@@ -906,7 +1086,7 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayArray, ok := days.([]interface{})
@@ -934,7 +1114,7 @@ func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entit
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
@@ -955,7 +1135,7 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists || !monthExists {
-		return fmt.Errorf("Error in the minute, hour, day or month sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	monthNumber, dayNumber, hourNumber, minuteNumber, err := checkEveryYearParamValidity(month, day, hour, minute)
@@ -1024,8 +1204,8 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 	return nil
 }
 
-func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
-	req, _ := http.NewRequest("GET", url, nil)
+func (self *WorkflowService) executeRedditRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Authorization", bearerType+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
@@ -1039,7 +1219,7 @@ func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*
 func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.RedditPostResponse, error) {
 	var result entities.RedditPostResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1059,7 +1239,7 @@ func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.Re
 func (self *WorkflowService) getRedditComments(url, accessToken string) (entities.RedditCommentResponse, error) {
 	var result entities.RedditCommentResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1079,7 +1259,7 @@ func (self *WorkflowService) getRedditComments(url, accessToken string) (entitie
 func (self *WorkflowService) getRedditVotes(url, accessToken string) (entities.RedditVoteResponse, error) {
 	var result entities.RedditVoteResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1100,7 +1280,7 @@ func (self *WorkflowService) getUsernameReddit(accessToken string, workflow enti
 	var result entities.RedditUsername
 	url := "https://oauth.reddit.com/api/v1/me"
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1395,7 +1575,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	return nil
 }
 
-func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
+func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
 		return nil, fmt.Errorf("Invalid repository")
