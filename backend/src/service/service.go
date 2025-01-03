@@ -8,12 +8,12 @@ import (
 )
 
 type UserService interface {
-	CreateUser(userEmail string, userPassword string, userConnectionType string) error
-	LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error)
-	LoginWithService(code string, serviceName string, appType string) (string, error)
-	GetUser(userEmail string, userConnectionType string) (entities.UserInfos, error)
-	ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error
-	DeleteAccount(userEmail string, userConnectionType string) error
+	CreateUser(userEmail, userPassword, userConnectionType string) error
+	LoginAuthentication(userEmail, userPassword, userConnectionType string) (string, error)
+	LoginWithService(code, serviceName, appType string) (string, error)
+	GetUser(userEmail, userConnectionType string) (entities.UserInfos, error)
+	ModifyPassword(userEmail, userConnectionType string, newPassword entities.UserModifyPassword) error
+	DeleteAccount(userEmail, userConnectionType string) error
 	FindUserById(userId string) (entities.User, error)
 }
 
@@ -34,31 +34,31 @@ type ServiceService interface {
 	GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetGitlabRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
-	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
-	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
-	GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error)
+	ExecuteApiRequest(url, method, typeToken, accessToken string, body io.Reader) (*http.Response, error)
+	GetResultTokenFromCode(code, serviceName, callbackType, appType string) (entities.ResultToken, error)
+	GetUserInfoFromService(accessToken, serviceName string) (entities.UserInfo, error)
 	RequestToTimeApi() (entities.TimeResponse, error)
-	OAuth2Service(serviceName string, callbackType string, appType string) (string, error)
+	OAuth2Service(serviceName, callbackType, appType string) (string, error)
 	RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error)
 	RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error)
 }
 
 type UserServiceService interface {
-	CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error)
-	UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error
-	RetrieveGithubUserRepositories(email string, connectionType string) ([]entities.GithubRepository, error)
-	RetrieveDiscordUserServers(email string, connectionType string) ([]map[string]interface{}, error)
-	RetrieveAsanaUserWorkspaces(email string, connectionType string) (entities.AsanaWorkspacesInfo, error)
-	RetrieveAsanaWorkspaceAssignees(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
-	RetrieveAsanaWorkspaceProjects(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
-	RetrieveAsanaWorkspaceTags(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error)
+	CallApiAndRefresh(email, connectionType, serviceName string) (string, error)
+	UpdateTokenForService(code, serviceName, appType, email string, connectionType string) error
+	RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error)
+	RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error)
+	RetrieveAsanaUserWorkspaces(email, connectionType string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceAssignees(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceProjects(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error)
+	RetrieveAsanaWorkspaceTags(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error)
 }
 
 type WorkflowService interface {
-	CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error
-	GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error)
+	CreateWorkflow(userEmail, userConnectionType string, newWorkflow entities.NewWorkflow) error
+	GetUserWorkflows(email, connectionType string) ([]entities.Workflow, error)
 	UpdateWorkflow(workflowId string, workflow entities.UpdatedWorkflow) error
-	DeleteWorkflow(email string, connectionType string, workflowId string) error
+	DeleteWorkflow(email, connectionType, workflowId string) error
 	CheckTimeAndDateActions() error
 	CheckGithubActions() error
 	CheckRedditActions() error
