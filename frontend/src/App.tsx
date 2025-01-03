@@ -10,6 +10,7 @@ import { NonExistantRoute } from './pages/NonExistantRoute'
 import DownloadMobileApk from './pages/ClientMobile'
 import ChangePasswordPage from './pages/ChangePassword'
 import ProtectedRoute from './ProtectedRoute'
+import RedirectRoute from './RedirectRoute'
 
 function App() {
   return (
@@ -23,9 +24,16 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <ProtectedRoute>
+                  <RedirectRoute dest='/explore'>
                     <HomePage />
-                  </ProtectedRoute>
+                  </RedirectRoute>
+                }
+              />
+
+              <Route
+                path="/explore"
+                element={
+                  <HomePage />
                 }
               />
 
