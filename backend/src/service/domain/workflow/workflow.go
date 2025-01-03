@@ -802,7 +802,6 @@ func (self *WorkflowService) upvoteDowvoteRedditPost(postId, accessToken string,
 
 	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
 	if err != nil {
-
 		return err
 	}
 	defer resp.Body.Close()
