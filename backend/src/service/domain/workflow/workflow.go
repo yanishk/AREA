@@ -771,6 +771,45 @@ func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) e
 	return nil
 }
 
+func (self *WorkflowService) postRedditComment(accessToken string, workflow entities.Workflow) error {
+	comment, commentExists := workflow.ReactionParam["comment"]
+	id, idExists := workflow.ReactionParam["id"]
+	if !commentExists || !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("thing_id", "t3_"+id.(string))
+	body.Set("text", comment.(string))
+	url := "https://oauth.reddit.com/api/comment"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) error {
+	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
+	if errReaction != nil {
+		return fmt.Errorf(errorRetrievingReaction)
+	}
+
+	accessToken, err := self.refreshTokenForService("Reddit", reactionFound.Name, self.redditReactions(), workflow)
+	if err != nil {
+		return fmt.Errorf(errorUpdatingToken)
+	}
+
+	switch reactionFound.Name {
+	case "Submit a comment on a post ":
+		return self.postRedditComment(accessToken, workflow)
+	}
+	return nil
+}
+
 func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSpotifyReactions(workflow)
 	self.checkDiscordReactions(workflow)
@@ -779,6 +818,7 @@ func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSMSReactions(workflow)
 	self.checkSendEmailReactions(workflow)
 	self.checkDropboxReactions(workflow)
+	self.checkRedditReactions(workflow)
 }
 
 func checkEveryHourParamValidity(minute interface{}) (float64, error) {
