@@ -228,18 +228,47 @@ func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entiti
 	message, messageErr := workflow.ReactionParam["message"]
 	channelID, channelErr := workflow.ReactionParam["channelid"]
 	if !messageErr || !channelErr {
-		return fmt.Errorf("Failed to get message body or channel id")
+		return fmt.Errorf(errorMissingField)
 	}
 
-	urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
-	content, errContent := json.Marshal(map[string]string{
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
+	content := map[string]string{
 		"content": message.(string),
-	})
-	if errContent != nil {
-		return fmt.Errorf("Failed to marshall message content")
 	}
 
-	resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) createDiscordThread(tokenBot string, workflow entities.Workflow) error {
+	title, titleErr := workflow.ReactionParam["title"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !titleErr || !channelErr {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/threads"
+	content := map[string]interface{}{
+		"name": title,
+		"type": 11,
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling, err)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
 	if errRequest != nil {
 		return errRequest
 	}
@@ -258,6 +287,8 @@ func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) e
 	switch reactionFound.Name {
 	case "Post a message to a channel":
 		return self.postDiscordMessage(tokenBot, workflow)
+	case "Create a thread in a channel":
+		return self.createDiscordThread(tokenBot, workflow)
 	}
 
 	return fmt.Errorf("Unknown reaction")
@@ -323,7 +354,7 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	res, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
@@ -367,7 +398,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
