@@ -230,7 +230,7 @@ func oauth2Dropbox(callbackType string) string {
 	return ("https://www.dropbox.com/oauth2/authorize?" +
 		clientIdParam + url.QueryEscape(os.Getenv("DROPBOX_CLIENT_ID")) +
 		redirectUriParam + callbackLink +
-		codeResponseType)
+		codeResponseType + "&token_access_type=offline")
 }
 
 func oauth2Gitlab(callbackType string) string {
