@@ -1532,7 +1532,7 @@ func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken strin
 
 func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, accessToken string) error {
 	createWebhookUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
-	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhook/Gitlab"
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
 	params := url.Values{}
 
 	params.Set("url", webhookUrl)
