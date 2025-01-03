@@ -1613,17 +1613,6 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, w
 	return nil
 }
 
-func unmarshalJsonToObject(jsonDataBytes []byte) (map[string]interface{}, error) {
-	jsonData := make(map[string]interface{})
-	if len(jsonDataBytes) > 0 {
-		err := json.Unmarshal(jsonDataBytes, &jsonData)
-		if err != nil {
-			return jsonData, err
-		}
-	}
-	return jsonData, nil
-}
-
 func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) {
 	var jsonData []map[string]interface{}
 	if len(jsonDataBytes) > 0 {
@@ -1663,7 +1652,7 @@ func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken strin
 	return res, nil
 }
 
-func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, accessToken string) error {
+func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessToken string) error {
 	createWebhookUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
 	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
 	params := url.Values{}
@@ -1682,7 +1671,7 @@ func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, acc
 	return nil
 }
 
-func (self *WorkflowService) isProjectWebhookPresent(projectId string, accessToken string) (bool, error) {
+func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken string) (bool, error) {
 	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
 	getWebhooksUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
 
