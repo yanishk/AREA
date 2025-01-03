@@ -34,6 +34,9 @@ const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
 
 const clientIdParam = "client_id="
+const clientSecretParam ="&client_secret="
+const codeParam = "&code="
+const grantTypeParam = "&grant_type"
 const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
 const codeResponseType = "&response_type=code"
@@ -386,12 +389,11 @@ func getGitlabOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 
 	tokenUrl := "https://gitlab.com/oauth/token"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
-		os.Getenv("GITLAB_CLIENT_ID"),
-		os.Getenv("GITLAB_CLIENT_SECRET"),
-		code,
-		gitlabCallback,
-		grantTypeAuthorization,
+		clientIdParam + os.Getenv("GITLAB_CLIENT_ID") +
+		clientSecretParam + os.Getenv("GITLAB_CLIENT_SECRET") +
+		codeParam + code +
+		redirectUriParam + gitlabCallback +
+		grantTypeParam + grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -417,12 +419,11 @@ func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 
 	tokenUrl := "https://app.asana.com/-/oauth_token"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
-		os.Getenv("ASANA_CLIENT_ID"),
-		os.Getenv("ASANA_CLIENT_SECRET"),
-		code,
-		asanaCallback,
-		grantTypeAuthorization,
+		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
+		clientSecretParam + os.Getenv("ASANA_CLIENT_SECRET") +
+		codeParam + code +
+		redirectUriParam + asanaCallback +
+		grantTypeParam + grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -448,12 +449,11 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 
 	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
-		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
-		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
-		code,
-		callback,
-		grantTypeAuthorization,
+		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
+		clientSecretParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")) +
+		codeParam + code +
+		redirectUriParam + callback +
+		grantTypeParam + grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
