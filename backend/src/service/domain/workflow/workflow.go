@@ -828,6 +828,30 @@ func (self *WorkflowService) downvoteRedditPost(accessToken string, workflow ent
 	return self.upvoteDowvoteRedditPost(id.(string), accessToken, -1)
 }
 
+func (self *WorkflowService) submitRedditPost(accessToken string, workflow entities.Workflow) error {
+	title, titleExists := workflow.ReactionParam["title"]
+	content, contentExists := workflow.ReactionParam["content"]
+	subreddit, subredditExists := workflow.ReactionParam["subreddit"]
+	if !titleExists || !contentExists || !subredditExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("title", title.(string))
+	body.Set("text", content.(string))
+	body.Set("sr", subreddit.(string))
+	body.Set("kind", "self")
+	url := "https://oauth.reddit.com/api/submit"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
 func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -846,6 +870,8 @@ func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) er
 		return self.downvoteRedditPost(accessToken, workflow)
 	case "Upvote a post":
 		return self.upvoteRedditPost(accessToken, workflow)
+	case "Submit a post":
+		return self.submitRedditPost(accessToken, workflow)
 	}
 	return nil
 }
