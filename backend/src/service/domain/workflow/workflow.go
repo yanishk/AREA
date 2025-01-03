@@ -647,32 +647,26 @@ func (self *WorkflowService) moveFileOrFolder(accessToken string, workflow entit
 	return nil
 }
 
-func (self *WorkflowService) createTextFile(accessToken string, workflow entities.Workflow) error {
-	name, nameExists := workflow.ReactionParam["name"]
-	content, contentExists := workflow.ReactionParam["content"]
-	path, pathExists := workflow.ReactionParam["path"]
-	if !nameExists || !contentExists || !pathExists {
-		return fmt.Errorf(errorMissingField)
+func concatanateSlashToPath(path, name string) string {
+	if path[0] != '/' {
+		path = "/" + path
+	}
+	if path[len(path)-1] != '/' {
+		path = path + "/"
 	}
 
-	if path.(string)[0] != '/' {
-		path = "/" + path.(string)
-	}
-	if path.(string)[len(path.(string))-1] != '/' {
-		path = path.(string) + "/"
-	}
+	return path + name
+}
 
-	filePath := path.(string) + name.(string) + ".txt"
-	url := "https://content.dropboxapi.com/2/files/upload"
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(content.(string))))
+func (self *WorkflowService) requestFileCreationModificationDropbox(url, accessToken, apiArg string, body io.Reader, workflow entities.Workflow) error {
+	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Authorization", bearerType+accessToken)
 	req.Header.Set("Content-Type", "application/octet-stream")
-	req.Header.Set("Dropbox-API-Arg", fmt.Sprintf(`{"autorename":false,"mode":"add","mute":false,"path":"%s","strict_conflict":false}`, filePath))
+	req.Header.Set("Dropbox-API-Arg", apiArg)
 
 	res, err := self.ServiceService.ExecuteRequest(req)
 	if err != nil {
@@ -681,6 +675,21 @@ func (self *WorkflowService) createTextFile(accessToken string, workflow entitie
 	defer res.Body.Close()
 
 	return nil
+}
+
+func (self *WorkflowService) createTextFile(accessToken string, workflow entities.Workflow) error {
+	name, nameExists := workflow.ReactionParam["name"]
+	content, contentExists := workflow.ReactionParam["content"]
+	path, pathExists := workflow.ReactionParam["path"]
+	if !nameExists || !contentExists || !pathExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	filePath := concatanateSlashToPath(path.(string), name.(string))
+	url := "https://content.dropboxapi.com/2/files/upload"
+	arg := fmt.Sprintf(`{"autorename":false,"mode":"add","mute":false,"path":"%s","strict_conflict":false}`, filePath)
+
+	return self.requestFileCreationModificationDropbox(url, accessToken, arg, bytes.NewBuffer([]byte(content.(string))), workflow)
 }
 
 func (self *WorkflowService) downloadFileFromDropbox(accessToken string, filePath string) (string, error) {
@@ -716,38 +725,17 @@ func (self *WorkflowService) appendTextFile(accessToken string, workflow entitie
 		return fmt.Errorf(errorMissingField)
 	}
 
-	if path.(string)[0] != '/' {
-		path = "/" + path.(string)
-	}
-	if path.(string)[len(path.(string))-1] != '/' {
-		path = path.(string) + "/"
-	}
-
-	filePath := path.(string) + name.(string) + ".txt"
+	filePath := concatanateSlashToPath(path.(string), name.(string))
 	contentAppend, err := self.downloadFileFromDropbox(accessToken, filePath)
 	if err != nil {
 		return err
 	}
 
-	url := "https://content.dropboxapi.com/2/files/upload"
 	contentAppend = contentAppend + content.(string)
+	url := "https://content.dropboxapi.com/2/files/upload"
+	arg := fmt.Sprintf(`{"autorename":false,"mode":"overwrite","mute":false,"path":"%s","strict_conflict":false}`, filePath)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(contentAppend)))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", bearerType+accessToken)
-	req.Header.Set("Content-Type", "application/octet-stream")
-	req.Header.Set("Dropbox-API-Arg", fmt.Sprintf(`{"autorename":false,"mode":"overwrite","mute":false,"path":"%s","strict_conflict":false}`, filePath))
-
-	res, err := self.ServiceService.ExecuteRequest(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	return nil
+	return self.requestFileCreationModificationDropbox(url, accessToken, arg, bytes.NewBuffer([]byte(contentAppend)), workflow)
 }
 
 func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) error {
