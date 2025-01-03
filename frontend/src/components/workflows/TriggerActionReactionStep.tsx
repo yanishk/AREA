@@ -1,14 +1,10 @@
 import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateSteps";
+import { fieldType } from "../../utils/fieldType";
 import { getFieldValues } from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
-
-enum fieldType {
-    SELECT = "select",
-    INPUT = "input",
-}
 
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
