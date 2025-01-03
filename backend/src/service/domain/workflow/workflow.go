@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"backend/src/entities"
@@ -792,6 +793,41 @@ func (self *WorkflowService) postRedditComment(accessToken string, workflow enti
 	return nil
 }
 
+func (self *WorkflowService) upvoteDowvoteRedditPost(postId, accessToken string, vote int) error {
+	body := url.Values{}
+	body.Set("id", "t3_"+postId)
+	body.Set("dir", strconv.Itoa(vote))
+
+	url := "https://oauth.reddit.com/api/vote"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) upvoteRedditPost(accessToken string, workflow entities.Workflow) error {
+	id, idExists := workflow.ReactionParam["id"]
+	if !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	return self.upvoteDowvoteRedditPost(id.(string), accessToken, 1)
+}
+
+func (self *WorkflowService) downvoteRedditPost(accessToken string, workflow entities.Workflow) error {
+	id, idExists := workflow.ReactionParam["id"]
+	if !idExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	return self.upvoteDowvoteRedditPost(id.(string), accessToken, -1)
+}
+
 func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -806,6 +842,10 @@ func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) er
 	switch reactionFound.Name {
 	case "Submit a comment on a post ":
 		return self.postRedditComment(accessToken, workflow)
+	case "Downvote a post":
+		return self.downvoteRedditPost(accessToken, workflow)
+	case "Upvote a post":
+		return self.upvoteRedditPost(accessToken, workflow)
 	}
 	return nil
 }
