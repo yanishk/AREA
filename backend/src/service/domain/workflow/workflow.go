@@ -332,7 +332,7 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
 	message, messageErr := workflow.ReactionParam["message"]
 	if !messageErr {
-		return fmt.Errorf("Failed to get message body")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -370,7 +370,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 	message, messageErr := workflow.ReactionParam["message"]
 	urlPost, urlErr := workflow.ReactionParam["url"]
 	if !messageErr || !urlErr {
-		return fmt.Errorf("Failed to get message body or URL")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -1033,7 +1033,7 @@ func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.Tim
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !hourExists || !minuteExists {
-		return fmt.Errorf("Error in the hour and minute sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
@@ -1052,7 +1052,7 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayArray, ok := days.([]interface{})
@@ -1080,7 +1080,7 @@ func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entit
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
@@ -1101,7 +1101,7 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists || !monthExists {
-		return fmt.Errorf("Error in the minute, hour, day or month sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	monthNumber, dayNumber, hourNumber, minuteNumber, err := checkEveryYearParamValidity(month, day, hour, minute)
