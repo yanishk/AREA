@@ -852,6 +852,30 @@ func (self *WorkflowService) submitRedditPost(accessToken string, workflow entit
 	return nil
 }
 
+func (self *WorkflowService) submitRedditPostLink(accessToken string, workflow entities.Workflow) error {
+	title, titleExists := workflow.ReactionParam["title"]
+	link, linkExists := workflow.ReactionParam["link"]
+	subreddit, subredditExists := workflow.ReactionParam["subreddit"]
+	if !titleExists || !linkExists || !subredditExists {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	body := url.Values{}
+	body.Set("title", title.(string))
+	body.Set("url", link.(string))
+	body.Set("sr", subreddit.(string))
+	body.Set("kind", "link")
+	url := "https://oauth.reddit.com/api/submit"
+
+	resp, err := self.executeRedditRequest("POST", url, accessToken, strings.NewReader(body.Encode()))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
 func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -872,6 +896,8 @@ func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) er
 		return self.upvoteRedditPost(accessToken, workflow)
 	case "Submit a post":
 		return self.submitRedditPost(accessToken, workflow)
+	case "Submit a post with a link":
+		return self.submitRedditPostLink(accessToken, workflow)
 	}
 	return nil
 }
