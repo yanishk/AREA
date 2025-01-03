@@ -1,6 +1,7 @@
 package workflow_handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,15 @@ func NewWorkflowHandler(WorkflowService service.WorkflowService, UserService ser
 }
 
 func (self *WorkflowHandler) setupRoutes(router *gin.Engine) {
+	self.publicRoutes(router)
 	self.privateRoutes(router)
+}
+
+func (self *WorkflowHandler) publicRoutes(router *gin.Engine) {
+	webhook := router.Group("/webhooks")
+	{
+		webhook.POST("/:service", self.receiveServiceWebhook)
+	}
 }
 
 func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
@@ -40,6 +49,23 @@ func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 		workflow.PUT("/:id", self.updateWorkflow)
 		workflow.DELETE("/:id", self.deleteWorkflow)
 	}
+}
+
+// // @Summary		Receive Service Webhook
+// // @Description	Receive webhook from a service
+// // @Tags			Webhooks
+// // @Produce		json
+// @Success		200		{object}	docs_service.WorkflowReceiveServiceWeebhookSuccessResponse
+// // @Router		/webhooks/{service} [post]
+func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
+    serviceName := context.Param("service")
+
+    if serviceName == "Gitlab" {
+        fmt.Println("Gitlab webhook received!")
+    }
+    context.IndentedJSON(http.StatusOK, gin.H{
+        "success": "Webhook received",
+    })
 }
 
 // @Summary		Create Workflow
