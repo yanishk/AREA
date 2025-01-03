@@ -18,14 +18,9 @@ func main() {
 	handlers := handler.New(services)
 
 	cronJob := cron.New()
-	_, errCronCreationEvery15Seconds := cronJob.AddFunc("@every 15s", func() {
-		services.WorkflowService.CheckNewGitlabWorkflows()
-	})
-	if errCronCreationEvery15Seconds != nil {
-		panic(errCronCreationEvery15Seconds)
-	}
 	_, errCronCreationEveryMinute := cronJob.AddFunc("@every 1m", func() {
 		services.WorkflowService.CheckTimeAndDateActions()
+		services.WorkflowService.CheckNewGitlabWorkflows()
 	})
 	if errCronCreationEveryMinute != nil {
 		panic(errCronCreationEveryMinute)
