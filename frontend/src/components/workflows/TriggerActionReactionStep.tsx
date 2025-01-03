@@ -94,11 +94,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         values={itemFieldValues}
                         onChange={(id, value) => handleFieldChange(id, value, type)}
                     />
-                    {/* <DynamicFields
-                        fields={fields}
-                        values={itemFieldValues}
-                        onChange={(id, value) => handleFieldChange(id, value, type)}
-                    /> */}
                     <TriggerButton
                         text="Create Trigger"
                         textColor="text-black"

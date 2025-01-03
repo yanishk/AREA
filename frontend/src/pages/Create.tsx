@@ -429,6 +429,35 @@ const WorkflowBuilder = () => {
         getDataFromUrl();
     }, []);
 
+    useEffect(() => {
+        if (selectedAction?.parameters) {
+            const defaultValues: Record<string, string> = {};
+
+            selectedAction.parameters.forEach((param) => {
+                const options = getFieldValues(param);
+
+                if (options && options.length > 0) {
+                    defaultValues[param.name] = options[0];
+                }
+            });
+            setActionFieldValues((prev) => ({ ...defaultValues, ...prev }));
+        }
+
+        if (selectedReaction?.parameters) {
+            const defaultValues: Record<string, string> = {};
+
+            selectedReaction.parameters.forEach((param) => {
+                const options = getFieldValues(param);
+
+                if (options && options.length > 0) {
+                    defaultValues[param.name] = options[0];
+                }
+
+            });
+            setReactionFieldValues((prev) => ({ ...defaultValues, ...prev }));
+        }
+    }, [selectedAction, selectedReaction]);
+
     const getIndexFromValues = (value: string, valuesArray: string[]): number | null => {
         const index = valuesArray.indexOf(value);
 
