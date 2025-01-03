@@ -10,6 +10,7 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper";
 
 const AccountPage = () => {
     const [userEmail, setUserEmail] = useState("");
+    const [userConnectionType, setUserConnectionType] = useState("");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
     const { logout } = useAuth();
@@ -20,6 +21,7 @@ const AccountPage = () => {
                 withCredentials: true,
             });
             setUserEmail(result.data.user.email);
+            setUserConnectionType(result.data.user.connectiontype);
         } catch (error) {
             console.error("Failed to get email : ", error);
         }
@@ -139,28 +141,32 @@ const AccountPage = () => {
                     <div
                         className="flex flex-col justify-start mt-4 w-full"
                     >
-                        <p
-                            className="font-extrabold text-[22.5px] mt-[6px]"
-                        >
-                            Password
-                        </p>
-                        <input
-                            className="text-[1.6em] mt-2 font-mono"
-                            type="password"
-                            name="password"
-                            value="****************"
-                            disabled={true}
-                        />
-                        <div
-                            className="flex justify-start mt-2"
-                        >
-                            <button
-                                className="font-[700] text-[20px] text-[#0099FF] hover:text-[#1BA3FF] hover:cursor-pointer"
-                                onClick={handleChangePassword}
-                            >
-                                Change password
-                            </button>
-                        </div>
+                        {userConnectionType === "basic" && (
+                            <>
+                                <p
+                                    className="font-extrabold text-[22.5px] mt-[6px]"
+                                >
+                                    Password
+                                </p>
+                                <input
+                                    className="text-[1.6em] mt-2 font-mono"
+                                    type="password"
+                                    name="password"
+                                    value="****************"
+                                    disabled={true}
+                                />
+                                <div
+                                    className="flex justify-start mt-2"
+                                >
+                                    <button
+                                        className="font-[700] text-[20px] text-[#0099FF] hover:text-[#1BA3FF] hover:cursor-pointer"
+                                        onClick={handleChangePassword}
+                                    >
+                                        Change password
+                                    </button>
+                                </div>
+                            </>
+                        )}
 
                         <div
                             className="flex justify-start mt-6"
