@@ -69,6 +69,16 @@ func (self *WorkflowService) dropboxReactions() []string {
 	}
 }
 
+func (self *WorkflowService) redditReactions() []string {
+	return []string{
+		"Submit a comment on a post ",
+		"Upvote a post",
+		"Downvote a post",
+		"Submit a post",
+		"Submit a post with a link",
+	}
+}
+
 func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepository storage.UserRepository,
 	ActionRepository storage.ActionRepository, ReactionRepository storage.ReactionRepository,
 	ServiceService service.ServiceService, UserServiceService service.UserServiceService) *WorkflowService {
