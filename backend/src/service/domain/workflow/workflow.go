@@ -219,8 +219,33 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 
 	if resp != nil {
 		defer resp.Body.Close()
+		return nil
 	}
 	return fmt.Errorf("Unknown reaction")
+}
+
+func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !messageErr || !channelErr {
+		return fmt.Errorf("Failed to get message body or channel id")
+	}
+
+	urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
+	content, errContent := json.Marshal(map[string]string{
+		"content": message.(string),
+	})
+	if errContent != nil {
+		return fmt.Errorf("Failed to marshall message content")
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) error {
@@ -230,27 +255,11 @@ func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	if reactionFound.Name == "Post a message to a channel" {
-		message, messageErr := workflow.ReactionParam["message"]
-		channelID, channelErr := workflow.ReactionParam["channelid"]
-		if !messageErr || !channelErr {
-			return fmt.Errorf("Failed to get message body or channel id")
-		}
-
-		urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
-		content, errContent := json.Marshal(map[string]string{
-			"content": message.(string),
-		})
-		if errContent != nil {
-			return fmt.Errorf("Failed to marshall message content")
-		}
-
-		resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
-		if errRequest != nil {
-			return errRequest
-		}
-		defer resp.Body.Close()
+	switch reactionFound.Name {
+	case "Post a message to a channel":
+		return self.postDiscordMessage(tokenBot, workflow)
 	}
+
 	return fmt.Errorf("Unknown reaction")
 }
 
