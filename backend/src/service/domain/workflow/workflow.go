@@ -93,7 +93,7 @@ func NewWorkflowService(WorkflowRepository storage.WorkflowRepository, UserRepos
 	}
 }
 
-func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType string, newWorkflow entities.NewWorkflow) error {
+func (self *WorkflowService) CreateWorkflow(userEmail, userConnectionType string, newWorkflow entities.NewWorkflow) error {
 	userFound, errFindingUser := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if errFindingUser != nil {
 		return errFindingUser
@@ -107,7 +107,7 @@ func (self *WorkflowService) CreateWorkflow(userEmail string, userConnectionType
 	return nil
 }
 
-func (self *WorkflowService) GetUserWorkflows(email string, connectionType string) ([]entities.Workflow, error) {
+func (self *WorkflowService) GetUserWorkflows(email, connectionType string) ([]entities.Workflow, error) {
 	userFound, errUserFound := self.UserRepository.FindUserByEmail(email, connectionType)
 	if errUserFound != nil {
 		return nil, errUserFound
@@ -152,7 +152,7 @@ func (self *WorkflowService) UpdateWorkflow(workflowId string, workflow entities
 	return nil
 }
 
-func (self *WorkflowService) DeleteWorkflow(email string, connectionType string, workflowId string) error {
+func (self *WorkflowService) DeleteWorkflow(email, connectionType, workflowId string) error {
 	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
 	if err != nil {
 		return err
@@ -704,7 +704,7 @@ func (self *WorkflowService) createTextFile(accessToken string, workflow entitie
 	return self.requestFileCreationModificationDropbox(url, accessToken, arg, bytes.NewBuffer([]byte(content.(string))), workflow)
 }
 
-func (self *WorkflowService) downloadFileFromDropbox(accessToken string, filePath string) (string, error) {
+func (self *WorkflowService) downloadFileFromDropbox(accessToken, filePath string) (string, error) {
 	url := "https://content.dropboxapi.com/2/files/download"
 
 	req, err := http.NewRequest("POST", url, nil)
@@ -1501,7 +1501,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 	return nil
 }
 
-func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken string, endpoint string) (*http.Response, error) {
+func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
 		return nil, fmt.Errorf("Invalid repository")
