@@ -63,6 +63,7 @@ type WorkflowService interface {
 	CheckGithubActions() error
 	CheckRedditActions() error
 	CheckWeatherActions() error
+	CheckNewGitlabWorkflows() error
 }
 
 type AboutService interface {

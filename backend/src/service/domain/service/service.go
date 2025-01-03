@@ -36,7 +36,7 @@ const oneYearSecond = 31536000
 const clientIdParam = "client_id="
 const clientSecretParam = "&client_secret="
 const codeParam = "&code="
-const grantTypeParam = "&grant_type"
+const grantTypeParam = "&grant_type="
 const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
 const codeResponseType = "&response_type=code"
@@ -743,7 +743,6 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 
 	res, err := self.ExecuteRequest(request)
 	if err != nil {
-		fmt.Println("err 1 result token form code:", err)
 		return tokenRes, err
 	}
 	defer res.Body.Close()

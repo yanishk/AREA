@@ -1514,3 +1514,94 @@ func (self *WorkflowService) CheckGithubActions() error {
 	}
 	return nil
 }
+
+func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", bearerType+accessToken)
+	req.Header.Set(contentType, "application/x-www-form-urlencoded")
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, accessToken string) error {
+	createWebhookUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhook/Gitlab"
+	params := url.Values{}
+
+	params.Set("url", webhookUrl)
+	params.Set("push_events", "true")
+	res, err := self.ExecuteGitlabRequest("POST", createWebhookUrl, accessToken, bytes.NewBufferString(params.Encode()))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Workflow, accessToken string) error {
+	_, webhookActivatedExists := workflow.ActionData["webhook_activated"]
+	projectId, projectIdExists := workflow.ActionParam["id"]
+	if !projectIdExists {
+		return fmt.Errorf("Error in the id sent")
+	}
+
+	projectIdString, projectIdIsString := projectId.(string)
+	if !projectIdIsString {
+		return fmt.Errorf("Error in the project id sent")
+	}
+
+	if !webhookActivatedExists {
+		self.createNewWorkflowGitlabWebhook(projectIdString, accessToken)
+		workflow.ActionData = make(map[string]interface{})
+		workflow.ActionData["webhook_activated"] = true
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNewWorkflowsGitlabWebhook(action entities.Action) error {
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		accessToken, err := self.getAccessToken("Gitlab", workflow)
+		if err != nil {
+			continue
+		}
+		self.checkNewWorkflowGitlabWebhook(workflow, accessToken)
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckNewGitlabWorkflows() error {
+	service, err := self.ServiceService.FindServiceByName("Gitlab")
+	if err != nil {
+		return err
+	}
+
+	actions, err := self.ActionRepository.FindActionsByServiceId(service.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, action := range actions {
+		err := self.checkNewWorkflowsGitlabWebhook(action)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
