@@ -92,6 +92,12 @@ definitions:
         example: url-example.com
         type: string
     type: object
+  docs_service.ServiceReceiveServiceWeebhookSuccessResponse:
+    properties:
+      success:
+        example: Webhook received
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse:
     properties:
       error:

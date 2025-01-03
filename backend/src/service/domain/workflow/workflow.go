@@ -38,7 +38,7 @@ const errorMarshaling = "Could not marshal JSON"
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
 
-func (self *WorkflowService) spotifyReactions() []string {
+func spotifyReactions() []string {
 	return []string{
 		"Start playback",
 		"Pause playback",
@@ -48,21 +48,21 @@ func (self *WorkflowService) spotifyReactions() []string {
 	}
 }
 
-func (self *WorkflowService) linkedinReactions() []string {
+func linkedinReactions() []string {
 	return []string{
 		"Share an update",
 		"Share a link",
 	}
 }
 
-func (self *WorkflowService) asanaReactions() []string {
+func asanaReactions() []string {
 	return []string{
 		"Create task",
 		"Create project",
 	}
 }
 
-func (self *WorkflowService) dropboxReactions() []string {
+func dropboxReactions() []string {
 	return []string{
 		"Move file or folder",
 		"Create a text file",
@@ -70,13 +70,47 @@ func (self *WorkflowService) dropboxReactions() []string {
 	}
 }
 
-func (self *WorkflowService) redditReactions() []string {
+func redditReactions() []string {
 	return []string{
 		"Submit a comment on a post ",
 		"Upvote a post",
 		"Downvote a post",
 		"Submit a post",
 		"Submit a post with a link",
+	}
+}
+
+func webhooksEventsToActions() map[string]string {
+	return map[string]string{
+		"Push Hook": "New push",
+		"Merge Request Hook": "Merge request update",
+		"Issue Hook": "Issue update",
+		"Note Hook": "Comment update",
+		"Tag Push Hook": "New tag push",
+		"Wiki Page Hook": "Wiki page update",
+		"Release Hook": "Release update",
+		"Feature Flag Hook": "Feature flag update",
+		"Pipeline Hook": "Pipeline update",
+		"Job Hook": "Job update",
+		"Deployment Hook": "Deployment update",
+		"Emoji Hook": "Emoji update",
+	}
+}
+
+func gitlabWebhookEventsToState() map[string]string {
+	return map[string]string{
+		"push_events": "true",
+		"issues_events": "true",
+		"merge_requests_events": "true",
+		"tag_push_events": "true",
+		"note_events": "true",
+		"job_events": "true",
+		"pipeline_events": "true",
+		"wiki_page_events": "true",
+		"deployment_events": "true",
+		"releases_events": "true",
+		"feature_flag_events": "true",
+		"emoji_events": "true",
 	}
 }
 
@@ -186,7 +220,7 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Spotify", reactionFound.Name, self.spotifyReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Spotify", reactionFound.Name, spotifyReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -414,7 +448,7 @@ func (self *WorkflowService) checkLinkedinReactions(workflow entities.Workflow) 
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Linkedin", reactionFound.Name, self.linkedinReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Linkedin", reactionFound.Name, linkedinReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -532,7 +566,7 @@ func (self *WorkflowService) checkAsanaReactions(workflow entities.Workflow) err
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Asana", reactionFound.Name, self.asanaReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Asana", reactionFound.Name, asanaReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -796,7 +830,7 @@ func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Dropbox", reactionFound.Name, self.dropboxReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Dropbox", reactionFound.Name, dropboxReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -921,7 +955,7 @@ func (self *WorkflowService) checkRedditReactions(workflow entities.Workflow) er
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Reddit", reactionFound.Name, self.redditReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Reddit", reactionFound.Name, redditReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -1689,6 +1723,228 @@ func (self *WorkflowService) CheckGithubActions() error {
 
 	for _, action := range actions {
 		err := self.checkWorkflowsWithGithubActions(action)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getGitlabIdActionParam(workflow entities.Workflow) (string, error) {
+	projectId, projectIdExists := workflow.ActionParam["project"]
+	if !projectIdExists {
+		return "", fmt.Errorf("Error in the id sent")
+	}
+
+	projectIdString, projectIdIsString := projectId.(string)
+	if !projectIdIsString {
+		return "", fmt.Errorf("Error in the project id sent")
+	}
+	return projectIdString, nil
+}
+
+func (self *WorkflowService) checkGitlabWebhooksWorkflow(workflow entities.Workflow, webhookProjectId int) error {
+	webhookProjectIdString := strconv.Itoa(webhookProjectId)
+	userProjectIdString, err := getGitlabIdActionParam(workflow)
+	if err != nil {
+		return err
+	}
+
+	if (userProjectIdString == webhookProjectIdString) {
+		self.checkReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, webhookJsonDataBytes []byte, eventsToActions map[string]string) error {
+	var webhookResponse entities.GitlabWebhookResponse
+	if len(webhookJsonDataBytes) > 0 {
+		err := json.Unmarshal(webhookJsonDataBytes, &webhookResponse)
+		if err != nil {
+			return err
+		}
+	}
+	if (webhookResponse.Project.Id == 0) {
+		return fmt.Errorf("Incorrect project id")
+	}
+
+	eventName := headers["X-Gitlab-Event"][0]
+	actionName, actionNameExists := eventsToActions[eventName]
+	if !actionNameExists {
+		return fmt.Errorf("No action mapped with this event")
+	}
+
+	action, err := self.ActionRepository.FindActionByName(actionName)
+	if err != nil {
+		return err
+	}
+
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		if !workflow.IsActivated {
+			continue
+		}
+		self.checkGitlabWebhooksWorkflow(workflow, webhookResponse.Project.Id)
+	}
+	return nil
+}
+
+func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) {
+	var jsonData []map[string]interface{}
+	if len(jsonDataBytes) > 0 {
+		err := json.Unmarshal(jsonDataBytes, &jsonData)
+		if err != nil {
+			return jsonData, err
+		}
+	}
+	return jsonData, nil
+}
+
+func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, request *http.Request) error {
+	webhookJsonDataBytes, err := io.ReadAll(request.Body)
+	if err != nil {
+		return err
+	}
+
+	switch serviceName {
+	case "Gitlab":
+        return self.checkGitlabWebhooksWorkflows(request.Header, webhookJsonDataBytes, webhooksEventsToActions())
+    }
+	return nil
+}
+
+func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", bearerType+accessToken)
+	req.Header.Set(contentType, "application/x-www-form-urlencoded")
+
+	res, err := self.ServiceService.ExecuteRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessToken string) error {
+	createWebhookUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
+	params := url.Values{}
+
+	params.Set("url", webhookUrl)
+	for webhookEvent, webhookState := range gitlabWebhookEventsToState() {
+		params.Set(webhookEvent, webhookState)
+	}
+
+	res, err := self.ExecuteGitlabRequest("POST", createWebhookUrl, accessToken, bytes.NewBufferString(params.Encode()))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken string) (bool, error) {
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
+	getWebhooksUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
+
+	res, err := self.ExecuteGitlabRequest("GET", getWebhooksUrl, accessToken, nil)
+	if err != nil {
+		return false, err
+	}
+	defer res.Body.Close()
+
+	webhooksJsonDataBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return false, err
+	}
+
+	webhooksJsonData, err := unmarshalJsonToMap(webhooksJsonDataBytes)
+	if err != nil {
+		return false, err
+	}
+
+	if (len(webhooksJsonData) == 0) {
+		return false, nil
+	}
+
+	for _, webhookJsonData := range webhooksJsonData {
+		url, urlExists := webhookJsonData["url"]
+		if !urlExists {
+			return false, fmt.Errorf("Error in the url received")
+		}
+
+		urlString, urlIsString := url.(string)
+		if !urlIsString {
+			return false, fmt.Errorf("Error in the url received")
+		}
+
+		if (urlString == webhookUrl) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Workflow, accessToken string) error {
+	projectIdString, err := getGitlabIdActionParam(workflow)
+	if err != nil {
+		return err
+	}
+
+	isWebhookPresent, err := self.isProjectWebhookPresent(projectIdString, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if !isWebhookPresent {
+		self.createNewWorkflowGitlabWebhook(projectIdString, accessToken)
+		workflow.ActionData = make(map[string]interface{})
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNewWorkflowsGitlabWebhook(action entities.Action) error {
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		accessToken, err := self.getAccessToken("Gitlab", workflow)
+		if err != nil {
+			continue
+		}
+		self.checkNewWorkflowGitlabWebhook(workflow, accessToken)
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckNewGitlabWorkflows() error {
+	service, err := self.ServiceService.FindServiceByName("Gitlab")
+	if err != nil {
+		return err
+	}
+
+	actions, err := self.ActionRepository.FindActionsByServiceId(service.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, action := range actions {
+		err := self.checkNewWorkflowsGitlabWebhook(action)
 		if err != nil {
 			return err
 		}
