@@ -233,6 +233,17 @@ func oauth2Dropbox(callbackType string) string {
 		codeResponseType)
 }
 
+func oauth2Gitlab(callbackType string) string {
+	callbackLink, _ := getCallbackAndClientId(callbackType, "GITLAB", false)
+
+	return ("https://gitlab.com/oauth/authorize?" +
+		clientIdParam + os.Getenv("GITLAB_CLIENT_ID") +
+		codeResponseType +
+		redirectUriParam + callbackLink +
+		stateParam + os.Getenv("GITLAB_STATE") +
+		"&scope=api read_api read_user read_repository write_repository")
+}
+
 func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
 	var authUrl string
 
@@ -252,6 +263,8 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = oauth2Linkedin(callbackType)
 	} else if serviceName == "Dropbox" {
 		authUrl = oauth2Dropbox(callbackType)
+	} else if serviceName == "Gitlab" {
+		authUrl = oauth2Gitlab(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(unknownServiceMessage)
 	}
