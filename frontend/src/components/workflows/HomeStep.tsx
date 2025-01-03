@@ -1,5 +1,6 @@
-import { servicesData } from "../../ServicesData";
+import { ActionType } from "../../utils/ActionType";
 import Steps from "../../utils/CreateSteps";
+import { ReactionType } from "../../utils/ReactionType";
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
 import ButtonThenCustom from "../buttons/ButtonThenCustom";
@@ -7,18 +8,9 @@ import ButtonThenDefault from "../buttons/ButtonThenDefault";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 
-interface Action {
-    name: string;
-    id: string;
-}
-
-interface Reaction {
-    name: string;
-    id: string;
-}
 interface HomeStepProps {
-    selectedAction: Action | null;
-    selectedReaction: Reaction | null;
+    selectedAction: ActionType | null;
+    selectedReaction: ReactionType | null;
     selectedServiceAction: { name: string; color: string; iconPath: string } | null;
     selectedServiceReaction: { name: string; color: string; iconPath: string } | null;
     goToStep: (step: number) => void;
@@ -44,44 +36,29 @@ const HomeStep: React.FC<HomeStepProps> = ({
     handleContinue,
 }) => {
 
-    const isTriggerable = (serviceName: string, actionOrReactionName: string, type: "action" | "reaction"): boolean => {
-        const service = servicesData[serviceName];
-
-        if (!service) {
-            return false;
-        }
-
-        if (type === "action" && service.actions) {
-            const action = service.actions[actionOrReactionName];
-
-            if (!action) {
-                return false;
+    const isTriggerable = (type: "action" | "reaction"): boolean => {
+        if (type === "action") {
+            if (selectedAction?.parameters != null) {
+                return true;
             }
-
-            return action.some((actionData) => actionData.trigger === "yes");
         }
 
-        if (type === "reaction" && service.reactions) {
-            const reaction = service.reactions[actionOrReactionName];
-
-            if (!reaction) {
-                return false;
+        if (type === "reaction") {
+            if (selectedReaction?.parameters != null) {
+                return true;
             }
-
-            return reaction.some((reactionData) => reactionData.trigger === "yes");
         }
-
         return false;
     };
 
     const isActionTriggerable =
         selectedServiceAction && selectedAction
-            ? isTriggerable(selectedServiceAction.name, selectedAction.name, "action")
+            ? isTriggerable("action")
             : false;
 
     const isReactionTriggerable =
         selectedServiceReaction && selectedReaction
-            ? isTriggerable(selectedServiceReaction.name, selectedReaction.name, "reaction")
+            ? isTriggerable("reaction")
             : false;
 
     return (

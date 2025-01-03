@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import {useEffect, useState } from "react";
 import axios from "axios";
-import {servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
 import SummaryStep from "../components/workflows/SummaryStep";
 import SelectActionReactionStep from "../components/workflows/SelectActionReactionStep";
@@ -11,6 +10,8 @@ import TriggerActionReactionStep from "../components/workflows/TriggerActionReac
 import Steps from "../utils/CreateSteps";
 import { getFieldValues } from "../utils/getFieldValues";
 import { Parameters } from "../utils/ActionReactionParameters";
+import { ActionType } from "../utils/ActionType";
+import { ReactionType } from "../utils/ReactionType";
 
 type availableActionsType = {
     name: string;
@@ -30,18 +31,7 @@ type selectedServiceType = {
     name: string;
     color: string;
     iconPath: string;
-};
-
-type selectedActionType = {
-    name: string;
-    id: string;
-    parameters: Parameters[];
-};
-
-type selectedReactionType = {
-    name: string;
-    id: string;
-    parameters: Parameters[];
+    isauthneeded: boolean;
 };
 
 const WorkflowBuilder = () => {
@@ -51,8 +41,8 @@ const WorkflowBuilder = () => {
     const [selectedReactionService, setSelectedReactionService] = useState<selectedServiceType | null>(null);
     const [availableActions, setAvailableActions] = useState<availableActionsType[]>([]);
     const [availableReactions, setAvailableReactions] = useState<availableReactionsType[]>([]);
-    const [selectedAction, setSelectedAction] = useState<selectedActionType | null>(null);
-    const [selectedReaction, setSelectedReaction] = useState<selectedReactionType | null>(null);
+    const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
+    const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(null);
     const [actionFieldValues, setActionFieldValues] = useState<Record<string, string>>({});
     const [reactionFieldValues, setReactionFieldValues] = useState<Record<string, string>>({});
     const [actionServices, setActionServices] = useState([]);
@@ -132,6 +122,7 @@ const WorkflowBuilder = () => {
                 name: service.name,
                 color: service.color,
                 iconPath: service.logo,
+                isauthneeded: service.isauthneeded,
             }));
             setActionServices(propertiesServices);
         } catch (err) {
@@ -184,6 +175,7 @@ const WorkflowBuilder = () => {
                 name: service.name,
                 color: service.color,
                 iconPath: service.logo,
+                isauthneeded: service.isauthneeded,
             }));
             setReactionServices(propertiesServices);
         } catch (err) {
@@ -237,47 +229,32 @@ const WorkflowBuilder = () => {
     }, [currentStep]);
 
     const isRequiredConnection = (
-        serviceName: string,
         type: "action" | "reaction",
-        actionOrReactionName?: string
     ): boolean => {
-        const service = servicesData[serviceName];
-        if (!service || !actionOrReactionName) {
-            return false;
-        }
-
         if (type === "action") {
-            const action = service.actions?.[actionOrReactionName];
-
-            if (!action) {
-                return false;
+            if (selectedActionService?.isauthneeded === true) {
+                return true;
             }
-
-            return action.some((actionData) => actionData.auth === "yes");
         }
 
         if (type === "reaction") {
-            const reaction = service.reactions?.[actionOrReactionName];
-
-            if (!reaction) {
-                return false;
+            if (selectedReactionService?.isauthneeded === true) {
+                return true;
             }
-
-            return reaction.some((reactionData) => reactionData.auth === "yes");
         }
 
         return false;
     };
 
-    const handleSelectActionService = (name: string, color: string, iconPath: string) => {
-        setSelectedActionService({ name, color, iconPath });
+    const handleSelectActionService = (name: string, color: string, iconPath: string, isauthneeded: boolean) => {
+        setSelectedActionService({ name, color, iconPath, isauthneeded });
         goToStep(Steps.SELECT_ACTION);
     };
 
     const handleSelectAction = (name: string, id: string, parameters: Parameters[]) => {
         setSelectedAction({ name, id, parameters });
 
-        if (selectedActionService?.name && isRequiredConnection(selectedActionService.name, "action", name)) {
+        if (selectedActionService?.name && isRequiredConnection("action")) {
             goToStep(Steps.CONNECT_ACTION_SERVICE);
         } else {
             goToStep(Steps.TRIGGER_ACTION);
@@ -302,15 +279,15 @@ const WorkflowBuilder = () => {
         }
     }
 
-    const handleSelectReactionService = (name: string, color: string, iconPath: string) => {
-        setSelectedReactionService({ name, color, iconPath });
+    const handleSelectReactionService = (name: string, color: string, iconPath: string, isauthneeded: boolean) => {
+        setSelectedReactionService({ name, color, iconPath, isauthneeded });
         goToStep(Steps.SELECT_REACTION);
     };
 
     const handleSelectReaction = (name: string, id: string, parameters: Parameters[]) => {
         setSelectedReaction({ name, id, parameters});
 
-        if (selectedReactionService?.name && isRequiredConnection(selectedReactionService.name, "reaction", name)) {
+        if (selectedReactionService?.name && isRequiredConnection("reaction")) {
             goToStep(Steps.CONNECT_REACTION_SERVICE);
         } else {
             goToStep(Steps.TRIGGER_REACTION);
