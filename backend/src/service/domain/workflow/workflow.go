@@ -38,7 +38,7 @@ const errorMarshaling = "Could not marshal JSON"
 const redditUserRoute = "https://oauth.reddit.com/user/"
 const githubBaseUrl = "https://api.github.com/"
 
-func (self *WorkflowService) spotifyReactions() []string {
+func spotifyReactions() []string {
 	return []string{
 		"Start playback",
 		"Pause playback",
@@ -48,25 +48,31 @@ func (self *WorkflowService) spotifyReactions() []string {
 	}
 }
 
-func (self *WorkflowService) linkedinReactions() []string {
+func linkedinReactions() []string {
 	return []string{
 		"Share an update",
 		"Share a link",
 	}
 }
 
-func (self *WorkflowService) asanaReactions() []string {
+func asanaReactions() []string {
 	return []string{
 		"Create task",
 		"Create project",
 	}
 }
 
-func (self *WorkflowService) dropboxReactions() []string {
+func dropboxReactions() []string {
 	return []string{
 		"Move file or folder",
 		"Create a text file",
 		"Append to a text file",
+	}
+}
+
+func webhooksEventsToActions() map[string]string {
+	return map[string]string{
+		"push": "New push",
 	}
 }
 
@@ -176,7 +182,7 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Spotify", reactionFound.Name, self.spotifyReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Spotify", reactionFound.Name, spotifyReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -364,7 +370,7 @@ func (self *WorkflowService) checkLinkedinReactions(workflow entities.Workflow) 
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Linkedin", reactionFound.Name, self.linkedinReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Linkedin", reactionFound.Name, linkedinReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -482,7 +488,7 @@ func (self *WorkflowService) checkAsanaReactions(workflow entities.Workflow) err
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Asana", reactionFound.Name, self.asanaReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Asana", reactionFound.Name, asanaReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -746,7 +752,7 @@ func (self *WorkflowService) checkDropboxReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	accessToken, err := self.refreshTokenForService("Dropbox", reactionFound.Name, self.dropboxReactions(), workflow)
+	accessToken, err := self.refreshTokenForService("Dropbox", reactionFound.Name, dropboxReactions(), workflow)
 	if err != nil {
 		return fmt.Errorf(errorUpdatingToken)
 	}
@@ -1621,9 +1627,6 @@ func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) 
 }
 
 func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, webhookJsonDataBytes []byte) error {
-	eventsToActions := map[string]string{
-		"push": "New push",
-	}
 	webhookJsonData, err := unmarshalJsonToObject(webhookJsonDataBytes)
 	if err != nil {
 		return err
@@ -1631,7 +1634,7 @@ func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, webhookJ
 
 	switch serviceName {
 	case "Gitlab":
-        return self.checkGitlabWebhooksWorkflows(webhookJsonData, eventsToActions)
+        return self.checkGitlabWebhooksWorkflows(webhookJsonData, webhooksEventsToActions())
     }
 	return nil
 }
