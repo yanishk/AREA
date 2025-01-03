@@ -373,6 +373,37 @@ func getGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
+func getGitlabOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+	var gitlabCallback string
+
+	if callbackType == "service" {
+		gitlabCallback = os.Getenv("GITLAB_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		gitlabCallback = os.Getenv("GITLAB_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(invalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://gitlab.com/oauth/token"
+	jsonBody := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		os.Getenv("GITLAB_CLIENT_ID"),
+		os.Getenv("GITLAB_CLIENT_SECRET"),
+		code,
+		gitlabCallback,
+		grantTypeAuthorization,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
 	var asanaCallback string
 
@@ -636,6 +667,21 @@ func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*
 	return request, nil
 }
 
+func (self *ServiceService) GetGitlabRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://gitlab.example.com/oauth/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GITLAB_CLIENT_ID"), os.Getenv("GITLAB_CLIENT_SECRET"), refreshToken)
+	jsonBody += "&redirect_uri=" + os.Getenv("GITLAB_SERVICE_CALLBACK")
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
@@ -685,6 +731,8 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = getLinkedinOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Dropbox" {
 		request, errRequest = getDropboxOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Gitlab" {
+		request, errRequest = getGitlabOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(unknownServiceMessage)
 	}
@@ -695,6 +743,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 
 	res, err := self.ExecuteRequest(request)
 	if err != nil {
+		fmt.Println("err 1 result token form code:", err)
 		return tokenRes, err
 	}
 	defer res.Body.Close()

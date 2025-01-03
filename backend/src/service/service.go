@@ -32,6 +32,7 @@ type ServiceService interface {
 	GetRedditRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error)
+	GetGitlabRefreshTokenRequest(refreshToken string) (*http.Request, error)
 	ExecuteRequest(request *http.Request) (*http.Response, error)
 	ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error)
 	GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error)
