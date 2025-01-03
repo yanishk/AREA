@@ -1517,7 +1517,7 @@ func (self *WorkflowService) CheckGithubActions() error {
 }
 
 func getGitlabIdActionParam(workflow entities.Workflow) (string, error) {
-	projectId, projectIdExists := workflow.ActionParam["id"]
+	projectId, projectIdExists := workflow.ActionParam["project"]
 	if !projectIdExists {
 		return "", fmt.Errorf("Error in the id sent")
 	}
@@ -1542,7 +1542,6 @@ func checkGitlabWebhookParamsValidity(webhookJsonData map[string]interface{}) (s
 	if !eventNameIsString {
 		return eventNameString, projectIdNumber, fmt.Errorf("Error in the event_name sent")
 	}
-
 
 	projectId, projectIdExists := webhookJsonData["project_id"]
 	if !projectIdExists {
@@ -1599,22 +1598,33 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflows(webhookJsonData map[st
 	return nil
 }
 
-func unmarshalWebhookJsonDataBytes(webhookJsonDataBytes []byte) (map[string]interface{}, error) {
-	webhookJsonData := make(map[string]interface{})
-	if len(webhookJsonDataBytes) > 0 {
-		err := json.Unmarshal(webhookJsonDataBytes, &webhookJsonData)
+func unmarshalJsonToObject(jsonDataBytes []byte) (map[string]interface{}, error) {
+	jsonData := make(map[string]interface{})
+	if len(jsonDataBytes) > 0 {
+		err := json.Unmarshal(jsonDataBytes, &jsonData)
 		if err != nil {
-			return webhookJsonData, err
+			return jsonData, err
 		}
 	}
-	return webhookJsonData, nil
+	return jsonData, nil
+}
+
+func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) {
+	var jsonData []map[string]interface{}
+	if len(jsonDataBytes) > 0 {
+		err := json.Unmarshal(jsonDataBytes, &jsonData)
+		if err != nil {
+			return jsonData, err
+		}
+	}
+	return jsonData, nil
 }
 
 func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, webhookJsonDataBytes []byte) error {
 	eventsToActions := map[string]string{
 		"push": "New push",
 	}
-	webhookJsonData, err := unmarshalWebhookJsonDataBytes(webhookJsonDataBytes)
+	webhookJsonData, err := unmarshalJsonToObject(webhookJsonDataBytes)
 	if err != nil {
 		return err
 	}
@@ -1648,6 +1658,7 @@ func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, acc
 
 	params.Set("url", webhookUrl)
 	params.Set("push_events", "true")
+
 	res, err := self.ExecuteGitlabRequest("POST", createWebhookUrl, accessToken, bytes.NewBufferString(params.Encode()))
 	if err != nil {
 		return err
@@ -1657,17 +1668,63 @@ func (self*WorkflowService) createNewWorkflowGitlabWebhook(projectId string, acc
 	return nil
 }
 
+func (self *WorkflowService) isProjectWebhookPresent(projectId string, accessToken string) (bool, error) {
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
+	getWebhooksUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
+
+	res, err := self.ExecuteGitlabRequest("GET", getWebhooksUrl, accessToken, nil)
+	if err != nil {
+		return false, err
+	}
+	defer res.Body.Close()
+
+	webhooksJsonDataBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		return false, err
+	}
+
+	webhooksJsonData, err := unmarshalJsonToMap(webhooksJsonDataBytes)
+	if err != nil {
+		return false, err
+	}
+
+	if (len(webhooksJsonData) == 0) {
+		return false, nil
+	}
+
+	for _, webhookJsonData := range webhooksJsonData {
+		url, urlExists := webhookJsonData["url"]
+		if !urlExists {
+			return false, fmt.Errorf("Error in the url received")
+		}
+
+		urlString, urlIsString := url.(string)
+		if !urlIsString {
+			return false, fmt.Errorf("Error in the url received")
+		}
+
+		if (urlString == webhookUrl) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Workflow, accessToken string) error {
-	_, webhookActivatedExists := workflow.ActionData["webhook_activated"]
 	projectIdString, err := getGitlabIdActionParam(workflow)
 	if err != nil {
 		return err
 	}
 
-	if !webhookActivatedExists {
+	isWebhookPresent, err := self.isProjectWebhookPresent(projectIdString, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if !isWebhookPresent {
 		self.createNewWorkflowGitlabWebhook(projectIdString, accessToken)
 		workflow.ActionData = make(map[string]interface{})
-		workflow.ActionData["webhook_activated"] = true
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
 			return err
