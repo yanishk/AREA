@@ -989,8 +989,8 @@ func (self *WorkflowService) CheckTimeAndDateActions() error {
 	return nil
 }
 
-func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*http.Response, error) {
-	req, _ := http.NewRequest("GET", url, nil)
+func (self *WorkflowService) executeRedditRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Authorization", bearerType+accessToken)
 	req.Header.Add("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 
@@ -1004,7 +1004,7 @@ func (self *WorkflowService) executeGetRedditRequest(url, accessToken string) (*
 func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.RedditPostResponse, error) {
 	var result entities.RedditPostResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1024,7 +1024,7 @@ func (self *WorkflowService) getRedditPost(url, accessToken string) (entities.Re
 func (self *WorkflowService) getRedditComments(url, accessToken string) (entities.RedditCommentResponse, error) {
 	var result entities.RedditCommentResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1044,7 +1044,7 @@ func (self *WorkflowService) getRedditComments(url, accessToken string) (entitie
 func (self *WorkflowService) getRedditVotes(url, accessToken string) (entities.RedditVoteResponse, error) {
 	var result entities.RedditVoteResponse
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
@@ -1065,7 +1065,7 @@ func (self *WorkflowService) getUsernameReddit(accessToken string, workflow enti
 	var result entities.RedditUsername
 	url := "https://oauth.reddit.com/api/v1/me"
 
-	resp, err := self.executeGetRedditRequest(url, accessToken)
+	resp, err := self.executeRedditRequest("GET", url, accessToken, nil)
 	if err != nil {
 		return result, err
 	}
