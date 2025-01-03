@@ -219,8 +219,62 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 
 	if resp != nil {
 		defer resp.Body.Close()
+		return nil
 	}
 	return fmt.Errorf("Unknown reaction")
+}
+
+func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entities.Workflow) error {
+	message, messageErr := workflow.ReactionParam["message"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !messageErr || !channelErr {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
+	content := map[string]string{
+		"content": message.(string),
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) createDiscordThread(tokenBot string, workflow entities.Workflow) error {
+	title, titleErr := workflow.ReactionParam["title"]
+	channelID, channelErr := workflow.ReactionParam["channelid"]
+	if !titleErr || !channelErr {
+		return fmt.Errorf(errorMissingField)
+	}
+
+	url := "https://discord.com/api/v10/channels/" + channelID.(string) + "/threads"
+	content := map[string]interface{}{
+		"name": title,
+		"type": 11,
+	}
+
+	jsonBody, err := json.Marshal(content)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling, err)
+	}
+
+	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
+	if errRequest != nil {
+		return errRequest
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) error {
@@ -230,27 +284,13 @@ func (self *WorkflowService) checkDiscordReactions(workflow entities.Workflow) e
 		return fmt.Errorf(errorRetrievingReaction)
 	}
 
-	if reactionFound.Name == "Post a message to a channel" {
-		message, messageErr := workflow.ReactionParam["message"]
-		channelID, channelErr := workflow.ReactionParam["channelid"]
-		if !messageErr || !channelErr {
-			return fmt.Errorf("Failed to get message body or channel id")
-		}
-
-		urlDiscordAuth := "https://discord.com/api/v10/channels/" + channelID.(string) + "/messages"
-		content, errContent := json.Marshal(map[string]string{
-			"content": message.(string),
-		})
-		if errContent != nil {
-			return fmt.Errorf("Failed to marshall message content")
-		}
-
-		resp, errRequest := self.ServiceService.ExecuteApiRequest(urlDiscordAuth, "POST", botBearer, tokenBot, bytes.NewBuffer(content))
-		if errRequest != nil {
-			return errRequest
-		}
-		defer resp.Body.Close()
+	switch reactionFound.Name {
+	case "Post a message to a channel":
+		return self.postDiscordMessage(tokenBot, workflow)
+	case "Create a thread in a channel":
+		return self.createDiscordThread(tokenBot, workflow)
 	}
+
 	return fmt.Errorf("Unknown reaction")
 }
 
@@ -292,7 +332,7 @@ func (self *WorkflowService) getUserUrnLinkedin(accessToken string, workflow ent
 func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, workflow entities.Workflow) error {
 	message, messageErr := workflow.ReactionParam["message"]
 	if !messageErr {
-		return fmt.Errorf("Failed to get message body")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -314,7 +354,7 @@ func (self *WorkflowService) publishTextLinkedinPost(urn, accessToken string, wo
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	res, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
@@ -330,7 +370,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 	message, messageErr := workflow.ReactionParam["message"]
 	urlPost, urlErr := workflow.ReactionParam["url"]
 	if !messageErr || !urlErr {
-		return fmt.Errorf("Failed to get message body or URL")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://api.linkedin.com/v2/ugcPosts"
@@ -358,7 +398,7 @@ func (self *WorkflowService) publishURLLinkedinPost(urn, accessToken string, wor
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf("Could not encode the body")
+		return fmt.Errorf(errorMarshaling)
 	}
 
 	_, errLinkedinRequest := self.ExecuteLinkedinRequest("POST", url, accessToken, bytes.NewBuffer([]byte(jsonBody)))
@@ -993,7 +1033,7 @@ func (self *WorkflowService) checkTimeAndDateEveryDayAction(timeRes entities.Tim
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !hourExists || !minuteExists {
-		return fmt.Errorf("Error in the hour and minute sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
@@ -1012,7 +1052,7 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayArray, ok := days.([]interface{})
@@ -1040,7 +1080,7 @@ func (self *WorkflowService) checkTimeAndDateEveryMonthOnTheAction(timeRes entit
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists {
-		return fmt.Errorf("Error in the minute, hour or day sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
@@ -1061,7 +1101,7 @@ func (self *WorkflowService) checkTimeAndDateEveryYearOnAction(timeRes entities.
 	hour, hourExists := workflow.ActionParam["hour"]
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists || !hourExists || !dayExists || !monthExists {
-		return fmt.Errorf("Error in the minute, hour, day or month sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	monthNumber, dayNumber, hourNumber, minuteNumber, err := checkEveryYearParamValidity(month, day, hour, minute)
