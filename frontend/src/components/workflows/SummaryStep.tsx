@@ -61,8 +61,6 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
     };
 
     useEffect(() => {
-        console.log("actions fields ici", actionFields);
-        console.log("actions fields ici", reactionFields);
         getUserName();
     }, []);
 

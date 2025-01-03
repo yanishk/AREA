@@ -1,19 +1,13 @@
-import Steps from "../../CreateSteps";
+import { Parameters } from "../../utils/ActionReactionParameters";
+import Steps from "../../utils/CreateSteps";
+import { getFieldValues } from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 
-type Parameters = {
-    isexhaustive: boolean;
-    name: string;
-    type: string;
-    route: string | null;
-    values: string[];
-};
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
     selectedItem: {name: string, id: string, parameters: Parameters[]} | null;
-    // fields: any[];
     itemFieldValues: Record<string, string>;
     handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
@@ -45,20 +39,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         }
 
         return "input"
-    };
-
-    const getFieldValues = (param: Parameters) => {
-        if (param.isexhaustive === true && param.values.length > 1) {
-            return param.values;
-        }
-
-        if (param.isexhaustive === false && param.values.length === 1) {
-            const value = param.values[0];
-            const [start, end] = value.split("-").map(Number);
-            const newArray = Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
-            return newArray;
-        }
-        return undefined;
     };
 
     const fields = selectedItem?.parameters.map((param) => ({
@@ -133,3 +113,4 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 };
 
 export default TriggerActionReactionStep;
+

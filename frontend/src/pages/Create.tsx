@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {useEffect, useMemo, useState } from "react";
+import {useEffect, useState } from "react";
 import axios from "axios";
 import {servicesData } from "../ServicesData";
 import HomeStep from "../components/workflows/HomeStep";
@@ -8,15 +8,9 @@ import SelectActionReactionStep from "../components/workflows/SelectActionReacti
 import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
-import Steps from "../CreateSteps";
-
-type Parameters = {
-    isexhaustive: boolean;
-    name: string;
-    type: string;
-    route: string | null;
-    values: string[];
-};
+import Steps from "../utils/CreateSteps";
+import { getFieldValues } from "../utils/getFieldValues";
+import { Parameters } from "../utils/ActionReactionParameters";
 
 type availableActionsType = {
     name: string;
@@ -240,8 +234,6 @@ const WorkflowBuilder = () => {
         if (currentStep === Steps.SELECT_REACTION) {
             getAvailableReactions();
         }
-        // console.log("action service la maintenant: ", selectedActionService);
-        // console.log("available actions ici : ", availableActions);
     }, [currentStep]);
 
     const isRequiredConnection = (
@@ -292,26 +284,6 @@ const WorkflowBuilder = () => {
         }
     };
 
-    // const actionServiceName = selectedActionService?.name;
-    // const actionName = selectedAction?.name;
-
-    // const reactionServiceName = selectedReactionService?.name;
-    // const reactionName = selectedReaction?.name;
-
-    // const actionFields = useMemo(() => {
-    //     return actionServiceName && actionName &&
-    //         servicesData[actionServiceName]?.actions?.[actionName]
-    //         ? servicesData[actionServiceName].actions[actionName]
-    //         : [];
-    // }, [actionServiceName, actionName]);
-
-    // const reactionFields = useMemo(() => {
-    //     return reactionServiceName && reactionName &&
-    //         servicesData[reactionServiceName]?.actions?.[reactionName]
-    //         ? servicesData[reactionServiceName].actions[reactionName]
-    //         : [];
-    // }, [reactionServiceName, reactionName]);
-
     const handleFieldChange = (id: string, value: string, type: "action" | "reaction") => {
         if (type === "action") {
             setActionFieldValues((prev) => ({
@@ -328,23 +300,7 @@ const WorkflowBuilder = () => {
         else {
             console.error(`Invalid type parameter: ${type}`);
         }
-    };
-
-    // useEffect(() => {
-    //     if (currentStep === Steps.TRIGGER_ACTION) {
-    //         const defaultValues = actionFields.reduce((acc, field) => {
-    //             acc[field.id] = field.options?.[0] ?? "";
-    //             return acc;
-    //         }, {} as Record<string, string>);
-    //         setActionFieldValues(defaultValues);
-    //     } else if (currentStep === Steps.TRIGGER_REACTION) {
-    //         const defaultValues = reactionFields.reduce((acc, field) => {
-    //             acc[field.id] = field.options?.[0] ?? "";
-    //             return acc;
-    //         }, {} as Record<string, string>);
-    //         setReactionFieldValues(defaultValues);
-    //     }
-    // }, [actionFields, reactionFields, currentStep]);
+    }
 
     const handleSelectReactionService = (name: string, color: string, iconPath: string) => {
         setSelectedReactionService({ name, color, iconPath });
@@ -473,47 +429,72 @@ const WorkflowBuilder = () => {
         getDataFromUrl();
     }, []);
 
-    const handleCreateWorkflow = async (workflowTitle: string) =>{
-            const actionParams = Object.keys(actionFieldValues).length > 0
-            ? Object.keys(actionFieldValues).reduce((params, key) => {
-                params[key] = actionFieldValues[key];
-                return params;
-            }, {} as Record<string, any>)
-            : null;
+    const getIndexFromValues = (value: string, valuesArray: string[]): number | null => {
+        const index = valuesArray.indexOf(value);
 
-            const reactionParams = Object.keys(reactionFieldValues).length > 0
-                ? Object.keys(reactionFieldValues).reduce((params, key) => {
-                    params[key] = reactionFieldValues[key];
-                    return params;
-            }, {} as Record<string, any>)
-            : null;
+        if (index === -1) {
+            return null;
+        }
 
-            console.log("actionid:", selectedAction?.id);
-            console.log("actionParams:", actionParams);
-            console.log("workflowTitle:", workflowTitle);
-            console.log("rectionid:", selectedReaction?.id);
-            console.log("reactionparam:", reactionParams);
+        return index;
+    };
 
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}workflows`,
-                {
-                    actionid: selectedAction?.id,
-                    actionparam: actionParams,
-                    name: workflowTitle || "My Workflow",
-                    reactionid: selectedReaction?.id,
-                    reactionparam: reactionParams
-                },
-                {
-                    withCredentials: true,
+    const getActionReactionParams = (
+        valuesSelectedByUser: Record<string, string>,
+        parameters: Parameters[]
+    ): Record<string, any> => {
+        return Object.keys(valuesSelectedByUser).reduce((params, key) => {
+            const param = parameters.find((param) => param.name === key);
+
+            if (param) {
+                if (param.type === "int") {
+                    const valuesArray = getFieldValues(param);
+
+                    if (valuesArray) {
+                        const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
+
+                        if (index !== null) {
+                            params[key] = index;
+                        }
+                    }
+
+                } else {
+                    params[key] = valuesSelectedByUser[key];
                 }
-            );
+            }
 
-            setSelectedActionService(null)
-            setSelectedAction(null);
-            setSelectedReaction(null)
-            setSelectedReaction(null);
-            navigate("/");
-    }
+            return params;
+        }, {} as Record<string, any>);
+    };
+
+    const handleCreateWorkflow = async (workflowTitle: string) => {
+        const actionParams = selectedAction
+            ? getActionReactionParams(actionFieldValues, selectedAction.parameters)
+            : null;
+
+        const reactionParams = selectedReaction
+            ? getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
+            : null;
+
+        await axios.post(
+            `${import.meta.env.VITE_API_URL}workflows`,
+            {
+                actionid: selectedAction?.id,
+                actionparam: actionParams,
+                name: workflowTitle || "My Workflow",
+                reactionid: selectedReaction?.id,
+                reactionparam: reactionParams
+            },
+            {
+                withCredentials: true,
+            }
+        );
+
+        setSelectedActionService(null);
+        setSelectedAction(null);
+        setSelectedReaction(null);
+        navigate("/");
+    };
 
     const renderStep = () => {
         switch (currentStep) {
@@ -558,7 +539,6 @@ const WorkflowBuilder = () => {
                     <TriggerActionReactionStep
                         selectedService={selectedActionService}
                         selectedItem={selectedAction}
-                        // fields={actionFields}
                         itemFieldValues={actionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={() => goToStep(Steps.HOME)}
@@ -591,7 +571,6 @@ const WorkflowBuilder = () => {
                     <TriggerActionReactionStep
                         selectedService={selectedReactionService}
                         selectedItem={selectedReaction}
-                        // fields={reactionFields}
                         itemFieldValues={reactionFieldValues}
                         handleFieldChange={handleFieldChange}
                         goToStep={() => goToStep(Steps.HOME)}
