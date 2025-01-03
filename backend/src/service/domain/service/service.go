@@ -36,7 +36,7 @@ const oneYearSecond = 31536000
 const clientIdParam = "client_id="
 const clientSecretParam = "&client_secret="
 const codeParam = "&code="
-const grantTypeParam = "&grant_type"
+const grantTypeParam = "&grant_type="
 const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
 const codeResponseType = "&response_type=code"
