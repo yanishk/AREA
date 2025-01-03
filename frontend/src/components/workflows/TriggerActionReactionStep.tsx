@@ -5,6 +5,11 @@ import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 
+enum fieldType {
+    SELECT = "select",
+    INPUT = "input",
+}
+
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
     selectedItem: {name: string, id: string, parameters: Parameters[]} | null;
@@ -27,18 +32,18 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     const getFieldType = (param: Parameters) => {
         if (param.isexhaustive === true) {
-            return "select";
+            return fieldType.SELECT;
         }
 
         if (param.isexhaustive === false && param.values.length === 1) {
-            return "select"
+            return fieldType.SELECT;
         }
 
         if (param.isexhaustive === false && param.route === null) {
-            return "input";
+            return fieldType.INPUT;
         }
 
-        return "input"
+        return fieldType.INPUT;
     };
 
     const fields = selectedItem?.parameters.map((param) => ({
