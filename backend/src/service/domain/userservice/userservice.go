@@ -60,6 +60,8 @@ func (self *UserServiceService) refreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetAsanaRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Dropbox" {
 		request, errRequest = self.ServiceService.GetDropboxRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Gitlab" {
+		request, errRequest = self.ServiceService.GetGitlabRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
