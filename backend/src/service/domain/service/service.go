@@ -668,7 +668,7 @@ func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*
 }
 
 func (self *ServiceService) GetGitlabRefreshTokenRequest(refreshToken string) (*http.Request, error) {
-	tokenUrl := "https://gitlab.example.com/oauth/token"
+	tokenUrl := "https://gitlab.com/oauth/token"
 	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GITLAB_CLIENT_ID"), os.Getenv("GITLAB_CLIENT_SECRET"), refreshToken)
 	jsonBody += "&redirect_uri=" + os.Getenv("GITLAB_SERVICE_CALLBACK")
 
