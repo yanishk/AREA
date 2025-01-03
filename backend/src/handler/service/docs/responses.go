@@ -76,6 +76,11 @@ type ServiceRetrieveReactionsFromServiceBadRequestResponse struct {
 	Msg string `json:"error"example:"Unknown service"`
 }
 
+// Receive Service Weebhook Responses
+type ServiceReceiveServiceWeebhookSuccessResponse struct {
+	Msg string `json:"success"example:"Webhook received"`
+}
+
 // Discord Get Guild Channels
 type ServiceGetDiscordGuildChannelsSuccessResponse struct {
 	Channels []DiscordChannelExample

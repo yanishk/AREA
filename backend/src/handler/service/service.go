@@ -2,6 +2,7 @@ package service_handler
 
 import (
 	"net/http"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 
@@ -37,6 +38,10 @@ func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 	authentication := router.Group("/authentication")
 	{
 		authentication.GET("/:service/:callback-type/:app-type", self.oauth2Service)
+	}
+	webhook := router.Group("/webhook")
+	{
+		webhook.POST("/:service", self.receiveServiceWebhook)
 	}
 }
 
@@ -143,6 +148,23 @@ func (self *ServiceHandler) retrieveReactionsFromService(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"reactions": reactions,
 	})
+}
+
+// // @Summary		Receive Service Webhook
+// // @Description	Receive webhook from a service
+// // @Tags			Webhook
+// // @Produce		json
+// @Success		200		{object}	docs_service.ServiceReceiveServiceWeebhookSuccessResponse
+// // @Router		/webhook/{service} [post]
+func (self *ServiceHandler) receiveServiceWebhook(context *gin.Context) {
+    serviceName := context.Param("service")
+
+    if serviceName == "Gitlab" {
+        fmt.Println("Gitlab webhook received!")
+    }
+    context.IndentedJSON(http.StatusOK, gin.H{
+        "success": "Webhook received",
+    })
 }
 
 // @Summary		Retrieve Service
