@@ -2,7 +2,6 @@ package workflow_handler
 
 import (
 	"net/http"
-	"io"
 
 	"github.com/gin-gonic/gin"
 
@@ -61,7 +60,7 @@ func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
     serviceName := context.Param("service")
 
-	webhookJsonDataBytes, err := io.ReadAll(context.Request.Body)
+	err := self.WorkflowService.CheckWebhooksWorkflows(serviceName,  context.Request)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": invalidRequestBodyMessage,
@@ -69,7 +68,6 @@ func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
 		return
 	}
 
-	self.WorkflowService.CheckWebhooksWorkflows(serviceName, webhookJsonDataBytes)
     context.IndentedJSON(http.StatusOK, gin.H{
         "success": "Webhook received",
     })

@@ -64,7 +64,7 @@ type WorkflowService interface {
 	CheckRedditActions() error
 	CheckWeatherActions() error
 	CheckNewGitlabWorkflows() error
-	CheckWebhooksWorkflows(serviceName string, webhookJsonDataBytes []byte) error
+	CheckWebhooksWorkflows(serviceName string, request *http.Request) error
 }
 
 type AboutService interface {
