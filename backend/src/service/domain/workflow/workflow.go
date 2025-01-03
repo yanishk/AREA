@@ -26,6 +26,7 @@ type WorkflowService struct {
 
 const botBearer = "Bot "
 const bearerType = "Bearer "
+const contentType = "Content-Type"
 
 const errorUpdatingWorkflow = "Could not update workflow"
 const errorUpdatingToken = "Could not update token"
@@ -248,7 +249,7 @@ func (self *WorkflowService) ExecuteLinkedinRequest(method, url, accessToken str
 		return nil, err
 	}
 	req.Header.Set("Authorization", bearerType+accessToken)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(contentType, "application/json")
 	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
 
 	res, err := self.ServiceService.ExecuteRequest(req)
@@ -514,7 +515,7 @@ func (self *WorkflowService) sendAnSMS(workflow entities.Workflow) error {
 		return err
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(contentType, "application/json")
 	req.SetBasicAuth(os.Getenv("SMS_ACCOUNT_SID"), os.Getenv("AUTH_TOKEN"))
 
 	res, err := self.ServiceService.ExecuteRequest(req)
@@ -665,7 +666,7 @@ func (self *WorkflowService) requestFileCreationModificationDropbox(url, accessT
 	}
 
 	req.Header.Set("Authorization", bearerType+accessToken)
-	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set(contentType, "application/octet-stream")
 	req.Header.Set("Dropbox-API-Arg", apiArg)
 
 	res, err := self.ServiceService.ExecuteRequest(req)
