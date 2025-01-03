@@ -394,7 +394,6 @@ const WorkflowBuilder = () => {
             updateStateFromDecoded(decodedState);
 
             if (!codeAuth) {
-                console.error("Error with fetching code from url");
                 return;
             }
 
