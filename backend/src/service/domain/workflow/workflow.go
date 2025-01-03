@@ -989,7 +989,7 @@ func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 func checkEveryHourParamValidity(minute interface{}) (float64, error) {
 	minuteNumber, minuteIsNumber := minute.(float64)
 	if !minuteIsNumber {
-		return minuteNumber, fmt.Errorf("Error in the minute sent")
+		return minuteNumber, fmt.Errorf(errorMissingField)
 	}
 	return minuteNumber, nil
 }
@@ -999,7 +999,7 @@ func checkEveryDayParamValidity(hour interface{}, minute interface{}) (float64, 
 
 	hourNumber, hourIsNumber := hour.(float64)
 	if !hourIsNumber {
-		return hourNumber, minuteNumber, fmt.Errorf("Error in the hour sent")
+		return hourNumber, minuteNumber, fmt.Errorf(errorMissingField)
 	}
 
 	minuteNumber, err := checkEveryHourParamValidity(minute)
@@ -1015,7 +1015,7 @@ func checkEveryMonthOnTheParamValidity(day interface{}, hour interface{}, minute
 
 	dayNumber, dayIsNumber := day.(float64)
 	if !dayIsNumber {
-		return dayNumber, hourNumber, minuteNumber, fmt.Errorf("Error in the day sent")
+		return dayNumber, hourNumber, minuteNumber, fmt.Errorf(errorMissingField)
 	}
 
 	hourNumber, minuteNumber, err := checkEveryDayParamValidity(hour, minute)
@@ -1035,7 +1035,7 @@ func checkEveryYearParamValidity(month interface{}, day interface{}, hour interf
 
 	monthNumber, monthIsNumber := month.(float64)
 	if !monthIsNumber {
-		return monthNumber, dayNumber, hourNumber, minuteNumber, fmt.Errorf("Error in the month sent")
+		return monthNumber, dayNumber, hourNumber, minuteNumber, fmt.Errorf(errorMissingField)
 	}
 
 	dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
@@ -1049,7 +1049,7 @@ func checkEveryYearParamValidity(month interface{}, day interface{}, hour interf
 func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.TimeResponse, workflow entities.Workflow) error {
 	minute, minuteExists := workflow.ActionParam["minute"]
 	if !minuteExists {
-		return fmt.Errorf("Error in the minute sent")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	minuteNumber, err := checkEveryHourParamValidity(minute)
@@ -1368,7 +1368,7 @@ func (self *WorkflowService) getAccessToken(serviceName string, workflow entitie
 func (self *WorkflowService) checkRedditNewPostInSubredditAction(accessToken string, workflow entities.Workflow) error {
 	subreddit, subredditExists := workflow.ActionParam["subreddit"]
 	if !subredditExists {
-		return fmt.Errorf("Could not find the subreddit field")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	url := "https://oauth.reddit.com/" + subreddit.(string) + "/new.json?limit=1"
@@ -1508,7 +1508,7 @@ func (self *WorkflowService) checkWeatherCurrentWeatherComparisonAction(checkTyp
 	city, cityExists := workflow.ActionParam["city"]
 	temp, tempExists := workflow.ActionParam["temperature"]
 	if !cityExists || !tempExists {
-		return fmt.Errorf("Could not retrieve the necessary fields")
+		return fmt.Errorf(errorMissingField)
 	}
 
 	weatherData, err := self.currentWeather(city.(string), workflow)
@@ -1578,7 +1578,7 @@ func (self *WorkflowService) CheckWeatherActions() error {
 func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
-		return nil, fmt.Errorf("Invalid repository")
+		return nil, fmt.Errorf(errorMissingField)
 	}
 
 	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
@@ -1733,12 +1733,12 @@ func (self *WorkflowService) CheckGithubActions() error {
 func getGitlabIdActionParam(workflow entities.Workflow) (string, error) {
 	projectId, projectIdExists := workflow.ActionParam["project"]
 	if !projectIdExists {
-		return "", fmt.Errorf("Error in the id sent")
+		return "", fmt.Errorf(errorMissingField)
 	}
 
 	projectIdString, projectIdIsString := projectId.(string)
 	if !projectIdIsString {
-		return "", fmt.Errorf("Error in the project id sent")
+		return "", fmt.Errorf(errorMissingField)
 	}
 	return projectIdString, nil
 }
@@ -1878,12 +1878,12 @@ func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken stri
 	for _, webhookJsonData := range webhooksJsonData {
 		url, urlExists := webhookJsonData["url"]
 		if !urlExists {
-			return false, fmt.Errorf("Error in the url received")
+			return false, fmt.Errorf(errorMissingField)
 		}
 
 		urlString, urlIsString := url.(string)
 		if !urlIsString {
-			return false, fmt.Errorf("Error in the url received")
+			return false, fmt.Errorf(errorMissingField)
 		}
 
 		if urlString == webhookUrl {
