@@ -248,25 +248,26 @@ func oauth2Gitlab(callbackType string) string {
 func (self *ServiceService) OAuth2Service(serviceName, callbackType, appType string) (string, error) {
 	var authUrl string
 
-	if serviceName == "Google" {
+	switch serviceName {
+	case "Google":
 		authUrl = oauth2Google(callbackType, appType)
-	} else if serviceName == "Spotify" {
+	case "Spotify":
 		authUrl = oauth2Spotify(callbackType)
-	} else if serviceName == "Discord" {
+	case "Discord":
 		authUrl = oauth2Discord(callbackType)
-	} else if serviceName == "Github" {
+	case "Github":
 		authUrl = oauth2Github(callbackType)
-	} else if serviceName == "Reddit" {
+	case "Reddit":
 		authUrl = oauth2Reddit(callbackType)
-	} else if serviceName == "Asana" {
+	case "Asana":
 		authUrl = oauth2Asana(callbackType)
-	} else if serviceName == "Linkedin" {
+	case "Linkedin":
 		authUrl = oauth2Linkedin(callbackType)
-	} else if serviceName == "Dropbox" {
+	case "Dropbox":
 		authUrl = oauth2Dropbox(callbackType)
-	} else if serviceName == "Gitlab" {
+	case "Gitlab":
 		authUrl = oauth2Gitlab(callbackType)
-	} else {
+	default:
 		return authUrl, fmt.Errorf(unknownServiceMessage)
 	}
 	return authUrl, nil
@@ -444,11 +445,12 @@ func getLinkedinOAuth2AccessTokenRequest(code, callbackType string) (*http.Reque
 
 	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
 	jsonBody := fmt.Sprintf(
-		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
-			clientSecretParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")) +
-			codeParam + code +
-			redirectUriParam + callback +
-			grantTypeParam + grantTypeAuthorization,
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
+		code,
+		callback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -705,28 +707,29 @@ func (self *ServiceService) GetResultTokenFromCode(code, serviceName, callbackTy
 	var request *http.Request
 	var errRequest error
 
-	if serviceName == "Google" {
+	switch serviceName {
+	case "Google":
 		request, errRequest = getGoogleOAuth2AccessTokenRequest(code, callbackType, appType)
-	} else if serviceName == "Spotify" {
+	case "Spotify":
 		request, errRequest = getSpotifyOAuth2AccessTokenRequest(code, callbackType)
-	} else if serviceName == "Discord" {
+	case "Discord":
 		request, errRequest = getDiscordOAuth2AccessTokenRequest(code, callbackType)
-	} else if serviceName == "Github" {
+	case "Github":
 		request, errRequest = getGithubOAuth2AccessTokenRequest(code, callbackType)
 		request.Header.Set("Accept", "application/json")
 		tokenRes.ExpiresIn = oneYearSecond
-	} else if serviceName == "Reddit" {
+	case "Reddit":
 		codeStripped := strings.TrimSuffix(code, "#_")
 		request, errRequest = getRedditOAuth2AccessTokenRequest(codeStripped, callbackType)
-	} else if serviceName == "Asana" {
+	case "Asana":
 		request, errRequest = getAsanaOAuth2AccessTokenRequest(code, callbackType)
-	} else if serviceName == "Linkedin" {
+	case "Linkedin":
 		request, errRequest = getLinkedinOAuth2AccessTokenRequest(code, callbackType)
-	} else if serviceName == "Dropbox" {
+	case "Dropbox":
 		request, errRequest = getDropboxOAuth2AccessTokenRequest(code, callbackType)
-	} else if serviceName == "Gitlab" {
+	case "Gitlab":
 		request, errRequest = getGitlabOAuth2AccessTokenRequest(code, callbackType)
-	} else {
+	default:
 		return tokenRes, fmt.Errorf(unknownServiceMessage)
 	}
 
@@ -758,7 +761,7 @@ func getOAuth2UserEmailRequest(userInfoUrl, accessToken string) (*http.Request, 
 	return request, nil
 }
 
-func decodeUserInfoWithGithub(res *http.Response) (entities.UserInfo, error) {
+func decodeUserInfoWithMultipleResults(res *http.Response) (entities.UserInfo, error) {
 	var userInfos []entities.UserInfo
 
 	err := json.NewDecoder(res.Body).Decode(&userInfos)
@@ -773,17 +776,21 @@ func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName stri
 	var request *http.Request
 	var err error
 
-	if serviceName == "Google" {
+	switch serviceName {
+	case "Google":
 		request, err = getOAuth2UserEmailRequest("https://www.googleapis.com/oauth2/v3/userinfo", accessToken)
-	} else if serviceName == "Spotify" {
+	case "Spotify":
 		request, err = getOAuth2UserEmailRequest("https://api.spotify.com/v1/me", accessToken)
-	} else if serviceName == "Discord" {
+	case "Discord":
 		request, err = getOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
-	} else if serviceName == "Github" {
+	case "Github":
 		request, err = getOAuth2UserEmailRequest(githubBaseUrl+"user/emails", accessToken)
-	} else {
+	case "Gitlab":
+		request, err = getOAuth2UserEmailRequest("https://gitlab.com/api/v4/user/emails", accessToken)
+	default:
 		return userInfo, fmt.Errorf(unknownServiceMessage)
 	}
+
 	if err != nil {
 		return userInfo, err
 	}
@@ -794,8 +801,8 @@ func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName stri
 	}
 	defer res.Body.Close()
 
-	if serviceName == "Github" {
-		userInfo, err = decodeUserInfoWithGithub(res)
+	if serviceName == "Github" || serviceName == "Gitlab" {
+		userInfo, err = decodeUserInfoWithMultipleResults(res)
 	} else {
 		err = json.NewDecoder(res.Body).Decode(&userInfo)
 	}

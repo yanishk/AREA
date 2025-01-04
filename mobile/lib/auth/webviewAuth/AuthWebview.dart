@@ -75,7 +75,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
   String removeUrlState(String url) {
     final splitState = url.split("?state=");
     if (splitState.length == 1) {
-      return url;
+      return url.split("&state=").first;
     }
     developer.log("removeUrlState splitState : $splitState");
     final splitCode = splitState.last.split("&code=");

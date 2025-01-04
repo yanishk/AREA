@@ -13,7 +13,7 @@ const botBearer = "Bot "
 
 func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entities.Workflow) error {
 	message, messageErr := workflow.ReactionParam["message"]
-	channelID, channelErr := workflow.ReactionParam["channelid"]
+	channelID, channelErr := workflow.ReactionParam["channel"]
 	if !messageErr || !channelErr {
 		return fmt.Errorf(errorMissingField)
 	}
@@ -39,7 +39,7 @@ func (self *WorkflowService) postDiscordMessage(tokenBot string, workflow entiti
 
 func (self *WorkflowService) createDiscordThread(tokenBot string, workflow entities.Workflow) error {
 	title, titleErr := workflow.ReactionParam["title"]
-	channelID, channelErr := workflow.ReactionParam["channelid"]
+	channelID, channelErr := workflow.ReactionParam["channel"]
 	if !titleErr || !channelErr {
 		return fmt.Errorf(errorMissingField)
 	}
