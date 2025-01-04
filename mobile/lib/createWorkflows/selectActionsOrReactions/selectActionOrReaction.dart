@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-import "../custom_widget.dart";
-import "../globalData.dart";
-import 'createWidget.dart';
-import 'createWorkflowsData.dart';
-import "../auth/spotifyAuth/connectSpotify.dart";
-import "../auth/redditAuth/connectReddit.dart";
+import "../../custom_widget.dart";
+import "../../globalData.dart";
+import '../createWidget.dart';
+import '../createWorkflowsData.dart';
 import "selectActionOrReactionParam.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
@@ -109,46 +107,18 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
 
   Future<void> saveSelectedActionOrReaction(int index) async {
     CreateData.selectedServiceId = serviceIndex;
-    if (actionOrReactionList[index].parameter.isNotEmpty) {
-      CreateData.selectedActionOrReactionData = actionOrReactionList[index];
-      await Navigator.push(
-        Globaldata.myContext,
-        MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
-      );
-      actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
-    } else {
-      CreateData.selectOrUpdateWorkflow = true;
-    }
+    CreateData.selectedActionOrReactionData = actionOrReactionList[index];
+    await Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
+    );
+    actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];
     } else {
       CreateData.serviceReaction = actionOrReactionList[index];
     }
     Navigator.pop(Globaldata.myContext);
-  }
-
-  Widget connectButton() {
-    if (CreateData.serviceNameList[serviceIndex] == "Spotify") {
-      return CustomButton(
-        backgroundColor: colorTheme,
-        text: ButtonText(text: "Connect",),
-        onPressed: () {MySpotifyAuth.connectSpotify("service");},
-        size: buttonSize,
-        padding: EdgeInsets.symmetric(horizontal: 15.0),
-        borderCircularRadius: buttonRadius,
-      );
-    }
-    if (CreateData.serviceNameList[serviceIndex] == "Reddit") {
-      return CustomButton(
-        backgroundColor: colorTheme,
-        text: ButtonText(text: "Connect",),
-        onPressed: () {MyRedditAuth.connectReddit("service");},
-        size: buttonSize,
-        padding: EdgeInsets.symmetric(horizontal: 15.0),
-        borderCircularRadius: buttonRadius,
-      );
-    }
-    return SizedBox();
   }
 
   @override
@@ -161,11 +131,10 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
             ActionOrReactionDescription(
                 colorTheme: colorTheme,
                 title: "Select $apiRoute",
-                serviceIconsList: CreateData.serviceIconsList,
+                serviceIcon: CreateData.serviceIconsList[serviceIndex],
                 serviceName: CreateData.serviceNameList[serviceIndex],
                 actionDescription: actionDescription),
             Padding(padding: EdgeInsets.only(top: 15)),
-            connectButton(),
             Column(
               children: ActionOrReactionButtonsList,
             ),
@@ -181,7 +150,6 @@ class ButtonText extends StatelessWidget {
     super.key,
     required this.text,
   });
-
   final String text;
 
   @override
