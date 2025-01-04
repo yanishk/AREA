@@ -37,7 +37,7 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 	case "Skip track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", bearerType, accessToken, nil)
 	case "Add track to playback queue":
-		uri, uriExists := workflow.ReactionParam["uri"]
+		uri, uriExists := workflow.ReactionParam["link"]
 		if !uriExists {
 			return fmt.Errorf("Incorrect URI")
 		}
