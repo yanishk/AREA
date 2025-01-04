@@ -1586,9 +1586,9 @@ func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, ac
 }
 
 func (self *WorkflowService) checkActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
-	workflow.ActionData = make(map[string]interface{})
 	lenLastTurn, lenLastTurnExists := workflow.ActionData["len"]
 	if !lenLastTurnExists {
+		workflow.ActionData = make(map[string]interface{})
 		workflow.ActionData["len"] = lenActualTurn
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
@@ -1907,7 +1907,6 @@ func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Wor
 
 	if !isWebhookPresent {
 		self.createNewWorkflowGitlabWebhook(projectIdString, accessToken)
-		workflow.ActionData = make(map[string]interface{})
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
 			return err
