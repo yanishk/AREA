@@ -1641,7 +1641,7 @@ const docTemplate = `{
         "docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse": {
             "type": "object",
             "properties": {
-                "repositories": {
+                "projects": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entities.GitlabProject"
@@ -1943,7 +1943,15 @@ const docTemplate = `{
             }
         },
         "entities.GitlabProject": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
         },
         "entities.NewWorkflow": {
             "type": "object",

@@ -855,8 +855,41 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 	return repositories, nil
 }
 
+
+func (self *ServiceService) RequestGitlabUser(accessToken string) (entities.GitlabUser, error) {
+	var user entities.GitlabUser
+
+	url := "https://gitlab.com/api/v4/user"
+	resp, err := self.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	if err != nil {
+		return user, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
 func (self *ServiceService) RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error) {
 	var projects []entities.GitlabProject
+
+	user, err := self.RequestGitlabUser(accessToken)
+	if err != nil {
+		return projects, nil
+	}
+
+	url := "https://gitlab.com/api/v4/" + "/users/" + user.Username + "/projects"
+	resp, err := self.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	if err != nil {
+		return projects, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&projects)
+	if err != nil {
+		return projects, err
+	}
 	return projects, nil
 }
 

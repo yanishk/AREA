@@ -377,7 +377,7 @@ definitions:
     type: object
   docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse:
     properties:
-      repositories:
+      projects:
         items:
           $ref: '#/definitions/entities.GitlabProject'
         type: array
@@ -578,6 +578,11 @@ definitions:
         type: string
     type: object
   entities.GitlabProject:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   entities.NewWorkflow:
     properties:
