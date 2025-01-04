@@ -2,6 +2,15 @@ package docs_workflow
 
 import "backend/src/entities"
 
+// Receive Service Weebhook Responses
+type WorkflowReceiveServiceWeebhookSuccessResponse struct {
+	Msg string `json:"success"example:"Webhook received"`
+}
+
+type WorkflowReceiveServiceWeebhookBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body"`
+}
+
 // Create Workflow Responses
 type WorkflowCreateWorkflowSuccessResponse struct {
 	Msg string `json:"success"example:"Successful workflow creation"`

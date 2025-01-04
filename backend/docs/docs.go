@@ -1184,6 +1184,15 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_service.ServiceReceiveServiceWeebhookSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Webhook received"
+                }
+            }
+        },
         "docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse": {
             "type": "object",
             "properties": {
