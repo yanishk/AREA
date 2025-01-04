@@ -436,7 +436,11 @@ const WorkflowBuilder = () => {
             return null;
         }
 
-        return index;
+        if (valuesArray[0] === "0") {
+            return index;
+        }
+
+        return index + 1;
     };
 
     const getActionReactionParams = (
