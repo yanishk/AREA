@@ -444,11 +444,12 @@ func getLinkedinOAuth2AccessTokenRequest(code, callbackType string) (*http.Reque
 
 	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
 	jsonBody := fmt.Sprintf(
-		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
-			clientSecretParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")) +
-			codeParam + code +
-			redirectUriParam + callback +
-			grantTypeParam + grantTypeAuthorization,
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
+		code,
+		callback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
