@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
 
-import "../custom_widget.dart";
-import "../globalData.dart";
-import 'createWidget.dart';
-import 'createWorkflowsData.dart';
+import "../../custom_widget.dart";
+import "../../globalData.dart";
+import '../createWidget.dart';
+import '../createWorkflowsData.dart';
+import "../../auth/webviewAuth/connectServiceAuth.dart";
 
 class SelectParamActionOrReactionPage extends StatelessWidget {
   @override
@@ -36,6 +37,10 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       setState(() {
         apiRoute = "reactions";
       });
+    }
+    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
+      CreateData.selectOrUpdateWorkflow = true;
+      Navigator.pop(Globaldata.myContext);
     }
     fillParameterFiledList();
   }
@@ -118,8 +123,65 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     return Column();
   }
 
+  Widget connectButton() {
+    Color buttonColor = HexColor(CreateData.serviceColorList[CreateData.selectedServiceId]);
+    int r = buttonColor.red ~/ 2;
+    int g = buttonColor.green ~/ 2;
+    int b = buttonColor.blue ~/ 2;
+    return CustomButton(
+      backgroundColor: Color.fromARGB(255, r, g, b),
+      text: AutoSizeText(
+        "Connect",
+        style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white),
+      ),
+      onPressed: () {
+        ConnectServiceAuthWebview.connectService("service", CreateData.serviceNameList[CreateData.selectedServiceId]);
+        setState(() {
+          CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId] = false;
+        });
+        if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
+          CreateData.selectOrUpdateWorkflow = true;
+          Navigator.pop(Globaldata.myContext);
+        }
+      },
+      size: Size(double.infinity, 60),
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
+      return Scaffold(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(padding: EdgeInsets.only(top: 30)),
+              SelectActionOrReactionTopBar(title: "Connect service", color: Colors.white),
+              Padding(padding: EdgeInsets.only(top: 75)),
+              SafeWebImage(
+                url: "${Globaldata.domainName}${CreateData.serviceIconsList[CreateData.selectedServiceId]}",
+                width: 120,
+                height: 120,
+              ),
+              AutoSizeText(
+                "Connect to ${CreateData.serviceNameList[CreateData.selectedServiceId]} to continue",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 50)),
+              connectButton(),
+            ],
+          ),
+        ),
+      );
+    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(

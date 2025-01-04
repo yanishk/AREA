@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
 import "../globalData.dart";
-import "selectActionOrReaction.dart";
+import "selectActionsOrReactions/selectActionOrReaction.dart";
 import 'createWorkflowsData.dart';
 import "createWidget.dart";
 
@@ -35,6 +34,7 @@ class SelectService extends State<APICall> {
       CreateData.serviceNameList = Globaldata.actionServicesName;
       CreateData.serviceColorList = Globaldata.actionServicesColor;
       CreateData.serviceIconsList = Globaldata.actionServicesIcons;
+      CreateData.serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
       return;
     }
     setState(() {
@@ -42,6 +42,7 @@ class SelectService extends State<APICall> {
       CreateData.serviceNameList = Globaldata.reactionServicesName;
       CreateData.serviceColorList = Globaldata.reactionServicesColor;
       CreateData.serviceIconsList = Globaldata.reactionServicesIcons;
+      CreateData.serviceIsAuthNeeded = Globaldata.reactionIsAuthNeeded;
     });
   }
 
@@ -76,7 +77,6 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-          developer.log("serviceIndex: $serviceIndex : ${CreateData.serviceNameList.length}");
           services.add(serviceTiles(serviceIndex));
       }
     });
@@ -131,7 +131,6 @@ class MySquareServicesCard extends StatelessWidget {
     if (servicesIndex > CreateData.serviceNameList.length) {
       return Column();
     }
-    developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
