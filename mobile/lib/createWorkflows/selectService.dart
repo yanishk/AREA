@@ -59,7 +59,6 @@ class SelectService extends State<APICall> {
         ],
       );
     }
-    developer.log("index : $index");
     return Row(
       children: [
         MySquareServicesCard(
@@ -77,7 +76,8 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-        services.add(serviceTiles(serviceIndex));
+          developer.log("serviceIndex: $serviceIndex : ${CreateData.serviceNameList.length}");
+          services.add(serviceTiles(serviceIndex));
       }
     });
   }
@@ -113,19 +113,23 @@ class MySquareServicesCard extends StatelessWidget {
     await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
-          builder: (context) => SelectActionOrReactionPage(
-            serviceIndex: servicesIndex,
-          )),
+        builder: (context) => SelectActionOrReactionPage(
+          serviceIndex: servicesIndex,
+        )
+      ),
     );
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
-      Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      if (CreateData.selectOrUpdateWorkflow) {
+        CreateData.selectOrUpdateWorkflow = false;
+        Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (servicesIndex > Globaldata.actionServicesName.length) {
-      return MyDivider();
+    if (servicesIndex > CreateData.serviceNameList.length) {
+      return Column();
     }
     developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
