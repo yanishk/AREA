@@ -283,7 +283,7 @@ class CompleteActionOrReactionTop extends StatelessWidget {
       children: [
         SafeWebImage(
           url:
-              "${Globaldata.domainName}${CreateData.serviceIconsList[Globaldata.firstService]}",
+              "${Globaldata.domainName}${CreateData.serviceIconsList[CreateData.selectedServiceId]}",
           width: 75,
           height: 75,
         ),
