@@ -117,6 +117,9 @@ type GitlabWebhookResponse struct {
 	} `json:"project"`
 }
 
+type GitlabProject struct {
+}
+
 // Linkedin
 type LinkedinSub struct {
 	Sub string `json:"sub"`

@@ -848,6 +848,11 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 	return repositories, nil
 }
 
+func (self *ServiceService) RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error) {
+	var projects []entities.GitlabProject
+	return projects, nil
+}
+
 func (self *ServiceService) RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error) {
 	var channels []map[string]interface{}
 	tokenBot := os.Getenv("DISCORD_BOT_TOKEN")

@@ -233,6 +233,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/Gitlab/user/projects": {
+            "get": {
+                "description": "Retrieve the projects of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gitlab"
+                ],
+                "summary": "Retrieve User Projects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/about.json": {
             "get": {
                 "description": "Get about.json file",
@@ -1184,15 +1210,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ServiceReceiveServiceWeebhookSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Webhook received"
-                }
-            }
-        },
         "docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1612,6 +1629,26 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the user's projects"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "repositories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.GitlabProject"
+                    }
+                }
+            }
+        },
         "docs_userservice.UserServiceServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1699,6 +1736,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowReceiveServiceWebhookBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "docs_workflow.WorkflowReceiveServiceWebhookSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Webhook received"
                 }
             }
         },
@@ -1886,6 +1941,9 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "entities.GitlabProject": {
+            "type": "object"
         },
         "entities.NewWorkflow": {
             "type": "object",
