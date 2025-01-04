@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/services.dart';
 import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
@@ -28,7 +27,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   String apiRoute = "actions";
   List<Widget> parameterFiledList = [];
   Map<int, String> selectedItems = {};
-  Map<int, TextEditingController> textInputControler = {};
+  Map<int, TextEditingController> textInputController = {};
 
   @override
   void initState() {
@@ -56,10 +55,10 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       return parameterList[index].values;
     }
     List<String> splitValuesRange = parameterList[index].values.first.split("-");
-    int firstValue = int.parse(splitValuesRange.first);
-    int secondValue = int.parse(splitValuesRange.last);
+    int valueRangeStart = int.parse(splitValuesRange.first);
+    int valueRangeEnd = int.parse(splitValuesRange.last);
     List<String> finalStringList = [];
-    for (int i = firstValue; i <= secondValue; i++) {
+    for (int i = valueRangeStart; i <= valueRangeEnd; i++) {
       finalStringList.add(i.toString());
     }
     return finalStringList;
@@ -96,7 +95,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       );
     }
     if (parameterList[index].route.isEmpty) {
-      textInputControler[index] = new TextEditingController(text: "");
+      textInputController[index] = new TextEditingController(text: "");
       return Padding(
         padding: EdgeInsets.only(top: 20),
         child: Container(
@@ -105,7 +104,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
           child: SingleChildScrollView(
             child: CustomClassicForm(
               hint: "${parameterList[index].name} : ",
-              controller: textInputControler[index],
+              controller: textInputController[index],
               maxLines: 5,
               padding:
                   EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -147,15 +146,15 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
-                for (int i = 0; i < textInputControler.length; i++) {
-                  if (textInputControler[i] != null) {
-                    String controlerText = textInputControler[i]!.text;
+                for (int i = 0; i < textInputController.length; i++) {
+                  if (textInputController[i] != null) {
+                    String controlerText = textInputController[i]!.text;
                     if (CreateData.selectedActionOrReactionData.parameter[i].type == "int") {
                       CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = int.parse(controlerText);
                     } else {
                       CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = controlerText;
                     }
-                    developer.log("text input content : ${textInputControler[i]?.text}");
+                    developer.log("text input content : ${textInputController[i]?.text}");
                   }
                 }
                 developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");

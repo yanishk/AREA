@@ -76,7 +76,8 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-        services.add(serviceTiles(serviceIndex));
+          developer.log("serviceIndex: $serviceIndex : ${CreateData.serviceNameList.length}");
+          services.add(serviceTiles(serviceIndex));
       }
     });
   }
@@ -127,8 +128,8 @@ class MySquareServicesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (servicesIndex > Globaldata.actionServicesName.length) {
-      return MyDivider();
+    if (servicesIndex > CreateData.serviceNameList.length) {
+      return Column();
     }
     developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
