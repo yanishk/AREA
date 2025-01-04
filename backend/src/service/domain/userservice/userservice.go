@@ -34,7 +34,7 @@ func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepo
 	}
 }
 
-func (self *UserServiceService) GetUser(emailStr string, connectionTypeStr string) (entities.User, error) {
+func (self *UserServiceService) GetUser(emailStr, connectionTypeStr string) (entities.User, error) {
 	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(emailStr, connectionTypeStr)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return foundUser, fmt.Errorf("Could not find requested user")
@@ -42,7 +42,7 @@ func (self *UserServiceService) GetUser(emailStr string, connectionTypeStr strin
 	return foundUser, nil
 }
 
-func (self *UserServiceService) refreshToken(refreshToken string, userId string, serviceName string) (entities.ResultToken, error) {
+func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var serviceFound entities.Service
 	var request *http.Request
@@ -58,6 +58,10 @@ func (self *UserServiceService) refreshToken(refreshToken string, userId string,
 		request, errRequest = self.ServiceService.GetRedditRefreshTokenRequest(refreshToken)
 	} else if serviceName == "Asana" {
 		request, errRequest = self.ServiceService.GetAsanaRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Dropbox" {
+		request, errRequest = self.ServiceService.GetDropboxRefreshTokenRequest(refreshToken)
+	} else if serviceName == "Gitlab" {
+		request, errRequest = self.ServiceService.GetGitlabRefreshTokenRequest(refreshToken)
 	} else {
 		return tokenRes, fmt.Errorf("Unknown service")
 	}
@@ -84,11 +88,14 @@ func (self *UserServiceService) refreshToken(refreshToken string, userId string,
 		return tokenRes, errServiceFound
 	}
 
-	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
-	return tokenRes, err
+	err = self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
+	if err != nil {
+		return tokenRes, err
+	}
+	return tokenRes, nil
 }
 
-func (self *UserServiceService) CallApiAndRefresh(email string, connectionType string, serviceName string) (string, error) {
+func (self *UserServiceService) CallApiAndRefresh(email, connectionType, serviceName string) (string, error) {
 	foundUser, errGetUser := self.GetUser(email, connectionType)
 	if errGetUser != nil || len(foundUser.Email) <= 0 {
 		return "", errGetUser
@@ -120,7 +127,7 @@ func (self *UserServiceService) CallApiAndRefresh(email string, connectionType s
 	return token, nil
 }
 
-func (self *UserServiceService) createOrUpdateUserService(userId string, serviceId string, token entities.ResultToken) {
+func (self *UserServiceService) createOrUpdateUserService(userId, serviceId string, token entities.ResultToken) {
 	currentTime := time.Now()
 	expiryDate := currentTime.Add(time.Duration(token.ExpiresIn) * time.Second).Format(formattingDate)
 
@@ -133,7 +140,7 @@ func (self *UserServiceService) createOrUpdateUserService(userId string, service
 	}
 }
 
-func (self *UserServiceService) UpdateTokenForService(code string, serviceName string, appType string, email string, connectionType string) error {
+func (self *UserServiceService) UpdateTokenForService(code, serviceName, appType, email, connectionType string) error {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return errorService
@@ -158,7 +165,7 @@ func (self *UserServiceService) UpdateTokenForService(code string, serviceName s
 	return nil
 }
 
-func (self *UserServiceService) RetrieveGithubUserRepositories(email string, connectionType string) ([]entities.GithubRepository, error) {
+func (self *UserServiceService) RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error) {
 	accessToken, err := self.CallApiAndRefresh(email, connectionType, "Github")
 	if err != nil {
 		return []entities.GithubRepository{}, err
@@ -166,9 +173,8 @@ func (self *UserServiceService) RetrieveGithubUserRepositories(email string, con
 	return self.ServiceService.RequestGithubUserRepositories(accessToken)
 }
 
-func (self *UserServiceService) RetrieveDiscordUserServers(email string, connectionType string) ([]map[string]interface{}, error) {
-	var ownedServers []map[string]interface{}
-	var guilds []map[string]interface{}
+func (self *UserServiceService) RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error) {
+	var ownedServers, guilds []map[string]interface{}
 
 	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Discord")
 	if errRefreshing != nil {
@@ -194,7 +200,7 @@ func (self *UserServiceService) RetrieveDiscordUserServers(email string, connect
 	return ownedServers, nil
 }
 
-func (self *UserServiceService) RetrieveAsanaUserWorkspaces(email string, connectionType string) (entities.AsanaWorkspacesInfo, error) {
+func (self *UserServiceService) RetrieveAsanaUserWorkspaces(email, connectionType string) (entities.AsanaWorkspacesInfo, error) {
 	var workspaces entities.AsanaWorkspacesInfo
 	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Asana")
 	if errRefreshing != nil {
@@ -214,7 +220,7 @@ func (self *UserServiceService) RetrieveAsanaUserWorkspaces(email string, connec
 	return workspaces, nil
 }
 
-func (self *UserServiceService) decodeRequiredWorkspaceInfo(email string, connectionType string, url string) (entities.AsanaWorkspacesInfo, error) {
+func (self *UserServiceService) decodeRequiredWorkspaceInfo(email, connectionType, url string) (entities.AsanaWorkspacesInfo, error) {
 	var info entities.AsanaWorkspacesInfo
 
 	accessToken, errRefreshing := self.CallApiAndRefresh(email, connectionType, "Asana")
@@ -235,17 +241,17 @@ func (self *UserServiceService) decodeRequiredWorkspaceInfo(email string, connec
 	return info, nil
 }
 
-func (self *UserServiceService) RetrieveAsanaWorkspaceAssignees(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+func (self *UserServiceService) RetrieveAsanaWorkspaceAssignees(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
 	url := asanaWorkspaceRoute + workspaceId + "/users"
 	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
 }
 
-func (self *UserServiceService) RetrieveAsanaWorkspaceProjects(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+func (self *UserServiceService) RetrieveAsanaWorkspaceProjects(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
 	url := asanaWorkspaceRoute + workspaceId + "/projects"
 	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
 }
 
-func (self *UserServiceService) RetrieveAsanaWorkspaceTags(email string, connectionType string, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+func (self *UserServiceService) RetrieveAsanaWorkspaceTags(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
 	url := asanaWorkspaceRoute + workspaceId + "/tags"
 	return self.decodeRequiredWorkspaceInfo(email, connectionType, url)
 }

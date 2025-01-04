@@ -34,6 +34,9 @@ const grantTypeAuthorization = "authorization_code"
 const oneYearSecond = 31536000
 
 const clientIdParam = "client_id="
+const clientSecretParam = "&client_secret="
+const codeParam = "&code="
+const grantTypeParam = "&grant_type="
 const redirectUriParam = "&redirect_uri="
 const stateParam = "&state="
 const codeResponseType = "&response_type=code"
@@ -110,9 +113,8 @@ func (self *ServiceService) RetrieveReactionsServices() ([]entities.Service, err
 	return self.ServiceRepository.FindReactionsServices()
 }
 
-func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessary bool) (string, string) {
-	var callbackLink string
-	var clientID string
+func getCallbackAndClientId(callbackType, serviceName string, isIdNecessary bool) (string, string) {
+	var callbackLink, clientID string
 
 	if callbackType == "login" {
 		if isIdNecessary {
@@ -128,9 +130,8 @@ func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessa
 	return callbackLink, clientID
 }
 
-func oauth2Google(callbackType string, appType string) string {
-	var callbackLink string
-	var appTypeLink string
+func oauth2Google(callbackType, appType string) string {
+	var callbackLink, appTypeLink string
 
 	if callbackType == "login" {
 		callbackLink = os.Getenv("GOOGLE_LOGIN_CALLBACK")
@@ -224,7 +225,27 @@ func oauth2Linkedin(callbackType string) string {
 		stateParam + os.Getenv("LINKEDIN_STATE")
 }
 
-func (self *ServiceService) OAuth2Service(serviceName string, callbackType string, appType string) (string, error) {
+func oauth2Dropbox(callbackType string) string {
+	callbackLink, _ := getCallbackAndClientId(callbackType, "DROPBOX", false)
+
+	return ("https://www.dropbox.com/oauth2/authorize?" +
+		clientIdParam + url.QueryEscape(os.Getenv("DROPBOX_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType + "&token_access_type=offline")
+}
+
+func oauth2Gitlab(callbackType string) string {
+	callbackLink, _ := getCallbackAndClientId(callbackType, "GITLAB", false)
+
+	return ("https://gitlab.com/oauth/authorize?" +
+		clientIdParam + os.Getenv("GITLAB_CLIENT_ID") +
+		codeResponseType +
+		redirectUriParam + callbackLink +
+		stateParam + os.Getenv("GITLAB_STATE") +
+		"&scope=api read_api read_user read_repository write_repository")
+}
+
+func (self *ServiceService) OAuth2Service(serviceName, callbackType, appType string) (string, error) {
 	var authUrl string
 
 	if serviceName == "Google" {
@@ -241,13 +262,17 @@ func (self *ServiceService) OAuth2Service(serviceName string, callbackType strin
 		authUrl = oauth2Asana(callbackType)
 	} else if serviceName == "Linkedin" {
 		authUrl = oauth2Linkedin(callbackType)
+	} else if serviceName == "Dropbox" {
+		authUrl = oauth2Dropbox(callbackType)
+	} else if serviceName == "Gitlab" {
+		authUrl = oauth2Gitlab(callbackType)
 	} else {
 		return authUrl, fmt.Errorf(unknownServiceMessage)
 	}
 	return authUrl, nil
 }
 
-func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string) (*http.Request, error) {
+func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&code=%s&redirect_uri=%s",
 		grantTypeAuthorization,
@@ -262,7 +287,7 @@ func genericAccessTokenRequest(tokenUrl string, code string, callbackUrl string)
 	return request, nil
 }
 
-func getGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) string {
+func getGoogleOAuth2AccessTokenWebRequestBody(code, callback string) string {
 	return fmt.Sprintf(
 		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
 		code,
@@ -273,7 +298,7 @@ func getGoogleOAuth2AccessTokenWebRequestBody(code string, callback string) stri
 	)
 }
 
-func getGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) string {
+func getGoogleOAuth2AccessTokenMobileRequestBody(code, callback string) string {
 	return fmt.Sprintf(
 		"code=%s&client_id=%s&redirect_uri=%s&grant_type=%s",
 		code,
@@ -283,9 +308,8 @@ func getGoogleOAuth2AccessTokenMobileRequestBody(code string, callback string) s
 	)
 }
 
-func getGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType string) (*http.Request, error) {
-	var googleCallback string
-	var jsonBody string
+func getGoogleOAuth2AccessTokenRequest(code, callbackType, appType string) (*http.Request, error) {
+	var googleCallback, jsonBody string
 
 	if callbackType == "service" {
 		googleCallback = os.Getenv("GOOGLE_SERVICE_CALLBACK")
@@ -313,10 +337,8 @@ func getGoogleOAuth2AccessTokenRequest(code string, callbackType string, appType
 	return request, nil
 }
 
-func getGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var githubCallback string
-	var githubClientID string
-	var githubClientSecret string
+func getGithubOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var githubCallback, githubClientID, githubClientSecret string
 
 	if callbackType == "service" {
 		githubCallback = os.Getenv("GITHUB_SERVICE_CALLBACK")
@@ -349,7 +371,37 @@ func getGithubOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getGitlabOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var gitlabCallback string
+
+	if callbackType == "service" {
+		gitlabCallback = os.Getenv("GITLAB_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		gitlabCallback = os.Getenv("GITLAB_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(invalidCallbackTypeMessage)
+	}
+
+	tokenUrl := "https://gitlab.com/oauth/token"
+	jsonBody := fmt.Sprintf(
+		clientIdParam + os.Getenv("GITLAB_CLIENT_ID") +
+			clientSecretParam + os.Getenv("GITLAB_CLIENT_SECRET") +
+			codeParam + code +
+			redirectUriParam + gitlabCallback +
+			grantTypeParam + grantTypeAuthorization,
+	)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func getAsanaOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var asanaCallback string
 
 	if callbackType == "service" {
@@ -362,12 +414,11 @@ func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 
 	tokenUrl := "https://app.asana.com/-/oauth_token"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
-		os.Getenv("ASANA_CLIENT_ID"),
-		os.Getenv("ASANA_CLIENT_SECRET"),
-		code,
-		asanaCallback,
-		grantTypeAuthorization,
+		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
+			clientSecretParam + os.Getenv("ASANA_CLIENT_SECRET") +
+			codeParam + code +
+			redirectUriParam + asanaCallback +
+			grantTypeParam + grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -380,7 +431,7 @@ func getAsanaOAuth2AccessTokenRequest(code string, callbackType string) (*http.R
 	return request, nil
 }
 
-func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getLinkedinOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var callback string
 
 	if callbackType == "service" {
@@ -393,12 +444,11 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 
 	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
 	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
-		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
-		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
-		code,
-		callback,
-		grantTypeAuthorization,
+		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
+			clientSecretParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")) +
+			codeParam + code +
+			redirectUriParam + callback +
+			grantTypeParam + grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -411,7 +461,29 @@ func getLinkedinOAuth2AccessTokenRequest(code string, callbackType string) (*htt
 	return request, nil
 }
 
-func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getDropboxOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var dropboxCallback string
+
+	if callbackType == "service" {
+		dropboxCallback = os.Getenv("DROPBOX_SERVICE_CALLBACK")
+	} else if callbackType == "login" {
+		dropboxCallback = os.Getenv("DROPBOX_LOGIN_CALLBACK")
+	} else {
+		return nil, fmt.Errorf(invalidCallbackTypeMessage)
+	}
+
+	request, err := genericAccessTokenRequest("https://api.dropboxapi.com/oauth2/token", code, dropboxCallback)
+	if err != nil {
+		return request, err
+	}
+
+	request.SetBasicAuth(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"))
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func getSpotifyOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var spotifyCallback string
 
 	if callbackType == "service" {
@@ -433,7 +505,7 @@ func getSpotifyOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func getDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
+func getDiscordOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
 	var discordCallback string
 
 	if callbackType == "service" {
@@ -455,10 +527,8 @@ func getDiscordOAuth2AccessTokenRequest(code string, callbackType string) (*http
 	return request, nil
 }
 
-func getRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.Request, error) {
-	var redditCallback string
-	var redditClientID string
-	var redditClientSecret string
+func getRedditOAuth2AccessTokenRequest(code, callbackType string) (*http.Request, error) {
+	var redditCallback, redditClientID, redditClientSecret string
 
 	if callbackType == "service" {
 		redditCallback = os.Getenv("REDDIT_SERVICE_CALLBACK")
@@ -484,7 +554,7 @@ func getRedditOAuth2AccessTokenRequest(code string, callbackType string) (*http.
 	return request, nil
 }
 
-func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshToken string) (*http.Request, error) {
+func (self *ServiceService) genericRefreshTokenRequest(tokenUrl, refreshToken string) (*http.Request, error) {
 	jsonBody := fmt.Sprintf(
 		"grant_type=%s&refresh_token=%s",
 		grantTypeRefreshToken,
@@ -498,15 +568,19 @@ func (self *ServiceService) genericRefreshTokenRequest(tokenUrl string, refreshT
 	return request, nil
 }
 
-func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
-	tokenUrl := "https://oauth2.googleapis.com/token"
-	jsonBody := fmt.Sprintf(
+func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string {
+	return fmt.Sprintf(
 		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
-		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		clientId,
+		secretId,
 		grantTypeRefreshToken,
 		refreshToken,
 	)
+}
+
+func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://oauth2.googleapis.com/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GOOGLE_WEB_CLIENT_ID"), os.Getenv("GOOGLE_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -520,13 +594,21 @@ func (self *ServiceService) GetGoogleRefreshTokenRequest(refreshToken string) (*
 
 func (self *ServiceService) GetAsanaRefreshTokenRequest(refreshToken string) (*http.Request, error) {
 	tokenUrl := "https://app.asana.com/-/oauth_token"
-	jsonBody := fmt.Sprintf(
-		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
-		os.Getenv("ASANA_CLIENT_ID"),
-		os.Getenv("ASANA_CLIENT_SECRET"),
-		grantTypeRefreshToken,
-		refreshToken,
-	)
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("ASANA_CLIENT_ID"), os.Getenv("ASANA_CLIENT_SECRET"), refreshToken)
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
+func (self *ServiceService) GetDropboxRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://api.dropbox.com/oauth2/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("DROPBOX_CLIENT_ID"), os.Getenv("DROPBOX_CLIENT_SECRET"), refreshToken)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
 	if errRequest != nil {
@@ -578,6 +660,21 @@ func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*
 	return request, nil
 }
 
+func (self *ServiceService) GetGitlabRefreshTokenRequest(refreshToken string) (*http.Request, error) {
+	tokenUrl := "https://gitlab.com/oauth/token"
+	jsonBody := self.genericJsonBodyRefreshToken(os.Getenv("GITLAB_CLIENT_ID"), os.Getenv("GITLAB_CLIENT_SECRET"), refreshToken)
+	jsonBody += "&redirect_uri=" + os.Getenv("GITLAB_SERVICE_CALLBACK")
+
+	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
+	if errRequest != nil {
+		return request, errRequest
+	}
+
+	request.Header.Set(contentType, contentTypeUrlEncoded)
+
+	return request, nil
+}
+
 func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	res, err := client.Do(request)
@@ -591,7 +688,7 @@ func (self *ServiceService) ExecuteRequest(request *http.Request) (*http.Respons
 	return res, nil
 }
 
-func (self *ServiceService) ExecuteApiRequest(url string, method string, typeToken string, accessToken string, body io.Reader) (*http.Response, error) {
+func (self *ServiceService) ExecuteApiRequest(url, method, typeToken, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
@@ -603,7 +700,7 @@ func (self *ServiceService) ExecuteApiRequest(url string, method string, typeTok
 	return self.ExecuteRequest(req)
 }
 
-func (self *ServiceService) GetResultTokenFromCode(code string, serviceName string, callbackType string, appType string) (entities.ResultToken, error) {
+func (self *ServiceService) GetResultTokenFromCode(code, serviceName, callbackType, appType string) (entities.ResultToken, error) {
 	var tokenRes entities.ResultToken
 	var request *http.Request
 	var errRequest error
@@ -625,6 +722,10 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 		request, errRequest = getAsanaOAuth2AccessTokenRequest(code, callbackType)
 	} else if serviceName == "Linkedin" {
 		request, errRequest = getLinkedinOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Dropbox" {
+		request, errRequest = getDropboxOAuth2AccessTokenRequest(code, callbackType)
+	} else if serviceName == "Gitlab" {
+		request, errRequest = getGitlabOAuth2AccessTokenRequest(code, callbackType)
 	} else {
 		return tokenRes, fmt.Errorf(unknownServiceMessage)
 	}
@@ -646,7 +747,7 @@ func (self *ServiceService) GetResultTokenFromCode(code string, serviceName stri
 	return tokenRes, nil
 }
 
-func getOAuth2UserEmailRequest(userInfoUrl string, accessToken string) (*http.Request, error) {
+func getOAuth2UserEmailRequest(userInfoUrl, accessToken string) (*http.Request, error) {
 	request, errRequest := http.NewRequest("GET", userInfoUrl, nil)
 	if errRequest != nil {
 		return request, errRequest
@@ -667,7 +768,7 @@ func decodeUserInfoWithGithub(res *http.Response) (entities.UserInfo, error) {
 	return userInfos[0], nil
 }
 
-func (self *ServiceService) GetUserInfoFromService(accessToken string, serviceName string) (entities.UserInfo, error) {
+func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName string) (entities.UserInfo, error) {
 	var userInfo entities.UserInfo
 	var request *http.Request
 	var err error

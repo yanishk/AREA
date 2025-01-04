@@ -110,6 +110,13 @@ type GithubIssue struct {
 	Title string `json:"title"`
 }
 
+// Gitlab
+type GitlabWebhookResponse struct {
+	Project struct {
+		Id int `json:"id"`
+	} `json:"project"`
+}
+
 // Linkedin
 type LinkedinSub struct {
 	Sub string `json:"sub"`

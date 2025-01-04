@@ -1,9 +1,10 @@
 import React from "react";
+import { fieldType } from "../../utils/fieldType";
 
 interface Field {
     id: string;
     label: string;
-    type: string;
+    type: fieldType;
     options?: string[];
 }
 
@@ -19,7 +20,7 @@ const DynamicFields: React.FC<DynamicFieldsProps> = ({ fields, values, onChange 
             {fields.map((field) => (
                 <div key={field.id} className="mb-6">
                     <label className="text-white block text-xl font-bold mb-2">{field.label}</label>
-                    {field.type === "select" ? (
+                    {field.type === fieldType.SELECT ? (
                         <select
                             value={values[field.id] || ""}
                             onChange={(e) => onChange(field.id, e.target.value)}
@@ -33,7 +34,7 @@ const DynamicFields: React.FC<DynamicFieldsProps> = ({ fields, values, onChange 
                         </select>
                     ) : (
                         <input
-                            type={field.type}
+                            type={field.type === fieldType.INPUT ? "input" : ""}
                             value={values[field.id] || ""}
                             onChange={(e) => onChange(field.id, e.target.value)}
                             className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] focus:outline-none focus:border-black placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"

@@ -40,7 +40,6 @@ const HomePage = () => {
         }
 
         if (!codeAuth) {
-            console.error("Error with fetching code from url");
             return;
         }
         await axios.post(
