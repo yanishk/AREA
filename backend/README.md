@@ -41,12 +41,45 @@ and modify the switch case to compare to the name of your service and add the fu
 The second step of any OAuth2 flow is the exchange of the access code for an access token that can be stored in our database.
 
 In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
-- Create the function that will handle the logic of the exchange
+- Create the function that will handle the logic of the exchange.
 - Get the callback URI from the .env according to the plateform used: "web" or "mobile"
-- Use the function
+- Use the function:
 ```go
 func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
 ```
--Set your headers and return the *http.Request returned by "genericAccessTokenRequest"
+-Set your headers and return the *http.Request returned by "genericAccessTokenRequest".
 > [!NOTE]
 > In some specific cases, depending on the service you are trying to implement, this function cannot be used but its logic can.
+
+#### Refresh the token
+
+> [!NOTE]
+> Some services do not implement a refresh token, be sure to read the documentation of the service you are implementing. If the service does not provide refresh token you can skip this step.
+
+In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
+- Create a function that will handle the logic of the refreshing of the token, it must be prototyped this way
+```go 
+func (self *ServiceService) <YOUR DESIRED FUNCTION NAME>(refreshToken string) (*http.Request, error)
+```
+- You can use one of two function depending on your service requirement:
+```go
+func (self *ServiceService) genericRefreshTokenRequest(tokenUrl, refreshToken string) (*http.Request, error)
+```
+or
+```go
+func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string
+```
+> [!NOTE]
+> The second function is to be used when the refresh method requires the CLIENT_ID and CLIENT_SECRET variable.
+
+- Set your header and return the "*http.Request".
+
+In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/service.go```:
+- In the ServiceService interface, add the newly created function prototyp to the list.
+
+In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/userservice/userservice.go```:
+- In the function
+```go
+func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error)
+```
+add your service to the switch case and return the function that you created in the first step.
