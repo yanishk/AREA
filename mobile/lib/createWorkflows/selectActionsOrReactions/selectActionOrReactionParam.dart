@@ -7,6 +7,7 @@ import "../../globalData.dart";
 import '../createWidget.dart';
 import '../createWorkflowsData.dart';
 import "../../auth/webviewAuth/connectServiceAuth.dart";
+import 'actionOrReactionsFunctions.dart';
 
 class SelectParamActionOrReactionPage extends StatelessWidget {
   @override
@@ -52,8 +53,50 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
   }
 
+  Future<void> getRouteData(String route, int index) async {
+    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
+    if (response == null) {
+      return;
+    }
+    List<ActionOrReactionsParameter> parameterList = CreateData.selectedActionOrReactionData.parameter;
+    String listName = response.toString().split(":").first.split("{").last;
+    List<dynamic> reponseList = response[listName];
+    List<String> nameList = [];
+    for (int i = 0; i < reponseList.length; i++) {
+      String itemName = reponseList[i].toString().split("name: ").last.split(",").first;
+      nameList.add(itemName.split("}").first);
+    }
+    if (!selectedItems.containsKey(index)) {
+      selectedItems[index] = nameList.first;
+      int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
+      CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+    }
+    setState(() {
+      parameterFiledList.add(
+        CreateDropdown(
+          index: index,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedItems[index] = newValue ?? "";
+              int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
+              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+              fillParameterFiledList();
+            });
+          },
+          stringList: nameList,
+          selectedItems: selectedItems,
+          dropdownName: "${parameterList[index].name} : "
+        )
+      );
+    });
+  }
+
   List<String> fillDropDownStringList(List<ActionOrReactionsParameter> parameterList, int index) {
     if (parameterList[index].values.isEmpty) {
+      if (parameterList[index].route.isEmpty) {
+        return [];
+      }
+      getRouteData(parameterList[index].route, index);
       return [];
     }
     if (parameterList[index].isexhaustive) {
@@ -291,47 +334,54 @@ class CreateDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(padding: EdgeInsets.only(top: 20)),
-        AutoSizeText(
-          dropdownName,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 10,
-        ),
-        DropdownButton<String>(
-          value: selectedItems[index],
-          hint: Text(
-            selectedItems[index] ?? "",
+    return Container(
+      padding: EdgeInsets.all(0.0),
+      constraints: BoxConstraints(maxHeight: 100.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(padding: EdgeInsets.only(top: 20)),
+          AutoSizeText(
+            dropdownName,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
-            )
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 10,
           ),
-          items: stringList.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
+          DropdownButton<String>(
+            isExpanded: true,
+            value: selectedItems[index],
+            hint: AutoSizeText(
+              selectedItems[index] ?? "",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          dropdownColor: Colors.grey[800],
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        )
-      ]
+              maxLines: 1,
+            ),
+            items: stringList.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: AutoSizeText(
+                  item,
+                  maxLines: 1,
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+            dropdownColor: Colors.grey[800],
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ]
+      ),
     );
   }
 }
