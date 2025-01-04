@@ -6,6 +6,7 @@ class CreateData {
   static List<String> serviceNameList = Globaldata.actionServicesName;
   static List<String> serviceColorList = Globaldata.actionServicesColor;
   static List<String> serviceIconsList = Globaldata.actionServicesIcons;
+  static List<bool> serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
 
   static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
   static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();

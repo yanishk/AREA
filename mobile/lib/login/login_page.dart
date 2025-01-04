@@ -11,8 +11,7 @@ import "../globalData.dart";
 import "loadServicesList.dart";
 import '../apiCall/apiRequest.dart';
 import "loginNavigator.dart";
-import "../auth/spotifyAuth/connectSpotify.dart";
-import "../auth/redditAuth/connectReddit.dart";
+import "../auth/webviewAuth/connectServiceAuth.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -168,7 +167,7 @@ class _APICallState extends State<APICall> {
                 text: "Continue with Spotify",
                 color: Color.fromARGB(255, 30, 215, 96),
                 imageUrl: 'assets/icon/Spotify.webp',
-                onPressed: () {MySpotifyAuth.connectSpotify("login");},
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Spotify");},
                 imageHeight: 30,
                 imageWidth: 30,
               ),
@@ -176,7 +175,7 @@ class _APICallState extends State<APICall> {
                 text: "Continue with Reddit",
                 color: Color.fromARGB(255, 255, 87, 0),
                 imageUrl: 'assets/icon/Reddit.webp',
-                onPressed: () {MyRedditAuth.connectReddit("login");},
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Reddit");},
                 imageHeight: 30,
                 imageWidth: 30,
               ),

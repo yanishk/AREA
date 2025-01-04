@@ -13,12 +13,14 @@ class Globaldata {
   static List<String> actionServicesColor = [];
   static List<String> actionServicesIcons = [];
   static List<String> actionServicesID = [];
+  static List<bool> actionIsAuthNeeded = [];
   static List<ActionOrReactionList> actionServicesActions = [];
 
   static List<String> reactionServicesName = [];
   static List<String> reactionServicesColor = [];
   static List<String> reactionServicesIcons = [];
   static List<String> reactionServicesID = [];
+  static List<bool> reactionIsAuthNeeded = [];
   static List<ActionOrReactionList> reactionServicesReaction = [];
 
   static String domainName = "https://mathisbrehm.fr/";
