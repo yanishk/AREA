@@ -88,8 +88,11 @@ func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName s
 		return tokenRes, errServiceFound
 	}
 
-	self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
-	return tokenRes, err
+	err = self.UserServiceRepository.UpdateUserServiceByServiceIdAndUserId(userId, tokenRes.AccessToken, tokenRes.RefreshToken, expiryDate, serviceFound.Id)
+	if err != nil {
+		return tokenRes, err
+	}
+	return tokenRes, nil
 }
 
 func (self *UserServiceService) CallApiAndRefresh(email, connectionType, serviceName string) (string, error) {
