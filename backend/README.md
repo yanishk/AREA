@@ -35,3 +35,18 @@ to get the callback and the <service>_CLIENT_ID and the <service>_CLIENT_SECRET 
 func (self *ServiceService) OAuth2Service(serviceName, callbackType, appType string) (string, error) {
 ```
 and modify the switch case to compare to the name of your service and add the function you did in the step above.
+
+#### Exchange the access code for an access token
+
+The second step of any OAuth2 flow is the exchange of the access code for an access token that can be stored in our database.
+
+In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
+- Create the function that will handle the logic of the exchange
+- Get the callback URI from the .env according to the plateform used: "web" or "mobile"
+- Use the function
+```go
+func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
+```
+-Set your headers and return the *http.Request returned by "genericAccessTokenRequest"
+> [!NOTE]
+> In some specific cases, depending on the service you are trying to implement, this function cannot be used but its logic can.
