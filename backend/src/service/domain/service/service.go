@@ -855,7 +855,6 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 	return repositories, nil
 }
 
-
 func (self *ServiceService) RequestGitlabUser(accessToken string) (entities.GitlabUser, error) {
 	var user entities.GitlabUser
 
