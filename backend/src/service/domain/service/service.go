@@ -784,6 +784,8 @@ func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName stri
 		request, err = getOAuth2UserEmailRequest("https://discord.com/api/users/@me", accessToken)
 	case "Github":
 		request, err = getOAuth2UserEmailRequest(githubBaseUrl+"user/emails", accessToken)
+	case "Gitlab":
+		request, err = getOAuth2UserEmailRequest("https://gitlab.com/api/v4/user/emails", accessToken)
 	default:
 		return userInfo, fmt.Errorf(unknownServiceMessage)
 	}
@@ -798,7 +800,7 @@ func (self *ServiceService) GetUserInfoFromService(accessToken, serviceName stri
 	}
 	defer res.Body.Close()
 
-	if serviceName == "Github" {
+	if serviceName == "Github" || serviceName == "Gitlab" {
 		userInfo, err = decodeUserInfoWithMultipleResults(res)
 	} else {
 		err = json.NewDecoder(res.Body).Decode(&userInfo)
