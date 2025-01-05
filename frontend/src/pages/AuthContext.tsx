@@ -1,8 +1,8 @@
-import axios from "axios";
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
+import isAuthenticated from "../utils/checkAuthStatus";
 
 type AuthContextType = {
-    isAuthenticated: boolean;
+    isUserConnected: boolean;
     login: () => void;
     logout: () => void;
 };
@@ -10,31 +10,19 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isUserConnected, setIsUserConnected] = useState(false);
+
+    const checkAuthStatus = async () => {
+        const authStatus = await isAuthenticated();
+        setIsUserConnected(authStatus);
+    };
 
     const login = () => {
-        setIsAuthenticated(true);
+        setIsUserConnected(true);
     };
 
     const logout = () => {
-        setIsAuthenticated(false);
-    };
-
-    const checkAuthStatus = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}user`, {
-                withCredentials: true,
-            });
-
-            if (response.status != 200) {
-                setIsAuthenticated(false);
-                return;
-            }
-            setIsAuthenticated(true);
-        } catch (error) {
-            console.error("error: ", error);
-            setIsAuthenticated(false);
-        }
+        setIsUserConnected(false);
     };
 
     useEffect(() => {
@@ -42,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated, login, logout])}>
+        <AuthContext.Provider value={useMemo(() => ({ isUserConnected, login, logout }), [isUserConnected])}>
             {children}
         </AuthContext.Provider>
     );
@@ -50,8 +38,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
+
     if (!context) {
         throw new Error("error with AuthProvider");
     }
+
     return context;
 };
