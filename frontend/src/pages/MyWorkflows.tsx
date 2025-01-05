@@ -2,6 +2,7 @@ import axios from "axios";
 import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";
+import { getUserName } from "../utils/GetUserName";
 
 const MyWorkflow = () => {
 
@@ -29,8 +30,20 @@ const MyWorkflow = () => {
         }
     };
 
+    const [userName, setUserName] = useState("You");
+
+
     useEffect(() => {
+        const fetchUserName = async () => {
+            try {
+                const username = await getUserName();
+                setUserName(username);
+            } catch (error) {
+                console.error("Failed to get username: ", error);
+            }
+        }
         getUserWorkflows();
+        fetchUserName();
     }, []);
 
     return (
@@ -64,8 +77,19 @@ const MyWorkflow = () => {
                                 onClick={() => ("")}
                             >
                                 <div className="text-left w-full px-[30px]">
-                                    <h2 className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0">{workflow.name}</h2>
-                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 mr-4">by</h2>
+                                    <h2
+                                        className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0"
+                                    >
+                                        {workflow.name}
+                                    </h2>
+                                    <p
+                                        className="text-white text-[15.7px] mt-[35px] mb-[110px]"
+                                    >
+                                        by{' '}
+                                        <span className="font-bold">
+                                            {userName}
+                                        </span>
+                                    </p>
                                 </div>
                             </button>
 
