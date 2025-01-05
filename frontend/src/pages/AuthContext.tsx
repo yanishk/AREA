@@ -3,6 +3,7 @@ import isAuthenticated from "../utils/checkAuthStatus";
 
 type AuthContextType = {
     isUserConnected: boolean;
+    isLoading: boolean;
     login: () => void;
     logout: () => void;
 };
@@ -10,11 +11,13 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [isUserConnected, setIsUserConnected] = useState(false);
+    const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const checkAuthStatus = async () => {
         const authStatus = await isAuthenticated();
         setIsUserConnected(authStatus);
+        setIsLoading(false);
     };
 
     const login = () => {
@@ -30,8 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={useMemo(() => ({ isUserConnected, login, logout }), [isUserConnected])}>
-            {children}
+        <AuthContext.Provider value={useMemo(() => ({ isUserConnected, login, logout, isLoading }), [isUserConnected, isLoading])}>            {children}
         </AuthContext.Provider>
     );
 };
