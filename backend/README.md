@@ -2,6 +2,8 @@
 
 ## Implement a new service
 
+### Database
+
 Here is a simple explanation on how to implement a new service in AREA.
 
 First of all, you must update the database used in order to implement a new service. You only have to update the "service" table with the following informations:
@@ -17,8 +19,8 @@ If your newly implemented service requires OAuth2, here are the step to follow t
 
 #### Require the access code:
 
-In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
-- Implement a function that returns the link to request an access code, you can use the function 
+In the file ```backend/src/service/domain/service/service.go```:
+- Implement a function that returns the link to request an access code, you can use the function
 ```go
 func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessary bool) (string, string)
 ```
@@ -40,7 +42,7 @@ and modify the switch case to compare to the name of your service and add the fu
 
 The second step of any OAuth2 flow is the exchange of the access code for an access token that can be stored in our database.
 
-In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
+In the file ```backend/src/service/domain/service/service.go```:
 - Create the function that will handle the logic of the exchange.
 - Get the callback URI from the .env according to the plateform used: "web" or "mobile"
 - Use the function:
@@ -56,7 +58,7 @@ func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Reques
 > [!NOTE]
 > Some services do not implement a refresh token, be sure to read the documentation of the service you are implementing. If the service does not provide refresh token you can skip this step.
 
-In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/service/service.go```:
+In the file ```backend/src/service/domain/service/service.go```:
 - Create a function that will handle the logic of the refreshing of the token, it must be prototyped this way
 ```go 
 func (self *ServiceService) <YOUR DESIRED FUNCTION NAME>(refreshToken string) (*http.Request, error)
@@ -74,12 +76,27 @@ func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refr
 
 - Set your header and return the "*http.Request".
 
-In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/service.go```:
+In the file ```backend/src/service/service.go```:
 - In the ServiceService interface, add the newly created function prototyp to the list.
 
-In the file ```/home/Chaegnal/Epitech/Tek3/B5/area/B-DEV-500-PAR-5-2-area-yanis.harkouk-mirror/backend/src/service/domain/userservice/userservice.go```:
+In the file ```backend/src/service/domain/userservice/userservice.go```:
 - In the function
 ```go
 func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error)
 ```
 add your service to the switch case and return the function that you created in the first step.
+
+## Implement a new action
+
+### Database
+
+First of all, to implement a new action you must update the database. In the table "actions":
+- Fill the "serviceid" column with the ID of the service that you want this action to belon to
+> [!NOTE]
+> The ID of a service can be found in the "service" table in the column "id"
+- Fill the "name" column with the name you wish to give to the action. Beware, this will be the name displayed on the front and mobile plateform
+- Fill the "description" column, this column will be displayed in the front.
+> [!NOTE]
+> Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the action in the description.
+- Fill the "nbparam" column with the number of input expected of the user in order to create the action correctly
+- Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
