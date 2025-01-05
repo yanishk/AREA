@@ -406,32 +406,27 @@ const WorkflowBuilder = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedAction?.parameters) {
+        const updateFieldValues = (parameters: Parameters[], setFieldValues: React.Dispatch<React.SetStateAction<Record<string, string>>>) => {
             const defaultValues: Record<string, string> = {};
 
-            selectedAction.parameters.forEach((param) => {
+            parameters.forEach((param) => {
                 const options = getFieldValues(param);
-
                 if (options && options.length > 0) {
                     defaultValues[param.name] = options[0];
                 }
             });
-            setActionFieldValues((prev) => ({ ...defaultValues, ...prev }));
+
+            setFieldValues((prev) => ({ ...defaultValues, ...prev }));
+        };
+
+        if (selectedAction?.parameters) {
+            updateFieldValues(selectedAction.parameters, setActionFieldValues);
         }
 
         if (selectedReaction?.parameters) {
-            const defaultValues: Record<string, string> = {};
-
-            selectedReaction.parameters.forEach((param) => {
-                const options = getFieldValues(param);
-
-                if (options && options.length > 0) {
-                    defaultValues[param.name] = options[0];
-                }
-
-            });
-            setReactionFieldValues((prev) => ({ ...defaultValues, ...prev }));
+            updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
         }
+
     }, [selectedAction, selectedReaction]);
 
     const getIndexFromValues = (value: string, valuesArray: string[]): number | null => {
@@ -441,7 +436,11 @@ const WorkflowBuilder = () => {
             return null;
         }
 
-        return index;
+        if (valuesArray[0] === "0") {
+            return index;
+        }
+
+        return index + 1;
     };
 
     const getActionReactionParams = (

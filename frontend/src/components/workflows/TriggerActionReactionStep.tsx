@@ -1,5 +1,6 @@
 import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateSteps";
+import { fieldType } from "../../utils/fieldType";
 import { getFieldValues } from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
@@ -27,18 +28,18 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     const getFieldType = (param: Parameters) => {
         if (param.isexhaustive === true) {
-            return "select";
+            return fieldType.SELECT;
         }
 
         if (param.isexhaustive === false && param.values.length === 1) {
-            return "select"
+            return fieldType.SELECT;
         }
 
         if (param.isexhaustive === false && param.route === null) {
-            return "input";
+            return fieldType.INPUT;
         }
 
-        return "input"
+        return fieldType.INPUT;
     };
 
     const fields = selectedItem?.parameters.map((param) => ({

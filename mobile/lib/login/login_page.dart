@@ -11,8 +11,7 @@ import "../globalData.dart";
 import "loadServicesList.dart";
 import '../apiCall/apiRequest.dart';
 import "loginNavigator.dart";
-import "../auth/spotifyAuth/connectSpotify.dart";
-import "../auth/redditAuth/connectReddit.dart";
+import "../auth/webviewAuth/connectServiceAuth.dart";
 
 class LoginPage extends StatelessWidget {
   @override
@@ -159,24 +158,34 @@ class _APICallState extends State<APICall> {
               ),
               Padding(padding: EdgeInsets.only(top: 5)),
               AuthButton(
-                text: "Continue with Google",
-                color: Color.fromARGB(255, 232, 74, 74),
-                imageUrl: 'assets/icon/Google.webp',
-                onPressed: () {},
-              ),
-              AuthButton(
                 text: "Continue with Spotify",
                 color: Color.fromARGB(255, 30, 215, 96),
                 imageUrl: 'assets/icon/Spotify.webp',
-                onPressed: () {MySpotifyAuth.connectSpotify("login");},
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Spotify");},
                 imageHeight: 30,
                 imageWidth: 30,
               ),
               AuthButton(
-                text: "Continue with Reddit",
-                color: Color.fromARGB(255, 255, 87, 0),
-                imageUrl: 'assets/icon/Reddit.webp',
-                onPressed: () {MyRedditAuth.connectReddit("login");},
+                text: "Continue with Discord",
+                color: Color(0xff7289da),
+                imageUrl: 'assets/icon/Discord.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Discord");},
+                imageHeight: 30,
+                imageWidth: 30,
+              ),
+              AuthButton(
+                text: "Continue with Github",
+                color: Color(0xff24292e),
+                imageUrl: 'assets/icon/Github.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Github");},
+                imageHeight: 30,
+                imageWidth: 30,
+              ),
+              AuthButton(
+                text: "Continue with Gitlab",
+                color: Color(0xfffc6d27),
+                imageUrl: 'assets/icon/Gitlab.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Gitlab");},
                 imageHeight: 30,
                 imageWidth: 30,
               ),

@@ -77,11 +77,13 @@ func (self *ServiceHandler) oauth2Service(context *gin.Context) {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid app type",
 		})
+		return
 	}
 	if callbackType != "login" && callbackType != "service" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid callback type",
 		})
+		return
 	}
 
 	authUrl, err := self.ServiceService.OAuth2Service(serviceName, callbackType, appType)

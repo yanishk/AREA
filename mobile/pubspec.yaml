@@ -39,5 +39,6 @@ flutter:
     - assets/icon/Github.webp
     - assets/icon/NoImage.webp
     - assets/icon/Spotify.webp
-    - assets/icon/Reddit.webp
+    - assets/icon/Gitlab.webp
+    - assets/icon/Discord.webp
     - .env

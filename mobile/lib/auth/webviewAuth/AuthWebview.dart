@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
 import 'dart:convert';
@@ -14,44 +13,47 @@ import "../../login/loadServicesList.dart";
 import "../../apiCall/apiData.dart";
 import "../authData.dart";
 
-String redditAuthType = "";
+String authConnectionType = "";
+String authServiceName = "";
 
-class RedditAuthPage extends StatelessWidget {
-  RedditAuthPage({
+class WebviewAuthPage extends StatelessWidget {
+  WebviewAuthPage({
     super.key,
     required this.callBackType,
+    required this.authService,
   });
   final String callBackType;
+  final String authService;
+
   @override
   Widget build(BuildContext context) {
-    redditAuthType = callBackType;
+    authConnectionType = callBackType;
+    authServiceName = authService;
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: RedditAuthAPICall(),
+      home: WebviewAuthAPICall(),
     );
   }
 }
 
-class RedditAuthAPICall extends StatefulWidget {
+class WebviewAuthAPICall extends StatefulWidget {
   @override
-  RedditAuth createState() => RedditAuth();
+  WebviewAuth createState() => WebviewAuth();
 }
 
-class RedditAuth extends State<RedditAuthAPICall> {
+class WebviewAuth extends State<WebviewAuthAPICall> {
   late InAppWebViewController webViewController;
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String newUrl = "";
-  String apiRoute = "service-callback/Reddit";
+  String apiRoute = "service-callback/$authServiceName";
 
   @override
   void initState() {
     super.initState();
-    if (redditAuthType == "login") {
-      developer.log("redditAuthType : $redditAuthType");
+    if (authConnectionType == "login") {
+      developer.log("authConnectionType : $authConnectionType");
       setState(() {
-        apiRoute = "login-callback/Reddit";
+        apiRoute = "login-callback/$authServiceName";
       });
     }
   }
@@ -72,6 +74,9 @@ class RedditAuth extends State<RedditAuthAPICall> {
 
   String removeUrlState(String url) {
     final splitState = url.split("?state=");
+    if (splitState.length == 1) {
+      return url.split("&state=").first;
+    }
     developer.log("removeUrlState splitState : $splitState");
     final splitCode = splitState.last.split("&code=");
     developer.log("removeUrlState splitCode : $splitCode");
@@ -83,19 +88,19 @@ class RedditAuth extends State<RedditAuthAPICall> {
     return Scaffold(
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: WebUri(AuthData.redditConnectionLink),
+          url: WebUri(AuthData.serviceConnectionLink),
         ),
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           domStorageEnabled: true,
         ),
         onLoadStart: (controller, url) {
-          AuthFunctions.setCookiesAndNavigate(apiUrl);
+          AuthFunctions.setCookiesAndNavigate(ApiData.apiUrl);
         },
         onLoadStop: (controller, url) async {
           developer.log("onLoadStop url : ${url.toString()}");
           if (url != null &&
-              url.toString().contains(apiUrl + apiRoute)) {
+              url.toString().contains(ApiData.apiUrl + apiRoute)) {
             final urlSplit = url.toString().split(ApiData.apiUrl);
             String callBackUrl = removeUrlState(urlSplit.last);
             final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(callBackUrl), jsonEncode(<String, dynamic>{}),);

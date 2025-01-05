@@ -1,4 +1,4 @@
-import { faGoogle, faApple, faSpotify, faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
@@ -133,13 +133,13 @@ const RegisterForm = () => {
                         onClick={() => handleOAuthLogin("Discord")}
                     />
                     <SocialButton
-                        icon={faApple}
+                        icon={faGithub}
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
-                        text="Continue with Apple"
+                        text="Continue with Github"
                         iconPosition="left-[20px]"
                         iconSize="size-11"
-                        onClick={() => handleOAuthLogin("")}
+                        onClick={() => handleOAuthLogin("Github")}
                     />
 
                     <div

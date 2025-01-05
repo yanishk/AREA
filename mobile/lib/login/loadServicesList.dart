@@ -69,6 +69,35 @@ class LoadService extends State<APICall> {
     return responseData;
   }
 
+  List<String> getValueListe(List<dynamic> values) {
+    List<String> valuesList = [];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] != null) {
+        valuesList.add(values[i]);
+      }
+    }
+    return valuesList;
+  }
+
+  List<ActionOrReactionsParameter> storeActionReactionParameter(List<dynamic> parameter) {
+    List<ActionOrReactionsParameter> parameterList = [];
+    if (parameter.isEmpty) {
+      return parameterList;
+    }
+    for (int i = 0; i < parameter.length; i++) {
+      parameterList.add(
+        ActionOrReactionsParameter.optional(
+          parameter[i]["isexhaustive"] ?? true,
+          parameter[i]["name"] ?? "",
+          parameter[i]["route"] ?? "",
+          parameter[i]["type"] ?? "",
+          getValueListe(parameter[i]["values"]),
+        )
+      );
+    }
+    return parameterList;
+  }
+
   void storeServiceDescription(dynamic responseData, String serviceName, String route) {
     String typeToGet = "actions";
     List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions;
@@ -86,9 +115,9 @@ class LoadService extends State<APICall> {
             actionResponse['description'] ?? '',
             actionResponse['id'] ?? '',
             actionResponse['name'] ?? '',
-            actionResponse['nbparam'] ?? 0,
             actionResponse['serviceid'] ?? '',
             serviceName,
+            storeActionReactionParameter(actionResponse["parameters"] ?? []),
           ));
         }
       }
@@ -110,10 +139,11 @@ class LoadService extends State<APICall> {
   }
 
   void storeData(List<String> servicesName, List<String> servicesColor,
-      List<String> servicesIcons, List<String> servicesID, dynamic service) {
+      List<String> servicesIcons, List<String> servicesID, List<bool> serviceIsAuthNeeded, dynamic service) {
     servicesName.add(service['name']);
     servicesColor.add(service['color']);
     servicesIcons.add(service['logo']);
+    serviceIsAuthNeeded.add(service['isauthneeded']);
     servicesID.add(service['id']);
   }
 
@@ -126,13 +156,14 @@ class LoadService extends State<APICall> {
         getWorkflows(route, result);
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);
+            Globaldata.actionServicesIcons, Globaldata.actionServicesID, Globaldata.actionIsAuthNeeded ,service);
         } else {
           storeData(
             Globaldata.reactionServicesName,
             Globaldata.reactionServicesColor,
             Globaldata.reactionServicesIcons,
             Globaldata.reactionServicesID,
+            Globaldata.reactionIsAuthNeeded,
             service
           );
           LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());

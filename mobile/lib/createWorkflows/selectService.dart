@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
 import "../globalData.dart";
-import "selectActionOrReaction.dart";
+import "selectActionsOrReactions/selectActionOrReaction.dart";
 import 'createWorkflowsData.dart';
 import "createWidget.dart";
 
@@ -35,6 +34,7 @@ class SelectService extends State<APICall> {
       CreateData.serviceNameList = Globaldata.actionServicesName;
       CreateData.serviceColorList = Globaldata.actionServicesColor;
       CreateData.serviceIconsList = Globaldata.actionServicesIcons;
+      CreateData.serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
       return;
     }
     setState(() {
@@ -42,6 +42,7 @@ class SelectService extends State<APICall> {
       CreateData.serviceNameList = Globaldata.reactionServicesName;
       CreateData.serviceColorList = Globaldata.reactionServicesColor;
       CreateData.serviceIconsList = Globaldata.reactionServicesIcons;
+      CreateData.serviceIsAuthNeeded = Globaldata.reactionIsAuthNeeded;
     });
   }
 
@@ -59,7 +60,6 @@ class SelectService extends State<APICall> {
         ],
       );
     }
-    developer.log("index : $index");
     return Row(
       children: [
         MySquareServicesCard(
@@ -77,7 +77,7 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.serviceNameList.length;
         serviceIndex++) {
-        services.add(serviceTiles(serviceIndex));
+          services.add(serviceTiles(serviceIndex));
       }
     });
   }
@@ -113,21 +113,24 @@ class MySquareServicesCard extends StatelessWidget {
     await Navigator.push(
       Globaldata.myContext,
       MaterialPageRoute(
-          builder: (context) => SelectActionOrReactionPage(
-            serviceIndex: servicesIndex,
-          )),
+        builder: (context) => SelectActionOrReactionPage(
+          serviceIndex: servicesIndex,
+        )
+      ),
     );
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
-      Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      if (CreateData.selectOrUpdateWorkflow) {
+        CreateData.selectOrUpdateWorkflow = false;
+        Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (servicesIndex > Globaldata.actionServicesName.length) {
-      return MyDivider();
+    if (servicesIndex > CreateData.serviceNameList.length) {
+      return Column();
     }
-    developer.log("https://mathisbrehm.fr/${CreateData.serviceIconsList[servicesIndex]}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
