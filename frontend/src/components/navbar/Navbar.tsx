@@ -8,7 +8,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
-    const { isAuthenticated } = useAuth();
+    const { isUserConnected } = useAuth();
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
@@ -37,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                 <ul
                     className="flex flex-row items-center gap-x-6 mr-4"
                 >
-                    {!isAuthenticated ? (
+                    {!isUserConnected ? (
                         <>
                             <li>
                                 <NavbarLink

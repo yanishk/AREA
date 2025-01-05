@@ -8,15 +8,15 @@ interface RedirectRouteProps {
 }
 
 const RedirectRoute: React.FC<RedirectRouteProps> = ({ children, dest }) => {
-    const { isAuthenticated } = useAuth();
+    const { isUserConnected } = useAuth();
 
-    if (isAuthenticated) {
-        return <Navigate to={`${dest}`} replace />;
+    if (!isUserConnected) {
+        return <>
+            {children}
+        </>;
     }
 
-    return <>
-        {children}
-    </>;
+    return <Navigate to={`${dest}`} replace />;
 };
 
 export default RedirectRoute;
