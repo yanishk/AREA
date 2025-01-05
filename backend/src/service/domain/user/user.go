@@ -21,10 +21,10 @@ type UserService struct {
 	ServiceService        service.ServiceService
 }
 
-const ContentType = "Content-Type"
-const ContentTypeUrlEncoded = "application/x-www-form-urlencoded"
-const FormattingDate = "2006-01-02 15:04:05-07:00"
-const BasicConnectionType = "basic"
+const contentType = "Content-Type"
+const contentTypeUrlEncoded = "application/x-www-form-urlencoded"
+const formattingDate = "2006-01-02 15:04:05-07:00"
+const basicConnectionType = "basic"
 
 func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository,
 	UserServiceRepository storage.UserServiceRepository, WorkflowRepository storage.WorkflowRepository, ServiceService service.ServiceService) *UserService {
@@ -37,10 +37,10 @@ func NewUserService(UserRepository storage.UserRepository, ServiceRepository sto
 	}
 }
 
-func (self *UserService) CreateUser(userEmail string, userPassword string, userConnectionType string) error {
+func (self *UserService) CreateUser(userEmail, userPassword, userConnectionType string) error {
 	var errorUser error
 
-	if userConnectionType == BasicConnectionType {
+	if userConnectionType == basicConnectionType {
 		hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("Internal server error")
@@ -59,7 +59,7 @@ func (self *UserService) CreateUser(userEmail string, userPassword string, userC
 	return nil
 }
 
-func createToken(email string, connectionType string) (string, error) {
+func createToken(email, connectionType string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"email":          email,
@@ -73,8 +73,8 @@ func createToken(email string, connectionType string) (string, error) {
 	return tokenString, nil
 }
 
-func (self *UserService) LoginAuthentication(userEmail string, userPassword string, userConnectionType string) (string, error) {
-	if userConnectionType != BasicConnectionType && userPassword != "" {
+func (self *UserService) LoginAuthentication(userEmail, userPassword, userConnectionType string) (string, error) {
+	if userConnectionType != basicConnectionType && userPassword != "" {
 		return "", fmt.Errorf("Wrong password")
 	}
 
@@ -83,7 +83,7 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 		return "", fmt.Errorf("Could not find requested user")
 	}
 
-	if userConnectionType == BasicConnectionType {
+	if userConnectionType == basicConnectionType {
 		resBcrypt := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(userPassword))
 		if resBcrypt != nil {
 			return "", fmt.Errorf("Wrong password")
@@ -96,7 +96,7 @@ func (self *UserService) LoginAuthentication(userEmail string, userPassword stri
 	return tokenString, nil
 }
 
-func (self *UserService) LoginWithService(code string, serviceName string, appType string) (string, error) {
+func (self *UserService) LoginWithService(code, serviceName, appType string) (string, error) {
 	_, errorService := self.ServiceRepository.FindServiceByName(serviceName)
 	if errorService != nil {
 		return "", errorService
@@ -127,7 +127,7 @@ func (self *UserService) LoginWithService(code string, serviceName string, appTy
 	return token, nil
 }
 
-func (self *UserService) GetUser(userEmail string, userConnectionType string) (entities.UserInfos, error) {
+func (self *UserService) GetUser(userEmail, userConnectionType string) (entities.UserInfos, error) {
 	user, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if err != nil {
 		return entities.UserInfos{}, err
@@ -136,8 +136,8 @@ func (self *UserService) GetUser(userEmail string, userConnectionType string) (e
 	return entities.UserInfos{Email: user.Email, CreatedAt: user.CreatedAt, Timezone: user.Timezone, ConnectionType: user.ConnectionType}, err
 }
 
-func (self *UserService) ModifyPassword(userEmail string, userConnectionType string, newPassword entities.UserModifyPassword) error {
-	if userConnectionType != BasicConnectionType {
+func (self *UserService) ModifyPassword(userEmail, userConnectionType string, newPassword entities.UserModifyPassword) error {
+	if userConnectionType != basicConnectionType {
 		return fmt.Errorf("Could not modify the password")
 	}
 
@@ -163,7 +163,7 @@ func (self *UserService) ModifyPassword(userEmail string, userConnectionType str
 	return nil
 }
 
-func (self *UserService) DeleteAccount(userEmail string, userConnectionType string) error {
+func (self *UserService) DeleteAccount(userEmail, userConnectionType string) error {
 	user, err := self.UserRepository.FindUserByEmail(userEmail, userConnectionType)
 	if err != nil {
 		return err

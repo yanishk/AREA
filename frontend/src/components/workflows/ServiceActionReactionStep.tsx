@@ -3,7 +3,7 @@ import CancelButton from "../buttons/CancelButton";
 interface SelectServiceStepProps {
     services: any;
     goBack: () => void;
-    handleSelectService: (name: string, color: string, icon: string) => void;
+    handleSelectService: (name: string, color: string, icon: string, isauthneeded: boolean) => void;
 }
 
 const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
@@ -42,7 +42,8 @@ const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
                                 handleSelectService(
                                     service.name,
                                     service.color,
-                                    `${import.meta.env.VITE_HOST_URL}${service.iconPath}`
+                                    `${import.meta.env.VITE_HOST_URL}${service.iconPath}`,
+                                    service.isauthneeded
                                 )
                             }
                         >

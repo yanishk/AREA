@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-import "../custom_widget.dart";
-import "../globalData.dart";
-import 'createWidget.dart';
-import 'createWorkflowsData.dart';
-import "../auth/connectSpotify.dart";
+import "../../custom_widget.dart";
+import "../../globalData.dart";
+import '../createWidget.dart';
+import '../createWorkflowsData.dart';
+import "selectActionOrReactionParam.dart";
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -54,13 +54,14 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     if (!isAnAction) {
       setState(() {
         apiRoute = "reactions";
+        CreateData.selectedActionOrReactionData = ActionOrReactionData.optional();
+        CreateData.selectedServiceId = serviceIndex;
       });
     }
     getActionsOrReactions();
   }
 
   Future<void> getActionsOrReactions() async {
-
     setState(() {
       if (apiRoute == "actions") {
         storeServiceDescription(Globaldata.actionServicesActions);
@@ -71,7 +72,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   void storeServiceDescription(List<ActionOrReactionList> allActionOrReactionList) {
-
     for (int i = 0; i < allActionOrReactionList.length; i++) {
       if (allActionOrReactionList[i].servicename == CreateData.serviceNameList[serviceIndex]) {
         actionOrReactionList.add(ActionOrReactionData.optional(
@@ -79,8 +79,9 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           allActionOrReactionList[i].name,
           allActionOrReactionList[i].description,
           allActionOrReactionList[i].serviceid,
-          allActionOrReactionList[i].nbparam,
+          allActionOrReactionList[i].parameter,
         ));
+        actionDescription = allActionOrReactionList[i].description;
         ActionOrReactionButtonsList.add(
           actionOrReactionButtons(actionOrReactionList.length - 1),
         );
@@ -89,9 +90,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
   }
 
   Widget actionOrReactionButtons(int index) {
-    if (actionOrReactionList[index].name == "Every day at") {
-      return selectDateTime(index);
-    }
     return Column(children: [
       Padding(padding: EdgeInsets.only(top: 15)),
       CustomButton(
@@ -107,74 +105,20 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     ]);
   }
 
-  Widget selectDateTime(int index) {
-    return Padding(
-      padding: EdgeInsets.only(top: 15),
-      child: CustomButton(
-        backgroundColor: HexColor(CreateData.serviceColorList[serviceIndex]),
-        text: ButtonText(text: actionOrReactionList[index].name,),
-        onPressed: () {
-          selectTimePopup(index);
-        },
-        size: buttonSize,
-        padding: EdgeInsets.symmetric(horizontal: 15.0),
-        borderCircularRadius: buttonRadius,
-      ),
-    );
-  }
-
   Future<void> saveSelectedActionOrReaction(int index) async {
+    CreateData.selectedServiceId = serviceIndex;
+    CreateData.selectedActionOrReactionData = actionOrReactionList[index];
+    await Navigator.push(
+      Globaldata.myContext,
+      MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
+    );
+    actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];
     } else {
       CreateData.serviceReaction = actionOrReactionList[index];
     }
     Navigator.pop(Globaldata.myContext);
-  }
-
-  Widget connectButton() {
-    if (CreateData.serviceNameList[serviceIndex] == "Spotify") {
-      return CustomButton(
-        backgroundColor: colorTheme,
-        text: ButtonText(text: "Connect",),
-        onPressed: () {MySpotifyAuth.connectSpotify("service");},
-        size: buttonSize,
-        padding: EdgeInsets.symmetric(horizontal: 15.0),
-        borderCircularRadius: buttonRadius,
-      );
-    } else {
-      return SizedBox();
-    }
-  }
-
-  Future<void> selectTimePopup(int index) async {
-    final TimeOfDay? selectedTime = await showTimePicker(
-      context: Globaldata.myContext,
-      initialEntryMode: TimePickerEntryMode.input,
-      initialTime: TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
-              primary: colorTheme,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: MediaQuery(
-            data: MediaQuery.of(Globaldata.myContext)
-                .copyWith(alwaysUse24HourFormat: true),
-            child: child!,
-          ),
-        );
-      },
-    );
-    if (selectedTime != null) {
-      actionOrReactionList[index].parameter =
-        "${selectedTime.hour.toString()}:${selectedTime.minute.toString()}";
-      actionOrReactionList[index].parameterList["hour"] = selectedTime.hour;
-      actionOrReactionList[index].parameterList["minute"] = selectedTime.minute;
-      saveSelectedActionOrReaction(index);
-    }
   }
 
   @override
@@ -187,11 +131,10 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
             ActionOrReactionDescription(
                 colorTheme: colorTheme,
                 title: "Select $apiRoute",
-                serviceIconsList: CreateData.serviceIconsList,
+                serviceIcon: CreateData.serviceIconsList[serviceIndex],
                 serviceName: CreateData.serviceNameList[serviceIndex],
                 actionDescription: actionDescription),
             Padding(padding: EdgeInsets.only(top: 15)),
-            connectButton(),
             Column(
               children: ActionOrReactionButtonsList,
             ),
@@ -207,7 +150,6 @@ class ButtonText extends StatelessWidget {
     super.key,
     required this.text,
   });
-
   final String text;
 
   @override

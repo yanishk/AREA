@@ -1,12 +1,14 @@
-import Steps from "../../CreateSteps";
+import { Parameters } from "../../utils/ActionReactionParameters";
+import Steps from "../../utils/CreateSteps";
+import { fieldType } from "../../utils/fieldType";
+import { getFieldValues } from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
-    selectedItem: {name: string, id: string} | null;
-    fields: any[];
+    selectedItem: {name: string, id: string, parameters: Parameters[]} | null;
     itemFieldValues: Record<string, string>;
     handleFieldChange: (id: string, value: string, type: "action" | "reaction") => void;
     goToStep: (step: number) => void;
@@ -17,13 +19,36 @@ interface TriggerActionReactionProps {
 const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     selectedService,
     selectedItem,
-    fields,
     itemFieldValues,
     handleFieldChange,
     goToStep,
     goBack,
     type,
 }) => {
+
+    const getFieldType = (param: Parameters) => {
+        if (param.isexhaustive === true) {
+            return fieldType.SELECT;
+        }
+
+        if (param.isexhaustive === false && param.values.length === 1) {
+            return fieldType.SELECT;
+        }
+
+        if (param.isexhaustive === false && param.route === null) {
+            return fieldType.INPUT;
+        }
+
+        return fieldType.INPUT;
+    };
+
+    const fields = selectedItem?.parameters.map((param) => ({
+        id: param.name,
+        label: param.name,
+        type: getFieldType(param),
+        options: getFieldValues(param),
+    })) || [];
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -84,3 +109,4 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 };
 
 export default TriggerActionReactionStep;
+

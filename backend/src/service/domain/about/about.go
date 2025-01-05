@@ -23,7 +23,7 @@ func NewAboutService(ServiceRepository storage.ServiceRepository, ActionReposito
 	}
 }
 
-func (self *AboutService) GetAboutAction(action entities.Action) entities.AboutAction {
+func getAboutAction(action entities.Action) entities.AboutAction {
 	var aboutAction entities.AboutAction
 
 	aboutAction.Name = action.Name
@@ -31,7 +31,7 @@ func (self *AboutService) GetAboutAction(action entities.Action) entities.AboutA
 	return aboutAction
 }
 
-func (self *AboutService) GetAboutReaction(reaction entities.Reaction) entities.AboutReaction {
+func getAboutReaction(reaction entities.Reaction) entities.AboutReaction {
 	var aboutReaction entities.AboutReaction
 
 	aboutReaction.Name = reaction.Name
@@ -39,44 +39,44 @@ func (self *AboutService) GetAboutReaction(reaction entities.Reaction) entities.
 	return aboutReaction
 }
 
-func (self *AboutService) GetAboutActions(serviceId string) ([]entities.AboutAction, error) {
+func (self *AboutService) getAboutActions(serviceId string) ([]entities.AboutAction, error) {
 	var aboutActions []entities.AboutAction
 
-	actions, err := self.ActionRepository.FindActionByServiceId(serviceId)
+	actions, err := self.ActionRepository.FindActionsByServiceId(serviceId)
 	if err != nil {
 		return aboutActions, err
 	}
 
 	for _, action := range actions {
-		aboutAction := self.GetAboutAction(action)
+		aboutAction := getAboutAction(action)
 		aboutActions = append(aboutActions, aboutAction)
 	}
 	return aboutActions, nil
 }
-func (self *AboutService) GetAboutReactions(serviceId string) ([]entities.AboutReaction, error) {
+func (self *AboutService) getAboutReactions(serviceId string) ([]entities.AboutReaction, error) {
 	var aboutReactions []entities.AboutReaction
 
-	reactions, err := self.ReactionRepository.FindReactionByServiceId(serviceId)
+	reactions, err := self.ReactionRepository.FindReactionsByServiceId(serviceId)
 	if err != nil {
 		return aboutReactions, err
 	}
 
 	for _, reaction := range reactions {
-		aboutReaction := self.GetAboutReaction(reaction)
+		aboutReaction := getAboutReaction(reaction)
 		aboutReactions = append(aboutReactions, aboutReaction)
 	}
 	return aboutReactions, nil
 }
 
-func (self *AboutService) GetAboutService(service entities.Service) (entities.AboutService, error) {
+func (self *AboutService) getAboutService(service entities.Service) (entities.AboutService, error) {
 	var aboutService entities.AboutService
 
-	actions, err := self.GetAboutActions(service.Id)
+	actions, err := self.getAboutActions(service.Id)
 	if err != nil {
 		return aboutService, err
 	}
 
-	reactions, err := self.GetAboutReactions(service.Id)
+	reactions, err := self.getAboutReactions(service.Id)
 	if err != nil {
 		return aboutService, err
 	}
@@ -87,7 +87,7 @@ func (self *AboutService) GetAboutService(service entities.Service) (entities.Ab
 	return aboutService, nil
 }
 
-func (self *AboutService) GetAboutServices() ([]entities.AboutService, error) {
+func (self *AboutService) getAboutServices() ([]entities.AboutService, error) {
 	var aboutServices []entities.AboutService
 
 	services, err := self.ServiceRepository.FindAllServices()
@@ -96,7 +96,7 @@ func (self *AboutService) GetAboutServices() ([]entities.AboutService, error) {
 	}
 
 	for _, service := range services {
-		aboutService, err := self.GetAboutService(service)
+		aboutService, err := self.getAboutService(service)
 		if err != nil {
 			return aboutServices, err
 		}
@@ -108,7 +108,7 @@ func (self *AboutService) GetAboutServices() ([]entities.AboutService, error) {
 func (self *AboutService) GetAboutServer(about entities.About) (entities.About, error) {
 	about.Server.CurrentTime = time.Now().Unix()
 
-	services, err := self.GetAboutServices()
+	services, err := self.getAboutServices()
 	if err != nil {
 		return about, err
 	}

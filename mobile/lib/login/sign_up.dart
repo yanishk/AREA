@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import "../auth/webviewAuth/connectServiceAuth.dart";
 
 import "../custom_widget.dart";
 import "login_page.dart";
@@ -115,77 +116,38 @@ class _APICallState extends State<APICall> {
                 ),
                 textPadding: EdgeInsets.symmetric(horizontal: 8.0),
               ),
-              Padding(padding: EdgeInsets.only(top: 15)),
-              CustomButton(
-                backgroundColor: Color.fromARGB(255, 232, 74, 74),
-                text: AutoSizeText(
-                  "Continue with google",
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                  maxLines: 1,
-                ),
-                onPressed: () {},
-                size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                textPaddingLeft: 30,
-                image: Image.asset('assets/icon/google_logo.webp',
-                    width: 24, height: 24),
+              Padding(padding: EdgeInsets.only(top: 5)),
+              AuthButton(
+                text: "Continue with Spotify",
+                color: Color.fromARGB(255, 30, 215, 96),
+                imageUrl: 'assets/icon/Spotify.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Spotify");},
+                imageHeight: 30,
+                imageWidth: 30,
               ),
-              Padding(padding: EdgeInsets.only(top: 10)),
-              CustomButton(
-                backgroundColor: Color.fromARGB(255, 59, 87, 157),
-                text: AutoSizeText(
-                  "Continue with Facebook",
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                  maxLines: 1,
-                ),
-                onPressed: () {},
-                size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                textPaddingLeft: 30,
-                image: Image.asset('assets/icon/facebook_icon.png',
-                    width: 24, height: 24),
+              AuthButton(
+                text: "Continue with Discord",
+                color: Color(0xff7289da),
+                imageUrl: 'assets/icon/Discord.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Discord");},
+                imageHeight: 30,
+                imageWidth: 30,
               ),
-              Padding(padding: EdgeInsets.only(top: 10)),
-              CustomButton(
-                backgroundColor: Color.fromARGB(255, 169, 169, 169),
-                text: AutoSizeText(
-                  "Continue with X",
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                  maxLines: 1,
-                ),
-                onPressed: () {},
-                size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                textPaddingLeft: 30,
-                image: Image.asset('assets/icon/X-Logo.png',
-                    width: 40, height: 40),
+              AuthButton(
+                text: "Continue with Github",
+                color: Color(0xff24292e),
+                imageUrl: 'assets/icon/Github.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Github");},
+                imageHeight: 30,
+                imageWidth: 30,
               ),
-              Padding(padding: EdgeInsets.only(top: 10)),
-              CustomButton(
-                backgroundColor: Color.fromARGB(255, 34, 34, 34),
-                text: AutoSizeText(
-                  "Continue with Apple",
-                  style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                  maxLines: 1,
-                ),
-                onPressed: () {},
-                size: Size(double.infinity, 60),
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                textPaddingLeft: 30,
-                image: Image.asset('assets/icon/apple_logo.png',
-                    width: 29, height: 29),
+              AuthButton(
+                text: "Continue with Gitlab",
+                color: Color(0xfffc6d27),
+                imageUrl: 'assets/icon/Gitlab.webp',
+                onPressed: () {ConnectServiceAuthWebview.connectService("login", "Gitlab");},
+                imageHeight: 30,
+                imageWidth: 30,
               ),
               Padding(padding: EdgeInsets.only(top: 30)),
               CustomTextButton(

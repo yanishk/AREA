@@ -3,9 +3,9 @@
 ![Static Badge](https://img.shields.io/badge/mobile-flutter-purple)
 ![Static Badge](https://img.shields.io/badge/containerization-docker-yellow)
 
-[![Quality Gate Status](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=alert_status&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
-[![Security Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=security_rating&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
-[![Maintainability Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=sqale_rating&token=sqb_875ba6a7803079c072fb4782f99696d00b0e457f)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+[![Quality Gate Status](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=alert_status&token=sqb_816c237053393841f07d61210c8f0cb66c77c87d)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+[![Security Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=security_rating&token=sqb_816c237053393841f07d61210c8f0cb66c77c87d)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
+[![Maintainability Rating](http://mathisbrehm.fr:9000/api/project_badges/measure?project=AREA&metric=sqale_rating&token=sqb_816c237053393841f07d61210c8f0cb66c77c87d)](http://mathisbrehm.fr:9000/dashboard?id=AREA)
 
 # AREA
 

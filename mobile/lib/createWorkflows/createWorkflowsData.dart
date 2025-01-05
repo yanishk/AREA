@@ -6,18 +6,22 @@ class CreateData {
   static List<String> serviceNameList = Globaldata.actionServicesName;
   static List<String> serviceColorList = Globaldata.actionServicesColor;
   static List<String> serviceIconsList = Globaldata.actionServicesIcons;
+  static List<bool> serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
 
   static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
   static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
+
+  static ActionOrReactionData selectedActionOrReactionData = ActionOrReactionData.optional();
+  static int selectedServiceId = 0;
+  static bool selectOrUpdateWorkflow = false;
 }
 
 class ActionOrReactionData {
+  String description;
   String id;
   String name;
-  String description;
   String serviceId;
-  int nbParam;
-  String parameter;
+  List<ActionOrReactionsParameter> parameter = [];
   Map<String, dynamic> parameterList = {};
 
   ActionOrReactionData.optional([
@@ -25,10 +29,10 @@ class ActionOrReactionData {
     this.name = "",
     this.description = "",
     this.serviceId = "",
-    this.nbParam = 0,
-    this.parameter = "",
+    List<ActionOrReactionsParameter> ?parameter,
     Map<String, dynamic>? parameterList,
   ]) {
     this.parameterList = parameterList ?? {};
+    this.parameter = parameter ?? [];
   }
 }

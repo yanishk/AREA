@@ -16,7 +16,7 @@ func NewActionRepository(db *sql.DB) *ActionRepository {
 	return &ActionRepository{db: db}
 }
 
-func (self *ActionRepository) UnmarshalParameters(parametersBytes []byte, action entities.Action) (entities.Action, error) {
+func (self *ActionRepository) unmarshalParameters(parametersBytes []byte, action entities.Action) (entities.Action, error) {
 	if len(parametersBytes) > 0 {
 		err := json.Unmarshal(parametersBytes, &action.Parameters)
 		if err != nil {
@@ -26,7 +26,7 @@ func (self *ActionRepository) UnmarshalParameters(parametersBytes []byte, action
 	return action, nil
 }
 
-func (self *ActionRepository) CreateAction(name string, description string, serviceId string, nbParam int) error {
+func (self *ActionRepository) CreateAction(name, description, serviceId string, nbParam int) error {
 	sqlStatement := `INSERT INTO actions (name, description, serviceid, nbparam) VALUES ($1, $2, $3, $4)`
 
 	_, err := self.FindActionByName(name)
@@ -41,25 +41,43 @@ func (self *ActionRepository) CreateAction(name string, description string, serv
 	return nil
 }
 
+func (self *ActionRepository) FindActionById(id string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM actions WHERE id = ($1)`
+	var action entities.Action
+	var parametersBytes []byte
+
+	row := self.db.QueryRow(sqlStatement, id)
+	err := row.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
+	if err != nil {
+		return action, err
+	}
+
+	action, err = self.unmarshalParameters(parametersBytes, action)
+	if err != nil {
+		return action, err
+	}
+	return action, nil
+}
+
 func (self *ActionRepository) FindActionByName(name string) (entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE name = ($1)`
-	var retrievedAction entities.Action
+	var action entities.Action
 	var parametersBytes []byte
 
 	row := self.db.QueryRow(sqlStatement, name)
-	err := row.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
+	err := row.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
 	if err != nil {
-		return retrievedAction, err
+		return action, err
 	}
 
-	retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
+	action, err = self.unmarshalParameters(parametersBytes, action)
 	if err != nil {
-		return retrievedAction, err
+		return action, err
 	}
-	return retrievedAction, nil
+	return action, nil
 }
 
-func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entities.Action, error) {
+func (self *ActionRepository) FindActionsByServiceId(serviceId string) ([]entities.Action, error) {
 	sqlStatement := `SELECT * FROM actions WHERE serviceid = ($1)`
 	var actions []entities.Action
 
@@ -70,19 +88,19 @@ func (self *ActionRepository) FindActionByServiceId(serviceId string) ([]entitie
 	defer rows.Close()
 
 	for rows.Next() {
-		var retrievedAction entities.Action
+		var action entities.Action
 		var parametersBytes []byte
 
-		err := rows.Scan(&retrievedAction.Id, &retrievedAction.ServiceId, &retrievedAction.Name, &retrievedAction.Description, &retrievedAction.NbParam, &parametersBytes)
+		err := rows.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
 		if err != nil {
 			return nil, err
 		}
 
-		retrievedAction, err = self.UnmarshalParameters(parametersBytes, retrievedAction)
+		action, err = self.unmarshalParameters(parametersBytes, action)
 		if err != nil {
 			return actions, err
 		}
-		actions = append(actions, retrievedAction)
+		actions = append(actions, action)
 	}
 	return actions, nil
 }
