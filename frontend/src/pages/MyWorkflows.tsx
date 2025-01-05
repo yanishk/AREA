@@ -1,15 +1,15 @@
 import axios from "axios";
 import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const MyWorkflow = () => {
 
-    const [userWorkflows, setUserWorkflows] = useState(null);
+    const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
 
     const getUserWorkflows = async () => {
         try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}workflows`, {
                     withCredentials: true,
             });
 
@@ -18,10 +18,9 @@ const MyWorkflow = () => {
                 return;
             }
 
-            const workflowsProperties = result.data.map((service: any) => ({
-                name: service.name,
-                color: service.color,
-                iconPath: service.logo,
+            const workflowsProperties = result.data.workflows.map((workflow: any) => ({
+                name: workflow.name,
+                id: workflow.id,
             }));
 
             setUserWorkflows(workflowsProperties);
@@ -29,6 +28,10 @@ const MyWorkflow = () => {
             console.error("Error fetching services:", err);
         }
     };
+
+    useEffect(() => {
+        getUserWorkflows();
+    }, []);
 
     return (
         <>
@@ -53,20 +56,20 @@ const MyWorkflow = () => {
                 </div>
                 <div className="mt-16 ml-[35px]">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                        {/* {availableItems?.map((element) => ( */}
+                        {userWorkflows?.map((workflow) => (
                             <button
-                                // key={element.name}
+                                key={workflow.id}
                                 // style={{ backgroundColor: "#333333"}}
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 bg-[#333333] hover:bg-[#474747]"
                                 onClick={() => ("")}
                             >
-                                <div className="text-left w-full pl-[30px]">
-                                    <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">aaa</h2>
-                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 mr-4">aaa</h2>
+                                <div className="text-left w-full px-[30px]">
+                                    <h2 className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0">{workflow.name}</h2>
+                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 mr-4">by</h2>
                                 </div>
                             </button>
 
-                        {/* ))} */}
+                        ))}
                     </div>
                 </div>
             </MaxWidthWrapper>
