@@ -18,10 +18,26 @@ function App() {
     <AuthProvider>
         <Router>
           <Routes>
-              <Route path="/register" element={<RegisterForm />} />
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/my_workflows" element={<MyWorkflow />} />
-              <Route path="/client.apk" element={<DownloadMobileApk />} />
+              <Route
+                path="/register"
+                element={
+                  <RegisterForm />
+                }
+              />
+
+              <Route
+                path="/login"
+                element={
+                  <LoginForm />
+                }
+              />
+
+              <Route
+                path="/client.apk"
+                element={
+                  <DownloadMobileApk />
+                }
+              />
 
               <Route
                 path="/"
@@ -36,6 +52,15 @@ function App() {
                 path="/explore"
                 element={
                   <HomePage />
+                }
+              />
+
+              <Route
+                path="/my_workflows"
+                element={
+                  <ProtectedRoute>
+                    <MyWorkflow />
+                  </ProtectedRoute>
                 }
               />
 
