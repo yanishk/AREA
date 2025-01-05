@@ -1,34 +1,7 @@
-import axios from "axios";
 import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
-import { useState } from "react";
 
 const MyWorkflow = () => {
-
-    const [userWorkflows, setUserWorkflows] = useState(null);
-
-    const getUserWorkflows = async () => {
-        try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}actions-services`, {
-                    withCredentials: true,
-            });
-
-            if (!result) {
-                console.error("Error fetching services");
-                return;
-            }
-
-            const workflowsProperties = result.data.map((service: any) => ({
-                name: service.name,
-                color: service.color,
-                iconPath: service.logo,
-            }));
-
-            setUserWorkflows(workflowsProperties);
-        } catch (err) {
-            console.error("Error fetching services:", err);
-        }
-    };
 
     return (
         <>
