@@ -173,6 +173,14 @@ func (self *UserServiceService) RetrieveGithubUserRepositories(email, connection
 	return self.ServiceService.RequestGithubUserRepositories(accessToken)
 }
 
+func (self *UserServiceService) RetrieveGitlabUserProjects(email, connectionType string) ([]entities.GitlabProject, error) {
+	accessToken, err := self.CallApiAndRefresh(email, connectionType, "Gitlab")
+	if err != nil {
+		return []entities.GitlabProject{}, err
+	}
+	return self.ServiceService.RequestGitlabUserProjects(accessToken)
+}
+
 func (self *UserServiceService) RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error) {
 	var ownedServers, guilds []map[string]interface{}
 

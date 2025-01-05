@@ -28,6 +28,7 @@ func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback/:service/:app-type", self.serviceCallback)
 	private.GET("/Github/user/repositories", self.getGithubUserRepositories)
+	private.GET("/Gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/Discord/user/servers", self.getDiscordUserServers)
 	asana := private.Group("/Asana")
 	{
@@ -104,6 +105,30 @@ func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) 
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"repositories": repositories,
+	})
+}
+
+// @Summary      Retrieve User Projects
+// @Description  Retrieve the projects of the authenticated user
+// @Tags         Gitlab
+// @Produce      json
+// @Failure		200		{object}	docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse
+// @Failure		500		{object}	docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse
+// @Router       /Gitlab/user/projects [get]
+func (self *UserServiceHandler) getGitlabUserProjects(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	projects, err := self.UserServiceService.RetrieveGitlabUserProjects(email, connectionType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve the user's projects",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"projects": projects,
 	})
 }
 
