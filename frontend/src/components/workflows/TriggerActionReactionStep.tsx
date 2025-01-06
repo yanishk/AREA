@@ -1,5 +1,5 @@
 import { Parameters } from "../../utils/ActionReactionParameters";
-import Steps from "../../utils/CreateSteps";
+import Steps from "../../utils/CreateStepsType";
 import { fieldType } from "../../utils/fieldType";
 import { getFieldValues } from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";

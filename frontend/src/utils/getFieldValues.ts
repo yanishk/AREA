@@ -1,6 +1,9 @@
 import { Parameters } from "./ActionReactionParameters";
 
 export const getFieldValues = (param: Parameters): string[] | undefined => {
+    if (param.values[0] === null) {
+        return []
+    }
     if (param.isexhaustive === true && param.values.length > 1) {
         return param.values;
     }

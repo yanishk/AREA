@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import {useEffect, useState } from "react";
 import axios from "axios";
 import HomeStep from "../components/workflows/HomeStep";
@@ -7,7 +7,7 @@ import SelectActionReactionStep from "../components/workflows/SelectActionReacti
 import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
-import Steps from "../utils/CreateSteps";
+import Steps from "../utils/CreateStepsType";
 import { getFieldValues } from "../utils/getFieldValues";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
@@ -309,6 +309,8 @@ const WorkflowBuilder = () => {
                 return;
             }
 
+            console.log("selected service ici : ", selectedService);
+
             const stateData = {
                 selectedActionService,
                 selectedReactionService,
@@ -316,12 +318,15 @@ const WorkflowBuilder = () => {
                 selectedReaction,
                 actionFieldValues,
                 reactionFieldValues,
+                selectedService,
             };
-            const state = encodeURIComponent(JSON.stringify(stateData));
 
-            const redirectUrl = `${authUrl}&state=${state}`;
+            sessionStorage.setItem("state-data", JSON.stringify(stateData));
+            // const state = encodeURIComponent(JSON.stringify(stateData));
 
-            window.location.href = redirectUrl;
+            // const redirectUrl = `${authUrl}&state=${state}`;
+
+            window.location.href = authUrl;
         } catch (error) {
             console.error("Error during authentication:", error);
         }
@@ -338,40 +343,41 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const updateStateFromDecoded = (decodedState: any) => {
-        if (!decodedState) return;
+    const updateStateFromSession = (state: any) => {
+        if (!state) return;
 
-        if (decodedState.selectedActionService) {
-            setSelectedActionService(decodedState.selectedActionService);
+        if (state.selectedActionService) {
+            setSelectedActionService(state.selectedActionService);
         }
-        if (decodedState.selectedReactionService) {
-            setSelectedReactionService(decodedState.selectedReactionService);
+        if (state.selectedReactionService) {
+            setSelectedReactionService(state.selectedReactionService);
         }
-        if (decodedState.selectedAction) {
-            setSelectedAction(decodedState.selectedAction);
+        if (state.selectedAction) {
+            setSelectedAction(state.selectedAction);
         }
-        if (decodedState.selectedReaction) {
-            setSelectedReaction(decodedState.selectedReaction);
+        if (state.selectedReaction) {
+            setSelectedReaction(state.selectedReaction);
         }
-        if (decodedState.actionFieldValues) {
-            setActionFieldValues(decodedState.actionFieldValues);
+        if (state.actionFieldValues) {
+            setActionFieldValues(state.actionFieldValues);
         }
-        if (decodedState.reactionFieldValues) {
-            setReactionFieldValues(decodedState.reactionFieldValues);
+        if (state.reactionFieldValues) {
+            setReactionFieldValues(state.reactionFieldValues);
         }
     };
 
-    const handleServiceCallback = async (codeAuth: string, serviceType: string | undefined) => {
-        if (!codeAuth || !serviceType) return;
+    const handleServiceCallback = async (codeAuth: string, serviceAuth: any | undefined) => {
+
+        if (!codeAuth || !serviceAuth) return;
+
+        console.log("icicic llalalaa", serviceAuth.name);
 
         try {
-            const serviceName =
-                serviceType === "action" ? selectedActionService?.name : selectedReactionService?.name;
-
             await axios.post(
-                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
-                {},
-                { withCredentials: true }
+                `${import.meta.env.VITE_API_URL}service-callback/${serviceAuth.name}/web/?code=${codeAuth}`,
+                {
+                    withCredentials: true
+                }
             );
         } catch (error) {
             console.error("Error with service callback:", error);
@@ -385,24 +391,37 @@ const WorkflowBuilder = () => {
     };
 
     useEffect(() => {
-        const getDataFromUrl = async () => {
+        const getSavedData = async () => {
             const params = new URLSearchParams(window.location.search);
+            console.log("params ici: ", params);
             const codeAuth = params.get("code");
-            const state = params.get("state");
 
-            const decodedState = decodeState(state);
-            updateStateFromDecoded(decodedState);
+            const state = sessionStorage.getItem("state-data");
+
+            if (!state) {
+                console.error("Undetected state into session storage");
+                return;
+            }
+
+            const jsonState = JSON.parse(state);
+
+            const serviceAuth = jsonState.selectedService;
+
+            console.log("service autj ici:", serviceAuth);
+            updateStateFromSession(jsonState);
 
             if (!codeAuth) {
                 return;
             }
 
-            await handleServiceCallback(codeAuth, decodedState?.serviceType);
+            await handleServiceCallback(codeAuth, serviceAuth);
+
+            sessionStorage.removeItem("state-data");
 
             clearUrlParams();
         };
 
-        getDataFromUrl();
+        getSavedData();
     }, []);
 
     useEffect(() => {
@@ -411,6 +430,7 @@ const WorkflowBuilder = () => {
 
             parameters.forEach((param) => {
                 const options = getFieldValues(param);
+
                 if (options && options.length > 0) {
                     defaultValues[param.name] = options[0];
                 }
