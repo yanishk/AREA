@@ -12,7 +12,7 @@ const WorkflowDetail = () => {
         const getWorkflowDetails = async () => {
             try {
                 const result = await axios.get(`${import.meta.env.VITE_API_URL}workflows`, {
-                withCredentials: true,
+                    withCredentials: true,
                 });
 
                 const rightWorkflow = result.data.workflows.find((element: any) => element.id === workflowId);
@@ -40,6 +40,7 @@ const WorkflowDetail = () => {
                 <div>
                 <h1>{workflow.name}</h1>
                 <p>{workflow.id}</p>
+                <p>{workflow.actionid}</p>
                 </div>
             </div>
         </>

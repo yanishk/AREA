@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
+    const [serviceDetails, setServiceDetails] = useState<any[]>([]);
     const navigate = useNavigate();
 
     const getUserWorkflows = async () => {
@@ -24,6 +25,7 @@ const MyWorkflow = () => {
             const workflowsProperties = result.data.workflows.map((workflow: any) => ({
                 name: workflow.name,
                 id: workflow.id,
+                actionid: workflow.actionid,
             }));
 
             setUserWorkflows(workflowsProperties);
@@ -31,6 +33,13 @@ const MyWorkflow = () => {
             console.error("Error fetching services:", err);
         }
     };
+
+    const getServiceDetails = async () => {
+        
+        const result = await axios.get(`${import.meta.env.VITE_API_URL}services/action/${}`, {
+            withCredentials: true,
+        });
+    }
 
     const [userName, setUserName] = useState("You");
 
