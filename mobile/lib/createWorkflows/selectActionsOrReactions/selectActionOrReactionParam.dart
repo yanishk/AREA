@@ -33,6 +33,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   Map<int, String> selectedParameterId = {};
   List<String> failedRouteList = [];
   String asanaWorkspaceId = "";
+  List<int> textInputControllerIndexList = [];
 
   @override
   void initState() {
@@ -65,9 +66,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       String itemName = reponseList[i].toString().split("name: ").last.split(",").first;
       nameList.add(itemName.split("}").first);
       if (parameterList[index].name == "channel") {
-        String itemId = reponseList[i].toString().split(" id: ").last.split(",").first;
-        idList.add(itemId.split("}").first);
-        developer.log("pass");
+        idList.add(reponseList[i]["id"]);
       } else {
         String itemId = reponseList[i].toString().split("id: ").last.split(",").first;
         idList.add(itemId.split("}").first);
@@ -211,7 +210,10 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       );
     }
     if (parameterList[index].route.isEmpty) {
-      textInputController[index] = new TextEditingController(text: "");
+      if (textInputController[index] == null) {
+        textInputController[index] = new TextEditingController(text: "");
+      }
+      textInputControllerIndexList.add(index);
       return Padding(
         padding: EdgeInsets.only(top: 20),
         child: Container(
@@ -319,15 +321,15 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
-                for (int i = 0; i < textInputController.length; i++) {
-                  if (textInputController[i] != null) {
-                    String controlerText = textInputController[i]!.text;
-                    if (CreateData.selectedActionOrReactionData.parameter[i].type == "int") {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = int.parse(controlerText);
+                for (int i = 0; i < textInputControllerIndexList.length; i++) {
+                  int controllerIndex = textInputControllerIndexList[i];
+                  if (textInputController[controllerIndex] != null) {
+                    String controlerText = textInputController[controllerIndex]!.text;
+                    if (CreateData.selectedActionOrReactionData.parameter[controllerIndex].type == "int") {
+                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[controllerIndex].name] = int.parse(controlerText);
                     } else {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = controlerText;
+                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[controllerIndex].name] = controlerText;
                     }
-                    developer.log("text input content : ${textInputController[i]?.text}");
                   }
                 }
                 developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");

@@ -15,7 +15,6 @@ class ActionsOrReactionsFunctions {
           "getRouteResponse FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return null;
     }
-    developer.log("responseData : ${responseData}");
     return responseData;
   }
 
