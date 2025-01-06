@@ -309,8 +309,6 @@ const WorkflowBuilder = () => {
                 return;
             }
 
-            console.log("selected service ici : ", selectedService);
-
             const stateData = {
                 selectedActionService,
                 selectedReactionService,
@@ -323,9 +321,6 @@ const WorkflowBuilder = () => {
             };
 
             sessionStorage.setItem("state-data", JSON.stringify(stateData));
-            // const state = encodeURIComponent(JSON.stringify(stateData));
-
-            // const redirectUrl = `${authUrl}&state=${state}`;
 
             window.location.href = authUrl;
         } catch (error) {
@@ -357,10 +352,7 @@ const WorkflowBuilder = () => {
     };
 
     const handleServiceCallback = async (codeAuth: string, serviceName: string) => {
-
         if (!codeAuth || !serviceName) return;
-
-        console.log("icicic llalalaa", serviceName);
 
         try {
             await axios.post(
@@ -383,7 +375,6 @@ const WorkflowBuilder = () => {
     useEffect(() => {
         const getSavedData = async () => {
             const params = new URLSearchParams(window.location.search);
-            console.log("params ici: ", params);
             const codeAuth = params.get("code");
 
             const state = sessionStorage.getItem("state-data");
@@ -404,7 +395,6 @@ const WorkflowBuilder = () => {
 
             const serviceAuth = jsonState.selectedService;
 
-            console.log("service autj ici:", serviceAuth);
             updateStateFromSession(jsonState);
 
             if (!codeAuth) {
