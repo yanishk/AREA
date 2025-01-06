@@ -41,12 +41,6 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                         <>
                             <li>
                                 <NavbarLink
-                                    href="/"
-                                    text="Home"
-                                />
-                            </li>
-                            <li>
-                                <NavbarLink
                                     href="/explore"
                                     text="Explore"
                                 />
