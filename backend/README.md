@@ -1,5 +1,11 @@
 # Developper Documentation
 
+## Summary
+
+- Implement a [`New Service`](#implement-a-new-service)<br>
+- Implement a [`New Action`](#implement-a-new-action)<br>
+- Implement a [`New Reaction`](#implement-a-new-reaction)
+
 ## Implement a new service
 
 ### Database
@@ -142,3 +148,37 @@ In the file ```/backend/src/service/service.go```:
 
 ### Database
 
+First of all, to implement a new reaction you must update the database. In the table "reactions":
+- Fill the "serviceid" column with the ID of the service that you want this reaction to belong to
+> [!NOTE]
+> The ID of a service can be found in the "service" table in the column "id"
+- Fill the "name" column with the name you wish to give to the reaction. Beware, this will be the name displayed on the front and mobile plateform.
+- Fill the "description" column, this column will be displayed in the front.
+> [!NOTE]
+> Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the reaction in the description.
+- Fill the "nbparam" column with the number of input expected of the user in order to create the reaction correctly.
+- Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
+
+### Logic of the new action
+
+In the file ```/backend/src/service/domain/workflow/<YOUR SERVICE>.go```, two cases can happen:
+- The new reaction belongs to an already existing service that has reactions:
+    - Update the switch case in the ```check<THE SERVICE>Reactions``` to include your new reactions and do the logic of the reaction
+- The new reaction does not belong to an already existing service that has reactions:
+    - Retrieve the reactions' of the service linked in the workflow, use the function
+    ```go
+    FindReactionById(id string) (entities.Reaction, error)
+    ```
+    - Retrieve the access token, and refresh it if necessary, via the function
+    ```go
+    refreshTokenForService(serviceName string, reactionFoundName string, reactionsPossible []string, workflow entities.Workflow) (string, error)
+    ```
+    - Create a switch case to match the name of your new reactions and handle the logic there
+
+In the file ```/backend/src/service/domain/workflow/workflow.go```:
+- If your reactiosn belong to a service with pre-existing reactions, you have nothing more to do
+- If your reaction does not belong to a service with pre-existing reactions, update the function
+```go
+checkReactions(workflow entities.Workflow)
+```
+with the function you created in the previous step.
