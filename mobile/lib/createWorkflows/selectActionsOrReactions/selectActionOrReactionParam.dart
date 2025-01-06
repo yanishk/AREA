@@ -64,7 +64,9 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     List<String> idList = [];
     for (int i = 0; i < reponseList.length; i++) {
       String itemName = reponseList[i].toString().split("name: ").last.split(",").first;
-      nameList.add(itemName.split("}").first);
+      if (!nameList.contains(itemName.split("}").first)) {
+        nameList.add(itemName.split("}").first);
+      }
       if (parameterList[index].name == "channel") {
         idList.add(reponseList[i]["id"]);
       } else {
