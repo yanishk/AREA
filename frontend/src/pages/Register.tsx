@@ -1,4 +1,4 @@
-import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
@@ -141,7 +141,15 @@ const RegisterForm = () => {
                         iconSize="size-11"
                         onClick={() => handleOAuthLogin("Github")}
                     />
-
+                    <SocialButton
+                        icon={faGitlab}
+                        bgColor="bg-[#FC6D27]"
+                        hoverColor="hover:bg-[#FD7A38]"
+                        text="Continue with Gitlab"
+                        iconPosition="left-[20px]"
+                        iconSize="size-10"
+                        onClick={() => handleOAuthLogin("Gitlab")}
+                    />
                     <div
                         className="flex justify-center mt-8">
                         <CallToActionLink
