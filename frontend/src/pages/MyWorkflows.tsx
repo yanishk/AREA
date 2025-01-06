@@ -3,10 +3,12 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
+import { useNavigate } from "react-router-dom";
 
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
+    const navigate = useNavigate();
 
     const getUserWorkflows = async () => {
         try {
@@ -74,7 +76,7 @@ const MyWorkflow = () => {
                                 key={workflow.id}
                                 // style={{ backgroundColor: "#333333"}}
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 bg-[#333333] hover:bg-[#474747]"
-                                onClick={() => ("")}
+                                onClick={() => navigate(`/workflow/${workflow.id}`)}
                             >
                                 <div className="text-left w-full px-[30px]">
                                     <h2

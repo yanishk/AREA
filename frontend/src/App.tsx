@@ -12,6 +12,7 @@ import ChangePasswordPage from './pages/ChangePassword'
 import MyWorkflow from './pages/MyWorkflows'
 import ProtectedRoute from './ProtectedRoute'
 import RedirectRoute from './RedirectRoute'
+import WorkflowDetail from './pages/WorkflowDetail'
 
 function App() {
   return (
@@ -60,6 +61,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyWorkflow />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/workflow/:workflowId"
+                element={
+                  <ProtectedRoute>
+                    <WorkflowDetail />
                   </ProtectedRoute>
                 }
               />

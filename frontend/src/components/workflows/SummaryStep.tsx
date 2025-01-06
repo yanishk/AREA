@@ -3,7 +3,6 @@ import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import BasicInput from "../inputs/BasicInput";
 import MaxWidthWrapper from "../MaxWidthWrapper";
-import axios from "axios";
 import { getUserName } from "../../utils/GetUserName";
 
 interface SummaryStepProps {
