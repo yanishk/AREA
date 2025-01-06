@@ -1,4 +1,4 @@
-import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
+import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
@@ -110,13 +110,6 @@ const RegisterForm = () => {
                         <div className="flex-grow border-t border-[#999999]" />
                     </div>
 
-                    <SocialButton
-                        icon={faGoogle}
-                        bgColor="bg-[#E84A4A]"
-                        hoverColor="hover:bg-[#F55B5B]"
-                        text="Continue with Google"
-                        onClick={() => handleOAuthLogin("Google")}
-                    />
                     <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
