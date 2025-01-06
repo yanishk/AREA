@@ -100,3 +100,37 @@ First of all, to implement a new action you must update the database. In the tab
 > Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the action in the description.
 - Fill the "nbparam" column with the number of input expected of the user in order to create the action correctly
 - Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
+
+### Logic of the new action
+
+In the file ```/backend/main.go/```:
+- Create a new cronjob, or use one of the existent one, to insert the function we will create in the next step that will check the name of actions of worklfows and trigger the reaction if necessary.
+> [!NOTE]
+> Be mindful of the cronjob timing, meaning that do not check all of your actions every minute.
+
+In the file ```/backend/src/service/domain/workflow/<THE NAME OF YOUR SERVICE>```:
+- Use the function
+```go
+FindServiceByName(name string) (entities.Service, error)
+```
+to check whether your service exist in the database.
+- Use the function
+```go
+FindActionsByServiceId(serviceId string) ([]entities.Action, error)
+```
+to retrieve all the actions associated to this service and loop through them.
+> [!NOTE]
+> This is why, when creating your action in the databse, it is mandatory to link it to a service via it's ID.
+- Use the function
+```go
+FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error)
+```
+to find all the workflow linked to a specific action ID and loop through them.
+
+- To get the access token linked to the user and the service, and also refresh if needed, use the function
+```go
+getAccessToken(serviceName string, workflow entities.Workflow) (string, error)
+```
+> [!NOTE]
+> The service name must correspond, in term of capitalization, to the name entered in the database
+- You can then do a switch case to match the name of the action, retrieved by the ```FindWorkflowsByActionId``` function, and implement the logic of your action there.
