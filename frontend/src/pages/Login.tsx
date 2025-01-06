@@ -125,15 +125,6 @@ const LoginForm = () => {
                     </div>
 
                     <SocialButton
-                        icon={faGoogle}
-                        bgColor="bg-[#E84A4A]"
-                        hoverColor="hover:bg-[#F55B5B]"
-                        text="Continue with Google"
-                        iconPosition="left-[20px]"
-                        iconSize="size-10"
-                        onClick={() => handleOAuthLogin("Google")}
-                    />
-                    <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"

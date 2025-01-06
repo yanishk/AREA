@@ -111,13 +111,6 @@ const RegisterForm = () => {
                     </div>
 
                     <SocialButton
-                        icon={faGoogle}
-                        bgColor="bg-[#E84A4A]"
-                        hoverColor="hover:bg-[#F55B5B]"
-                        text="Continue with Google"
-                        onClick={() => handleOAuthLogin("Google")}
-                    />
-                    <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
