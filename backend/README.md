@@ -19,9 +19,9 @@ First of all, you must update the database used in order to implement a new serv
 - You must set the columns "hasactions" and "hasreactions" to true or false depending on the available feature linked to the service
 - You must set the column "isauthneeded" to true or false if the service relies on a OAuth2 flow to authenticate a user
 
-### OAuh2
+### OAuth2
 
-If your newly implemented service requires OAuth2, here are the step to follow to implement it in AREA.
+If your newly implemented service requires OAuth2, here are the steps to follow to implement it in AREA.
 
 #### Require the access code:
 
@@ -33,7 +33,7 @@ func getCallbackAndClientId(callbackType string, serviceName string, isIdNecessa
 to get the callback and the <service>_CLIENT_ID and the <service>_CLIENT_SECRET if necessary.
 
 > [!NOTE]
-> To use our helper functions, such as getCallbackAndClientId and many other, the environment variable must be named a certain way and must contain two callback, one for our mobile plateform and one for our website. Those naming convention can be found in the .env.example at the root of the "backend" folder.
+> To use our helper functions, such as getCallbackAndClientId and many other, the environment variables must be named a certain way and must contain two callbacks, one for our mobile platform and one for our website. Those naming convention can be found in the .env.example at the root of the "backend" folder.
 
 > [!NOTE]
 > The serviceName variable must be entirely capitalized.
@@ -50,12 +50,12 @@ The second step of any OAuth2 flow is the exchange of the access code for an acc
 
 In the file ```backend/src/service/domain/service/service.go```:
 - Create the function that will handle the logic of the exchange.
-- Get the callback URI from the .env according to the plateform used: "web" or "mobile"
+- Get the callback URI from the .env according to the platform used: "web" or "mobile"
 - Use the function:
 ```go
 genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
 ```
--Set your headers and return the *http.Request returned by "genericAccessTokenRequest".
+- Set your headers and return the *http.Request returned by "genericAccessTokenRequest".
 > [!NOTE]
 > In some specific cases, depending on the service you are trying to implement, this function cannot be used but its logic can.
 
@@ -78,12 +78,12 @@ or
 genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string
 ```
 > [!NOTE]
-> The second function is to be used when the refresh method requires the CLIENT_ID and CLIENT_SECRET variable.
+> The second function is to be used when the refresh method requires the CLIENT_ID and CLIENT_SECRET variables.
 
 - Set your header and return the "*http.Request".
 
 In the file ```backend/src/service/service.go```:
-- In the ServiceService interface, add the newly created function prototyp to the list.
+- In the ServiceService interface, add the newly created function's prototype to the list.
 
 In the file ```backend/src/service/domain/userservice/userservice.go```:
 - In the function
@@ -100,17 +100,17 @@ First of all, to implement a new action you must update the database. In the tab
 - Fill the "serviceid" column with the ID of the service that you want this action to belong to
 > [!NOTE]
 > The ID of a service can be found in the "service" table in the column "id"
-- Fill the "name" column with the name you wish to give to the action. Beware, this will be the name displayed on the front and mobile plateform.
+- Fill the "name" column with the name you wish to give to the action. Beware, this will be the name displayed on the front and mobile platform.
 - Fill the "description" column, this column will be displayed in the front.
 > [!NOTE]
 > Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the action in the description.
-- Fill the "nbparam" column with the number of input expected of the user in order to create the action correctly.
+- Fill the "nbparam" column with the number of inputs expected of the user in order to create the action correctly.
 - Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
 
 ### Logic of the new action
 
 In the file ```/backend/main.go/```:
-- Create a new cronjob, or use one of the existent one, to insert the function we will create in the next step that will check the name of actions of worklfows and trigger the reaction if necessary.
+- Create a new cronjob, or use one of the existent ones, to insert the function we will create in the next steps that will check the action and trigger the reaction if necessary.
 > [!NOTE]
 > Be mindful of the cronjob timing, meaning that do not check all of your actions every minute.
 
@@ -126,12 +126,12 @@ FindActionsByServiceId(serviceId string) ([]entities.Action, error)
 ```
 to retrieve all the actions associated to this service and loop through them.
 > [!NOTE]
-> This is why, when creating your action in the databse, it is mandatory to link it to a service via it's ID.
+> This is why, when creating your action in the database, it is mandatory to link it to a service via it's ID.
 - Use the function
 ```go
 FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error)
 ```
-to find all the workflow linked to a specific action ID and loop through them.
+to find all the workflows linked to a specific action ID and loop through them.
 
 - To get the access token linked to the user and the service, and also refresh if needed, use the function
 ```go
@@ -152,20 +152,20 @@ First of all, to implement a new reaction you must update the database. In the t
 - Fill the "serviceid" column with the ID of the service that you want this reaction to belong to
 > [!NOTE]
 > The ID of a service can be found in the "service" table in the column "id"
-- Fill the "name" column with the name you wish to give to the reaction. Beware, this will be the name displayed on the front and mobile plateform.
+- Fill the "name" column with the name you wish to give to the reaction. Beware, this will be the name displayed on the front and mobile platform.
 - Fill the "description" column, this column will be displayed in the front.
 > [!NOTE]
 > Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the reaction in the description.
-- Fill the "nbparam" column with the number of input expected of the user in order to create the reaction correctly.
+- Fill the "nbparam" column with the number of inputs expected of the user in order to create the reaction correctly.
 - Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
 
-### Logic of the new action
+### Logic of the new reaction
 
 In the file ```/backend/src/service/domain/workflow/<YOUR SERVICE>.go```, two cases can happen:
 - The new reaction belongs to an already existing service that has reactions:
     - Update the switch case in the ```check<THE SERVICE>Reactions``` to include your new reactions and do the logic of the reaction
 - The new reaction does not belong to an already existing service that has reactions:
-    - Retrieve the reactions' of the service linked in the workflow, use the function
+    - Retrieve the reactions of the service linked in the workflow, use the function
     ```go
     FindReactionById(id string) (entities.Reaction, error)
     ```
@@ -173,10 +173,10 @@ In the file ```/backend/src/service/domain/workflow/<YOUR SERVICE>.go```, two ca
     ```go
     refreshTokenForService(serviceName string, reactionFoundName string, reactionsPossible []string, workflow entities.Workflow) (string, error)
     ```
-    - Create a switch case to match the name of your new reactions and handle the logic there
+    - Create a switch case to match the name of your new reaction and handle the logic there
 
 In the file ```/backend/src/service/domain/workflow/workflow.go```:
-- If your reactiosn belong to a service with pre-existing reactions, you have nothing more to do
+- If your reaction belong to a service with pre-existing reactions, you have nothing more to do
 - If your reaction does not belong to a service with pre-existing reactions, update the function
 ```go
 checkReactions(workflow entities.Workflow)
