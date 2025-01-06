@@ -133,6 +133,7 @@ class CreateWorkflows extends State<APICall> {
       }
       if (result != null) {
         firstSelectedService = "$result";
+        firstButtonColor = HexColor(CreateData.serviceColorList[Globaldata.firstService]);
       }
     });
   }

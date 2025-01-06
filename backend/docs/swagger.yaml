@@ -92,12 +92,6 @@ definitions:
         example: url-example.com
         type: string
     type: object
-  docs_service.ServiceReceiveServiceWeebhookSuccessResponse:
-    properties:
-      success:
-        example: Webhook received
-        type: string
-    type: object
   docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse:
     properties:
       error:
@@ -375,6 +369,19 @@ definitions:
           $ref: '#/definitions/entities.GithubRepository'
         type: array
     type: object
+  docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's projects
+        type: string
+    type: object
+  docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse:
+    properties:
+      projects:
+        items:
+          $ref: '#/definitions/entities.GitlabProject'
+        type: array
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -435,6 +442,18 @@ definitions:
       error:
         example: Email not found in token-Email is not a valid string-Connection type
           not found in token-Connection type is not a valid string
+        type: string
+    type: object
+  docs_workflow.WorkflowReceiveServiceWebhookBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowReceiveServiceWebhookSuccessResponse:
+    properties:
+      success:
+        example: Webhook received
         type: string
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
@@ -556,6 +575,13 @@ definitions:
   entities.GithubRepository:
     properties:
       full_name:
+        type: string
+    type: object
+  entities.GitlabProject:
+    properties:
+      id:
+        type: integer
+      name:
         type: string
     type: object
   entities.NewWorkflow:
@@ -862,6 +888,23 @@ paths:
       summary: Retrieve User Repositories
       tags:
       - Github
+  /Gitlab/user/projects:
+    get:
+      description: Retrieve the projects of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse'
+      summary: Retrieve User Projects
+      tags:
+      - Gitlab
   /about.json:
     get:
       description: Get about.json file

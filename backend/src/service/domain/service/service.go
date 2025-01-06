@@ -22,6 +22,7 @@ type ServiceService struct {
 	ReactionRepository storage.ReactionRepository
 }
 
+const bearerType = "Bearer "
 const contentType = "Content-Type"
 const contentTypeUrlEncoded = "application/x-www-form-urlencoded"
 
@@ -445,11 +446,12 @@ func getLinkedinOAuth2AccessTokenRequest(code, callbackType string) (*http.Reque
 
 	tokenUrl := "https://www.linkedin.com/oauth/v2/accessToken"
 	jsonBody := fmt.Sprintf(
-		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
-			clientSecretParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")) +
-			codeParam + code +
-			redirectUriParam + callback +
-			grantTypeParam + grantTypeAuthorization,
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")),
+		url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_SECRET")),
+		code,
+		callback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
@@ -755,7 +757,7 @@ func getOAuth2UserEmailRequest(userInfoUrl, accessToken string) (*http.Request, 
 		return request, errRequest
 	}
 
-	request.Header.Set("Authorization", "Bearer "+accessToken)
+	request.Header.Set("Authorization", bearerType+accessToken)
 	request.Header.Set(contentType, contentTypeUrlEncoded)
 	return request, nil
 }
@@ -842,7 +844,7 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 	var repositories []entities.GithubRepository
 	url := githubBaseUrl + "user/repos"
 
-	resp, err := self.ExecuteApiRequest(url, "GET", "Bearer ", accessToken, nil)
+	resp, err := self.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
 	if err != nil {
 		return repositories, err
 	}
@@ -852,6 +854,43 @@ func (self *ServiceService) RequestGithubUserRepositories(accessToken string) ([
 		return repositories, err
 	}
 	return repositories, nil
+}
+
+func (self *ServiceService) RequestGitlabUser(accessToken string) (entities.GitlabUser, error) {
+	var user entities.GitlabUser
+
+	url := "https://gitlab.com/api/v4/user"
+	resp, err := self.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
+	if err != nil {
+		return user, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func (self *ServiceService) RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error) {
+	var projects []entities.GitlabProject
+
+	user, err := self.RequestGitlabUser(accessToken)
+	if err != nil {
+		return projects, nil
+	}
+
+	url := "https://gitlab.com/api/v4/" + "/users/" + user.Username + "/projects"
+	resp, err := self.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
+	if err != nil {
+		return projects, err
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&projects)
+	if err != nil {
+		return projects, err
+	}
+	return projects, nil
 }
 
 func (self *ServiceService) RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error) {

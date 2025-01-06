@@ -29,8 +29,18 @@ type UserServiceServiceCallbackInternalServerErrorResponse struct {
 type UserServiceGetGithubUserRepositoriesSuccessResponse struct {
 	Repositories []entities.GithubRepository
 }
+
 type UserServiceGetGithubUserRepositoriesInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve the user's repositories"`
+}
+
+// Gitlab Get User Projects
+type UserServiceGetGitlabUserProjectsSuccessResponse struct {
+	Projects []entities.GitlabProject
+}
+
+type UserServiceGetGitlabUserProjectsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve the user's projects"`
 }
 
 // Discord Get User Servers

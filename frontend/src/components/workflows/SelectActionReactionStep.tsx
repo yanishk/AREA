@@ -1,10 +1,18 @@
 import CancelButton from "../buttons/CancelButton";
 
+type Parameters = {
+    isexhaustive: boolean;
+    name: string;
+    type: string;
+    route: string | null;
+    values: string[];
+};
+
 interface SelectActionReactionStepProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
-    availableItems: { name: string; description: string; id: string } [] | null;
+    availableItems: { name: string; description: string; id: string; parameters: Parameters[] } [] | null;
     goBack: () => void;
-    handleSelect: (name: string, id: string) => void;
+    handleSelect: (name: string, id: string, parameters: Parameters[]) => void;
 }
 
 const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
@@ -52,7 +60,8 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
                                 className="h-[240px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5"
                                 onClick={() => handleSelect(
                                     element.name,
-                                    element.id
+                                    element.id,
+                                    element.parameters
                                 )
                             }
                             >

@@ -117,6 +117,15 @@ type GitlabWebhookResponse struct {
 	} `json:"project"`
 }
 
+type GitlabUser struct {
+	Username string `json:"username"`
+}
+
+type GitlabProject struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 // Linkedin
 type LinkedinSub struct {
 	Sub string `json:"sub"`
