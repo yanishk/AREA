@@ -91,14 +91,14 @@ add your service to the switch case and return the function that you created in 
 ### Database
 
 First of all, to implement a new action you must update the database. In the table "actions":
-- Fill the "serviceid" column with the ID of the service that you want this action to belon to
+- Fill the "serviceid" column with the ID of the service that you want this action to belong to
 > [!NOTE]
 > The ID of a service can be found in the "service" table in the column "id"
-- Fill the "name" column with the name you wish to give to the action. Beware, this will be the name displayed on the front and mobile plateform
+- Fill the "name" column with the name you wish to give to the action. Beware, this will be the name displayed on the front and mobile plateform.
 - Fill the "description" column, this column will be displayed in the front.
 > [!NOTE]
 > Think about what you want your user to know, as it will be displayed to the user. A good practice is to put the limitation of the action in the description.
-- Fill the "nbparam" column with the number of input expected of the user in order to create the action correctly
+- Fill the "nbparam" column with the number of input expected of the user in order to create the action correctly.
 - Fill the "parameters" column. In this column, you must give the name, type (string, int), route that must be called, any pre-conceived value and if those values are exhaustive for each parameter.
 
 ### Logic of the new action
@@ -134,3 +134,11 @@ getAccessToken(serviceName string, workflow entities.Workflow) (string, error)
 > [!NOTE]
 > The service name must correspond, in term of capitalization, to the name entered in the database
 - You can then do a switch case to match the name of the action, retrieved by the ```FindWorkflowsByActionId``` function, and implement the logic of your action there.
+
+In the file ```/backend/src/service/service.go```:
+- In the interface ```WorkflowService```, put the prototype of the function you created in the ```/backend/src/service/domain/workflow/<THE NAME OF YOUR SERVICE>``` file to handle the logic of your new action.
+
+## Implement a new reaction
+
+### Database
+
