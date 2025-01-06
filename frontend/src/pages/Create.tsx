@@ -294,7 +294,7 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const handleConnectService = async (selectedService: any) => {
+    const handleConnectService = async (selectedService: any, type: "action" | "reaction") => {
         try {
             const result = await axios.get(
                 `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
@@ -319,6 +319,7 @@ const WorkflowBuilder = () => {
                 actionFieldValues,
                 reactionFieldValues,
                 selectedService,
+                type
             };
 
             sessionStorage.setItem("state-data", JSON.stringify(stateData));
@@ -366,15 +367,15 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const handleServiceCallback = async (codeAuth: string, serviceAuth: any | undefined) => {
+    const handleServiceCallback = async (codeAuth: string, serviceName: string) => {
 
-        if (!codeAuth || !serviceAuth) return;
+        if (!codeAuth || !serviceName) return;
 
-        console.log("icicic llalalaa", serviceAuth.name);
+        console.log("icicic llalalaa", serviceName);
 
         try {
             await axios.post(
-                `${import.meta.env.VITE_API_URL}service-callback/${serviceAuth.name}/web/?code=${codeAuth}`,
+                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
                 {
                     withCredentials: true
                 }
@@ -405,6 +406,10 @@ const WorkflowBuilder = () => {
 
             const jsonState = JSON.parse(state);
 
+            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+                goToStep(Steps.TRIGGER_ACTION);
+            }
+
             const serviceAuth = jsonState.selectedService;
 
             console.log("service autj ici:", serviceAuth);
@@ -414,7 +419,7 @@ const WorkflowBuilder = () => {
                 return;
             }
 
-            await handleServiceCallback(codeAuth, serviceAuth);
+            await handleServiceCallback(codeAuth, serviceAuth.name);
 
             sessionStorage.removeItem("state-data");
 
@@ -608,7 +613,7 @@ const WorkflowBuilder = () => {
                         <ConnectServiceStep
                             selectedService={selectedActionService}
                             goBack={goBack}
-                            handleConnect={() => handleConnectService(selectedActionService)}
+                            handleConnect={() => handleConnectService(selectedActionService, "action")}
                         />
                     )
 
@@ -617,7 +622,7 @@ const WorkflowBuilder = () => {
                     <ConnectServiceStep
                         selectedService={selectedReactionService}
                         goBack={() => goBack()}
-                        handleConnect={() => handleConnectService(selectedReactionService)}
+                        handleConnect={() => handleConnectService(selectedReactionService, "reaction")}
                     />
                 )
 
