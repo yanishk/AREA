@@ -146,8 +146,8 @@ const RegisterForm = () => {
                         bgColor="bg-[#FC6D27]"
                         hoverColor="hover:bg-[#FD7A38]"
                         text="Continue with Gitlab"
-                        iconSize="size-10"
                         iconPosition="left-[20px]"
+                        iconSize="size-10"
                         onClick={() => handleOAuthLogin("Gitlab")}
                     />
                     <div
