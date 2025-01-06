@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
+import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";

@@ -1,4 +1,4 @@
-import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
+import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
