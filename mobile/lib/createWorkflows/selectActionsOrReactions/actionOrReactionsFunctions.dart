@@ -18,4 +18,12 @@ class ActionsOrReactionsFunctions {
     developer.log("responseData : ${responseData}");
     return responseData;
   }
+
+  static dynamic getMapKeyName(dynamic data) {
+    String mapKeyName = data.toString().split(":").first.split("{").last;
+    if (!(data[mapKeyName] is List<dynamic>)) {
+      return getMapKeyName(data[mapKeyName]);
+    }
+    return data;
+  }
 }

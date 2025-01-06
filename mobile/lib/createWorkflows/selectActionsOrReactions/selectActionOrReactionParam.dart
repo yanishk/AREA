@@ -30,6 +30,9 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   List<Widget> parameterFiledList = [];
   Map<int, String> selectedItems = {};
   Map<int, TextEditingController> textInputController = {};
+  Map<int, String> selectedParameterId = {};
+  List<String> failedRouteList = [];
+  String asanaWorkspaceId = "";
 
   @override
   void initState() {
@@ -53,23 +56,40 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
   }
 
-  Future<void> getRouteData(String route, int index) async {
-    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
-    if (response == null) {
-      return;
-    }
+  void createDropdownFromRoute(int index, dynamic response, String listName) {
     List<ActionOrReactionsParameter> parameterList = CreateData.selectedActionOrReactionData.parameter;
-    String listName = response.toString().split(":").first.split("{").last;
     List<dynamic> reponseList = response[listName];
     List<String> nameList = [];
+    List<String> idList = [];
     for (int i = 0; i < reponseList.length; i++) {
       String itemName = reponseList[i].toString().split("name: ").last.split(",").first;
       nameList.add(itemName.split("}").first);
+      if (parameterList[index].name == "channel") {
+        String itemId = reponseList[i].toString().split(" id: ").last.split(",").first;
+        idList.add(itemId.split("}").first);
+        developer.log("pass");
+      } else {
+        String itemId = reponseList[i].toString().split("id: ").last.split(",").first;
+        idList.add(itemId.split("}").first);
+      }
+    }
+    if (nameList.length < 1) {
+      developer.log("No : ${parameterList[index].name}");
+      return;
     }
     if (!selectedItems.containsKey(index)) {
       selectedItems[index] = nameList.first;
+      selectedParameterId[index] = idList.first;
+      if (parameterList[index].name == "workspace") {
+        asanaWorkspaceId = idList.first;
+      }
       int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-      CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+      developer.log("parameterList[index].name : ${parameterList[index].name}, selectedParameterId[index] : ${selectedParameterId[index]}, idList : $idList");
+      if (selectedParameterId[index] != "") {
+        CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
+      } else {
+        CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+      }
     }
     setState(() {
       parameterFiledList.add(
@@ -78,8 +98,17 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
           onChanged: (String? newValue) {
             setState(() {
               selectedItems[index] = newValue ?? "";
+              selectedParameterId[index] = idList[nameList.indexOf(newValue ?? "")];
               int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+              developer.log("parameterList[index].name : ${parameterList[index].name}, selectedParameterId[index] : ${selectedParameterId[index]}, idList : $idList");
+              if (selectedParameterId[index] != "") {
+                CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
+              } else {
+                CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+              }
+              if (parameterList[index].name == "workspace") {
+                asanaWorkspaceId = idList[nameList.indexOf(newValue ?? "")];
+              }
               fillParameterFiledList();
             });
           },
@@ -89,6 +118,45 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         )
       );
     });
+  }
+
+  Future<bool> getFailedRouteData(String route, int index) async {
+    developer.log("getRouteData pass, route : $route");
+    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
+    if (response == null) {
+      return false;
+    }
+    String listName = response.toString().split(":").first.split("{").last;
+    if (!(response[listName] is List<dynamic>)) {
+      developer.log("new responce : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
+      dynamic newResponce = ActionsOrReactionsFunctions.getMapKeyName(response);
+      listName = newResponce.toString().split(":").first.split("{").last;
+      createDropdownFromRoute(index, newResponce, listName);
+      return true;
+    }
+    createDropdownFromRoute(index, response, listName);
+    return true;
+  }
+
+  Future<void> getRouteData(String route, int index) async {
+    if (CreateData.serviceNameList[CreateData.selectedServiceId] == "Asana") {
+      route = "$route?id=$asanaWorkspaceId";
+    } else if (selectedParameterId[index - 1] != null) {
+      route = "$route?id=${selectedParameterId[index - 1]}";
+    }
+    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
+    if (response == null) {
+      return;
+    }
+    String listName = response.toString().split(":").first.split("{").last;
+    if (!(response[listName] is List<dynamic>)) {
+      developer.log("new responce : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
+      dynamic newResponce = ActionsOrReactionsFunctions.getMapKeyName(response);
+      listName = newResponce.toString().split(":").first.split("{").last;
+      createDropdownFromRoute(index, newResponce, listName);
+      return;
+    }
+    createDropdownFromRoute(index, response, listName);
   }
 
   List<String> fillDropDownStringList(List<ActionOrReactionsParameter> parameterList, int index) {
@@ -334,6 +402,9 @@ class CreateDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (selectedItems[index] == null) {
+      return Column();
+    }
     return Container(
       padding: EdgeInsets.all(0.0),
       constraints: BoxConstraints(maxHeight: 100.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
@@ -353,9 +424,9 @@ class CreateDropdown extends StatelessWidget {
           ),
           DropdownButton<String>(
             isExpanded: true,
-            value: selectedItems[index],
+            value: selectedItems[index] ?? "No data",
             hint: AutoSizeText(
-              selectedItems[index] ?? "",
+              selectedItems[index] ?? "test",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
