@@ -15,7 +15,7 @@ func NewServiceRepository(db *sql.DB) *ServiceRepository {
 	return &ServiceRepository{db: db}
 }
 
-func (self *ServiceRepository) CreateService(name string, color string, logo string) error {
+func (self *ServiceRepository) CreateService(name, color, logo string) error {
 	sqlStatement := `INSERT INTO services (name, color, logo) VALUES ($1, $2, $3)`
 
 	_, err := self.FindServiceByName(name)
@@ -30,18 +30,18 @@ func (self *ServiceRepository) CreateService(name string, color string, logo str
 	return nil
 }
 
-func (self *ServiceRepository) FindServiceWithParam(sqlStatement string, param string) (entities.Service, error) {
+func (self *ServiceRepository) findServiceWithParam(sqlStatement, param string) (entities.Service, error) {
 	var service entities.Service
 
 	row := self.db.QueryRow(sqlStatement, param)
-	err := row.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions)
+	err := row.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded)
 	if err != nil {
 		return service, err
 	}
 	return service, nil
 }
 
-func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Service, error) {
+func (self *ServiceRepository) findServices(sqlStatement string) ([]entities.Service, error) {
 	var services []entities.Service
 
 	rows, err := self.db.Query(sqlStatement)
@@ -52,7 +52,7 @@ func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Ser
 
 	for rows.Next() {
 		var service entities.Service
-		err := rows.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions)
+		err := rows.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded)
 		if err != nil {
 			return services, err
 		}
@@ -63,25 +63,25 @@ func (self *ServiceRepository) FindServices(sqlStatement string) ([]entities.Ser
 
 func (self *ServiceRepository) FindServiceById(id string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE id = ($1)`
-	return self.FindServiceWithParam(sqlStatement, id)
+	return self.findServiceWithParam(sqlStatement, id)
 }
 
 func (self *ServiceRepository) FindServiceByName(name string) (entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE name = ($1)`
-	return self.FindServiceWithParam(sqlStatement, name)
+	return self.findServiceWithParam(sqlStatement, name)
 }
 
 func (self *ServiceRepository) FindAllServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindActionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasactions = true`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }
 
 func (self *ServiceRepository) FindReactionsServices() ([]entities.Service, error) {
 	sqlStatement := `SELECT * FROM services WHERE hasreactions = true`
-	return self.FindServices(sqlStatement)
+	return self.findServices(sqlStatement)
 }

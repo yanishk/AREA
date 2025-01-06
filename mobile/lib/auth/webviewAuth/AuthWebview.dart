@@ -1,70 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
 import 'dart:convert';
 import "package:http/src/response.dart";
+import "package:namer_app/auth/authFunctions.dart";
 
-import "../apiCall/apiErrorHandling.dart";
-import "../globalData.dart";
-import "../login/loginNavigator.dart";
-import "../login/loadServicesList.dart";
+import "../../apiCall/apiErrorHandling.dart";
+import "../../globalData.dart";
+import "../../login/loginNavigator.dart";
+import "../../login/loadServicesList.dart";
+import "../../apiCall/apiData.dart";
+import "../authData.dart";
 
-String spotifyAuthType = "";
+String authConnectionType = "";
+String authServiceName = "";
 
-class SpotifyAuthPage extends StatelessWidget {
-  SpotifyAuthPage({
+class WebviewAuthPage extends StatelessWidget {
+  WebviewAuthPage({
     super.key,
     required this.callBackType,
+    required this.authService,
   });
   final String callBackType;
+  final String authService;
+
   @override
   Widget build(BuildContext context) {
-    spotifyAuthType = callBackType;
+    authConnectionType = callBackType;
+    authServiceName = authService;
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: SpotifyAuthAPICall(),
+      home: WebviewAuthAPICall(),
     );
   }
 }
 
-class SpotifyAuthAPICall extends StatefulWidget {
+class WebviewAuthAPICall extends StatefulWidget {
   @override
-  SpotifyAuth createState() => SpotifyAuth();
+  WebviewAuth createState() => WebviewAuth();
 }
 
-class SpotifyAuth extends State<SpotifyAuthAPICall> {
+class WebviewAuth extends State<WebviewAuthAPICall> {
   late InAppWebViewController webViewController;
-  final String apiUrl = dotenv.get('SERVER_LINK',
-      fallback: 'Cannot find .env variable "SERVER_LINK"');
   String newUrl = "";
-  String apiRoute = "service-callback/Spotify";
+  String apiRoute = "service-callback/$authServiceName";
 
   @override
   void initState() {
     super.initState();
-    if (spotifyAuthType == "login") {
-      developer.log("spotifyAuthType : $spotifyAuthType");
+    if (authConnectionType == "login") {
+      developer.log("authConnectionType : $authConnectionType");
       setState(() {
-        apiRoute = "login-callback/Spotify";
+        apiRoute = "login-callback/$authServiceName";
       });
     }
-  }
-
-  Future<void> _setCookiesAndNavigate() async {
-    if (Globaldata.JWToken.isEmpty) {
-      return;
-    }
-    final cookieManager = CookieManager();
-    await cookieManager.setCookie(
-      url: WebUri(apiUrl),
-      name: "JWToken",
-      value: Globaldata.JWToken.split('=').last,
-      isSecure: true,
-      isHttpOnly: true,
-    );
   }
 
   Future<void> saveJWToken(Response response) async {
@@ -81,10 +72,15 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     }
   }
 
-  String insertAppTypeInUrl(String url) {
-    final splitUrl = url.split("?code=");
-    String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
-    return finalUrl;
+  String removeUrlState(String url) {
+    final splitState = url.split("?state=");
+    if (splitState.length == 1) {
+      return url.split("&state=").first;
+    }
+    developer.log("removeUrlState splitState : $splitState");
+    final splitCode = splitState.last.split("&code=");
+    developer.log("removeUrlState splitCode : $splitCode");
+    return "${splitState.first}?code=${splitCode.last}";
   }
 
   @override
@@ -92,21 +88,22 @@ class SpotifyAuth extends State<SpotifyAuthAPICall> {
     return Scaffold(
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: WebUri(Globaldata.spotifyConnectionLink),
+          url: WebUri(AuthData.serviceConnectionLink),
         ),
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           domStorageEnabled: true,
         ),
         onLoadStart: (controller, url) {
-          _setCookiesAndNavigate();
+          AuthFunctions.setCookiesAndNavigate(ApiData.apiUrl);
         },
         onLoadStop: (controller, url) async {
-          developer.log(url.toString());
+          developer.log("onLoadStop url : ${url.toString()}");
           if (url != null &&
-              url.toString().contains(apiUrl + apiRoute)) {
-            final urlSplit = url.toString().split(':8080/');
-            final Response response = await ApiRequest.post(insertAppTypeInUrl(urlSplit.last), jsonEncode(<String, dynamic>{}),);
+              url.toString().contains(ApiData.apiUrl + apiRoute)) {
+            final urlSplit = url.toString().split(ApiData.apiUrl);
+            String callBackUrl = removeUrlState(urlSplit.last);
+            final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(callBackUrl), jsonEncode(<String, dynamic>{}),);
 
             if (response.statusCode == 200) {
               developer.log("User connected");

@@ -97,14 +97,14 @@ class ActionOrReactionDescription extends StatelessWidget {
     super.key,
     required this.colorTheme,
     required this.title,
-    required this.serviceIconsList,
+    required this.serviceIcon,
     required this.serviceName,
     required this.actionDescription,
   });
 
   final Color colorTheme;
   final String title;
-  final List<String> serviceIconsList;
+  final String serviceIcon;
   final String serviceName;
   final String actionDescription;
 
@@ -127,7 +127,7 @@ class ActionOrReactionDescription extends StatelessWidget {
             Padding(padding: EdgeInsets.only(top: 20)),
             SafeWebImage(
               url:
-                  "${Globaldata.domainName}${serviceIconsList[Globaldata.firstService]}",
+                  "${Globaldata.domainName}$serviceIcon",
               width: 75,
               height: 75,
             ),

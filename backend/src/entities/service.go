@@ -7,6 +7,7 @@ type Service struct {
 	Logo         string `json:"logo"`
 	HasActions   bool   `json:"hasactions"`
 	HasReactions bool   `json:"hasreactions"`
+	IsAuthNeeded bool   `json:"isauthneeded"`
 }
 
 type ResultToken struct {
@@ -107,4 +108,33 @@ type GithubCommit struct {
 
 type GithubIssue struct {
 	Title string `json:"title"`
+}
+
+// Gitlab
+type GitlabWebhookResponse struct {
+	Project struct {
+		Id int `json:"id"`
+	} `json:"project"`
+}
+
+type GitlabUser struct {
+	Username string `json:"username"`
+}
+
+type GitlabProject struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+// Linkedin
+type LinkedinSub struct {
+	Sub string `json:"sub"`
+}
+
+// Asana
+type AsanaWorkspacesInfo struct {
+	Data []struct {
+		Gid  string `json:"gid"`
+		Name string `json:"name"`
+	} `json:"data"`
 }

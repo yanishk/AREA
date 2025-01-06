@@ -15,32 +15,32 @@ type UserHandler struct {
 	UserService service.UserService
 }
 
-const InvalidRequestBodyMessage = "Invalid request body"
+const invalidRequestBodyMessage = "Invalid request body"
 
 func NewUserHandler(UserService service.UserService, router *gin.Engine) *UserHandler {
 	handler := &UserHandler{UserService: UserService}
-	handler.SetupRoutes(router)
+	handler.setupRoutes(router)
 	return handler
 }
 
-func (self *UserHandler) SetupRoutes(router *gin.Engine) {
-	self.PublicRoutes(router)
-	self.PrivateRoutes(router)
+func (self *UserHandler) setupRoutes(router *gin.Engine) {
+	self.publicRoutes(router)
+	self.privateRoutes(router)
 }
 
-func (self *UserHandler) PublicRoutes(router *gin.Engine) {
-	router.POST("/register", self.CreateUser)
-	router.POST("/login", self.LoginAuthentication)
-	router.POST("/login-callback/:service/:app-type", self.LoginCallback)
+func (self *UserHandler) publicRoutes(router *gin.Engine) {
+	router.POST("/register", self.createUser)
+	router.POST("/login", self.loginAuthentication)
+	router.POST("/login-callback/:service/:app-type", self.loginCallback)
 }
 
-func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
+func (self *UserHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	user := private.Group("/user")
 	{
-		user.PUT("/modify-password", self.ModifyPassword)
-		user.DELETE("/delete-account", self.DeleteAccount)
-		user.GET("/email", self.GetUserEmail)
+		user.GET("", self.getUser)
+		user.PUT("/modify-password", self.modifyPassword)
+		user.DELETE("", self.deleteAccount)
 	}
 }
 
@@ -55,13 +55,13 @@ func (self *UserHandler) PrivateRoutes(router *gin.Engine) {
 // @Failure		409		{object}	docs_user.UserRegisterConflictResponse
 // @Failure		500		{object}	docs_user.UserInternalServerErrorResponse
 // @Router			/register [post]
-func (self *UserHandler) CreateUser(context *gin.Context) {
+func (self *UserHandler) createUser(context *gin.Context) {
 	var newUser entities.UserCredentials
 
 	err := context.ShouldBindJSON(&newUser)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -90,7 +90,7 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 }
 
 // @Summary		Login
-// @Description	User Authentication
+// @Description	User authentication
 // @Tags			Users
 // @Accept			json
 // @Produce		json
@@ -100,13 +100,13 @@ func (self *UserHandler) CreateUser(context *gin.Context) {
 // @Failure		401		{object}	docs_user.UserLoginUnauthorizedResponse
 // @Failure		500		{object}	docs_user.UserLoginTokenErrorResponse
 // @Router			/login [post]
-func (self *UserHandler) LoginAuthentication(context *gin.Context) {
+func (self *UserHandler) loginAuthentication(context *gin.Context) {
 	var user entities.UserCredentials
 
 	err := context.ShouldBindJSON(&user)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -142,7 +142,7 @@ func (self *UserHandler) LoginAuthentication(context *gin.Context) {
 // @Failure		400		{object}	docs_user.UserLoginCallbackBadRequestResponse
 // @Failure		500		{object}	docs_user.UserLoginCallbackInternalServerErrorResponse
 // @Router       /login-callback/{service}/{app-type} [post]
-func (self *UserHandler) LoginCallback(context *gin.Context) {
+func (self *UserHandler) loginCallback(context *gin.Context) {
 	appType := context.Param("app-type")
 	serviceName := context.Param("service")
 	code := context.Query("code")
@@ -175,6 +175,31 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 	})
 }
 
+// @Summary		Retrieve User's Informations
+// @Description	Retrieve informations about the user's connected
+// @Tags			Users
+// @Produce		json
+// @Success		200		{object}	docs_user.UserGetUserSuccessResponse
+// @Failure		401		{object}	docs_user.UserGetUserUnauthorizedResponse
+// @Failure		500		{object}	docs_user.UserGetUserInternalServerErrorResponse
+// @Router			/user [get]
+func (self *UserHandler) getUser(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	user, err := self.UserService.GetUser(email, connectionType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+}
+
 // @Summary		Modify Password
 // @Description	Modify the user password
 // @Tags			Users
@@ -187,7 +212,7 @@ func (self *UserHandler) LoginCallback(context *gin.Context) {
 // @Failure		403		{object}	docs_user.UserModifyPasswordOldPasswordNotValidResponse
 // @Failure		500		{object}	docs_user.UserModifyPasswordInternalServerErrorResponse
 // @Router			/user/modify-password [put]
-func (self *UserHandler) ModifyPassword(context *gin.Context) {
+func (self *UserHandler) modifyPassword(context *gin.Context) {
 	var newPassword entities.UserModifyPassword
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -195,7 +220,7 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 	errorBody := context.ShouldBindJSON(&newPassword)
 	if errorBody != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": InvalidRequestBodyMessage,
+			"error": invalidRequestBodyMessage,
 		})
 		return
 	}
@@ -230,8 +255,8 @@ func (self *UserHandler) ModifyPassword(context *gin.Context) {
 // @Success		200		{object}	docs_user.UserDeleteAccountSuccessResponse
 // @Failure		401		{object}	docs_user.UserDeleteAccountUnauthorizedResponse
 // @Failure		500		{object}	docs_user.UserDeleteAccountInternalServerErrorResponse
-// @Router			/user/delete-account [delete]
-func (self *UserHandler) DeleteAccount(context *gin.Context) {
+// @Router			/user [delete]
+func (self *UserHandler) deleteAccount(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 
@@ -244,20 +269,5 @@ func (self *UserHandler) DeleteAccount(context *gin.Context) {
 	}
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Account deleted",
-	})
-}
-
-// @Summary		Get User Email
-// @Description	Get the email of user connected
-// @Tags			Users
-// @Produce		json
-// @Success		200		{object}	docs_user.UserGetUserEmailSuccessResponse
-// @Failure		401		{object}	docs_user.UserGetUserEmailUnauthorizedResponse
-// @Router			/user/email [get]
-func (self *UserHandler) GetUserEmail(context *gin.Context) {
-	email := context.GetString("email")
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"email": email,
 	})
 }

@@ -5,15 +5,15 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(email string, password string, connectionType string) error
-	FindUserByEmail(email string, connectionType string) (entities.User, error)
+	CreateUser(email, password, connectionType string) error
+	FindUserByEmail(email, connectionType string) (entities.User, error)
 	FindUserById(userId string) (entities.User, error)
-	UpdateUser(email string, password string, connectionType string) error
-	DeleteUser(email string, connectionType string) error
+	UpdateUser(email, password, connectionType string) error
+	DeleteUser(email, connectionType string) error
 }
 
 type ServiceRepository interface {
-	CreateService(name string, color string, logo string) error
+	CreateService(name, color, logo string) error
 	FindServiceById(id string) (entities.Service, error)
 	FindServiceByName(name string) (entities.Service, error)
 	FindAllServices() ([]entities.Service, error)
@@ -22,33 +22,33 @@ type ServiceRepository interface {
 }
 
 type UserServiceRepository interface {
-	CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error
+	CreateUserService(userId, token, tokenRefresh, expiryDate, serviceId string) error
 	FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error)
-	UpdateUserServiceByServiceIdAndUserId(userId string, accessToken string, refreshToken string, expiryDate string, serviceId string) error
+	UpdateUserServiceByServiceIdAndUserId(userId, accessToken, refreshToken, expiryDate, serviceId string) error
 	DeleteUserServiceByUserId(userId string) error
 }
 
 type ReactionRepository interface {
-	CreateReaction(name string, description string, serviceId string, nbParam int) error
+	CreateReaction(name, description, serviceId string, nbParam int) error
+	FindReactionById(id string) (entities.Reaction, error)
 	FindReactionByName(name string) (entities.Reaction, error)
-	FindReactionByServiceId(serviceId string) ([]entities.Reaction, error)
-	FindReactionByID(id string) (entities.Reaction, error)
+	FindReactionsByServiceId(serviceId string) ([]entities.Reaction, error)
 }
 
 type ActionRepository interface {
-	CreateAction(name string, description string, serviceId string, nbParam int) error
+	CreateAction(name, description, serviceId string, nbParam int) error
+	FindActionById(id string) (entities.Action, error)
 	FindActionByName(name string) (entities.Action, error)
-	FindActionByServiceId(serviceId string) ([]entities.Action, error)
+	FindActionsByServiceId(serviceId string) ([]entities.Action, error)
 }
 
 type WorkflowRepository interface {
-	CreateWorkflow(name string, ownerId string, actionId string, reactionId string, actionParam map[string]interface{}, reactionParam map[string]interface{}, actionData map[string]interface{}) error
-	FindWorkflowByNameAndUserId(name string, ownerId string) (entities.Workflow, error)
-	FindWorkflowByActionId(actionId string) ([]entities.Workflow, error)
-	FindWorkflowByUserId(userId string) ([]entities.Workflow, error)
-	UpdateWorkflow(workflowId string, updatedWorkflow entities.Workflow) error
-	FindWorkflowById(workflowId string) (entities.Workflow, error)
-	DeleteWorkflow(workflowId string, ownerId string) error
+	CreateWorkflow(name, ownerId, actionId, reactionId string, actionParam, reactionParam, actionData map[string]interface{}) error
+	FindWorkflowById(id string) (entities.Workflow, error)
+	FindWorkflowsByActionId(actionId string) ([]entities.Workflow, error)
+	FindWorkflowsByOwnerId(ownerId string) ([]entities.Workflow, error)
+	UpdateWorkflow(id string, updatedWorkflow entities.Workflow) error
+	DeleteWorkflow(id, ownerId string) error
 	DeleteWorkflowByOwnerId(ownerId string) error
 }
 

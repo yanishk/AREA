@@ -9,6 +9,7 @@ import "../custom_widget.dart";
 import "../globalData.dart";
 import "../explore/explorePage.dart";
 import "../apiCall/apiRequest.dart";
+import "../apiCall/apiErrorHandling.dart";
 import "loginNavigator.dart";
 
 class LoadServicePage extends StatelessWidget {
@@ -29,12 +30,29 @@ class APICall extends StatefulWidget {
 
 class LoadService extends State<APICall> {
   String result = '';
-  String apiRoute = 'actions-services';
+  String apiRoute = 'services/actions';
   String title = "Select action service";
-  String actionsServices = "actions-services";
-  String reactionsServices = "reactions-services";
+  String actionsServices = "services/actions";
+  String reactionsServices = "services/reactions";
   bool isInit = true;
   bool hasToRetry = false;
+
+  String getInfosFromUserDataString(String userData, String infos) {
+    return (userData.split(infos).last).split(",").first;
+  }
+
+  Future<void> storeUserInfos() async {
+    Response response = await ApiRequest.get("user");
+    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
+    if (responseData == null) {
+      return;
+    }
+    final userDataString = (responseData.toString().split("{").last).split("}").first;
+    Globaldata.userInfos.email = getInfosFromUserDataString(userDataString, "email: ");
+    Globaldata.userInfos.createdat = getInfosFromUserDataString(userDataString, "createdat: ");
+    Globaldata.userInfos.timezone = getInfosFromUserDataString(userDataString, "timezone: ");
+    Globaldata.userInfos.connectiontype = getInfosFromUserDataString(userDataString, "connectiontype: ");
+  }
 
   Future<dynamic> getWorkflowsResponse(String route) async {
     Response response = await ApiRequest.get(route);
@@ -49,6 +67,35 @@ class LoadService extends State<APICall> {
       return null;
     }
     return responseData;
+  }
+
+  List<String> getValueListe(List<dynamic> values) {
+    List<String> valuesList = [];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] != null) {
+        valuesList.add(values[i]);
+      }
+    }
+    return valuesList;
+  }
+
+  List<ActionOrReactionsParameter> storeActionReactionParameter(List<dynamic> parameter) {
+    List<ActionOrReactionsParameter> parameterList = [];
+    if (parameter.isEmpty) {
+      return parameterList;
+    }
+    for (int i = 0; i < parameter.length; i++) {
+      parameterList.add(
+        ActionOrReactionsParameter.optional(
+          parameter[i]["isexhaustive"] ?? true,
+          parameter[i]["name"] ?? "",
+          parameter[i]["route"] ?? "",
+          parameter[i]["type"] ?? "",
+          getValueListe(parameter[i]["values"]),
+        )
+      );
+    }
+    return parameterList;
   }
 
   void storeServiceDescription(dynamic responseData, String serviceName, String route) {
@@ -68,9 +115,9 @@ class LoadService extends State<APICall> {
             actionResponse['description'] ?? '',
             actionResponse['id'] ?? '',
             actionResponse['name'] ?? '',
-            actionResponse['nbparam'] ?? 0,
             actionResponse['serviceid'] ?? '',
             serviceName,
+            storeActionReactionParameter(actionResponse["parameters"] ?? []),
           ));
         }
       }
@@ -92,10 +139,11 @@ class LoadService extends State<APICall> {
   }
 
   void storeData(List<String> servicesName, List<String> servicesColor,
-      List<String> servicesIcons, List<String> servicesID, dynamic service) {
+      List<String> servicesIcons, List<String> servicesID, List<bool> serviceIsAuthNeeded, dynamic service) {
     servicesName.add(service['name']);
     servicesColor.add(service['color']);
     servicesIcons.add(service['logo']);
+    serviceIsAuthNeeded.add(service['isauthneeded']);
     servicesID.add(service['id']);
   }
 
@@ -108,13 +156,14 @@ class LoadService extends State<APICall> {
         getWorkflows(route, result);
         if (route == actionsServices) {
           storeData(Globaldata.actionServicesName, Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons, Globaldata.actionServicesID ,service);
+            Globaldata.actionServicesIcons, Globaldata.actionServicesID, Globaldata.actionIsAuthNeeded ,service);
         } else {
           storeData(
             Globaldata.reactionServicesName,
             Globaldata.reactionServicesColor,
             Globaldata.reactionServicesIcons,
             Globaldata.reactionServicesID,
+            Globaldata.reactionIsAuthNeeded,
             service
           );
           LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
@@ -154,6 +203,7 @@ class LoadService extends State<APICall> {
   Widget build(BuildContext context) {
     if (isInit == true) {
       isInit = false;
+      storeUserInfos();
       getServices();
     }
 

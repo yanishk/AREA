@@ -61,25 +61,6 @@ definitions:
       type:
         type: integer
     type: object
-  docs_service.DiscordServerExample:
-    properties:
-      banner:
-        type: string
-      features:
-        items:
-          type: string
-        type: array
-      icon:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      owner:
-        type: boolean
-      permissions:
-        type: string
-    type: object
   docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse:
     properties:
       error:
@@ -91,20 +72,6 @@ definitions:
       channels:
         items:
           $ref: '#/definitions/docs_service.DiscordChannelExample'
-        type: array
-    type: object
-  docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse:
-    properties:
-      error:
-        example: Could not retrieve or refresh the token-Could not retrieve the user's
-          servers
-        type: string
-    type: object
-  docs_service.ServiceGetDiscordUserServersSuccessResponse:
-    properties:
-      servers:
-        items:
-          $ref: '#/definitions/docs_service.DiscordServerExample'
         type: array
     type: object
   docs_service.ServiceInternalServerErrorResponse:
@@ -125,6 +92,12 @@ definitions:
         example: url-example.com
         type: string
     type: object
+  docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
+    type: object
   docs_service.ServiceRetrieveActionsFromServiceSuccessResponse:
     properties:
       actions:
@@ -139,18 +112,18 @@ definitions:
           $ref: '#/definitions/entities.Service'
         type: array
     type: object
+  docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse:
+    properties:
+      error:
+        example: Unknown service
+        type: string
+    type: object
   docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse:
     properties:
       reactions:
         items:
           $ref: '#/definitions/entities.Reaction'
         type: array
-    type: object
-  docs_service.ServiceRetrieveServiceByIdBadRequestResponse:
-    properties:
-      error:
-        example: Invalid service id
-        type: string
     type: object
   docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse:
     properties:
@@ -182,16 +155,32 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_user.UserGetUserEmailSuccessResponse:
+  docs_user.UserGetUserInternalServerErrorResponse:
     properties:
-      email:
-        example: email@example.com
+      error:
+        example: Internal server error
         type: string
     type: object
-  docs_user.UserGetUserEmailUnauthorizedResponse:
+  docs_user.UserGetUserSuccessResponse:
+    properties:
+      user:
+        $ref: '#/definitions/docs_user.UserInfosExample'
+    type: object
+  docs_user.UserGetUserUnauthorizedResponse:
     properties:
       error:
         example: Email not found in token-Email is not a valid string
+        type: string
+    type: object
+  docs_user.UserInfosExample:
+    properties:
+      connectiontype:
+        type: string
+      createdat:
+        type: string
+      email:
+        type: string
+      timezone:
         type: string
     type: object
   docs_user.UserInternalServerErrorResponse:
@@ -291,6 +280,108 @@ definitions:
         example: New user created
         type: string
     type: object
+  docs_userservice.DiscordServerExample:
+    properties:
+      banner:
+        type: string
+      features:
+        items:
+          type: string
+        type: array
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      owner:
+        type: boolean
+      permissions:
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's workspaces
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse:
+    properties:
+      workspaces:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's assignees
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse:
+    properties:
+      assignees:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's projects
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse:
+    properties:
+      projects:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve workspace's tags
+        type: string
+    type: object
+  docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse:
+    properties:
+      tags:
+        $ref: '#/definitions/entities.AsanaWorkspacesInfo'
+    type: object
+  docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's servers
+        type: string
+    type: object
+  docs_userservice.UserServiceGetDiscordUserServersSuccessResponse:
+    properties:
+      servers:
+        items:
+          $ref: '#/definitions/docs_userservice.DiscordServerExample'
+        type: array
+    type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's repositories
+        type: string
+    type: object
+  docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse:
+    properties:
+      repositories:
+        items:
+          $ref: '#/definitions/entities.GithubRepository'
+        type: array
+    type: object
+  docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not retrieve the user's projects
+        type: string
+    type: object
+  docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse:
+    properties:
+      projects:
+        items:
+          $ref: '#/definitions/entities.GitlabProject'
+        type: array
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -334,12 +425,6 @@ definitions:
           not found in token-Connection type is not a valid string
         type: string
     type: object
-  docs_workflow.WorkflowDeleteWorkflowBadRequestResponse:
-    properties:
-      error:
-        example: Invalid workflow id
-        type: string
-    type: object
   docs_workflow.WorkflowDeleteWorkflowInternalServerErrorResponse:
     properties:
       error:
@@ -357,6 +442,18 @@ definitions:
       error:
         example: Email not found in token-Email is not a valid string-Connection type
           not found in token-Connection type is not a valid string
+        type: string
+    type: object
+  docs_workflow.WorkflowReceiveServiceWebhookBadRequestResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  docs_workflow.WorkflowReceiveServiceWebhookSuccessResponse:
+    properties:
+      success:
+        example: Webhook received
         type: string
     type: object
   docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse:
@@ -382,7 +479,7 @@ definitions:
   docs_workflow.WorkflowUpdateWorkflowBadRequestResponse:
     properties:
       error:
-        example: Invalid workflow id-Invalid request body
+        example: Invalid request body
         type: string
     type: object
   docs_workflow.WorkflowUpdateWorkflowInternalServerErrorResponse:
@@ -455,11 +552,43 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
+        type: string
+    type: object
+  entities.AsanaWorkspacesInfo:
+    properties:
+      data:
+        items:
+          properties:
+            gid:
+              type: string
+            name:
+              type: string
+          type: object
+        type: array
+    type: object
+  entities.GithubRepository:
+    properties:
+      full_name:
+        type: string
+    type: object
+  entities.GitlabProject:
+    properties:
+      id:
+        type: integer
+      name:
         type: string
     type: object
   entities.NewWorkflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
@@ -483,6 +612,11 @@ definitions:
         type: string
       nbparam:
         type: integer
+      parameters:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
       serviceid:
         type: string
     type: object
@@ -496,6 +630,8 @@ definitions:
         type: boolean
       id:
         type: string
+      isauthneeded:
+        type: boolean
       logo:
         type: string
       name:
@@ -534,6 +670,9 @@ definitions:
     type: object
   entities.Workflow:
     properties:
+      actiondata:
+        additionalProperties: true
+        type: object
       actionid:
         type: string
       actionparam:
@@ -576,13 +715,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceSuccessResponse'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions From Service
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse'
+      summary: Retrieve Actions From Service
       tags:
-      - Services
+      - Service
   /{service}/reactions:
     get:
       description: Retrieve reactions from requested service
@@ -599,13 +738,99 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse'
+      summary: Retrieve Reactions From Service
+      tags:
+      - Service
+  /Asana/user/workspaces:
+    get:
+      description: Retrieve the workspaces from the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions From Service
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse'
+      summary: Retrieve Asana Workspaces
       tags:
-      - Services
+      - Asana
+  /Asana/workspace/assignees:
+    get:
+      description: Retrieve the assignees from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Assignees
+      tags:
+      - Asana
+  /Asana/workspace/projects:
+    get:
+      description: Retrieve the projects from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Projects
+      tags:
+      - Asana
+  /Asana/workspace/tags:
+    get:
+      description: Retrieve the tags from the selected workspace
+      parameters:
+      - description: workspace id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse'
+      summary: Retrieve Asana Workspace Tags
+      tags:
+      - Asana
   /Discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -626,9 +851,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
-      summary: Discord Server Channels
+      summary: Retrieve Discord Server Channels
       tags:
-      - Services
+      - Discord
   /Discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
@@ -638,14 +863,48 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordUserServersInternalServerErrorResponse'
-      summary: Discord User Servers
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse'
+      summary: Retrieve Discord User Servers
       tags:
-      - Services
+      - Discord
+  /Github/user/repositories:
+    get:
+      description: Retrieve the repositories of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse'
+      summary: Retrieve User Repositories
+      tags:
+      - Github
+  /Gitlab/user/projects:
+    get:
+      description: Retrieve the projects of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse'
+      summary: Retrieve User Projects
+      tags:
+      - Gitlab
   /about.json:
     get:
       description: Get about.json file
@@ -663,23 +922,6 @@ paths:
       summary: About.json
       tags:
       - About.json
-  /actions-services:
-    get:
-      description: Retrieve services with actions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Actions Services
-      tags:
-      - Services
   /authentication/{service}/{callback-type}/{app-type}:
     get:
       description: Get Service OAuth2 URL
@@ -712,12 +954,12 @@ paths:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Service OAuth2
       tags:
-      - Services Authentication
+      - Authentication
   /login:
     post:
       consumes:
       - application/json
-      description: User Authentication
+      description: User authentication
       parameters:
       - description: User credentials
         in: body
@@ -784,23 +1026,6 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
-  /reactions-services:
-    get:
-      description: Retrieve services with reactions available
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
-      summary: Reactions Services
-      tags:
-      - Services
   /register:
     post:
       consumes:
@@ -872,12 +1097,12 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
-  /service/retrieve:
+  /services/{id}:
     get:
       description: Retrieve service by id
       parameters:
       - description: Service id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -888,10 +1113,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdBadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -899,7 +1120,87 @@ paths:
       summary: Retrieve Service
       tags:
       - Services
-  /user/delete-account:
+  /services/action/{actionid}:
+    get:
+      description: Retrieve service by action id
+      parameters:
+      - description: Action id
+        in: path
+        name: actionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
+  /services/actions:
+    get:
+      description: Retrieve services with actions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Actions
+      tags:
+      - Services
+  /services/reaction/{reactionid}:
+    get:
+      description: Retrieve service by reaction id
+      parameters:
+      - description: Reaction id
+        in: path
+        name: reactionid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveServiceByIdInternalServerErrorResponse'
+      summary: Retrieve Service
+      tags:
+      - Services
+  /services/reactions:
+    get:
+      description: Retrieve services with reactions available
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services With Reactions
+      tags:
+      - Services
+  /user:
     delete:
       consumes:
       - application/json
@@ -922,21 +1223,24 @@ paths:
       summary: Delete Account
       tags:
       - Users
-  /user/email:
     get:
-      description: Get the email of user connected
+      description: Retrieve informations about the user's connected
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailSuccessResponse'
+            $ref: '#/definitions/docs_user.UserGetUserSuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/docs_user.UserGetUserEmailUnauthorizedResponse'
-      summary: Get User Email
+            $ref: '#/definitions/docs_user.UserGetUserUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserGetUserInternalServerErrorResponse'
+      summary: Retrieve User's Informations
       tags:
       - Users
   /user/modify-password:
@@ -977,9 +1281,29 @@ paths:
       summary: Modify Password
       tags:
       - Users
-  /workflow/create:
+  /workflows:
+    get:
+      description: Retrieve the workflows of the user actually connected
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
+      summary: Retrieve User's Workflows
+      tags:
+      - Workflows
     post:
-      description: Create a Workflow
+      description: Create a workflow
       parameters:
       - description: Workflow informations
         in: body
@@ -1009,12 +1333,12 @@ paths:
       summary: Create Workflow
       tags:
       - Workflows
-  /workflow/delete:
+  /workflows/{id}:
     delete:
       description: Delete a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string
@@ -1025,10 +1349,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowDeleteWorkflowBadRequestResponse'
         "401":
           description: Unauthorized
           schema:
@@ -1040,33 +1360,11 @@ paths:
       summary: Delete Workflow
       tags:
       - Workflows
-  /workflow/retrieve:
-    get:
-      description: Retrieve the workflows of the user actually connected
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsSuccessResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsUnauthorizedResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_workflow.WorkflowRetrieveUserWorkflowsInternalServerErrorResponse'
-      summary: Retrieve User's Workflows
-      tags:
-      - Workflows
-  /workflow/update:
     put:
       description: Update a user's workflow by specifying the workflow id
       parameters:
       - description: Workflow id
-        in: query
+        in: path
         name: id
         required: true
         type: string

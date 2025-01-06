@@ -24,34 +24,22 @@ const HomePage = () => {
 
     const getAuthCode = async () => {
         const codeAuth = searchParams.get("code");
-        const stateParam = searchParams.get("state");
+        const serviceName = sessionStorage.getItem("oauth2-login")
 
-        let serviceName = null;
-
-        if (!stateParam) {
-            console.error("Failed to get state param");
+        if (!codeAuth || !serviceName) {
             return;
         }
 
-        try {
-            const state = JSON.parse(decodeURIComponent(stateParam));
-            serviceName = state.service;
-        } catch (error) {
-            console.error("Error to get serviceName:", error);
-        }
-
-        if (codeAuth) {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
-                {
-                },
-                {
-                    withCredentials: true,
-                }
-            );
-            login();
-            navigate(location.pathname, { replace: true });
-        }
+        await axios.post(
+            `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
+            {
+            },
+            {
+                withCredentials: true,
+            }
+        );
+        login();
+        navigate(location.pathname, { replace: true });
     }
 
     useEffect(() => {

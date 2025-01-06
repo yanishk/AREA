@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import "package:http/src/response.dart";
 import 'package:flutter_switch/flutter_switch.dart';
 import 'dart:convert';
-import "../../apiCall/apiErrorHandling.dart";
 
 import "../custom_widget.dart";
 import "../apiCall/apiRequest.dart";
@@ -31,7 +29,7 @@ class WorkflowInfosAPICall extends StatefulWidget {
 
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
-  String email = "";
+  String email = Globaldata.userInfos.email;
   Color backgroundColor = HexColor(
     MyWorkflowsfunctions.getServiceDataById(
       MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID,
@@ -39,8 +37,6 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
       Globaldata.reactionServicesColor
     )
   );
-
-
 
   bool editNameMode = false;
   String editNameButtonText = "Edit name";
@@ -50,19 +46,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
   @override
   void initState() {
     super.initState();
-    getEmail();
     modifDate = MyWorkflowsfunctions.getWorkflowDate();
-  }
-
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
-    }
-    setState(() {
-      email = responseData["email"];
-    });
   }
 
   Future<void> enableEditName() async {
@@ -73,9 +57,9 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
       } else {
         editNameButtonText = "Edit name";
         ApiRequest.put(
-          "workflow/update?id=$workflowID",
+          "workflows/$workflowID",
           jsonEncode(<String, dynamic>{
-            'name':workflowTitleController.text,
+            'name': workflowTitleController.text,
           }),
         );
       }
@@ -123,7 +107,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
                 onToggle: (bool) {
                   changeActivationBool();
                   ApiRequest.put(
-                    "workflow/update?id=$workflowID",
+                    "workflows/$workflowID",
                     jsonEncode(<String, dynamic>{
                       'isactivated': MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].isActivated,
                     }),

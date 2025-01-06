@@ -15,10 +15,8 @@ export const handleOAuthLogin = async (serviceName: string) => {
             return;
         }
 
-        const state = JSON.stringify({ service: serviceName });
-        const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
-
-        window.location.href = authUrlWithService;
+        sessionStorage.setItem("oauth2-login", serviceName)
+        window.location.href = authUrl;
     } catch (error) {
         console.error(`Error during ${serviceName} authentication:`, error);
     }

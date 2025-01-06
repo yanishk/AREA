@@ -5,44 +5,47 @@ interface ButtonThenCustomProps {
     color: string;
     iconPath: string;
     onEdit: () => void;
+    isEdit?: boolean;
     onDelete: () => void;
 }
 
-const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, iconPath, onEdit, onDelete }) => {
+const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, iconPath, onEdit, onDelete, isEdit }) => {
     const buttonColor = color || "#222222";
 
     return (
         <div className="relative inline-block">
             <button
                 style={{ backgroundColor: buttonColor }}
-                className="w-[600px] flex justify-center items-center text-white text-[5.2rem] rounded-lg font-[900]"
+                className="w-[730px] h-[125px] flex justify-start items-center text-white rounded-lg font-[900]"
             >
                 <p
-                    className="pr-10 text-[5.2rem]"
+                    className="ml-[35px] pr-10 text-[5.8rem]"
                 >
                     Then
                 </p>
                 <img
                     alt="icon"
                     src={iconPath}
-                    className="size-10"
+                    className="size-11"
                 />
                 <p
-                    className="text-[1.2rem] ml-4">
+                    className="text-[1.4rem] font-bold ml-4">
                         {text}
                 </p>
             </button>
 
-            <button
-                onClick={onEdit}
-                className="absolute top-[10px] right-[70px] text-sm font-extrabold text-white underline"
-            >
-                Edit
-            </button>
+            { isEdit && (
+                <button
+                    onClick={onEdit}
+                    className="absolute top-[15px] right-[70px] text-[12px] font-extrabold text-white underline"
+                >
+                    Edit
+                </button>
+            )}
 
             <button
                 onClick={onDelete}
-                className="absolute top-[10px] right-[10px] text-sm font-extrabold text-white underline"
+                className="absolute top-[15px] right-[15px] text-[12px] text-sm font-extrabold text-white underline"
             >
                 Delete
             </button>

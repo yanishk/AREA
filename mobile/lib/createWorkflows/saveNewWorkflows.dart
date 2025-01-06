@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import "package:http/src/response.dart";
+import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
 import "../globalData.dart";
@@ -31,17 +32,12 @@ class APICall extends StatefulWidget {
 class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
-          "If ${CreateData.serviceAction.name} ${CreateData.serviceAction.parameter}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
-  final String apiRoute = "workflow/create";
-  String email = "";
-
-  @override
-  void initState() {
-    super.initState();
-    getEmail();
-  }
+          "If ${CreateData.serviceAction.name}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
+  final String apiRoute = "workflows";
+  String email = Globaldata.userInfos.email;
 
   Future<void> postCreateWorkflows() async {
+    developer.log("${CreateData.serviceAction.parameterList}");
     Response response = await ApiRequest.post(
       apiRoute,
       jsonEncode(<String, dynamic>{
@@ -67,17 +63,6 @@ class SaveNewWorkflows extends State<APICall> {
         Globaldata.myContext,
         MaterialPageRoute(builder: (context) => ExplorePage(),),
       );
-    });
-  }
-
-  Future<void> getEmail() async {
-    Response response = await ApiRequest.get("user/email");
-    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
-    if (responseData == null) {
-      return;
-    }
-    setState(() {
-      email = responseData["email"];
     });
   }
 
@@ -139,7 +124,7 @@ class SaveNewWorkflows extends State<APICall> {
                       child: CustomClassicForm(
                         controller: workflowTitleController,
                         maxLines: 5,
-                        hint: 'Email',
+                        hint: 'Workflow title',
                         padding:
                             EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                         focusedBorderColor: Colors.white,

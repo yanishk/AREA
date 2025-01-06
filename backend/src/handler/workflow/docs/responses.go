@@ -2,6 +2,15 @@ package docs_workflow
 
 import "backend/src/entities"
 
+// Receive Service Weebhook Responses
+type WorkflowReceiveServiceWebhookSuccessResponse struct {
+	Msg string `json:"success"example:"Webhook received"`
+}
+
+type WorkflowReceiveServiceWebhookBadRequestResponse struct {
+	Msg string `json:"error"example:"Invalid request body"`
+}
+
 // Create Workflow Responses
 type WorkflowCreateWorkflowSuccessResponse struct {
 	Msg string `json:"success"example:"Successful workflow creation"`
@@ -38,7 +47,7 @@ type WorkflowUpdateWorkflowSuccessResponse struct {
 }
 
 type WorkflowUpdateWorkflowBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid workflow id-Invalid request body"`
+	Msg string `json:"error"example:"Invalid request body"`
 }
 
 type WorkflowUpdateWorkflowInternalServerErrorResponse struct {
@@ -48,10 +57,6 @@ type WorkflowUpdateWorkflowInternalServerErrorResponse struct {
 // Delete Workflow Responses
 type WorkflowDeleteWorkflowSuccessResponse struct {
 	Msg string `json:"success"example:"Workflow deleted"`
-}
-
-type WorkflowDeleteWorkflowBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid workflow id"`
 }
 
 type WorkflowDeleteWorkflowUnauthorizedResponse struct {

@@ -1,9 +1,10 @@
 package userservice_repository
 
 import (
-	"backend/src/entities"
 	"database/sql"
 	"fmt"
+
+	"backend/src/entities"
 )
 
 type UserServiceRepository struct {
@@ -14,7 +15,7 @@ func NewUserServiceRepository(db *sql.DB) *UserServiceRepository {
 	return &UserServiceRepository{db: db}
 }
 
-func (self *UserServiceRepository) CreateUserService(userId string, token string, tokenRefresh string, expiryDate string, serviceId string) error {
+func (self *UserServiceRepository) CreateUserService(userId, token, tokenRefresh, expiryDate, serviceId string) error {
 	sqlStatement := `INSERT INTO userservices (userid, token, tokenrefresh, expiry, serviceid) VALUES ($1, $2, $3, $4, $5)`
 
 	_, err := self.FindUserServiceByServiceIdandUserId(userId, serviceId)
@@ -31,18 +32,18 @@ func (self *UserServiceRepository) CreateUserService(userId string, token string
 
 func (self *UserServiceRepository) FindUserServiceByServiceIdandUserId(userId, serviceId string) (entities.UserService, error) {
 	sqlStatement := `SELECT * FROM userservices WHERE userid = ($1) AND serviceid = ($2)`
-	var retrievedUserService entities.UserService
+	var userService entities.UserService
 
 	row := self.db.QueryRow(sqlStatement, userId, serviceId)
-	err := row.Scan(&retrievedUserService.Id, &retrievedUserService.UserId, &retrievedUserService.AccessToken,
-		&retrievedUserService.RefreshToken, &retrievedUserService.ExpiryDate, &retrievedUserService.ServiceId)
+	err := row.Scan(&userService.Id, &userService.UserId, &userService.AccessToken,
+		&userService.RefreshToken, &userService.ExpiryDate, &userService.ServiceId)
 	if err != nil {
-		return retrievedUserService, err
+		return userService, err
 	}
-	return retrievedUserService, nil
+	return userService, nil
 }
 
-func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(serviceId string, userId string, accessToken string, refreshToken string, expiryToken string) error {
+func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(userId, accessToken, refreshToken, expiryDate, serviceId string) error {
 	sqlStatement := `UPDATE userservices SET token = ($1), tokenrefresh = ($2), expiry = ($3) WHERE userid = ($4) AND serviceid = ($5)`
 
 	_, err := self.FindUserServiceByServiceIdandUserId(userId, serviceId)
@@ -50,7 +51,7 @@ func (self *UserServiceRepository) UpdateUserServiceByServiceIdAndUserId(service
 		return fmt.Errorf("Service doesn't exist for user")
 	}
 
-	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryToken, userId, serviceId)
+	_, err = self.db.Exec(sqlStatement, accessToken, refreshToken, expiryDate, userId, serviceId)
 	if err != nil {
 		return err
 	}

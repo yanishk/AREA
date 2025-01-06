@@ -2,16 +2,6 @@ package docs_service
 
 import "backend/src/entities"
 
-type DiscordServerExample struct {
-	Banner      string
-	Features    []string
-	Icon        string
-	Id          string
-	Name        string
-	Owner       bool
-	Permissions string
-}
-
 type DiscordChannelIconEmojiExample struct {
 	Id   string
 	Name string
@@ -59,10 +49,6 @@ type ServiceRetrieveServiceByIdSuccessResponse struct {
 	Service entities.Service
 }
 
-type ServiceRetrieveServiceByIdBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid service id"`
-}
-
 type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve requested service"`
 }
@@ -77,18 +63,17 @@ type ServiceRetrieveActionsFromServiceSuccessResponse struct {
 	Actions []entities.Action
 }
 
+type ServiceRetrieveActionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
+}
+
 // Retrieve Reactions from Service Responses
 type ServiceRetrieveReactionsFromServiceSuccessResponse struct {
 	Reactions []entities.Reaction
 }
 
-// Discord Get User Servers
-type ServiceGetDiscordUserServersSuccessResponse struct {
-	Servers []DiscordServerExample
-}
-
-type ServiceGetDiscordUserServersInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve or refresh the token-Could not retrieve the user's servers"`
+type ServiceRetrieveReactionsFromServiceBadRequestResponse struct {
+	Msg string `json:"error"example:"Unknown service"`
 }
 
 // Discord Get Guild Channels
