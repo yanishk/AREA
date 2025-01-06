@@ -333,17 +333,6 @@ const WorkflowBuilder = () => {
         }
     }
 
-    const decodeState = (state: string | null) => {
-        if (!state) return null;
-
-        try {
-            return JSON.parse(decodeURIComponent(state));
-        } catch (error) {
-            console.error("Error parsing state:", error);
-            return null;
-        }
-    };
-
     const updateStateFromSession = (state: any) => {
         if (!state) return;
 
@@ -408,6 +397,9 @@ const WorkflowBuilder = () => {
 
             if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
                 goToStep(Steps.TRIGGER_ACTION);
+            }
+            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+                goToStep(Steps.TRIGGER_REACTION);
             }
 
             const serviceAuth = jsonState.selectedService;
