@@ -24,24 +24,12 @@ const HomePage = () => {
 
     const getAuthCode = async () => {
         const codeAuth = searchParams.get("code");
-        const stateParam = searchParams.get("state");
+        const serviceName = sessionStorage.getItem("oauth2-login")
 
-        let serviceName = null;
-
-        if (!stateParam) {
+        if (!codeAuth || !serviceName) {
             return;
         }
 
-        try {
-            const state = JSON.parse(decodeURIComponent(stateParam));
-            serviceName = state.service;
-        } catch (error) {
-            console.error("Error to get serviceName:", error);
-        }
-
-        if (!codeAuth) {
-            return;
-        }
         await axios.post(
             `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
             {

@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
+import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
@@ -129,8 +129,8 @@ const LoginForm = () => {
                         bgColor="bg-[#E84A4A]"
                         hoverColor="hover:bg-[#F55B5B]"
                         text="Continue with Google"
-                        iconSize="size-10"
                         iconPosition="left-[20px]"
+                        iconSize="size-10"
                         onClick={() => handleOAuthLogin("Google")}
                     />
                     <SocialButton
@@ -138,8 +138,8 @@ const LoginForm = () => {
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
                         text="Continue with Spotify"
-                        iconSize="size-11"
                         iconPosition="left-[19px]"
+                        iconSize="size-11"
                         onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
@@ -160,7 +160,15 @@ const LoginForm = () => {
                         iconSize="size-11"
                         onClick={() => handleOAuthLogin("Github")}
                     />
-
+                    <SocialButton
+                        icon={faGitlab}
+                        bgColor="bg-[#FC6D27]"
+                        hoverColor="hover:bg-[#FD7A38]"
+                        text="Continue with Gitlab"
+                        iconPosition="left-[20px]"
+                        iconSize="size-10"
+                        onClick={() => handleOAuthLogin("Gitlab")}
+                    />
                     <div
                         className="flex justify-center mt-8">
                         <CallToActionLink
