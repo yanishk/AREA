@@ -36,7 +36,7 @@ sudo docker-compose up
 
 ## Documentation
 
-- Implement a new service, action, reaction -> [`Developper Documentation`](backend/README.md)
+- Implement a new service, action, reaction -> [`Developer Documentation`](backend/README.md)
 
 ## Authors
 

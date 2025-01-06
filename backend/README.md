@@ -1,4 +1,4 @@
-# Developper Documentation
+# Developer Documentation
 
 ## Summary
 
@@ -40,7 +40,7 @@ to get the callback and the <service>_CLIENT_ID and the <service>_CLIENT_SECRET 
 
 - In the same file, go to
 ```go
-func (self *ServiceService) OAuth2Service(serviceName, callbackType, appType string) (string, error) {
+OAuth2Service(serviceName, callbackType, appType string) (string, error) {
 ```
 and modify the switch case to compare to the name of your service and add the function you did in the step above.
 
@@ -53,7 +53,7 @@ In the file ```backend/src/service/domain/service/service.go```:
 - Get the callback URI from the .env according to the plateform used: "web" or "mobile"
 - Use the function:
 ```go
-func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
+genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Request, error) {
 ```
 -Set your headers and return the *http.Request returned by "genericAccessTokenRequest".
 > [!NOTE]
@@ -66,16 +66,16 @@ func genericAccessTokenRequest(tokenUrl, code, callbackUrl string) (*http.Reques
 
 In the file ```backend/src/service/domain/service/service.go```:
 - Create a function that will handle the logic of the refreshing of the token, it must be prototyped this way
-```go 
+```go
 func (self *ServiceService) <YOUR DESIRED FUNCTION NAME>(refreshToken string) (*http.Request, error)
 ```
 - You can use one of two function depending on your service requirement:
 ```go
-func (self *ServiceService) genericRefreshTokenRequest(tokenUrl, refreshToken string) (*http.Request, error)
+genericRefreshTokenRequest(tokenUrl, refreshToken string) (*http.Request, error)
 ```
 or
 ```go
-func (self *ServiceService) genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string
+genericJsonBodyRefreshToken(clientId, secretId, refreshToken string) string
 ```
 > [!NOTE]
 > The second function is to be used when the refresh method requires the CLIENT_ID and CLIENT_SECRET variable.
@@ -88,7 +88,7 @@ In the file ```backend/src/service/service.go```:
 In the file ```backend/src/service/domain/userservice/userservice.go```:
 - In the function
 ```go
-func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error)
+refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error)
 ```
 add your service to the switch case and return the function that you created in the first step.
 
