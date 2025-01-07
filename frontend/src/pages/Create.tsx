@@ -1,5 +1,5 @@
-import { redirect, useNavigate } from "react-router-dom";
-import {useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import HomeStep from "../components/workflows/HomeStep";
 import SummaryStep from "../components/workflows/SummaryStep";
@@ -357,6 +357,7 @@ const WorkflowBuilder = () => {
         try {
             await axios.post(
                 `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
+                {},
                 {
                     withCredentials: true
                 }
