@@ -6,7 +6,33 @@
     },
     "host": "localhost:8080",
     "paths": {
-        "/Asana/user/workspaces": {
+        "/about.json": {
+            "get": {
+                "description": "Get about.json file",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About.json"
+                ],
+                "summary": "About.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/asana/user/workspaces": {
             "get": {
                 "description": "Retrieve the workspaces from the authenticated user",
                 "produces": [
@@ -32,7 +58,7 @@
                 }
             }
         },
-        "/Asana/workspace/assignees": {
+        "/asana/workspace/assignees": {
             "get": {
                 "description": "Retrieve the assignees from the selected workspace",
                 "produces": [
@@ -67,7 +93,7 @@
                 }
             }
         },
-        "/Asana/workspace/projects": {
+        "/asana/workspace/projects": {
             "get": {
                 "description": "Retrieve the projects from the selected workspace",
                 "produces": [
@@ -102,7 +128,7 @@
                 }
             }
         },
-        "/Asana/workspace/tags": {
+        "/asana/workspace/tags": {
             "get": {
                 "description": "Retrieve the tags from the selected workspace",
                 "produces": [
@@ -132,145 +158,6 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/Discord/server/channels": {
-            "get": {
-                "description": "Retrieve the channels from the selected server",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Discord"
-                ],
-                "summary": "Retrieve Discord Server Channels",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "server id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/Discord/user/servers": {
-            "get": {
-                "description": "Retrieve the discord servers from the authenticated user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Discord"
-                ],
-                "summary": "Retrieve Discord User Servers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/Github/user/repositories": {
-            "get": {
-                "description": "Retrieve the repositories of the authenticated user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Github"
-                ],
-                "summary": "Retrieve User Repositories",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/Gitlab/user/projects": {
-            "get": {
-                "description": "Retrieve the projects of the authenticated user",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Gitlab"
-                ],
-                "summary": "Retrieve User Projects",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/about.json": {
-            "get": {
-                "description": "Get about.json file",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "About.json"
-                ],
-                "summary": "About.json",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
                         }
                     }
                 }
@@ -320,6 +207,119 @@
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/discord/server/channels": {
+            "get": {
+                "description": "Retrieve the channels from the selected server",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discord"
+                ],
+                "summary": "Retrieve Discord Server Channels",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "server id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/discord/user/servers": {
+            "get": {
+                "description": "Retrieve the discord servers from the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discord"
+                ],
+                "summary": "Retrieve Discord User Servers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/github/user/repositories": {
+            "get": {
+                "description": "Retrieve the repositories of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Github"
+                ],
+                "summary": "Retrieve User Repositories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/gitlab/user/projects": {
+            "get": {
+                "description": "Retrieve the projects of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Gitlab"
+                ],
+                "summary": "Retrieve User Projects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse"
                         }
                     }
                 }
