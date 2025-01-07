@@ -31,7 +31,6 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   Map<int, String> selectedItems = {};
   Map<int, TextEditingController> textInputController = {};
   Map<int, String> selectedParameterId = {};
-  List<String> failedRouteList = [];
   String asanaWorkspaceId = "";
   List<int> textInputControllerIndexList = [];
   List<String> actionOrReactionParamListName = [];
@@ -118,6 +117,8 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               }
               if (parameterList[index].name == "workspace") {
                 asanaWorkspaceId = idList[nameList.indexOf(newValue ?? "")];
+                selectedItems.clear();
+                selectedItems[index] = newValue ?? "";
               }
               fillParameterFiledList();
             });
@@ -412,6 +413,7 @@ class CreateDropdown extends StatelessWidget {
     if (selectedItems[index] == null) {
       return Column();
     }
+    developer.log("CreateDropdown, stringList : ${stringList}\nselectedItems : ${selectedItems}");
     return Container(
       padding: EdgeInsets.all(0.0),
       constraints: BoxConstraints(maxHeight: 100.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
