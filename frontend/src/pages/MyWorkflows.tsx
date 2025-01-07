@@ -4,6 +4,7 @@ import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
 import { useNavigate } from "react-router-dom";
+import getServiceDetails from "../utils/GetServiceDetails";
 
 const MyWorkflow = () => {
 
@@ -42,23 +43,6 @@ const MyWorkflow = () => {
             console.log("ici : ", workflowsDetails);
         } catch (err) {
             console.error("Error fetching workflows:", err);
-        }
-    };
-
-    const getServiceDetails = async (id: string, type: string) => {
-        try {
-            const request = type === "action"
-                ? `${import.meta.env.VITE_API_URL}services/action/${id}`
-                : `${import.meta.env.VITE_API_URL}services/reaction/${id}`;
-
-            const result = await axios.get(request, {
-                withCredentials: true,
-            });
-
-            return result.data.service;
-        } catch (err) {
-            console.error(`Failed to get details`, err);
-            return null;
         }
     };
 
@@ -103,7 +87,7 @@ const MyWorkflow = () => {
                                 key={workflow.id}
                                 style={{ backgroundColor: workflow.actioncolor}}
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90"
-                                onClick={() => navigate(`/workflow/${workflow.id}`)}
+                                onClick={() => navigate(`/workflows/${workflow.id}`)}
                             >
                                 <div className="flex flex-row pl-[25px] pt-[15px]">
                                     <img
