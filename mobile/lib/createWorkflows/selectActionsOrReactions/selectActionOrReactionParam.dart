@@ -39,16 +39,16 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   @override
   void initState() {
     super.initState();
-    if (!isAnAction) {
+    if (isAnAction) {
+      setState(() {
+        CreateData.actionParamListName = [];
+        actionOrReactionParamListName = CreateData.actionParamListName;
+      });
+    } else {
       setState(() {
         apiRoute = "reactions";
         CreateData.reactionParamListName = [];
         actionOrReactionParamListName = CreateData.reactionParamListName;
-      });
-    } else {
-      setState(() {
-        CreateData.actionParamListName = [];
-        actionOrReactionParamListName = CreateData.actionParamListName;
       });
     }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
@@ -67,18 +67,18 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
 
   void createDropdownFromRoute(int index, dynamic response, String listName) {
     List<ActionOrReactionsParameter> parameterList = CreateData.selectedActionOrReactionData.parameter;
-    List<dynamic> reponseList = response[listName];
+    List<dynamic> responceList = response[listName];
     List<String> nameList = [];
     List<String> idList = [];
-    for (int i = 0; i < reponseList.length; i++) {
-      String itemName = reponseList[i].toString().split("name: ").last.split(",").first;
+    for (int i = 0; i < responceList.length; i++) {
+      String itemName = responceList[i].toString().split("name: ").last.split(",").first;
       if (!nameList.contains(itemName.split("}").first)) {
         nameList.add(itemName.split("}").first);
       }
       if (parameterList[index].name == "channel") {
-        idList.add(reponseList[i]["id"]);
+        idList.add(responceList[i]["id"]);
       } else {
-        String itemId = reponseList[i].toString().split("id: ").last.split(",").first;
+        String itemId = responceList[i].toString().split("id: ").last.split(",").first;
         idList.add(itemId.split("}").first);
       }
     }
@@ -91,7 +91,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
       selectedParameterId[index] = idList.first;
       int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-      if (selectedParameterId[index] != "") {
+      if (selectedParameterId[index] != "{") {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
       } else {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
@@ -110,9 +110,11 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               selectedParameterId[index] = idList[nameList.indexOf(newValue ?? "")];
               int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
               actionOrReactionParamStringMap[index] = "$newValue";
-              if (selectedParameterId[index] != "") {
+              if (selectedParameterId[index]?[0] != "{") {
+                developer.log("selectedParameterId[index] : ${selectedParameterId[index]}");
                 CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
               } else {
+                developer.log("nameList[selectedParamIndex] : ${nameList[selectedParamIndex]}");
                 CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
               }
               if (parameterList[index].name == "workspace") {
@@ -317,19 +319,21 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
+                Map<String, dynamic> parameterList = CreateData.selectedActionOrReactionData.parameterList;
                 for (int i = 0; i < textInputControllerIndexList.length; i++) {
                   int controllerIndex = textInputControllerIndexList[i];
                   if (textInputController[controllerIndex] != null) {
                     String controlerText = textInputController[controllerIndex]!.text;
-                    if (CreateData.selectedActionOrReactionData.parameter[controllerIndex].type == "int") {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[controllerIndex].name] = int.parse(controlerText);
+                    ActionOrReactionsParameter thisParameter = CreateData.selectedActionOrReactionData.parameter[controllerIndex];
+                    if (thisParameter.type == "int") {
+                      parameterList[thisParameter.name] = int.parse(controlerText);
                     } else {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[controllerIndex].name] = controlerText;
+                      parameterList[thisParameter.name] = controlerText;
                     }
-                    actionOrReactionParamStringMap[controllerIndex] = "${CreateData.selectedActionOrReactionData.parameter[controllerIndex].name} : $controlerText";
+                    actionOrReactionParamStringMap[controllerIndex] = "${thisParameter.name} : $controlerText";
                   }
                 }
-                developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");
+                developer.log("parameter : ${parameterList}");
                 for (int i = 0; i < actionOrReactionParamStringMap.length; i++) {
                   actionOrReactionParamListName.add(actionOrReactionParamStringMap[i] ?? "");
                 }
@@ -413,7 +417,6 @@ class CreateDropdown extends StatelessWidget {
     if (selectedItems[index] == null) {
       return Column();
     }
-    developer.log("CreateDropdown, stringList : ${stringList}\nselectedItems : ${selectedItems}");
     return Container(
       padding: EdgeInsets.all(0.0),
       constraints: BoxConstraints(maxHeight: 100.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
