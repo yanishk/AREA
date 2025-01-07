@@ -90,6 +90,15 @@ type WeatherResponse struct {
 }
 
 // Github
+type GithubWebhookResponse struct {
+	Name   string `json:"name"`
+	Active bool   `json:"active"`
+	Config struct {
+		Url string `json:"url"`
+	} `json:"config"`
+	Events []string `json:"events"`
+}
+
 type GithubRepository struct {
 	Name string `json:"full_name"`
 }
