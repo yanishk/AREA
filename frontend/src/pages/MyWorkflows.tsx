@@ -39,8 +39,7 @@ const MyWorkflow = () => {
             );
 
             setUserWorkflows(workflowsDetails);
-
-            console.log("Workflows with details:", workflowsDetails);
+            console.log("ici : ", workflowsDetails);
         } catch (err) {
             console.error("Error fetching workflows:", err);
         }
@@ -106,7 +105,17 @@ const MyWorkflow = () => {
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90"
                                 onClick={() => navigate(`/workflow/${workflow.id}`)}
                             >
-                                <div className="text-left w-full px-[30px]">
+                                <div className="flex flex-row pl-[25px] pt-[15px]">
+                                    <img
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow.actionlogo}`}
+                                        className="size-[26px]"
+                                    />
+                                    <img
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow.reactionlogo}`}
+                                        className="size-[26px] ml-[10px]"
+                                    />
+                                </div>
+                                <div className="text-left w-full px-[25px]">
                                     <h2
                                         className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0"
                                     >
