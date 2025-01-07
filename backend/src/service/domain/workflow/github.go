@@ -15,6 +15,11 @@ func githubWebhooksEventsToActions() map[string]string {
 		"watch":     "New star",
 		"public":    "Visibility update",
 		"milestone": "Milestone update",
+		"release":   "Release update",
+		"gollum":   "Wiki update",
+		"workflow_job": "Workflow job update",
+		"workflow_run": "Workflow run update",
+		"fork": "Fork update",
 	}
 }
 
@@ -24,15 +29,10 @@ func githubWebhookEvents() []string {
 		"public",
 		"milestone",
 		"release",
+		"gollum",
 		"workflow_job",
 		"workflow_run",
-		"team_add",
 		"fork",
-		"gollum",
-		"deployment",
-		"project",
-		"project_card",
-		"project_column",
 	}
 }
 
@@ -200,7 +200,6 @@ func (self *WorkflowService) checkGithubWebhooksWorkflow(workflow entities.Workf
 	}
 
 	if userRepository == webhookRepository {
-		fmt.Println("réaction!")
 		self.checkReactions(workflow)
 	}
 	return nil
@@ -219,6 +218,10 @@ func (self *WorkflowService) checkGithubWebhooksWorkflows(headers http.Header, w
 	}
 
 	eventName := headers["X-Github-Event"][0]
+	if eventName == "ping" {
+		return nil
+	}
+
 	actionName, actionNameExists := eventsToActions[eventName]
 	if !actionNameExists {
 		return fmt.Errorf("No action mapped with this event")
