@@ -37,6 +37,7 @@ func githubWebhookEvents() []string {
 }
 
 const githubBaseUrl = "https://api.github.com/"
+const githubRepositoryEndpoint = "repos/"
 
 func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, method, accessToken, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
@@ -44,7 +45,7 @@ func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, me
 		return nil, fmt.Errorf(errorMissingField)
 	}
 
-	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
+	url := githubBaseUrl + githubRepositoryEndpoint + repository.(string) + endpoint
 	return self.ServiceService.ExecuteApiRequest(url, method, bearerType, accessToken, nil)
 }
 
@@ -272,7 +273,7 @@ func (self *WorkflowService) createNewWorkflowGithubWebhook(repository, accessTo
 
 func (self *WorkflowService) isGithubRepositoryWebhookPresent(repository, accessToken string) (bool, error) {
 	var webhooks []entities.GithubWebhookResponse
-	getWebhooksUrl := githubBaseUrl + "repos/" + repository + "/hooks"
+	getWebhooksUrl := githubBaseUrl + githubRepositoryEndpoint + repository + "/hooks"
 	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Github"
 
 	res, err := self.ServiceService.ExecuteApiRequest(getWebhooksUrl, "GET", bearerType, accessToken, nil)
