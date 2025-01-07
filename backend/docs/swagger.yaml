@@ -198,7 +198,7 @@ definitions:
   docs_user.UserLoginCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization
+        example: Invalid request body-Invalid code authorization
         type: string
     type: object
   docs_user.UserLoginCallbackInternalServerErrorResponse:
@@ -385,7 +385,7 @@ definitions:
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization-Invalid app type
+        example: Invalid request body-Invalid code authorization-Invalid app type
         type: string
     type: object
   docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse:
@@ -571,6 +571,13 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  entities.CallbackInformations:
+    properties:
+      app-type:
+        type: string
+      service:
+        type: string
     type: object
   entities.GithubRepository:
     properties:
@@ -989,25 +996,21 @@ paths:
       summary: Login
       tags:
       - Users
-  /login-callback/{service}/{app-type}:
+  /login-callback:
     post:
       description: Callback for login
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:
@@ -1060,25 +1063,21 @@ paths:
       summary: Register
       tags:
       - Users
-  /service-callback/{service}/{app-type}:
+  /service-callback:
     post:
       description: Callback for services
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:

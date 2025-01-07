@@ -47,7 +47,7 @@ type UserLoginCallbackSuccessResponse struct {
 }
 
 type UserLoginCallbackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization"`
+	Msg string `json:"error"example:"Invalid request body-Invalid code authorization"`
 }
 
 type UserLoginCallbackInternalServerErrorResponse struct {
