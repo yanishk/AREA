@@ -34,6 +34,8 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   List<String> failedRouteList = [];
   String asanaWorkspaceId = "";
   List<int> textInputControllerIndexList = [];
+  List<String> actionOrReactionParamListName = [];
+  Map<int, String> actionOrReactionParamStringMap = {};
 
   @override
   void initState() {
@@ -41,6 +43,13 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     if (!isAnAction) {
       setState(() {
         apiRoute = "reactions";
+        CreateData.reactionParamListName = [];
+        actionOrReactionParamListName = CreateData.reactionParamListName;
+      });
+    } else {
+      setState(() {
+        CreateData.actionParamListName = [];
+        actionOrReactionParamListName = CreateData.actionParamListName;
       });
     }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
@@ -80,16 +89,16 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
     if (!selectedItems.containsKey(index)) {
       selectedItems[index] = nameList.first;
+      actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
       selectedParameterId[index] = idList.first;
-      if (parameterList[index].name == "workspace") {
-        asanaWorkspaceId = idList.first;
-      }
       int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-      developer.log("parameterList[index].name : ${parameterList[index].name}, selectedParameterId[index] : ${selectedParameterId[index]}, idList : $idList");
       if (selectedParameterId[index] != "") {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
       } else {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+      }
+      if (parameterList[index].name == "workspace") {
+        asanaWorkspaceId = idList.first;
       }
     }
     setState(() {
@@ -101,7 +110,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               selectedItems[index] = newValue ?? "";
               selectedParameterId[index] = idList[nameList.indexOf(newValue ?? "")];
               int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-              developer.log("parameterList[index].name : ${parameterList[index].name}, selectedParameterId[index] : ${selectedParameterId[index]}, idList : $idList");
+              actionOrReactionParamStringMap[index] = "$newValue";
               if (selectedParameterId[index] != "") {
                 CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
               } else {
@@ -119,24 +128,6 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         )
       );
     });
-  }
-
-  Future<bool> getFailedRouteData(String route, int index) async {
-    developer.log("getRouteData pass, route : $route");
-    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
-    if (response == null) {
-      return false;
-    }
-    String listName = response.toString().split(":").first.split("{").last;
-    if (!(response[listName] is List<dynamic>)) {
-      developer.log("new responce : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
-      dynamic newResponce = ActionsOrReactionsFunctions.getMapKeyName(response);
-      listName = newResponce.toString().split(":").first.split("{").last;
-      createDropdownFromRoute(index, newResponce, listName);
-      return true;
-    }
-    createDropdownFromRoute(index, response, listName);
-    return true;
   }
 
   Future<void> getRouteData(String route, int index) async {
@@ -188,6 +179,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       if (!selectedItems.containsKey(index)) {
         selectedItems[index] = dropdownStringList.first;
         int selectedParamIndex = dropdownStringList.indexOf(selectedItems[index] ?? "") + 1;
+        actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
         if (dropdownStringList.first == "0") {
           selectedParamIndex--;
         }
@@ -199,6 +191,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
           setState(() {
             selectedItems[index] = newValue ?? "";
             int selectedParamIndex = dropdownStringList.indexOf(selectedItems[index] ?? "") + 1;
+            actionOrReactionParamStringMap[index] = "$newValue";
             if (dropdownStringList.first == "0") {
               selectedParamIndex--;
             }
@@ -332,9 +325,13 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     } else {
                       CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[controllerIndex].name] = controlerText;
                     }
+                    actionOrReactionParamStringMap[controllerIndex] = "${CreateData.selectedActionOrReactionData.parameter[controllerIndex].name} : $controlerText";
                   }
                 }
                 developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");
+                for (int i = 0; i < actionOrReactionParamStringMap.length; i++) {
+                  actionOrReactionParamListName.add(actionOrReactionParamStringMap[i] ?? "");
+                }
                 CreateData.selectOrUpdateWorkflow = true;
                 Navigator.pop(Globaldata.myContext);
               },
@@ -406,6 +403,12 @@ class CreateDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> finalStringList = [];
+    for (int i = 0; i < stringList.length; i++) {
+      if (!finalStringList.contains(stringList[i])) {
+        finalStringList.add(stringList[i]);
+      }
+    }
     if (selectedItems[index] == null) {
       return Column();
     }
@@ -430,7 +433,7 @@ class CreateDropdown extends StatelessWidget {
             isExpanded: true,
             value: selectedItems[index] ?? "No data",
             hint: AutoSizeText(
-              selectedItems[index] ?? "test",
+              selectedItems[index] ?? "No data",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -438,7 +441,7 @@ class CreateDropdown extends StatelessWidget {
               ),
               maxLines: 1,
             ),
-            items: stringList.map((String item) {
+            items: finalStringList.map((String item) {
               return DropdownMenuItem<String>(
                 value: item,
                 child: AutoSizeText(
