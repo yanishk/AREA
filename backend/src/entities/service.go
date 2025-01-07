@@ -21,6 +21,11 @@ type UserInfo struct {
 	Email string `json:"email"`
 }
 
+type CallbackInformations struct {
+	Service string `json:"service"`
+	AppType string `json:"app-type"`
+}
+
 // Time & Date
 type TimeResponse struct {
 	Timezone  string `json:"timezone"`
