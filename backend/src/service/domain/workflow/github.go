@@ -138,7 +138,7 @@ func (self *WorkflowService) checkWorkflowsWithGithubActions(action entities.Act
 			self.checkGithubNewPullRequestAction(workflow, accessToken)
 		case "New branch":
 			self.checkGithubNewBranchAction(workflow, accessToken)
-		case "New commit":
+		case "New push":
 			self.checkGithubNewCommitAction(workflow, accessToken)
 		}
 	}
