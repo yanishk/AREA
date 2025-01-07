@@ -13,7 +13,7 @@ import (
 	"backend/src/entities"
 )
 
-func webhooksEventsToActions() map[string]string {
+func gitlabWebhooksEventsToActions() map[string]string {
 	return map[string]string{
 		"Push Hook":          "New push",
 		"Merge Request Hook": "Merge request update",
@@ -60,8 +60,8 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflow(workflow entities.Workf
 	return nil
 }
 
-func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, webhookJsonDataBytes []byte, eventsToActions map[string]string) error {
-	var webhookResponse entities.GitlabWebhookResponse
+func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, webhookJsonDataBytes []byte, eventsToActions map[string]string, serviceId string) error {
+	var webhookResponse entities.GitlabWebhookTriggeredResponse
 	if len(webhookJsonDataBytes) > 0 {
 		err := json.Unmarshal(webhookJsonDataBytes, &webhookResponse)
 		if err != nil {
@@ -78,7 +78,7 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, w
 		return fmt.Errorf("No action mapped with this event")
 	}
 
-	action, err := self.ActionRepository.FindActionByName(actionName)
+	action, err := self.ActionRepository.FindActionByNameAndServiceId(actionName, serviceId)
 	if err != nil {
 		return err
 	}
@@ -93,19 +93,6 @@ func (self *WorkflowService) checkGitlabWebhooksWorkflows(headers http.Header, w
 			continue
 		}
 		self.checkGitlabWebhooksWorkflow(workflow, webhookResponse.Project.Id)
-	}
-	return nil
-}
-
-func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, request *http.Request) error {
-	webhookJsonDataBytes, err := io.ReadAll(request.Body)
-	if err != nil {
-		return err
-	}
-
-	switch serviceName {
-	case "Gitlab":
-		return self.checkGitlabWebhooksWorkflows(request.Header, webhookJsonDataBytes, webhooksEventsToActions())
 	}
 	return nil
 }
