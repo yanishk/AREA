@@ -47,7 +47,9 @@ const WorkflowDetail = () => {
             <div
                 style={{ backgroundColor: workflow.actioncolor}}
             >
-                <Navbar />
+                <Navbar
+                    isWhiteMod={true}
+                />
                 <div>
                 <h1>{workflow.name}</h1>
                 <p>{workflow.id}</p>
