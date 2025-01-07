@@ -161,6 +161,19 @@ func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) 
 	return jsonData, nil
 }
 
+func getWorkflowStringActionParam(workflow entities.Workflow, paramKey string) (string, error) {
+	param, paramExists := workflow.ActionParam[paramKey]
+	if !paramExists {
+		return "", fmt.Errorf(errorMissingField)
+	}
+
+	paramString, paramIsString := param.(string)
+	if !paramIsString {
+		return "", fmt.Errorf(errorMissingField)
+	}
+	return paramString, nil
+}
+
 func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
 	self.checkSpotifyReactions(workflow)
 	self.checkDiscordReactions(workflow)

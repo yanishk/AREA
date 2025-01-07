@@ -47,22 +47,9 @@ func gitlabWebhookEventsToState() map[string]string {
 	}
 }
 
-func getGitlabIdActionParam(workflow entities.Workflow) (string, error) {
-	projectId, projectIdExists := workflow.ActionParam["project"]
-	if !projectIdExists {
-		return "", fmt.Errorf(errorMissingField)
-	}
-
-	projectIdString, projectIdIsString := projectId.(string)
-	if !projectIdIsString {
-		return "", fmt.Errorf(errorMissingField)
-	}
-	return projectIdString, nil
-}
-
 func (self *WorkflowService) checkGitlabWebhooksWorkflow(workflow entities.Workflow, webhookProjectId int) error {
 	webhookProjectIdString := strconv.Itoa(webhookProjectId)
-	userProjectIdString, err := getGitlabIdActionParam(workflow)
+	userProjectIdString, err := getWorkflowStringActionParam(workflow, "project")
 	if err != nil {
 		return err
 	}
@@ -123,7 +110,7 @@ func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, request 
 	return nil
 }
 
-func (self *WorkflowService) ExecuteGitlabRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
+func (self *WorkflowService) executeGitlabRequest(method, url, accessToken string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
@@ -148,7 +135,7 @@ func (self *WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessTok
 		params.Set(webhookEvent, webhookState)
 	}
 
-	res, err := self.ExecuteGitlabRequest("POST", createWebhookUrl, accessToken, bytes.NewBufferString(params.Encode()))
+	res, err := self.executeGitlabRequest("POST", createWebhookUrl, accessToken, bytes.NewBufferString(params.Encode()))
 	if err != nil {
 		return err
 	}
@@ -157,11 +144,11 @@ func (self *WorkflowService) createNewWorkflowGitlabWebhook(projectId, accessTok
 	return nil
 }
 
-func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken string) (bool, error) {
+func (self *WorkflowService) isGitlabProjectWebhookPresent(projectId, accessToken string) (bool, error) {
 	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Gitlab"
 	getWebhooksUrl := "https://gitlab.com/api/v4/projects/" + projectId + "/hooks"
 
-	res, err := self.ExecuteGitlabRequest("GET", getWebhooksUrl, accessToken, nil)
+	res, err := self.executeGitlabRequest("GET", getWebhooksUrl, accessToken, nil)
 	if err != nil {
 		return false, err
 	}
@@ -201,18 +188,18 @@ func (self *WorkflowService) isProjectWebhookPresent(projectId, accessToken stri
 }
 
 func (self *WorkflowService) checkNewWorkflowGitlabWebhook(workflow entities.Workflow, accessToken string) error {
-	projectIdString, err := getGitlabIdActionParam(workflow)
+	projectId, err := getWorkflowStringActionParam(workflow, "project")
 	if err != nil {
 		return err
 	}
 
-	isWebhookPresent, err := self.isProjectWebhookPresent(projectIdString, accessToken)
+	isWebhookPresent, err := self.isGitlabProjectWebhookPresent(projectId, accessToken)
 	if err != nil {
 		return err
 	}
 
 	if !isWebhookPresent {
-		self.createNewWorkflowGitlabWebhook(projectIdString, accessToken)
+		self.createNewWorkflowGitlabWebhook(projectId, accessToken)
 		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
 		if err != nil {
 			return err
