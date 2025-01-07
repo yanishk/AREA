@@ -106,6 +106,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                                         <NavbarButton
                                             onClick={handleCreate}
                                             text="Create"
+                                            isWhiteMod={true}
                                         />
                                     </li>
                                     <li>
