@@ -7,6 +7,7 @@ import "../../globalData.dart";
 import '../createWidget.dart';
 import '../createWorkflowsData.dart';
 import "../../auth/webviewAuth/connectServiceAuth.dart";
+import 'actionOrReactionsFunctions.dart';
 
 class SelectParamActionOrReactionPage extends StatelessWidget {
   @override
@@ -29,13 +30,25 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   List<Widget> parameterFiledList = [];
   Map<int, String> selectedItems = {};
   Map<int, TextEditingController> textInputController = {};
+  Map<int, String> selectedParameterId = {};
+  String asanaWorkspaceId = "";
+  List<int> textInputControllerIndexList = [];
+  List<String> actionOrReactionParamListName = [];
+  Map<int, String> actionOrReactionParamStringMap = {};
 
   @override
   void initState() {
     super.initState();
-    if (!isAnAction) {
+    if (isAnAction) {
+      setState(() {
+        CreateData.actionParamListName = [];
+        actionOrReactionParamListName = CreateData.actionParamListName;
+      });
+    } else {
       setState(() {
         apiRoute = "reactions";
+        CreateData.reactionParamListName = [];
+        actionOrReactionParamListName = CreateData.reactionParamListName;
       });
     }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
@@ -52,8 +65,101 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
   }
 
+  void createDropdownFromRoute(int index, dynamic response, String listName) {
+    List<ActionOrReactionsParameter> parameterList = CreateData.selectedActionOrReactionData.parameter;
+    List<dynamic> responceList = response[listName];
+    List<String> nameList = [];
+    List<String> idList = [];
+    for (int i = 0; i < responceList.length; i++) {
+      String itemName = responceList[i].toString().split("name: ").last.split(",").first;
+      if (!nameList.contains(itemName.split("}").first)) {
+        nameList.add(itemName.split("}").first);
+      }
+      if (parameterList[index].name == "channel") {
+        idList.add(responceList[i]["id"]);
+      } else {
+        String itemId = responceList[i].toString().split("id: ").last.split(",").first;
+        idList.add(itemId.split("}").first);
+      }
+    }
+    if (nameList.length < 1) {
+      developer.log("No : ${parameterList[index].name}");
+      return;
+    }
+    if (!selectedItems.containsKey(index)) {
+      selectedItems[index] = nameList.first;
+      actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
+      selectedParameterId[index] = idList.first;
+      int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
+      if (selectedParameterId[index] != "{") {
+        CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
+      } else {
+        CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+      }
+      if (parameterList[index].name == "workspace") {
+        asanaWorkspaceId = idList.first;
+      }
+    }
+    setState(() {
+      parameterFiledList.add(
+        CreateDropdown(
+          index: index,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedItems[index] = newValue ?? "";
+              selectedParameterId[index] = idList[nameList.indexOf(newValue ?? "")];
+              int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
+              actionOrReactionParamStringMap[index] = "$newValue";
+              if (selectedParameterId[index]?[0] != "{") {
+                developer.log("selectedParameterId[index] : ${selectedParameterId[index]}");
+                CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
+              } else {
+                developer.log("nameList[selectedParamIndex] : ${nameList[selectedParamIndex]}");
+                CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
+              }
+              if (parameterList[index].name == "workspace") {
+                asanaWorkspaceId = idList[nameList.indexOf(newValue ?? "")];
+                selectedItems.clear();
+                selectedItems[index] = newValue ?? "";
+              }
+              fillParameterFiledList();
+            });
+          },
+          stringList: nameList,
+          selectedItems: selectedItems,
+          dropdownName: "${parameterList[index].name} : "
+        )
+      );
+    });
+  }
+
+  Future<void> getRouteData(String route, int index) async {
+    if (CreateData.serviceNameList[CreateData.selectedServiceId] == "Asana") {
+      route = "$route?id=$asanaWorkspaceId";
+    } else if (selectedParameterId[index - 1] != null) {
+      route = "$route?id=${selectedParameterId[index - 1]}";
+    }
+    final response = await ActionsOrReactionsFunctions.getRouteResponse(route);
+    if (response == null) {
+      return;
+    }
+    String listName = response.toString().split(":").first.split("{").last;
+    if (!(response[listName] is List<dynamic>)) {
+      developer.log("new responce : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
+      dynamic newResponce = ActionsOrReactionsFunctions.getMapKeyName(response);
+      listName = newResponce.toString().split(":").first.split("{").last;
+      createDropdownFromRoute(index, newResponce, listName);
+      return;
+    }
+    createDropdownFromRoute(index, response, listName);
+  }
+
   List<String> fillDropDownStringList(List<ActionOrReactionsParameter> parameterList, int index) {
     if (parameterList[index].values.isEmpty) {
+      if (parameterList[index].route.isEmpty) {
+        return [];
+      }
+      getRouteData(parameterList[index].route, index);
       return [];
     }
     if (parameterList[index].isexhaustive) {
@@ -76,6 +182,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       if (!selectedItems.containsKey(index)) {
         selectedItems[index] = dropdownStringList.first;
         int selectedParamIndex = dropdownStringList.indexOf(selectedItems[index] ?? "") + 1;
+        actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
         if (dropdownStringList.first == "0") {
           selectedParamIndex--;
         }
@@ -87,6 +194,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
           setState(() {
             selectedItems[index] = newValue ?? "";
             int selectedParamIndex = dropdownStringList.indexOf(selectedItems[index] ?? "") + 1;
+            actionOrReactionParamStringMap[index] = "$newValue";
             if (dropdownStringList.first == "0") {
               selectedParamIndex--;
             }
@@ -100,7 +208,10 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       );
     }
     if (parameterList[index].route.isEmpty) {
-      textInputController[index] = new TextEditingController(text: "");
+      if (textInputController[index] == null) {
+        textInputController[index] = new TextEditingController(text: "");
+      }
+      textInputControllerIndexList.add(index);
       return Padding(
         padding: EdgeInsets.only(top: 20),
         child: Container(
@@ -208,18 +319,24 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
-                for (int i = 0; i < textInputController.length; i++) {
-                  if (textInputController[i] != null) {
-                    String controlerText = textInputController[i]!.text;
-                    if (CreateData.selectedActionOrReactionData.parameter[i].type == "int") {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = int.parse(controlerText);
+                Map<String, dynamic> parameterList = CreateData.selectedActionOrReactionData.parameterList;
+                for (int i = 0; i < textInputControllerIndexList.length; i++) {
+                  int controllerIndex = textInputControllerIndexList[i];
+                  if (textInputController[controllerIndex] != null) {
+                    String controlerText = textInputController[controllerIndex]!.text;
+                    ActionOrReactionsParameter thisParameter = CreateData.selectedActionOrReactionData.parameter[controllerIndex];
+                    if (thisParameter.type == "int") {
+                      parameterList[thisParameter.name] = int.parse(controlerText);
                     } else {
-                      CreateData.selectedActionOrReactionData.parameterList[CreateData.selectedActionOrReactionData.parameter[i].name] = controlerText;
+                      parameterList[thisParameter.name] = controlerText;
                     }
-                    developer.log("text input content : ${textInputController[i]?.text}");
+                    actionOrReactionParamStringMap[controllerIndex] = "${thisParameter.name} : $controlerText";
                   }
                 }
-                developer.log("parameter : ${CreateData.selectedActionOrReactionData.parameterList}");
+                developer.log("parameter : ${parameterList}");
+                for (int i = 0; i < actionOrReactionParamStringMap.length; i++) {
+                  actionOrReactionParamListName.add(actionOrReactionParamStringMap[i] ?? "");
+                }
                 CreateData.selectOrUpdateWorkflow = true;
                 Navigator.pop(Globaldata.myContext);
               },
@@ -240,7 +357,7 @@ class CompleteActionOrReactionTop extends StatelessWidget {
       children: [
         SafeWebImage(
           url:
-              "${Globaldata.domainName}${CreateData.serviceIconsList[Globaldata.firstService]}",
+              "${Globaldata.domainName}${CreateData.serviceIconsList[CreateData.selectedServiceId]}",
           width: 75,
           height: 75,
         ),
@@ -291,47 +408,63 @@ class CreateDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(padding: EdgeInsets.only(top: 20)),
-        AutoSizeText(
-          dropdownName,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 10,
-        ),
-        DropdownButton<String>(
-          value: selectedItems[index],
-          hint: Text(
-            selectedItems[index] ?? "",
+    List<String> finalStringList = [];
+    for (int i = 0; i < stringList.length; i++) {
+      if (!finalStringList.contains(stringList[i])) {
+        finalStringList.add(stringList[i]);
+      }
+    }
+    if (selectedItems[index] == null) {
+      return Column();
+    }
+    return Container(
+      padding: EdgeInsets.all(0.0),
+      constraints: BoxConstraints(maxHeight: 100.0, maxWidth: (MediaQuery.of(Globaldata.myContext).size.width - 40)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(padding: EdgeInsets.only(top: 20)),
+          AutoSizeText(
+            dropdownName,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
-            )
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 10,
           ),
-          items: stringList.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item,
+          DropdownButton<String>(
+            isExpanded: true,
+            value: selectedItems[index] ?? "No data",
+            hint: AutoSizeText(
+              selectedItems[index] ?? "No data",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          dropdownColor: Colors.grey[800],
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        )
-      ]
+              maxLines: 1,
+            ),
+            items: finalStringList.map((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: AutoSizeText(
+                  item,
+                  maxLines: 1,
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+            dropdownColor: Colors.grey[800],
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ]
+      ),
     );
   }
 }

@@ -35,6 +35,25 @@ class SaveNewWorkflows extends State<APICall> {
           "If ${CreateData.serviceAction.name}, Then ${Globaldata.reactionServicesName[Globaldata.secondService]} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflows";
   String email = Globaldata.userInfos.email;
+  String defaultWorkflowName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    defaultWorkflowName = "If ${CreateData.serviceAction.name} ";
+    developer.log("${CreateData.actionParamListName}");
+    developer.log("${CreateData.reactionParamListName}");
+    for (int i = 0; i < CreateData.actionParamListName.length; i++) {
+      defaultWorkflowName += "${CreateData.actionParamListName[i]} ";
+    }
+    defaultWorkflowName += ", Then ${Globaldata.reactionServicesName[Globaldata.secondService]} ${CreateData.serviceReaction.name} ";
+    for (int i = 0; i < CreateData.reactionParamListName.length; i++) {
+      defaultWorkflowName += "${CreateData.reactionParamListName[i]} ";
+    }
+    workflowTitleController = new TextEditingController(
+      text: defaultWorkflowName,
+    );
+  }
 
   Future<void> postCreateWorkflows() async {
     developer.log("${CreateData.serviceAction.parameterList}");

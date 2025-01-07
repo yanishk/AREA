@@ -55,7 +55,7 @@ func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 		services.GET("/actions", self.retrieveActionsServices)
 		services.GET("/reactions", self.retrieveReactionsServices)
 	}
-	private.GET("Discord/server/channels", self.getDiscordGuildChannels)
+	private.GET("discord/server/channels", self.getDiscordGuildChannels)
 }
 
 // @Summary		Service OAuth2
@@ -262,7 +262,7 @@ func (self *ServiceHandler) retrieveReactionsServices(context *gin.Context) {
 // @Param        id  query      string  true  "server id"
 // @Success		200		{object}	docs_service.ServiceGetDiscordGuildChannelsSuccessResponse
 // @Failure		500		{object}	docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse
-// @Router /Discord/server/channels [get]
+// @Router /discord/server/channels [get]
 func (self *ServiceHandler) getDiscordGuildChannels(context *gin.Context) {
 	guildId := context.Query("id")
 

@@ -34,7 +34,6 @@ class LoadService extends State<APICall> {
   String title = "Select action service";
   String actionsServices = "services/actions";
   String reactionsServices = "services/reactions";
-  bool isInit = true;
   bool hasToRetry = false;
 
   String getInfosFromUserDataString(String userData, String infos) {
@@ -133,9 +132,7 @@ class LoadService extends State<APICall> {
     if (response == null) {
       return;
     }
-    setState(() {
-      storeServiceDescription(response, service, route);
-    });
+    storeServiceDescription(response, service, route);
   }
 
   void storeData(List<String> servicesName, List<String> servicesColor,
@@ -166,7 +163,9 @@ class LoadService extends State<APICall> {
             Globaldata.reactionIsAuthNeeded,
             service
           );
-          LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+          Future.delayed(const Duration(seconds: 1)).then((val) {
+            LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+          });
         }
       }
     }
@@ -200,13 +199,14 @@ class LoadService extends State<APICall> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (isInit == true) {
-      isInit = false;
-      storeUserInfos();
-      getServices();
-    }
+  void initState() {
+    super.initState();
+    storeUserInfos();
+    getServices();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     if (hasToRetry) {
       return Scaffold(
         body: SingleChildScrollView(

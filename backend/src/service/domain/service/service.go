@@ -416,11 +416,12 @@ func getAsanaOAuth2AccessTokenRequest(code, callbackType string) (*http.Request,
 
 	tokenUrl := "https://app.asana.com/-/oauth_token"
 	jsonBody := fmt.Sprintf(
-		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
-			clientSecretParam + os.Getenv("ASANA_CLIENT_SECRET") +
-			codeParam + code +
-			redirectUriParam + asanaCallback +
-			grantTypeParam + grantTypeAuthorization,
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		code,
+		asanaCallback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))
