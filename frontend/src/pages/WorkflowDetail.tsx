@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar/Navbar";
@@ -12,6 +12,7 @@ const WorkflowDetail = () => {
     const [workflow, setWorkflow] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("You");
+    const navigate = useNavigate();
 
     const getWorkflowDetails = async () => {
         try {
@@ -39,7 +40,22 @@ const WorkflowDetail = () => {
     };
 
     const goBack = () => {
-        return;
+        navigate(-1);
+    }
+
+    const handleDelete = async () => {
+        try {
+            const result = await axios.delete(`${import.meta.env.VITE_API_URL}workflows/${workflowId}`, {
+                withCredentials: true,
+            });
+
+            if (result.data.success) {
+                navigate("/");
+            }
+
+        } catch (error) {
+            console.error("Error deleting workflow:", error);
+        }
     }
 
     useEffect(() => {
@@ -111,6 +127,16 @@ const WorkflowDetail = () => {
                     </p>
                 </MaxWidthWrapper>
             </div>
+
+            <div className="flex justify-center mt-[20px]">
+                <button
+                    className="font-[700] text-[20px] text-[#BC5555] hover:opacity-85 hover:cursor-pointer"
+                    onClick={handleDelete}
+                >
+                    Delete workflow
+                </button>
+            </div>
+
         </>
     );
 };
