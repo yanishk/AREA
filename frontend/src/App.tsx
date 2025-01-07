@@ -66,7 +66,7 @@ function App() {
               />
 
               <Route
-                path="/workflow/:workflowId"
+                path="/workflows/:workflowId"
                 element={
                   <ProtectedRoute>
                     <WorkflowDetail />
