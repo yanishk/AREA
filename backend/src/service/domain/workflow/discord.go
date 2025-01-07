@@ -52,7 +52,7 @@ func (self *WorkflowService) createDiscordThread(tokenBot string, workflow entit
 
 	jsonBody, err := json.Marshal(content)
 	if err != nil {
-		return fmt.Errorf(errorMarshaling, err)
+		return err
 	}
 
 	resp, errRequest := self.ServiceService.ExecuteApiRequest(url, "POST", botBearer, tokenBot, bytes.NewBuffer(jsonBody))
