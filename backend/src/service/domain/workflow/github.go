@@ -12,14 +12,14 @@ import (
 
 func githubWebhooksEventsToActions() map[string]string {
 	return map[string]string{
-		"watch":     "New star",
-		"public":    "Visibility update",
-		"milestone": "Milestone update",
-		"release":   "Release update",
-		"gollum":   "Wiki update",
+		"watch":        "New star",
+		"public":       "Visibility update",
+		"milestone":    "Milestone update",
+		"release":      "Release update",
+		"gollum":       "Wiki update",
 		"workflow_job": "Workflow job update",
 		"workflow_run": "Workflow run update",
-		"fork": "Fork update",
+		"fork":         "Fork update",
 	}
 }
 
