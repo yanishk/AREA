@@ -8,41 +8,60 @@ import { useNavigate } from "react-router-dom";
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
-    const [serviceDetails, setServiceDetails] = useState<any[]>([]);
+    const [userName, setUserName] = useState("You");
     const navigate = useNavigate();
 
     const getUserWorkflows = async () => {
         try {
             const result = await axios.get(`${import.meta.env.VITE_API_URL}workflows`, {
-                    withCredentials: true,
+                withCredentials: true,
             });
 
             if (!result) {
-                console.error("Error fetching services");
+                console.error("Error fetching workflows");
                 return;
             }
 
-            const workflowsProperties = result.data.workflows.map((workflow: any) => ({
-                name: workflow.name,
-                id: workflow.id,
-                actionid: workflow.actionid,
-            }));
+            const workflows = result.data.workflows;
 
-            setUserWorkflows(workflowsProperties);
+            const workflowsDetails = await Promise.all(
+                workflows.map(async (workflow: any) => {
+                    const actionDetails = await getServiceDetails(workflow.actionid, "action");
+                    const reactionDetails = await getServiceDetails(workflow.reactionid, "reaction");
+
+                    return {
+                        ...workflow,
+                        actioncolor: actionDetails?.color,
+                        actionlogo: actionDetails?.logo,
+                        reactionlogo: reactionDetails?.logo,
+                    };
+                })
+            );
+
+            setUserWorkflows(workflowsDetails);
+
+            console.log("Workflows with details:", workflowsDetails);
         } catch (err) {
-            console.error("Error fetching services:", err);
+            console.error("Error fetching workflows:", err);
         }
     };
 
-    const getServiceDetails = async () => {
-        
-        const result = await axios.get(`${import.meta.env.VITE_API_URL}services/action/${}`, {
-            withCredentials: true,
-        });
-    }
+    const getServiceDetails = async (id: string, type: string) => {
+        try {
+            const request = type === "action"
+                ? `${import.meta.env.VITE_API_URL}services/action/${id}`
+                : `${import.meta.env.VITE_API_URL}services/reaction/${id}`;
 
-    const [userName, setUserName] = useState("You");
+            const result = await axios.get(request, {
+                withCredentials: true,
+            });
 
+            return result.data.service;
+        } catch (err) {
+            console.error(`Failed to get details`, err);
+            return null;
+        }
+    };
 
     useEffect(() => {
         const fetchUserName = async () => {
@@ -83,8 +102,8 @@ const MyWorkflow = () => {
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
-                                // style={{ backgroundColor: "#333333"}}
-                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 bg-[#333333] hover:bg-[#474747]"
+                                style={{ backgroundColor: workflow.actioncolor}}
+                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90"
                                 onClick={() => navigate(`/workflow/${workflow.id}`)}
                             >
                                 <div className="text-left w-full px-[30px]">
