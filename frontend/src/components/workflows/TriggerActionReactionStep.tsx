@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateStepsType";
 import { fieldType } from "../../utils/fieldType";
-import { getFieldValues } from "../../utils/getFieldValues";
+import getFieldValues from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
@@ -27,27 +28,56 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 }) => {
 
     const getFieldType = (param: Parameters) => {
-        if (param.isexhaustive === true) {
+        if (!param.isexhaustive && param.route) {
+            return fieldType.SELECT;
+        }
+        if (param.isexhaustive) {
+            return fieldType.SELECT;
+        }
+        if (!param.isexhaustive && param.values.length === 1) {
             return fieldType.SELECT;
         }
 
-        if (param.isexhaustive === false && param.values.length === 1) {
-            return fieldType.SELECT;
-        }
-
-        if (param.isexhaustive === false && param.route === null) {
+        if (!param.isexhaustive && param.route === null) {
             return fieldType.INPUT;
         }
 
         return fieldType.INPUT;
     };
 
-    const fields = selectedItem?.parameters.map((param) => ({
-        id: param.name,
-        label: param.name,
-        type: getFieldType(param),
-        options: getFieldValues(param),
-    })) || [];
+    const [fields, setFields] = useState<{
+        id: string;
+        label: string;
+        type: fieldType;
+        options?: string[]
+        }[]
+    > ([]);
+
+    useEffect(() => {
+        const fetchFields = async () => {
+            if (!selectedItem) return;
+
+            const fetchedFields = await Promise.all(
+                selectedItem.parameters.map(async (param) => {
+                    const options =
+                        getFieldType(param) === fieldType.SELECT
+                            ? await getFieldValues(param)
+                            : undefined;
+
+                    return {
+                        id: param.name,
+                        label: param.name,
+                        type: getFieldType(param),
+                        options: options || [],
+                    };
+                })
+            );
+
+            setFields(fetchedFields);
+        };
+
+        fetchFields();
+    }, [selectedItem]);
 
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">

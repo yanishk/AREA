@@ -1,6 +1,37 @@
+import axios from "axios";
 import { Parameters } from "./ActionReactionParameters";
 
-export const getFieldValues = (param: Parameters): string[] | undefined => {
+interface GitlabParams {
+    id: number;
+    name: string;
+}
+
+const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: GitlabParams[] } }> => {
+    try {
+        const newRoute = route.slice(1);
+        const userProject = await axios.get(
+            `${import.meta.env.VITE_API_URL}${newRoute}`,
+            {
+                withCredentials: true
+            }
+        );
+
+        return userProject;
+    } catch (error) {
+        console.error("Error with gitlab fields values:", error);
+        return { data: { projects: [] } };
+    }
+}
+
+const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
+    if (param.route) {
+        const result = await getGitlabFieldValues(param.route);
+
+        if (result.data && Array.isArray(result.data.projects)) {
+            const values = result.data.projects.map((item) => item.name);
+            return values;
+        }
+    }
     if (param.values[0] === null) {
         return []
     }
@@ -17,3 +48,5 @@ export const getFieldValues = (param: Parameters): string[] | undefined => {
 
     return undefined;
 };
+
+export default getFieldValues

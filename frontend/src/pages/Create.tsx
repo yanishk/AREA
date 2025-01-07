@@ -8,10 +8,10 @@ import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
 import Steps from "../utils/CreateStepsType";
-import { getFieldValues } from "../utils/getFieldValues";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
+import getFieldValues from "../utils/getFieldValues";
 
 type availableActionsType = {
     name: string;
@@ -412,28 +412,32 @@ const WorkflowBuilder = () => {
         getSavedData();
     }, []);
 
+    const updateFieldValues = async (parameters: Parameters[], setFieldValues: React.Dispatch<React.SetStateAction<Record<string, string>>>) => {
+        const defaultValues: Record<string, string> = {};
+
+        for (const param of parameters) {
+            const options = await getFieldValues(param);
+
+            if (options && options.length > 0) {
+                defaultValues[param.name] = options[0];
+            }
+        }
+
+        setFieldValues((prev) => ({ ...defaultValues, ...prev }));
+    };
+
     useEffect(() => {
-        const updateFieldValues = (parameters: Parameters[], setFieldValues: React.Dispatch<React.SetStateAction<Record<string, string>>>) => {
-            const defaultValues: Record<string, string> = {};
+        const fetchFieldValues = async () => {
+            if (selectedAction?.parameters) {
+                await updateFieldValues(selectedAction.parameters, setActionFieldValues);
+            }
 
-            parameters.forEach((param) => {
-                const options = getFieldValues(param);
-
-                if (options && options.length > 0) {
-                    defaultValues[param.name] = options[0];
-                }
-            });
-
-            setFieldValues((prev) => ({ ...defaultValues, ...prev }));
+            if (selectedReaction?.parameters) {
+                await updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
+            }
         };
 
-        if (selectedAction?.parameters) {
-            updateFieldValues(selectedAction.parameters, setActionFieldValues);
-        }
-
-        if (selectedReaction?.parameters) {
-            updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
-        }
+        fetchFieldValues();
 
     }, [selectedAction, selectedReaction]);
 
@@ -451,16 +455,18 @@ const WorkflowBuilder = () => {
         return index + 1;
     };
 
-    const getActionReactionParams = (
+    const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
         parameters: Parameters[]
-    ): Record<string, any> => {
-        return Object.keys(valuesSelectedByUser).reduce((params, key) => {
+    ): Promise<Record<string, any>> => {
+        const params: Record<string, any> = {};
+
+        for (const key of Object.keys(valuesSelectedByUser)) {
             const param = parameters.find((param) => param.name === key);
 
             if (param) {
                 if (param.type === "int") {
-                    const valuesArray = getFieldValues(param);
+                    const valuesArray = await getFieldValues(param);
 
                     if (valuesArray) {
                         const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
@@ -469,14 +475,13 @@ const WorkflowBuilder = () => {
                             params[key] = index;
                         }
                     }
-
                 } else {
                     params[key] = valuesSelectedByUser[key];
                 }
             }
+        }
 
-            return params;
-        }, {} as Record<string, any>);
+        return params;
     };
 
     const handleCreateWorkflow = async (workflowTitle: string) => {
