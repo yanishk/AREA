@@ -27,7 +27,6 @@ class APICall extends StatefulWidget {
 }
 
 class LoadService extends State<APICall> {
-  String actualServiceName = "";
   bool isInit = true;
   bool hasToRetry = false;
 

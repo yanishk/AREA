@@ -10,9 +10,6 @@ import "../loginNavigator.dart";
 import 'loadServicesData.dart';
 
 class LoadDataFunctions {
-  static List<ActionOrReactionList> tmpActions = [];
-  static List<ActionOrReactionList> tmpReactions = [];
-
   static String getInfosFromUserDataString(String userData, String infos) {
     return (userData.split(infos).last).split(",").first;
   }
@@ -29,7 +26,6 @@ class LoadDataFunctions {
     Globaldata.userInfos.timezone = getInfosFromUserDataString(userDataString, "timezone: ");
     Globaldata.userInfos.connectiontype = getInfosFromUserDataString(userDataString, "connectiontype: ");
   }
-
 
   static Future<dynamic> getServiceActionsOrReactions(String route) async {
     Response response = await ApiRequest.get(route);
