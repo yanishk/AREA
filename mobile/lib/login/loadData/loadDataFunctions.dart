@@ -1,11 +1,7 @@
-import 'package:flutter/material.dart';
 import "package:http/src/response.dart";
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import "../../custom_widget.dart";
 import "../../globalData.dart";
 import "../../explore/explorePage.dart";
 import "../../apiCall/apiRequest.dart";
@@ -153,14 +149,17 @@ class LoadDataFunctions {
         String actualServiceName = service['name'] ?? 'No Name';
         bool hasactions = service['hasactions'] ?? false;
         bool hasreactions = service['hasreactions'] ?? false;
+        if (!hasactions && !hasreactions) {
+          continue;
+        }
         storeServiceActionsOrReactions(actualServiceName, hasactions, hasreactions);
         Globaldata.serviceList.add(
           ServiceData.optional(
             service['name'] ?? 'No Name',
             service['color'] ?? '',
-            service['icon'] ?? '',
+            service['logo'] ?? '',
             service['id'] ?? '',
-            service['isAuthNeeded'] ?? false,
+            service['isauthneeded'] ?? false,
             hasactions,
             hasreactions,
             tmpActions,

@@ -3,13 +3,11 @@ import "../globalData.dart";
 bool isAnAction = true;
 
 class CreateData {
-  static List<String> serviceNameList = Globaldata.actionServicesName;
-  static List<String> serviceColorList = Globaldata.actionServicesColor;
-  static List<String> serviceIconsList = Globaldata.actionServicesIcons;
-  static List<bool> serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
-
   static ActionOrReactionData serviceAction = ActionOrReactionData.optional();
   static ActionOrReactionData serviceReaction = ActionOrReactionData.optional();
+  static List<ServiceData> actualServiceList = [];
+  static List<ServiceData> actionServiceList = [];
+  static List<ServiceData> reactionServiceList = [];
 
   static ActionOrReactionData selectedActionOrReactionData = ActionOrReactionData.optional();
   static int selectedServiceId = 0;

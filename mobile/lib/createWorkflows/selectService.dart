@@ -31,23 +31,15 @@ class SelectService extends State<APICall> {
   Future<void> setActionOrReactionServiceList() async {
     if (isAnAction == true) {
       title = "Select action service";
-      CreateData.serviceNameList = Globaldata.actionServicesName;
-      CreateData.serviceColorList = Globaldata.actionServicesColor;
-      CreateData.serviceIconsList = Globaldata.actionServicesIcons;
-      CreateData.serviceIsAuthNeeded = Globaldata.actionIsAuthNeeded;
       return;
     }
     setState(() {
       title = "Select reaction service";
-      CreateData.serviceNameList = Globaldata.reactionServicesName;
-      CreateData.serviceColorList = Globaldata.reactionServicesColor;
-      CreateData.serviceIconsList = Globaldata.reactionServicesIcons;
-      CreateData.serviceIsAuthNeeded = Globaldata.reactionIsAuthNeeded;
     });
   }
 
   Widget serviceTiles(int index) {
-    if (index + 1 < CreateData.serviceNameList.length && index % 2 == 0) {
+    if (index + 1 < CreateData.actualServiceList.length && index % 2 == 0) {
       serviceIndex++;
       return Row(
         children: [
@@ -72,12 +64,28 @@ class SelectService extends State<APICall> {
   @override
   void initState() {
     super.initState();
+    CreateData.actualServiceList = [];
+    CreateData.actionServiceList = [];
+    CreateData.reactionServiceList = [];
     setState(() {
       setActionOrReactionServiceList();
+      for (int i = 0; i < Globaldata.serviceList.length; i++) {
+        if (isAnAction) {
+          if (Globaldata.serviceList[i].hasActions) {
+            CreateData.actualServiceList.add(Globaldata.serviceList[i]);
+            CreateData.actionServiceList.add(Globaldata.serviceList[i]);
+          }
+        } else if (Globaldata.serviceList[i].hasReactions) {
+          CreateData.actualServiceList.add(Globaldata.serviceList[i]);
+          CreateData.reactionServiceList.add(Globaldata.serviceList[i]);
+        }
+      }
       for (serviceIndex = 0;
-        serviceIndex < CreateData.serviceNameList.length;
+        serviceIndex < CreateData.actualServiceList.length;
         serviceIndex++) {
-          services.add(serviceTiles(serviceIndex));
+          if (CreateData.actualServiceList[serviceIndex].hasActions == isAnAction) {
+            services.add(serviceTiles(serviceIndex));
+          }
       }
     });
   }
@@ -121,23 +129,23 @@ class MySquareServicesCard extends StatelessWidget {
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
       if (CreateData.selectOrUpdateWorkflow) {
         CreateData.selectOrUpdateWorkflow = false;
-        Navigator.pop(Globaldata.myContext, CreateData.serviceNameList[servicesIndex]);
+        Navigator.pop(Globaldata.myContext, CreateData.actualServiceList[servicesIndex].name);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (servicesIndex > CreateData.serviceNameList.length) {
+    if (servicesIndex > CreateData.actualServiceList.length) {
       return Column();
     }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
-          color: HexColor(CreateData.serviceColorList[servicesIndex]),
+          color: HexColor(CreateData.actualServiceList[servicesIndex].color),
           border: Border.all(
-            color: HexColor(CreateData.serviceColorList[servicesIndex]),
+            color: HexColor(CreateData.actualServiceList[servicesIndex].color),
             width: 2.0,
           ),
           borderRadius: BorderRadius.circular(4.0),
@@ -163,9 +171,9 @@ class MySquareServicesCard extends StatelessWidget {
                 child: Column(children: [
                   SafeWebImage(
                       url:
-                          "${Globaldata.domainName}${CreateData.serviceIconsList[servicesIndex]}"),
+                          "${Globaldata.domainName}${CreateData.actualServiceList[servicesIndex].icon}"),
                   AutoSizeText(
-                    CreateData.serviceNameList[servicesIndex],
+                    CreateData.actualServiceList[servicesIndex].name,
                     style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
