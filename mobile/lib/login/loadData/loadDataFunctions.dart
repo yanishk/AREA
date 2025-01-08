@@ -1,0 +1,200 @@
+import 'package:flutter/material.dart';
+import "package:http/src/response.dart";
+import 'dart:convert';
+import 'dart:developer' as developer;
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import "../../custom_widget.dart";
+import "../../globalData.dart";
+import "../../explore/explorePage.dart";
+import "../../apiCall/apiRequest.dart";
+import "../../apiCall/apiErrorHandling.dart";
+import "../loginNavigator.dart";
+import 'loadServicesList.dart';
+
+class LoadDataFunctions {
+  static List<ActionOrReactionList> tmpActions = [];
+  static List<ActionOrReactionList> tmpReactions = [];
+
+  static String getInfosFromUserDataString(String userData, String infos) {
+    return (userData.split(infos).last).split(",").first;
+  }
+
+  static Future<void> storeUserInfos() async {
+    Response response = await ApiRequest.get("user");
+    final responseData = await errorHandler.basicResponseErrorHandler(response, "getEmail");
+    if (responseData == null) {
+      return;
+    }
+    final userDataString = (responseData.toString().split("{").last).split("}").first;
+    Globaldata.userInfos.email = getInfosFromUserDataString(userDataString, "email: ");
+    Globaldata.userInfos.createdat = getInfosFromUserDataString(userDataString, "createdat: ");
+    Globaldata.userInfos.timezone = getInfosFromUserDataString(userDataString, "timezone: ");
+    Globaldata.userInfos.connectiontype = getInfosFromUserDataString(userDataString, "connectiontype: ");
+  }
+
+
+  static Future<dynamic> getServiceActionsOrReactions(String route) async {
+    Response response = await ApiRequest.get(route);
+    if (response.statusCode == 504) {
+      developer.log('${response.body}');
+      return null;
+    }
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      developer.log(
+          "getServiceActionsOrReactions FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      return null;
+    }
+    return responseData;
+  }
+
+  static List<String> getValueListe(List<dynamic> values) {
+    List<String> valuesList = [];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] != null) {
+        valuesList.add(values[i]);
+      }
+    }
+    return valuesList;
+  }
+
+  static List<ActionOrReactionsParameter> storeActionReactionParameter(List<dynamic> parameter) {
+    List<ActionOrReactionsParameter> parameterList = [];
+    if (parameter.isEmpty) {
+      return parameterList;
+    }
+    for (int i = 0; i < parameter.length; i++) {
+      parameterList.add(
+        ActionOrReactionsParameter.optional(
+          parameter[i]["isexhaustive"] ?? true,
+          parameter[i]["name"] ?? "",
+          parameter[i]["route"] ?? "",
+          parameter[i]["type"] ?? "",
+          getValueListe(parameter[i]["values"]),
+        )
+      );
+    }
+    return parameterList;
+  }
+
+  static void storeServiceActionsOrReactionsData(dynamic responseData, String serviceName, String route) {
+    List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions; // supr ici
+    List<ActionOrReactionList> tmpListActionOrReaction = tmpActions;
+    if (route == "reactions") {
+      listActionOrReaction = Globaldata.reactionServicesReaction; // supr ici
+      tmpListActionOrReaction = tmpReactions;
+    }
+    if (responseData is Map<String, dynamic> &&
+        responseData[route] is List) {
+      List<dynamic> actions = responseData[route];
+      for (int i = 0; !actions.isEmpty; i++) {
+        final actionResponse = actions.removeLast();
+        if (actionResponse is Map<String, dynamic>) {
+          tmpListActionOrReaction.add(ActionOrReactionList.optional(
+            actionResponse['description'] ?? '',
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['serviceid'] ?? '',
+            serviceName,
+            storeActionReactionParameter(actionResponse["parameters"] ?? []),
+          ));
+        }
+
+        // supr ici
+        if (actionResponse is Map<String, dynamic>) {
+          listActionOrReaction.add(ActionOrReactionList.optional(
+            actionResponse['description'] ?? '',
+            actionResponse['id'] ?? '',
+            actionResponse['name'] ?? '',
+            actionResponse['serviceid'] ?? '',
+            serviceName,
+            storeActionReactionParameter(actionResponse["parameters"] ?? []),
+          ));
+        }
+      }
+    }
+  }
+
+  static Future<void> storeServiceActionsOrReactions(String serviceName, bool hasActions, bool hasReactions) async {
+    String getServiceActionRoute = "/actions";
+    String getServiceReactionRoute = "/reactions";
+    if (hasActions) {
+      final response = await getServiceActionsOrReactions(serviceName + getServiceActionRoute);
+      if (response == null) {
+        return;
+      }
+      storeServiceActionsOrReactionsData(response, serviceName, "actions");
+    }
+    if (hasReactions) {
+      final response = await getServiceActionsOrReactions(serviceName + getServiceReactionRoute);
+      if (response == null) {
+        return;
+      }
+      storeServiceActionsOrReactionsData(response, serviceName, "reactions");
+    }
+  }
+
+  static void storeServiceData(List<String> servicesName, List<String> servicesColor,
+      List<String> servicesIcons, List<String> servicesID, List<bool> serviceIsAuthNeeded, dynamic service) {
+    servicesName.add(service['name']);
+    servicesColor.add(service['color']);
+    servicesIcons.add(service['logo']);
+    serviceIsAuthNeeded.add(service['isauthneeded']);
+    servicesID.add(service['id']);
+  }
+
+  static void setStoreServiceData(dynamic responseData) {
+    final List<dynamic> allResponse = responseData;
+    for (int i = 0; i < allResponse.length; i++) {
+      final service = responseData[i];
+      if (service is Map<String, dynamic>) {
+        String actualServiceName = service['name'] ?? 'No Name';
+        bool hasactions = service['hasactions'] ?? false;
+        bool hasreactions = service['hasreactions'] ?? false;
+        storeServiceActionsOrReactions(actualServiceName, hasactions, hasreactions);
+        Globaldata.serviceList.add(
+          ServiceData.optional(
+            service['name'] ?? 'No Name',
+            service['color'] ?? '',
+            service['icon'] ?? '',
+            service['id'] ?? '',
+            service['isAuthNeeded'] ?? false,
+            hasactions,
+            hasreactions,
+            tmpActions,
+            tmpReactions,
+          ),
+        );
+        tmpActions = [];
+        tmpReactions = [];
+
+        // supr ici
+        if (hasactions) {
+          storeServiceData (
+            Globaldata.actionServicesName,
+            Globaldata.actionServicesColor,
+            Globaldata.actionServicesIcons,
+            Globaldata.actionServicesID,
+            Globaldata.actionIsAuthNeeded,
+            service
+          );
+        }
+        if (hasreactions) {
+          storeServiceData(
+            Globaldata.reactionServicesName,
+            Globaldata.reactionServicesColor,
+            Globaldata.reactionServicesIcons,
+            Globaldata.reactionServicesID,
+            Globaldata.reactionIsAuthNeeded,
+            service
+          );
+        }
+
+
+      }
+      LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+    }
+  }
+}

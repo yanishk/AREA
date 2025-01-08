@@ -34,6 +34,7 @@ class LoadService extends State<APICall> {
   String title = "Select action service";
   String actionsServices = "services/actions";
   String reactionsServices = "services/reactions";
+  String actualServiceName = "";
   bool isInit = true;
   bool hasToRetry = false;
 
@@ -188,15 +189,66 @@ class LoadService extends State<APICall> {
     return responseData;
   }
 
+  void storeServiceData(List<String> servicesName, List<String> servicesColor,
+      List<String> servicesIcons, List<String> servicesID, List<bool> serviceIsAuthNeeded, dynamic service) {
+    servicesName.add(service['name']);
+    servicesColor.add(service['color']);
+    servicesIcons.add(service['logo']);
+    serviceIsAuthNeeded.add(service['isauthneeded']);
+    servicesID.add(service['id']);
+  }
+
+  void setStoreServiceData(dynamic responseData) {
+    final List<dynamic> allResponse = responseData;
+    for (int i = 0; i < allResponse.length; i++) {
+      final service = responseData[i];
+      if (service is Map<String, dynamic>) {
+        actualServiceName = service['name'] ?? 'No Name';
+        bool hasactions = service['hasactions'];
+        bool hasreactions = service['hasreactions'];
+        Globaldata.serviceList.add(
+          ServiceData.optional(
+            service['name'] ?? 'No Name',
+            service['color'] ?? '',
+            service['icon'] ?? '',
+            service['id'] ?? '',
+            service['isAuthNeeded'] ?? false,
+            hasactions,
+            hasreactions,
+          ),
+        );
+        if (hasactions) {
+          storeData (
+            Globaldata.actionServicesName,
+            Globaldata.actionServicesColor,
+            Globaldata.actionServicesIcons,
+            Globaldata.actionServicesID,
+            Globaldata.actionIsAuthNeeded,
+            service
+          );
+        }
+        if (hasreactions) {
+          storeData(
+            Globaldata.reactionServicesName,
+            Globaldata.reactionServicesColor,
+            Globaldata.reactionServicesIcons,
+            Globaldata.reactionServicesID,
+            Globaldata.reactionIsAuthNeeded,
+            service
+          );
+        }
+      }
+      LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+    }
+  }
+
   Future<void> getServices() async {
-    final response = await getServiceResponse(actionsServices);
-    final responseReaction = await getServiceResponse(reactionsServices);
-    if (response == null || responseReaction == null) {
+    final allServiceResponce = await getServiceResponse("services");
+    if (allServiceResponce == null) {
       hasToRetry = true;
       return;
     }
-    setStoreData(response, actionsServices);
-    setStoreData(responseReaction, reactionsServices);
+    setStoreServiceData(allServiceResponce);
   }
 
   @override

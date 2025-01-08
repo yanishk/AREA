@@ -23,6 +23,8 @@ class Globaldata {
   static List<bool> reactionIsAuthNeeded = [];
   static List<ActionOrReactionList> reactionServicesReaction = [];
 
+  static List<ServiceData> serviceList = [];
+
   static String domainName = "https://mathisbrehm.fr/";
 
   static UserInfos userInfos = UserInfos.optional();
@@ -42,6 +44,35 @@ class Globaldata {
     Globaldata.reactionServicesID = [];
     Globaldata.reactionServicesReaction = [];
     Globaldata.userInfos = UserInfos.optional();
+
+    Globaldata.serviceList = [];
+  }
+}
+
+class ServiceData {
+  String name;
+  String color;
+  String icon;
+  String id;
+  bool isAuthNeeded;
+  bool hasActions;
+  bool hasReactions;
+  List<ActionOrReactionList> actions = [];
+  List<ActionOrReactionList> reactions = [];
+
+  ServiceData.optional([
+    this.name = "",
+    this.color = "",
+    this.icon = "",
+    this.id = "",
+    this.isAuthNeeded = false,
+    this.hasActions = false,
+    this.hasReactions = false,
+    List<ActionOrReactionList> ?actions,
+    List<ActionOrReactionList> ?reactions,
+  ]) {
+    this.actions = actions ?? [];
+    this.reactions = reactions ?? [];
   }
 }
 
