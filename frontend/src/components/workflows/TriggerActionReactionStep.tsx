@@ -27,6 +27,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     type,
 }) => {
 
+    const [isLoading, setIsLoading] = useState(true);
+
     const getFieldType = (param: Parameters) => {
         if (!param.isexhaustive && param.route) {
             return fieldType.SELECT;
@@ -57,6 +59,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         const fetchFields = async () => {
             if (!selectedItem) return;
 
+            setIsLoading(true);
+
             const fetchedFields = await Promise.all(
                 selectedItem.parameters.map(async (param) => {
                     const options =
@@ -74,6 +78,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             );
 
             setFields(fetchedFields);
+            setIsLoading(false);
         };
 
         fetchFields();
@@ -120,18 +125,24 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 <div
                     className="flex flex-col items-center"
                 >
-                    <DynamicFields
-                        fields={fields}
-                        values={itemFieldValues}
-                        onChange={(id, value) => handleFieldChange(id, value, type)}
-                    />
-                    <TriggerButton
-                        text="Create Trigger"
-                        textColor="text-black"
-                        bgColor="bg-white"
-                        hoverColor="hover:bg-[#EEEEEE]"
-                        onClick={() => goToStep(Steps.HOME)}
-                    />
+                    {isLoading ? (
+                        <div />
+                    ) : (
+                        <>
+                            <DynamicFields
+                                fields={fields}
+                                values={itemFieldValues}
+                                onChange={(id, value) => handleFieldChange(id, value, type)}
+                            />
+                            <TriggerButton
+                                text="Create Trigger"
+                                textColor="text-black"
+                                bgColor="bg-white"
+                                hoverColor="hover:bg-[#EEEEEE]"
+                                onClick={() => goToStep(Steps.HOME)}
+                            />
+                        </>
+                    )}
                 </div>
 
         </div>
