@@ -172,7 +172,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/{service}/{callback-type}/{app-type}": {
+        "/authentication": {
             "get": {
                 "description": "Get Service OAuth2 URL",
                 "produces": [
@@ -187,21 +187,21 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service name (Github, Spotify, Discord..)",
                         "name": "service",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
+                        "name": "callbacktype",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
+                        "name": "apptype",
+                        "in": "query",
                         "required": true
                     }
                 ],
