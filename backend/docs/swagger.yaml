@@ -855,23 +855,23 @@ paths:
       summary: Retrieve Asana Workspace Tags
       tags:
       - Asana
-  /authentication/{service}/{callback-type}/{app-type}:
+  /authentication:
     get:
       description: Get Service OAuth2 URL
       parameters:
       - description: Service name (Github, Spotify, Discord..)
-        in: path
+        in: query
         name: service
         required: true
         type: string
       - description: Callback type (login or service)
-        in: path
-        name: callback-type
+        in: query
+        name: callbacktype
         required: true
         type: string
       - description: App type (web or mobile)
-        in: path
-        name: app-type
+        in: query
+        name: apptype
         required: true
         type: string
       produces:
