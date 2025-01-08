@@ -104,14 +104,6 @@ const LoginForm = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
 
-                        <div
-                            className="flex justify-center mt-[2px]">
-                            <CallToActionLink
-                                href="/"
-                                underlinedText="Forgot your password?"
-                            />
-                        </div>
-
                         <ButtonValidation onClick={sendFormOnClick} text="Log in" />
                     </div>
 
