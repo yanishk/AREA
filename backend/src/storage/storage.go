@@ -40,6 +40,7 @@ type ActionRepository interface {
 	FindActionById(id string) (entities.Action, error)
 	FindActionByName(name string) (entities.Action, error)
 	FindActionsByServiceId(serviceId string) ([]entities.Action, error)
+	FindActionByNameAndServiceId(name, serviceId string) (entities.Action, error)
 }
 
 type WorkflowRepository interface {
