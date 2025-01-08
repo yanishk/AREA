@@ -48,6 +48,7 @@ const WorkflowBuilder = () => {
     const [actionServices, setActionServices] = useState([]);
     const [reactionServices, setReactionServices] = useState([]);
     const [currentStep, setCurrentStep] = useState<Steps>(Steps.HOME);
+    const [isServiceConnected, setIsServiceConnected] = useState(false);
 
     const goToStep = (step: Steps) => {
         setCurrentStep(step);
@@ -355,7 +356,7 @@ const WorkflowBuilder = () => {
         if (!codeAuth || !serviceName) return;
 
         try {
-            await axios.post(
+            const result = await axios.post(
                 `${import.meta.env.VITE_API_URL}service-callback/?code=${codeAuth}`,
                 {
                     service: serviceName,
@@ -365,6 +366,10 @@ const WorkflowBuilder = () => {
                     withCredentials: true
                 }
             );
+
+            if (result.data && result.data.success) {
+                setIsServiceConnected(true);
+            }
         } catch (error) {
             console.error("Error with service callback:", error);
         }
@@ -432,11 +437,19 @@ const WorkflowBuilder = () => {
     useEffect(() => {
         const fetchFieldValues = async () => {
             if (selectedAction?.parameters) {
+                if (isRequiredConnection("action") && !isServiceConnected) {
+                    return;
+                }
                 await updateFieldValues(selectedAction.parameters, setActionFieldValues);
+                setIsServiceConnected(false);
             }
 
             if (selectedReaction?.parameters) {
+                if (isRequiredConnection("reaction") && !isServiceConnected) {
+                    return;
+                }
                 await updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
+                setIsServiceConnected(false);
             }
         };
 
