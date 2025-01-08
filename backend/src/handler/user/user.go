@@ -7,6 +7,7 @@ import (
 
 	"backend/src/entities"
 	"backend/src/handler/middleware"
+	_ "backend/src/handler/service/docs"
 	_ "backend/src/handler/user/docs"
 	"backend/src/service"
 )
@@ -31,7 +32,7 @@ func (self *UserHandler) setupRoutes(router *gin.Engine) {
 func (self *UserHandler) publicRoutes(router *gin.Engine) {
 	router.POST("/register", self.createUser)
 	router.POST("/login", self.loginAuthentication)
-	router.POST("/login-callback/:service/:app-type", self.loginCallback)
+	router.POST("/login-callback", self.loginCallback)
 }
 
 func (self *UserHandler) privateRoutes(router *gin.Engine) {
@@ -135,17 +136,23 @@ func (self *UserHandler) loginAuthentication(context *gin.Context) {
 // @Description  Callback for login
 // @Tags         Callbacks
 // @Produce      json
-// @Param        service  path      string  true  "Service name (Google, Spotify..)"
-// @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
+// @Param		callback-informations	body		entities.CallbackInformations true	"Callback informations"
 // @Failure		200		{object}	docs_user.UserLoginCallbackSuccessResponse
 // @Failure		400		{object}	docs_user.UserLoginCallbackBadRequestResponse
 // @Failure		500		{object}	docs_user.UserLoginCallbackInternalServerErrorResponse
-// @Router       /login-callback/{service}/{app-type} [post]
+// @Router       /login-callback [post]
 func (self *UserHandler) loginCallback(context *gin.Context) {
-	appType := context.Param("app-type")
-	serviceName := context.Param("service")
+	var callbackInformations entities.CallbackInformations
 	code := context.Query("code")
+
+	errorBody := context.ShouldBindJSON(&callbackInformations)
+	if errorBody != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": invalidRequestBodyMessage,
+		})
+		return
+	}
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -154,14 +161,14 @@ func (self *UserHandler) loginCallback(context *gin.Context) {
 		return
 	}
 
-	if appType != "web" && appType != "mobile" {
+	if callbackInformations.AppType != "web" && callbackInformations.AppType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid app type",
 		})
 		return
 	}
 
-	token, err := self.UserService.LoginWithService(code, serviceName, appType)
+	token, err := self.UserService.LoginWithService(code, callbackInformations.Service, callbackInformations.AppType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to connect with requested service",

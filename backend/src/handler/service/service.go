@@ -34,10 +34,7 @@ func (self *ServiceHandler) setupRoutes(router *gin.Engine) {
 }
 
 func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
-	authentication := router.Group("/authentication")
-	{
-		authentication.GET("/:service/:callback-type/:app-type", self.oauth2Service)
-	}
+	router.GET("/authentication", self.oauth2Service)
 }
 
 func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
@@ -63,16 +60,16 @@ func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 // @Description	Get Service OAuth2 URL
 // @Tags			Authentication
 // @Produce		json
-// @Param        service  path      string  true  "Service name (Github, Spotify, Discord..)"
-// @Param        callback-type  path      string  true  "Callback type (login or service)"
-// @Param        app-type  path      string  true  "App type (web or mobile)"
+// @Param        service  query      string  true  "Service name (Github, Spotify, Discord..)"
+// @Param        callbacktype  query      string  true  "Callback type (login or service)"
+// @Param        apptype  query      string  true  "App type (web or mobile)"
 // @Success		200		{object}	docs_service.ServiceOAuth2SuccessResponse
 // @Failure		400		{object}	docs_service.ServiceOAuth2BadRequestResponse
-// @Router			/authentication/{service}/{callback-type}/{app-type} [get]
+// @Router			/authentication [get]
 func (self *ServiceHandler) oauth2Service(context *gin.Context) {
-	serviceName := context.Param("service")
-	callbackType := context.Param("callback-type")
-	appType := context.Param("app-type")
+	serviceName := context.Query("service")
+	callbackType := context.Query("callbacktype")
+	appType := context.Query("apptype")
 
 	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
