@@ -574,7 +574,7 @@ definitions:
     type: object
   entities.CallbackInformations:
     properties:
-      app-type:
+      apptype:
         type: string
       service:
         type: string

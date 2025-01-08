@@ -1927,7 +1927,7 @@ const docTemplate = `{
         "entities.CallbackInformations": {
             "type": "object",
             "properties": {
-                "app-type": {
+                "apptype": {
                     "type": "string"
                 },
                 "service": {
