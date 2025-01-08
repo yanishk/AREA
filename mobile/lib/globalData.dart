@@ -9,18 +9,8 @@ class Globaldata {
   static int firstService = -1;
   static int secondService = -1;
 
-  static List<String> actionServicesName = [];
-  static List<String> actionServicesColor = [];
-  static List<String> actionServicesIcons = [];
-  static List<String> actionServicesID = [];
-  static List<bool> actionIsAuthNeeded = [];
   static List<ActionOrReactionList> actionServicesActions = [];
 
-  static List<String> reactionServicesName = [];
-  static List<String> reactionServicesColor = [];
-  static List<String> reactionServicesIcons = [];
-  static List<String> reactionServicesID = [];
-  static List<bool> reactionIsAuthNeeded = [];
   static List<ActionOrReactionList> reactionServicesReaction = [];
 
   static List<ServiceData> serviceList = [];
@@ -32,19 +22,9 @@ class Globaldata {
   static const String appType = "mobile";
 
   static void resetActionReactionServicesList() {
-    Globaldata.actionServicesName = [];
-    Globaldata.actionServicesColor = [];
-    Globaldata.actionServicesIcons = [];
-    Globaldata.actionServicesID = [];
     Globaldata.actionServicesActions = [];
-
-    Globaldata.reactionServicesName = [];
-    Globaldata.reactionServicesColor = [];
-    Globaldata.reactionServicesIcons = [];
-    Globaldata.reactionServicesID = [];
     Globaldata.reactionServicesReaction = [];
     Globaldata.userInfos = UserInfos.optional();
-
     Globaldata.serviceList = [];
   }
 }

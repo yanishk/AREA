@@ -150,30 +150,6 @@ class LoadDataFunctions {
             hasreactions,
           ),
         );
-
-        // supr ici
-        if (hasactions) {
-          storeServiceData (
-            Globaldata.actionServicesName,
-            Globaldata.actionServicesColor,
-            Globaldata.actionServicesIcons,
-            Globaldata.actionServicesID,
-            Globaldata.actionIsAuthNeeded,
-            service
-          );
-        }
-        if (hasreactions) {
-          storeServiceData(
-            Globaldata.reactionServicesName,
-            Globaldata.reactionServicesColor,
-            Globaldata.reactionServicesIcons,
-            Globaldata.reactionServicesID,
-            Globaldata.reactionIsAuthNeeded,
-            service
-          );
-        }
-
-
       }
       LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
     }
