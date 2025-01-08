@@ -745,7 +745,24 @@ paths:
       summary: Retrieve Reactions From Service
       tags:
       - Service
-  /Asana/user/workspaces:
+  /about.json:
+    get:
+      description: Get about.json file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
+      summary: About.json
+      tags:
+      - About.json
+  /asana/user/workspaces:
     get:
       description: Retrieve the workspaces from the authenticated user
       produces:
@@ -762,7 +779,7 @@ paths:
       summary: Retrieve Asana Workspaces
       tags:
       - Asana
-  /Asana/workspace/assignees:
+  /asana/workspace/assignees:
     get:
       description: Retrieve the assignees from the selected workspace
       parameters:
@@ -785,7 +802,7 @@ paths:
       summary: Retrieve Asana Workspace Assignees
       tags:
       - Asana
-  /Asana/workspace/projects:
+  /asana/workspace/projects:
     get:
       description: Retrieve the projects from the selected workspace
       parameters:
@@ -808,7 +825,7 @@ paths:
       summary: Retrieve Asana Workspace Projects
       tags:
       - Asana
-  /Asana/workspace/tags:
+  /asana/workspace/tags:
     get:
       description: Retrieve the tags from the selected workspace
       parameters:
@@ -831,97 +848,6 @@ paths:
       summary: Retrieve Asana Workspace Tags
       tags:
       - Asana
-  /Discord/server/channels:
-    get:
-      description: Retrieve the channels from the selected server
-      parameters:
-      - description: server id
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
-      summary: Retrieve Discord Server Channels
-      tags:
-      - Discord
-  /Discord/user/servers:
-    get:
-      description: Retrieve the discord servers from the authenticated user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse'
-      summary: Retrieve Discord User Servers
-      tags:
-      - Discord
-  /Github/user/repositories:
-    get:
-      description: Retrieve the repositories of the authenticated user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse'
-      summary: Retrieve User Repositories
-      tags:
-      - Github
-  /Gitlab/user/projects:
-    get:
-      description: Retrieve the projects of the authenticated user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse'
-      summary: Retrieve User Projects
-      tags:
-      - Gitlab
-  /about.json:
-    get:
-      description: Get about.json file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
-      summary: About.json
-      tags:
-      - About.json
   /authentication/{service}/{callback-type}/{app-type}:
     get:
       description: Get Service OAuth2 URL
@@ -955,6 +881,80 @@ paths:
       summary: Service OAuth2
       tags:
       - Authentication
+  /discord/server/channels:
+    get:
+      description: Retrieve the channels from the selected server
+      parameters:
+      - description: server id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceGetDiscordGuildChannelsInternalServerErrorResponse'
+      summary: Retrieve Discord Server Channels
+      tags:
+      - Discord
+  /discord/user/servers:
+    get:
+      description: Retrieve the discord servers from the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse'
+      summary: Retrieve Discord User Servers
+      tags:
+      - Discord
+  /github/user/repositories:
+    get:
+      description: Retrieve the repositories of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse'
+      summary: Retrieve User Repositories
+      tags:
+      - Github
+  /gitlab/user/projects:
+    get:
+      description: Retrieve the projects of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse'
+      summary: Retrieve User Projects
+      tags:
+      - Gitlab
   /login:
     post:
       consumes:

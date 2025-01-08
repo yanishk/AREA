@@ -21,13 +21,12 @@ func main() {
 	_, errCronCreationEveryMinute := cronJob.AddFunc("@every 1m", func() {
 		services.WorkflowService.CheckTimeAndDateActions()
 		services.WorkflowService.CheckNewGitlabWorkflows()
-		services.WorkflowService.CheckNewGithubWorkflows()
+		services.WorkflowService.CheckGithubActions()
 	})
 	if errCronCreationEveryMinute != nil {
 		panic(errCronCreationEveryMinute)
 	}
 	_, errCronCreationEvery15Minutes := cronJob.AddFunc("@every 15m", func() {
-		services.WorkflowService.CheckGithubActions()
 		services.WorkflowService.CheckRedditActions()
 	})
 	if errCronCreationEvery15Minutes != nil {

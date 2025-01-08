@@ -27,10 +27,10 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback/:service/:app-type", self.serviceCallback)
-	private.GET("/Github/user/repositories", self.getGithubUserRepositories)
-	private.GET("/Gitlab/user/projects", self.getGitlabUserProjects)
-	private.GET("/Discord/user/servers", self.getDiscordUserServers)
-	asana := private.Group("/Asana")
+	private.GET("/github/user/repositories", self.getGithubUserRepositories)
+	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
+	private.GET("/discord/user/servers", self.getDiscordUserServers)
+	asana := private.Group("/asana")
 	{
 		asana.GET("/user/workspaces", self.getAsanaUserWorkspaces)
 		asana.GET("/workspace/assignees", self.getAsanaWorkspaceAssignees)
@@ -90,7 +90,7 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 // @Produce      json
 // @Failure		200		{object}	docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse
-// @Router       /Github/user/repositories [get]
+// @Router       /github/user/repositories [get]
 func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -114,7 +114,7 @@ func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) 
 // @Produce      json
 // @Failure		200		{object}	docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse
-// @Router       /Gitlab/user/projects [get]
+// @Router       /gitlab/user/projects [get]
 func (self *UserServiceHandler) getGitlabUserProjects(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -138,7 +138,7 @@ func (self *UserServiceHandler) getGitlabUserProjects(context *gin.Context) {
 // @Produce		json
 // @Success		200		{object}	docs_userservice.UserServiceGetDiscordUserServersSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse
-// @Router			/Discord/user/servers [get]
+// @Router			/discord/user/servers [get]
 func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -162,7 +162,7 @@ func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 // @Produce		json
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse
-// @Router /Asana/user/workspaces [get]
+// @Router /asana/user/workspaces [get]
 func (self *UserServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -187,7 +187,7 @@ func (self *UserServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse
-// @Router /Asana/workspace/assignees [get]
+// @Router /asana/workspace/assignees [get]
 func (self *UserServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -213,7 +213,7 @@ func (self *UserServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context)
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse
-// @Router /Asana/workspace/projects [get]
+// @Router /asana/workspace/projects [get]
 func (self *UserServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -239,7 +239,7 @@ func (self *UserServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) 
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse
-// @Router /Asana/workspace/tags [get]
+// @Router /asana/workspace/tags [get]
 func (self *UserServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
