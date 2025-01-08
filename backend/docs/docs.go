@@ -172,7 +172,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication": {
+        "/authentication/{service}/{callback-type}/{app-type}": {
             "get": {
                 "description": "Get Service OAuth2 URL",
                 "produces": [
@@ -187,21 +187,21 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service name (Github, Spotify, Discord..)",
                         "name": "service",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
-                        "name": "callbacktype",
-                        "in": "query",
+                        "name": "callback-type",
+                        "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "App type (web or mobile)",
-                        "name": "apptype",
-                        "in": "query",
+                        "name": "app-type",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -386,7 +386,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback": {
+        "/login-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for login",
                 "produces": [
@@ -399,19 +399,24 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "description": "Callback informations",
-                        "name": "callback-informations",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.CallbackInformations"
-                        }
                     }
                 ],
                 "responses": {
@@ -488,7 +493,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback": {
+        "/service-callback/{service}/{app-type}": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -501,19 +506,24 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Service name (Google, Spotify..)",
+                        "name": "service",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "app-type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "description": "Callback informations",
-                        "name": "callback-informations",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entities.CallbackInformations"
-                        }
                     }
                 ],
                 "responses": {
@@ -1398,7 +1408,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid request body-Invalid code authorization"
+                    "example": "Invalid code authorization"
                 }
             }
         },
@@ -1681,7 +1691,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid request body-Invalid code authorization-Invalid app type"
+                    "example": "Invalid code authorization-Invalid app type"
                 }
             }
         },
@@ -1958,17 +1968,6 @@ const docTemplate = `{
                             }
                         }
                     }
-                }
-            }
-        },
-        "entities.CallbackInformations": {
-            "type": "object",
-            "properties": {
-                "apptype": {
-                    "type": "string"
-                },
-                "service": {
-                    "type": "string"
                 }
             }
         },

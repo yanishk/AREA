@@ -31,13 +31,11 @@ const HomePage = () => {
         }
 
         await axios.post(
-            `${import.meta.env.VITE_API_URL}login-callback/?code=${codeAuth}`,
+            `${import.meta.env.VITE_API_URL}login-callback/${serviceName}/web/?code=${codeAuth}`,
             {
-                service: serviceName,
-                apptype: "web"
             },
             {
-                withCredentials: true
+                withCredentials: true,
             }
         );
         login();

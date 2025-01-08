@@ -5,9 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"backend/src/entities"
 	"backend/src/handler/middleware"
-	_ "backend/src/handler/service/docs"
 	_ "backend/src/handler/userservice/docs"
 	"backend/src/service"
 )
@@ -28,7 +26,7 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
-	private.POST("/service-callback", self.serviceCallback)
+	private.POST("/service-callback/:service/:app-type", self.serviceCallback)
 	private.GET("/github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/discord/user/servers", self.getDiscordUserServers)
@@ -45,25 +43,19 @@ func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 // @Description  Callback for services
 // @Tags         Callbacks
 // @Produce      json
+// @Param        service  path      string  true  "Service name (Google, Spotify..)"
+// @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
-// @Param		callback-informations	body		entities.CallbackInformations true	"Callback informations"
 // @Failure		200		{object}	docs_userservice.UserServiceServiceCallbackSuccessResponse
 // @Failure		400		{object}	docs_userservice.UserServiceServiceCallbackBadRequestResponse
 // @Failure		500		{object}	docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse
-// @Router       /service-callback [post]
+// @Router       /service-callback/{service}/{app-type} [post]
 func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
-	var callbackInformations entities.CallbackInformations
+	appType := context.Param("app-type")
+	serviceName := context.Param("service")
 	code := context.Query("code")
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
-
-	errorBody := context.ShouldBindJSON(&callbackInformations)
-	if errorBody != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request body",
-		})
-		return
-	}
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -72,14 +64,14 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 		return
 	}
 
-	if callbackInformations.AppType != "web" && callbackInformations.AppType != "mobile" {
+	if appType != "web" && appType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid app type",
 		})
 		return
 	}
 
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, callbackInformations.Service, callbackInformations.AppType, email, connectionType)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, appType, email, connectionType)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",
