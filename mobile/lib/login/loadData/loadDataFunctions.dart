@@ -7,7 +7,7 @@ import "../../explore/explorePage.dart";
 import "../../apiCall/apiRequest.dart";
 import "../../apiCall/apiErrorHandling.dart";
 import "../loginNavigator.dart";
-import 'loadServicesList.dart';
+import 'loadServicesData.dart';
 
 class LoadDataFunctions {
   static List<ActionOrReactionList> tmpActions = [];

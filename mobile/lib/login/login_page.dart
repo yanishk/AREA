@@ -8,7 +8,7 @@ import "../custom_widget.dart";
 import "sign_up.dart";
 import "../explore/explorePage.dart";
 import "../globalData.dart";
-import "loadData/loadServicesList.dart";
+import "loadData/loadServicesData.dart";
 import '../apiCall/apiRequest.dart';
 import "loginNavigator.dart";
 import "../auth/webviewAuth/connectServiceAuth.dart";
