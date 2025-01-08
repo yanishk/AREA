@@ -9,7 +9,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 class AuthFunctions {
   static Future<String> getAuthLink(String callBackType, String service) async {
     String authLink = "";
-    Response response = await ApiRequest.get("authentication/$service/$callBackType/${Globaldata.appType}");
+    Response response = await ApiRequest.get("authentication?service=$service&callbacktype=$callBackType&apptype=${Globaldata.appType}");
     if (response.statusCode == 504) {
       developer.log('${response.body}');
       return authLink;
