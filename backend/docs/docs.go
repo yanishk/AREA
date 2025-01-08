@@ -538,6 +538,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/services": {
+            "get": {
+                "description": "Retrieve services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveAllServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/services/action/{actionid}": {
             "get": {
                 "description": "Retrieve service by action id",
@@ -1221,6 +1247,17 @@ const docTemplate = `{
             }
         },
         "docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Service"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveAllServicesSuccessResponse": {
             "type": "object",
             "properties": {
                 "services": {

@@ -147,7 +147,9 @@ class LoadDataFunctions {
           ),
         );
       }
-      LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
     }
+    Future.delayed(const Duration(seconds: 1)).then((val) {
+      LoginNavigator.redirectAndHandleGoBackRedirection(ExplorePage(), LoadServicePage());
+    });
   }
 }

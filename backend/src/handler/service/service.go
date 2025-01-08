@@ -39,18 +39,19 @@ func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 
 func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	services := private.Group("/services")
+	{
+		services.GET("", self.retrieveAllServices)
+		services.GET("/actions", self.retrieveActionsServices)
+		services.GET("/reactions", self.retrieveReactionsServices)
+		services.GET("/:id", self.retrieveServiceById)
+		services.GET("/action/:actionid", self.retrieveServiceByActionId)
+		services.GET("/reaction/:reactionid", self.retrieveServiceByReactionId)
+	}
 	service := private.Group("/:service")
 	{
 		service.GET("/actions", self.retrieveActionsFromService)
 		service.GET("/reactions", self.retrieveReactionsFromService)
-	}
-	services := private.Group("/services")
-	{
-		services.GET("/:id", self.retrieveServiceById)
-		services.GET("/action/:actionid", self.retrieveServiceByActionId)
-		services.GET("/reaction/:reactionid", self.retrieveServiceByReactionId)
-		services.GET("/actions", self.retrieveActionsServices)
-		services.GET("/reactions", self.retrieveReactionsServices)
 	}
 	private.GET("discord/server/channels", self.getDiscordGuildChannels)
 }
@@ -96,52 +97,58 @@ func (self *ServiceHandler) oauth2Service(context *gin.Context) {
 	})
 }
 
-// @Summary		Retrieve Actions From Service
-// @Description	Retrieve actions from requested service
-// @Tags			Service
+// @Summary		Retrieve Services
+// @Description	Retrieve services
+// @Tags			Services
 // @Produce		json
-// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse
-// @Router			/{service}/actions [get]
-func (self *ServiceHandler) retrieveActionsFromService(context *gin.Context) {
-	serviceName := context.Param("service")
-
-	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
-	if errActions != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": unknownServiceMessage,
+// @Success		200		{object}	docs_service.ServiceRetrieveAllServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/services [get]
+func (self *ServiceHandler) retrieveAllServices(context *gin.Context) {
+	services, err := self.ServiceService.FindAllServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
-
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"actions": actions,
-	})
+	context.IndentedJSON(http.StatusOK, services)
 }
 
-// @Summary		Retrieve Reactions From Service
-// @Description	Retrieve reactions from requested service
-// @Tags			Service
+// @Summary		Retrieve Services With Actions
+// @Description	Retrieve services with actions available
+// @Tags			Services
 // @Produce		json
-// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
-// @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
-// @Failure		400		{object}	docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse
-// @Router			/{service}/reactions [get]
-func (self *ServiceHandler) retrieveReactionsFromService(context *gin.Context) {
-	serviceName := context.Param("service")
-
-	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
-	if errReactions != nil {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{
-			"error": unknownServiceMessage,
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/services/actions [get]
+func (self *ServiceHandler) retrieveActionsServices(context *gin.Context) {
+	actionsServices, err := self.ServiceService.RetrieveActionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": internalServerErrorMessage,
 		})
 		return
 	}
+	context.IndentedJSON(http.StatusOK, actionsServices)
+}
 
-	context.IndentedJSON(http.StatusOK, gin.H{
-		"reactions": reactions,
-	})
+// @Summary		Retrieve Services With Reactions
+// @Description	Retrieve services with reactions available
+// @Tags			Services
+// @Produce		json
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
+// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
+// @Router			/services/reactions [get]
+func (self *ServiceHandler) retrieveReactionsServices(context *gin.Context) {
+	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": internalServerErrorMessage,
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, reactionsServices)
 }
 
 // @Summary		Retrieve Service
@@ -216,40 +223,52 @@ func (self *ServiceHandler) retrieveServiceByReactionId(context *gin.Context) {
 	})
 }
 
-// @Summary		Retrieve Services With Actions
-// @Description	Retrieve services with actions available
-// @Tags			Services
+// @Summary		Retrieve Actions From Service
+// @Description	Retrieve actions from requested service
+// @Tags			Service
 // @Produce		json
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/services/actions [get]
-func (self *ServiceHandler) retrieveActionsServices(context *gin.Context) {
-	actionsServices, err := self.ServiceService.RetrieveActionsServices()
-	if err != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": internalServerErrorMessage,
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveActionsFromServiceSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse
+// @Router			/{service}/actions [get]
+func (self *ServiceHandler) retrieveActionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+
+	actions, errActions := self.ServiceService.RetrieveActionsFromService(serviceName)
+	if errActions != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": unknownServiceMessage,
 		})
 		return
 	}
-	context.IndentedJSON(http.StatusOK, actionsServices)
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"actions": actions,
+	})
 }
 
-// @Summary		Retrieve Services With Reactions
-// @Description	Retrieve services with reactions available
-// @Tags			Services
+// @Summary		Retrieve Reactions From Service
+// @Description	Retrieve reactions from requested service
+// @Tags			Service
 // @Produce		json
-// @Success		200		{object}	docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse
-// @Failure		500		{object}	docs_service.ServiceInternalServerErrorResponse
-// @Router			/services/reactions [get]
-func (self *ServiceHandler) retrieveReactionsServices(context *gin.Context) {
-	reactionsServices, err := self.ServiceService.RetrieveReactionsServices()
-	if err != nil {
-		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": internalServerErrorMessage,
+// @Param        service  path      string  true  "Service name (Google, Spotify, Time & Date..)"
+// @Success		200		{object}	docs_service.ServiceRetrieveReactionsFromServiceSuccessResponse
+// @Failure		400		{object}	docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse
+// @Router			/{service}/reactions [get]
+func (self *ServiceHandler) retrieveReactionsFromService(context *gin.Context) {
+	serviceName := context.Param("service")
+
+	reactions, errReactions := self.ServiceService.RetrieveReactionsFromService(serviceName)
+	if errReactions != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": unknownServiceMessage,
 		})
 		return
 	}
-	context.IndentedJSON(http.StatusOK, reactionsServices)
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"reactions": reactions,
+	})
 }
 
 // @Summary		Retrieve Discord Server Channels

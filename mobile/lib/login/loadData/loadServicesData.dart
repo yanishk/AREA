@@ -27,7 +27,6 @@ class APICall extends StatefulWidget {
 }
 
 class LoadService extends State<APICall> {
-  bool isInit = true;
   bool hasToRetry = false;
 
   Future<dynamic> getServiceResponse(String route) async {
@@ -56,13 +55,14 @@ class LoadService extends State<APICall> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (isInit == true) {
-      isInit = false;
-      LoadDataFunctions.storeUserInfos();
-      getServices();
-    }
+  void initState() {
+    super.initState();
+    LoadDataFunctions.storeUserInfos();
+    getServices();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     if (hasToRetry) {
       return Scaffold(
         body: SingleChildScrollView(

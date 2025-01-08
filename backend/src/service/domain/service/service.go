@@ -79,6 +79,9 @@ func (self *ServiceService) FindServiceByReactionId(id string) (entities.Service
 	}
 	return self.ServiceRepository.FindServiceById(reaction.ServiceId)
 }
+func (self *ServiceService) FindAllServices() ([]entities.Service, error) {
+	return self.ServiceRepository.FindAllServices()
+}
 
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
 	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
