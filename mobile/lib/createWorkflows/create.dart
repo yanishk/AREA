@@ -127,13 +127,13 @@ class CreateWorkflows extends State<APICall> {
       if (firstButtonComplete == false && result != null) {
         firstButtonComplete = true;
         secondButtonState++;
-        firstButtonColor = HexColor(CreateData.serviceColorList[Globaldata.firstService]);
+        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.firstService].color);
         secondButtonColor = enableButton;
         firstButtonHight = 50;
       }
       if (result != null) {
         firstSelectedService = "$result";
-        firstButtonColor = HexColor(CreateData.serviceColorList[Globaldata.firstService]);
+        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.firstService].color);
       }
     });
   }
@@ -148,7 +148,7 @@ class CreateWorkflows extends State<APICall> {
       );
       setState(() {
         if (result != null) {
-          secondButtonColor = HexColor(CreateData.serviceColorList[Globaldata.secondService]);
+          secondButtonColor = HexColor(CreateData.reactionServiceList[Globaldata.secondService].color);
           secondButtonState = 2;
           secondSelectedService = "$result";
         }

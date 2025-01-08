@@ -31,11 +31,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
   String email = Globaldata.userInfos.email;
   Color backgroundColor = HexColor(
-    MyWorkflowsfunctions.getServiceDataById(
-      MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID,
-      Globaldata.actionServicesColor,
-      Globaldata.reactionServicesColor
-    )
+    Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)].color
   );
 
   bool editNameMode = false;
@@ -213,11 +209,7 @@ class WorkflowInfosTitle extends StatelessWidget {
                 SafeWebImage(
                   url:
                       "${Globaldata.domainName}${
-                        MyWorkflowsfunctions.getServiceDataById(
-                          MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID,
-                          Globaldata.actionServicesIcons,
-                          Globaldata.reactionServicesIcons
-                        )
+                        Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)].icon
                       }",
                   width: 50,
                   height: 50,
@@ -226,11 +218,7 @@ class WorkflowInfosTitle extends StatelessWidget {
                 SafeWebImage(
                   url:
                       "${Globaldata.domainName}${
-                        MyWorkflowsfunctions.getServiceDataById(
-                          MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].reactionId,
-                          Globaldata.actionServicesIcons,
-                          Globaldata.reactionServicesIcons
-                        )
+                        Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].reactionId)].icon
                       }",
                   width: 50,
                   height: 50,
