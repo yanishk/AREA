@@ -297,7 +297,7 @@ const WorkflowBuilder = () => {
     const handleConnectService = async (selectedService: any) => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
+                `${import.meta.env.VITE_API_URL}authentication?service=${selectedService.name}&callbacktype=service&apptype=web`,
                 {
                     withCredentials: true,
                 }
