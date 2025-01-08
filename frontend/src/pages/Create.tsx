@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import axios from "axios";
 import HomeStep from "../components/workflows/HomeStep";
 import SummaryStep from "../components/workflows/SummaryStep";
@@ -11,7 +11,7 @@ import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
-import getFieldValues from "../utils/getFieldValues";
+import getFieldValues, { gitlabNameToIdMap } from "../utils/getFieldValues";
 
 type availableActionsType = {
     name: string;
@@ -486,12 +486,19 @@ const WorkflowBuilder = () => {
 
     const handleCreateWorkflow = async (workflowTitle: string) => {
         const actionParams = selectedAction
-            ? getActionReactionParams(actionFieldValues, selectedAction.parameters)
+            ? await getActionReactionParams(actionFieldValues, selectedAction.parameters)
             : null;
 
         const reactionParams = selectedReaction
-            ? getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
+            ? await getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
             : null;
+
+            if (selectedActionService?.name === "Gitlab" && actionParams) {
+                Object.keys(actionParams).forEach((key) => {
+                    const value = actionParams[key];
+                    actionParams[key] = gitlabNameToIdMap[value];
+                });
+            }
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,

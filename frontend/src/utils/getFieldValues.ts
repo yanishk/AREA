@@ -6,6 +6,8 @@ interface GitlabParams {
     name: string;
 }
 
+export const gitlabNameToIdMap: Record<string, number> = {};
+
 const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: GitlabParams[] } }> => {
     try {
         const newRoute = route.slice(1);
@@ -28,6 +30,11 @@ const getFieldValues = async (param: Parameters): Promise<string[] | undefined> 
         const result = await getGitlabFieldValues(param.route);
 
         if (result.data && Array.isArray(result.data.projects)) {
+
+            result.data.projects.forEach((item) => {
+                gitlabNameToIdMap[item.name] = item.id;
+            });
+
             const values = result.data.projects.map((item) => item.name);
             return values;
         }
