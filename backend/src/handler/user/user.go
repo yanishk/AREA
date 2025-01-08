@@ -37,6 +37,7 @@ func (self *UserHandler) publicRoutes(router *gin.Engine) {
 
 func (self *UserHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+	private.POST("/logout", self.logoutUser)
 	user := private.Group("/user")
 	{
 		user.GET("", self.getUser)
@@ -197,13 +198,38 @@ func (self *UserHandler) getUser(context *gin.Context) {
 	user, err := self.UserService.GetUser(email, connectionType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
+			"error": "Could not find user",
 		})
 		return
 	}
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"user": user,
+	})
+}
+
+// @Summary		Logout
+// @Description	User logout
+// @Tags			Users
+// @Produce		json
+// @Success		200		{object}	docs_user.UserLogoutUserSuccessResponse
+// @Failure		500		{object}	docs_user.UserLogoutUserInternalServerErrorResponse
+// @Router			/logout [post]
+func (self *UserHandler) logoutUser(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	_, err := self.UserService.GetUser(email, connectionType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not find user",
+		})
+		return
+	}
+	context.SetSameSite(http.SameSiteNoneMode)
+	context.SetCookie("JWToken", "", -1, "", "", true, true)
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": "Logout successful",
 	})
 }
 

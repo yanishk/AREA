@@ -436,6 +436,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/logout": {
+            "post": {
+                "description": "User logout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "description": "Create user account",
@@ -1337,7 +1363,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Internal server error"
+                    "example": "Could not find user"
                 }
             }
         },
@@ -1444,6 +1470,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Could not find requested user-Wrong password"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find user"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Logout successful"
                 }
             }
         },
