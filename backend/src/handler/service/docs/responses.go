@@ -44,6 +44,16 @@ type ServiceOAuth2BadRequestResponse struct {
 	Msg string `json:"error"example:"Invalid callback type-Invalid app type-Unknown service"`
 }
 
+// Retrieve All Services
+type ServiceRetrieveAllServicesSuccessResponse struct {
+	Services []entities.Service
+}
+
+// Retrieve Actions/Reactions Services Responses
+type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
+	Services []entities.Service
+}
+
 // Retrieve Service by Id
 type ServiceRetrieveServiceByIdSuccessResponse struct {
 	Service entities.Service
@@ -51,11 +61,6 @@ type ServiceRetrieveServiceByIdSuccessResponse struct {
 
 type ServiceRetrieveServiceByIdInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve requested service"`
-}
-
-// Retrieve Actions/Reactions Services Responses
-type ServiceRetrieveActionsReactionsServicesSuccessResponse struct {
-	Services []entities.Service
 }
 
 // Retrieve Actions from Service Responses

@@ -14,6 +14,9 @@ class CreateData {
   static ActionOrReactionData selectedActionOrReactionData = ActionOrReactionData.optional();
   static int selectedServiceId = 0;
   static bool selectOrUpdateWorkflow = false;
+
+  static List<String> actionParamListName = [];
+  static List<String> reactionParamListName = [];
 }
 
 class ActionOrReactionData {

@@ -112,6 +112,13 @@ definitions:
           $ref: '#/definitions/entities.Service'
         type: array
     type: object
+  docs_service.ServiceRetrieveAllServicesSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/entities.Service'
+        type: array
+    type: object
   docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse:
     properties:
       error:
@@ -158,7 +165,7 @@ definitions:
   docs_user.UserGetUserInternalServerErrorResponse:
     properties:
       error:
-        example: Internal server error
+        example: Could not find user
         type: string
     type: object
   docs_user.UserGetUserSuccessResponse:
@@ -198,7 +205,7 @@ definitions:
   docs_user.UserLoginCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization
+        example: Invalid request body-Invalid code authorization
         type: string
     type: object
   docs_user.UserLoginCallbackInternalServerErrorResponse:
@@ -229,6 +236,18 @@ definitions:
     properties:
       error:
         example: Could not find requested user-Wrong password
+        type: string
+    type: object
+  docs_user.UserLogoutUserInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not find user
+        type: string
+    type: object
+  docs_user.UserLogoutUserSuccessResponse:
+    properties:
+      success:
+        example: Logout successful
         type: string
     type: object
   docs_user.UserModifyPasswordBadRequestResponse:
@@ -385,7 +404,7 @@ definitions:
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization-Invalid app type
+        example: Invalid request body-Invalid code authorization-Invalid app type
         type: string
     type: object
   docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse:
@@ -572,6 +591,13 @@ definitions:
           type: object
         type: array
     type: object
+  entities.CallbackInformations:
+    properties:
+      apptype:
+        type: string
+      service:
+        type: string
+    type: object
   entities.GithubRepository:
     properties:
       full_name:
@@ -745,7 +771,24 @@ paths:
       summary: Retrieve Reactions From Service
       tags:
       - Service
-  /Asana/user/workspaces:
+  /about.json:
+    get:
+      description: Get about.json file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
+      summary: About.json
+      tags:
+      - About.json
+  /asana/user/workspaces:
     get:
       description: Retrieve the workspaces from the authenticated user
       produces:
@@ -762,7 +805,7 @@ paths:
       summary: Retrieve Asana Workspaces
       tags:
       - Asana
-  /Asana/workspace/assignees:
+  /asana/workspace/assignees:
     get:
       description: Retrieve the assignees from the selected workspace
       parameters:
@@ -785,7 +828,7 @@ paths:
       summary: Retrieve Asana Workspace Assignees
       tags:
       - Asana
-  /Asana/workspace/projects:
+  /asana/workspace/projects:
     get:
       description: Retrieve the projects from the selected workspace
       parameters:
@@ -808,7 +851,7 @@ paths:
       summary: Retrieve Asana Workspace Projects
       tags:
       - Asana
-  /Asana/workspace/tags:
+  /asana/workspace/tags:
     get:
       description: Retrieve the tags from the selected workspace
       parameters:
@@ -831,7 +874,40 @@ paths:
       summary: Retrieve Asana Workspace Tags
       tags:
       - Asana
-  /Discord/server/channels:
+  /authentication:
+    get:
+      description: Get Service OAuth2 URL
+      parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: query
+        name: service
+        required: true
+        type: string
+      - description: Callback type (login or service)
+        in: query
+        name: callbacktype
+        required: true
+        type: string
+      - description: App type (web or mobile)
+        in: query
+        name: apptype
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
+      summary: Service OAuth2
+      tags:
+      - Authentication
+  /discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
       parameters:
@@ -854,7 +930,7 @@ paths:
       summary: Retrieve Discord Server Channels
       tags:
       - Discord
-  /Discord/user/servers:
+  /discord/user/servers:
     get:
       description: Retrieve the discord servers from the authenticated user
       produces:
@@ -871,7 +947,7 @@ paths:
       summary: Retrieve Discord User Servers
       tags:
       - Discord
-  /Github/user/repositories:
+  /github/user/repositories:
     get:
       description: Retrieve the repositories of the authenticated user
       produces:
@@ -888,7 +964,7 @@ paths:
       summary: Retrieve User Repositories
       tags:
       - Github
-  /Gitlab/user/projects:
+  /gitlab/user/projects:
     get:
       description: Retrieve the projects of the authenticated user
       produces:
@@ -905,56 +981,6 @@ paths:
       summary: Retrieve User Projects
       tags:
       - Gitlab
-  /about.json:
-    get:
-      description: Get about.json file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_about.AboutGetAboutSuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse'
-      summary: About.json
-      tags:
-      - About.json
-  /authentication/{service}/{callback-type}/{app-type}:
-    get:
-      description: Get Service OAuth2 URL
-      parameters:
-      - description: Service name (Github, Spotify, Discord..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: Callback type (login or service)
-        in: path
-        name: callback-type
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
-      summary: Service OAuth2
-      tags:
-      - Authentication
   /login:
     post:
       consumes:
@@ -989,25 +1015,21 @@ paths:
       summary: Login
       tags:
       - Users
-  /login-callback/{service}/{app-type}:
+  /login-callback:
     post:
       description: Callback for login
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:
@@ -1026,6 +1048,23 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
+  /logout:
+    post:
+      description: User logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse'
+      summary: Logout
+      tags:
+      - Users
   /register:
     post:
       consumes:
@@ -1060,25 +1099,21 @@ paths:
       summary: Register
       tags:
       - Users
-  /service-callback/{service}/{app-type}:
+  /service-callback:
     post:
       description: Callback for services
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:
@@ -1097,6 +1132,23 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
+  /services:
+    get:
+      description: Retrieve services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveAllServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services
+      tags:
+      - Services
   /services/{id}:
     get:
       description: Retrieve service by id

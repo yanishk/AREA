@@ -3,6 +3,8 @@ package workflow_service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 
 	"backend/src/entities"
 	"backend/src/service"
@@ -159,6 +161,39 @@ func unmarshalJsonToMap(jsonDataBytes []byte) ([]map[string]interface{}, error) 
 		}
 	}
 	return jsonData, nil
+}
+
+func getWorkflowStringActionParam(workflow entities.Workflow, paramKey string) (string, error) {
+	param, paramExists := workflow.ActionParam[paramKey]
+	if !paramExists {
+		return "", fmt.Errorf(errorMissingField)
+	}
+
+	paramString, paramIsString := param.(string)
+	if !paramIsString {
+		return "", fmt.Errorf(errorMissingField)
+	}
+	return paramString, nil
+}
+
+func (self *WorkflowService) CheckWebhooksWorkflows(serviceName string, request *http.Request) error {
+	webhookJsonDataBytes, err := io.ReadAll(request.Body)
+	if err != nil {
+		return err
+	}
+
+	service, err := self.ServiceService.FindServiceByName(serviceName)
+	if err != nil {
+		return err
+	}
+
+	switch service.Name {
+	case "Gitlab":
+		return self.checkGitlabWebhooksWorkflows(request.Header, webhookJsonDataBytes, gitlabWebhooksEventsToActions(), service.Id)
+	case "Github":
+		return self.checkGithubWebhooksWorkflows(request.Header, webhookJsonDataBytes, githubWebhooksEventsToActions(), service.Id)
+	}
+	return nil
 }
 
 func (self *WorkflowService) checkReactions(workflow entities.Workflow) {
