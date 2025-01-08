@@ -165,7 +165,7 @@ definitions:
   docs_user.UserGetUserInternalServerErrorResponse:
     properties:
       error:
-        example: Internal server error
+        example: Could not find user
         type: string
     type: object
   docs_user.UserGetUserSuccessResponse:
@@ -205,7 +205,7 @@ definitions:
   docs_user.UserLoginCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization
+        example: Invalid request body-Invalid code authorization
         type: string
     type: object
   docs_user.UserLoginCallbackInternalServerErrorResponse:
@@ -236,6 +236,18 @@ definitions:
     properties:
       error:
         example: Could not find requested user-Wrong password
+        type: string
+    type: object
+  docs_user.UserLogoutUserInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not find user
+        type: string
+    type: object
+  docs_user.UserLogoutUserSuccessResponse:
+    properties:
+      success:
+        example: Logout successful
         type: string
     type: object
   docs_user.UserModifyPasswordBadRequestResponse:
@@ -392,7 +404,7 @@ definitions:
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
-        example: Invalid code authorization-Invalid app type
+        example: Invalid request body-Invalid code authorization-Invalid app type
         type: string
     type: object
   docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse:
@@ -578,6 +590,13 @@ definitions:
               type: string
           type: object
         type: array
+    type: object
+  entities.CallbackInformations:
+    properties:
+      apptype:
+        type: string
+      service:
+        type: string
     type: object
   entities.GithubRepository:
     properties:
@@ -855,23 +874,23 @@ paths:
       summary: Retrieve Asana Workspace Tags
       tags:
       - Asana
-  /authentication/{service}/{callback-type}/{app-type}:
+  /authentication:
     get:
       description: Get Service OAuth2 URL
       parameters:
       - description: Service name (Github, Spotify, Discord..)
-        in: path
+        in: query
         name: service
         required: true
         type: string
       - description: Callback type (login or service)
-        in: path
-        name: callback-type
+        in: query
+        name: callbacktype
         required: true
         type: string
       - description: App type (web or mobile)
-        in: path
-        name: app-type
+        in: query
+        name: apptype
         required: true
         type: string
       produces:
@@ -996,25 +1015,21 @@ paths:
       summary: Login
       tags:
       - Users
-  /login-callback/{service}/{app-type}:
+  /login-callback:
     post:
       description: Callback for login
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:
@@ -1033,6 +1048,23 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
+  /logout:
+    post:
+      description: User logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse'
+      summary: Logout
+      tags:
+      - Users
   /register:
     post:
       consumes:
@@ -1067,25 +1099,21 @@ paths:
       summary: Register
       tags:
       - Users
-  /service-callback/{service}/{app-type}:
+  /service-callback:
     post:
       description: Callback for services
       parameters:
-      - description: Service name (Google, Spotify..)
-        in: path
-        name: service
-        required: true
-        type: string
-      - description: App type (web or mobile)
-        in: path
-        name: app-type
-        required: true
-        type: string
       - description: Authorization code given by the service
         in: query
         name: code
         required: true
         type: string
+      - description: Callback informations
+        in: body
+        name: callback-informations
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CallbackInformations'
       produces:
       - application/json
       responses:

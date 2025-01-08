@@ -18,7 +18,7 @@ type UserServiceServiceCallbackSuccessResponse struct {
 }
 
 type UserServiceServiceCallbackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization-Invalid app type"`
+	Msg string `json:"error"example:"Invalid request body-Invalid code authorization-Invalid app type"`
 }
 
 type UserServiceServiceCallbackInternalServerErrorResponse struct {

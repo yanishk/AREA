@@ -172,7 +172,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication/{service}/{callback-type}/{app-type}": {
+        "/authentication": {
             "get": {
                 "description": "Get Service OAuth2 URL",
                 "produces": [
@@ -187,21 +187,21 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Service name (Github, Spotify, Discord..)",
                         "name": "service",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
+                        "name": "callbacktype",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
+                        "name": "apptype",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -386,7 +386,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback/{service}/{app-type}": {
+        "/login-callback": {
             "post": {
                 "description": "Callback for login",
                 "produces": [
@@ -399,24 +399,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "Callback informations",
+                        "name": "callback-informations",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.CallbackInformations"
+                        }
                     }
                 ],
                 "responses": {
@@ -436,6 +431,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "User logout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse"
                         }
                     }
                 }
@@ -493,7 +514,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback/{service}/{app-type}": {
+        "/service-callback": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -506,24 +527,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "Callback informations",
+                        "name": "callback-informations",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.CallbackInformations"
+                        }
                     }
                 ],
                 "responses": {
@@ -1347,7 +1363,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Internal server error"
+                    "example": "Could not find user"
                 }
             }
         },
@@ -1408,7 +1424,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid request body-Invalid code authorization"
                 }
             }
         },
@@ -1454,6 +1470,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Could not find requested user-Wrong password"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find user"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Logout successful"
                 }
             }
         },
@@ -1691,7 +1725,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization-Invalid app type"
+                    "example": "Invalid request body-Invalid code authorization-Invalid app type"
                 }
             }
         },
@@ -1968,6 +2002,17 @@ const docTemplate = `{
                             }
                         }
                     }
+                }
+            }
+        },
+        "entities.CallbackInformations": {
+            "type": "object",
+            "properties": {
+                "apptype": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
                 }
             }
         },
