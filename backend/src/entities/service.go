@@ -23,7 +23,7 @@ type UserInfo struct {
 
 type CallbackInformations struct {
 	Service string `json:"service"`
-	AppType string `json:"app-type"`
+	AppType string `json:"apptype"`
 }
 
 // Time & Date
