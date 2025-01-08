@@ -57,8 +57,6 @@ class ServiceData {
   bool isAuthNeeded;
   bool hasActions;
   bool hasReactions;
-  List<ActionOrReactionList> actions = [];
-  List<ActionOrReactionList> reactions = [];
 
   ServiceData.optional([
     this.name = "",
@@ -68,12 +66,7 @@ class ServiceData {
     this.isAuthNeeded = false,
     this.hasActions = false,
     this.hasReactions = false,
-    List<ActionOrReactionList> ?actions,
-    List<ActionOrReactionList> ?reactions,
-  ]) {
-    this.actions = actions ?? [];
-    this.reactions = reactions ?? [];
-  }
+  ]);
 }
 
 class ActionOrReactionList {

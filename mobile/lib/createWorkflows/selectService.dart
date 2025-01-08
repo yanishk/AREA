@@ -65,8 +65,11 @@ class SelectService extends State<APICall> {
   void initState() {
     super.initState();
     CreateData.actualServiceList = [];
-    CreateData.actionServiceList = [];
-    CreateData.reactionServiceList = [];
+    if (isAnAction) {
+      CreateData.actionServiceList = [];
+    } else {
+      CreateData.reactionServiceList = [];
+    }
     setState(() {
       setActionOrReactionServiceList();
       for (int i = 0; i < Globaldata.serviceList.length; i++) {

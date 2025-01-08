@@ -76,29 +76,15 @@ class LoadDataFunctions {
   }
 
   static void storeServiceActionsOrReactionsData(dynamic responseData, String serviceName, String route) {
-    List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions; // supr ici
-    List<ActionOrReactionList> tmpListActionOrReaction = tmpActions;
+    List<ActionOrReactionList> listActionOrReaction = Globaldata.actionServicesActions;
     if (route == "reactions") {
-      listActionOrReaction = Globaldata.reactionServicesReaction; // supr ici
-      tmpListActionOrReaction = tmpReactions;
+      listActionOrReaction = Globaldata.reactionServicesReaction;
     }
     if (responseData is Map<String, dynamic> &&
         responseData[route] is List) {
       List<dynamic> actions = responseData[route];
       for (int i = 0; !actions.isEmpty; i++) {
         final actionResponse = actions.removeLast();
-        if (actionResponse is Map<String, dynamic>) {
-          tmpListActionOrReaction.add(ActionOrReactionList.optional(
-            actionResponse['description'] ?? '',
-            actionResponse['id'] ?? '',
-            actionResponse['name'] ?? '',
-            actionResponse['serviceid'] ?? '',
-            serviceName,
-            storeActionReactionParameter(actionResponse["parameters"] ?? []),
-          ));
-        }
-
-        // supr ici
         if (actionResponse is Map<String, dynamic>) {
           listActionOrReaction.add(ActionOrReactionList.optional(
             actionResponse['description'] ?? '',
@@ -162,12 +148,8 @@ class LoadDataFunctions {
             service['isauthneeded'] ?? false,
             hasactions,
             hasreactions,
-            tmpActions,
-            tmpReactions,
           ),
         );
-        tmpActions = [];
-        tmpReactions = [];
 
         // supr ici
         if (hasactions) {
