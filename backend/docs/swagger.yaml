@@ -112,6 +112,13 @@ definitions:
           $ref: '#/definitions/entities.Service'
         type: array
     type: object
+  docs_service.ServiceRetrieveAllServicesSuccessResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/entities.Service'
+        type: array
+    type: object
   docs_service.ServiceRetrieveReactionsFromServiceBadRequestResponse:
     properties:
       error:
@@ -1097,6 +1104,23 @@ paths:
       summary: Service Callback
       tags:
       - Callbacks
+  /services:
+    get:
+      description: Retrieve services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_service.ServiceRetrieveAllServicesSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_service.ServiceInternalServerErrorResponse'
+      summary: Retrieve Services
+      tags:
+      - Services
   /services/{id}:
     get:
       description: Retrieve service by id
