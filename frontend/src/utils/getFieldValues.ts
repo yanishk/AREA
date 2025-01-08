@@ -6,6 +6,11 @@ interface GitlabParams {
     name: string;
 }
 
+interface GithubParams {
+    id: number;
+    name: string;
+}
+
 export const gitlabNameToIdMap: Record<string, number> = {};
 
 const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: GitlabParams[] } }> => {
@@ -22,6 +27,26 @@ const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: 
     } catch (error) {
         console.error("Error with gitlab fields values:", error);
         return { data: { projects: [] } };
+    }
+}
+
+const getGithubFieldValues = async (route: string): Promise<{ data: { repo: GithubParams[] } }> => {
+    try {
+        const newRoute = route.slice(1);
+        console.log("new route ici : ", newRoute);
+        const userRepo = await axios.get(
+            `${import.meta.env.VITE_API_URL}${newRoute}`,
+            {
+                withCredentials: true
+            }
+        );
+
+        console.log("user repo ici : ", userRepo);
+
+        return userRepo;
+    } catch (error) {
+        console.error("Error with github fields values:", error);
+        return { data: { repo: [] } };
     }
 }
 
@@ -43,7 +68,13 @@ const getFieldValues = async (param: Parameters): Promise<string[] | undefined> 
             }
         }
         if (serviceName === "github") {
+            const result = await getGithubFieldValues(param.route);
 
+            if (result.data && Array.isArray(result.data.repo)) {
+
+                const values = result.data.repo.map((item) => item.name);
+                return values;
+            }
         }
     }
     if (param.values[0] === null) {
