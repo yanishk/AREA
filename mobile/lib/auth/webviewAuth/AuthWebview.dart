@@ -45,7 +45,7 @@ class WebviewAuthAPICall extends StatefulWidget {
 class WebviewAuth extends State<WebviewAuthAPICall> {
   late InAppWebViewController webViewController;
   String newUrl = "";
-  String apiRoute = "service-callback/$authServiceName";
+  String apiRoute = "service-callback";
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
     if (authConnectionType == "login") {
       developer.log("authConnectionType : $authConnectionType");
       setState(() {
-        apiRoute = "login-callback/$authServiceName";
+        apiRoute = "login-callback";
       });
     }
   }
@@ -100,10 +100,16 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
         onLoadStop: (controller, url) async {
           developer.log("onLoadStop url : ${url.toString()}");
           if (url != null &&
-              url.toString().contains(ApiData.apiUrl + apiRoute)) {
+              url.toString().contains(ApiData.apiUrl + "$apiRoute/$authServiceName")) {
             final urlSplit = url.toString().split(ApiData.apiUrl);
             String callBackUrl = removeUrlState(urlSplit.last);
-            final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(callBackUrl), jsonEncode(<String, dynamic>{}),);
+            final Response response = await ApiRequest.post(
+              AuthFunctions.removeServiceFromUrl(callBackUrl, authServiceName),
+              jsonEncode(<String, dynamic>{
+                "apptype" : Globaldata.appType,
+                "service" : authServiceName,
+              }),
+            );
 
             if (response.statusCode == 200) {
               developer.log("User connected");

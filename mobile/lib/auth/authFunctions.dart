@@ -45,4 +45,10 @@ class AuthFunctions {
     String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
     return finalUrl;
   }
+
+  static String removeServiceFromUrl(String url, String serviceName) {
+    final splitUrl = url.split("/$serviceName");
+    String finalUrl = "${splitUrl.first}${splitUrl.last}";
+    return finalUrl;
+  }
 }
