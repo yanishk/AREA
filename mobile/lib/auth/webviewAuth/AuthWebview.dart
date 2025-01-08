@@ -77,9 +77,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
     if (splitState.length == 1) {
       return url.split("&state=").first;
     }
-    developer.log("removeUrlState splitState : $splitState");
     final splitCode = splitState.last.split("&code=");
-    developer.log("removeUrlState splitCode : $splitCode");
     return "${splitState.first}?code=${splitCode.last}";
   }
 
