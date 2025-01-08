@@ -27,16 +27,23 @@ const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: 
 
 const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
     if (param.route) {
-        const result = await getGitlabFieldValues(param.route);
+        const serviceName = param.route.split("/")[1];
 
-        if (result.data && Array.isArray(result.data.projects)) {
+        if (serviceName === "gitlab") {
+            const result = await getGitlabFieldValues(param.route);
 
-            result.data.projects.forEach((item) => {
-                gitlabNameToIdMap[item.name] = item.id;
-            });
+            if (result.data && Array.isArray(result.data.projects)) {
 
-            const values = result.data.projects.map((item) => item.name);
-            return values;
+                result.data.projects.forEach((item) => {
+                    gitlabNameToIdMap[item.name] = item.id;
+                });
+
+                const values = result.data.projects.map((item) => item.name);
+                return values;
+            }
+        }
+        if (serviceName === "github") {
+
         }
     }
     if (param.values[0] === null) {
