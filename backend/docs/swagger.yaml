@@ -158,7 +158,7 @@ definitions:
   docs_user.UserGetUserInternalServerErrorResponse:
     properties:
       error:
-        example: Internal server error
+        example: Could not find user
         type: string
     type: object
   docs_user.UserGetUserSuccessResponse:
@@ -229,6 +229,18 @@ definitions:
     properties:
       error:
         example: Could not find requested user-Wrong password
+        type: string
+    type: object
+  docs_user.UserLogoutUserInternalServerErrorResponse:
+    properties:
+      error:
+        example: Could not find user
+        type: string
+    type: object
+  docs_user.UserLogoutUserSuccessResponse:
+    properties:
+      success:
+        example: Logout successful
         type: string
     type: object
   docs_user.UserModifyPasswordBadRequestResponse:
@@ -1026,6 +1038,23 @@ paths:
       summary: Login Callback
       tags:
       - Callbacks
+  /logout:
+    post:
+      description: User logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserSuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse'
+      summary: Logout
+      tags:
+      - Users
   /register:
     post:
       consumes:
