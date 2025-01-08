@@ -46,12 +46,12 @@ class LoadService extends State<APICall> {
   }
 
   Future<void> getServices() async {
-    final allServiceResponce = await getServiceResponse("services");
-    if (allServiceResponce == null) {
+    final allServicesResponses = await getServiceResponse("services");
+    if (allServicesResponses == null) {
       hasToRetry = true;
       return;
     }
-    LoadDataFunctions.setStoreServiceData(allServiceResponce);
+    LoadDataFunctions.setStoreServiceData(allServicesResponses);
   }
 
   @override

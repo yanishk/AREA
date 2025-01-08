@@ -124,17 +124,17 @@ class LoadDataFunctions {
   }
 
   static void setStoreServiceData(dynamic responseData) {
-    final List<dynamic> allResponse = responseData;
-    for (int i = 0; i < allResponse.length; i++) {
+    final List<dynamic> responses = responseData;
+    for (int i = 0; i < responses.length; i++) {
       final service = responseData[i];
       if (service is Map<String, dynamic>) {
         String actualServiceName = service['name'] ?? 'No Name';
-        bool hasactions = service['hasactions'] ?? false;
-        bool hasreactions = service['hasreactions'] ?? false;
-        if (!hasactions && !hasreactions) {
+        bool hasActions = service['hasactions'] ?? false;
+        bool hasReactions = service['hasreactions'] ?? false;
+        if (!hasActions && !hasReactions) {
           continue;
         }
-        storeServiceActionsOrReactions(actualServiceName, hasactions, hasreactions);
+        storeServiceActionsOrReactions(actualServiceName, hasActions, hasReactions);
         Globaldata.serviceList.add(
           ServiceData.optional(
             service['name'] ?? 'No Name',
@@ -142,8 +142,8 @@ class LoadDataFunctions {
             service['logo'] ?? '',
             service['id'] ?? '',
             service['isauthneeded'] ?? false,
-            hasactions,
-            hasreactions,
+            hasActions,
+            hasReactions,
           ),
         );
       }
