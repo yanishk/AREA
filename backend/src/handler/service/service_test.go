@@ -333,3 +333,50 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 		mockService.AssertExpectations(test)
 	})
 }
+
+func TestRetrieveServiceById(test *testing.T) {
+	secretKey := os.Getenv("SECRET_KEY")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":          "eva.legrand@epitech.eu",
+		"connectionType": "basic",
+		"exp":            time.Now().Add(time.Hour).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(secretKey))
+	require.NoError(test, err)
+
+	router := gin.Default()
+
+	router.Use(middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+
+	mockService := new(MockServiceService)
+
+	expectedService := entities.Service{Id: "1", Name: "service"}
+
+	router.GET("/services/:id", func(context *gin.Context) {
+		self := &ServiceHandler{
+			ServiceService: mockService,
+		}
+		self.retrieveServiceById(context)
+	})
+
+	createRequestWithJWT := func(method, url string) *http.Request {
+		req, _ := http.NewRequest(method, url, nil)
+		req.AddCookie(&http.Cookie{Name: "JWToken", Value: tokenString})
+		return req
+	}
+
+	test.Run("Successful", func(t *testing.T) {
+		mockService.On("FindServiceById", "1").Return(expectedService, nil)
+
+		req := createRequestWithJWT("GET", "/services/1")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+}
