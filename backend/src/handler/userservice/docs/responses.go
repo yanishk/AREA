@@ -49,7 +49,7 @@ type UserServiceGetDiscordUserServersSuccessResponse struct {
 }
 
 type UserServiceGetDiscordUserServersInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve the user's servers"`
+	Msg string `json:"error"example:"Could not retrieve the user's repositories"`
 }
 
 // Asana Get User Workspaces

@@ -365,7 +365,7 @@ definitions:
   docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse:
     properties:
       error:
-        example: Could not retrieve the user's servers
+        example: Could not retrieve the user's repositories
         type: string
     type: object
   docs_userservice.UserServiceGetDiscordUserServersSuccessResponse:
