@@ -30,20 +30,22 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [isLoading, setIsLoading] = useState(true);
 
     const getFieldType = (param: Parameters) => {
+        console.log("parm ici : ", param);
         if (!param.isexhaustive && param.route) {
             return fieldType.SELECT;
         }
         if (param.isexhaustive) {
             return fieldType.SELECT;
         }
-        if (!param.isexhaustive && param.values.length === 1) {
+        if (!param.isexhaustive && param.values.length === 1 && param.route) {
             return fieldType.SELECT;
         }
-
-        if (!param.isexhaustive && param.route === null) {
+        if (!param.isexhaustive && param.route === null && !param.route) {
             return fieldType.INPUT;
         }
-
+        if (!param.isexhaustive && param.values[0].length > 1) {
+            return fieldType.SELECT;
+        }
         return fieldType.INPUT;
     };
 

@@ -7,7 +7,11 @@ interface GitlabParams {
 }
 
 interface GithubParams {
-    id: number;
+    full_name: string;
+}
+
+interface AsanaParams {
+    gid: number;
     name: string;
 }
 
@@ -30,7 +34,7 @@ const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: 
     }
 }
 
-const getGithubFieldValues = async (route: string): Promise<{ data: { repo: GithubParams[] } }> => {
+const getGithubFieldValues = async (route: string): Promise<{ data: { repositories: GithubParams[] } }> => {
     try {
         const newRoute = route.slice(1);
         console.log("new route ici : ", newRoute);
@@ -46,13 +50,37 @@ const getGithubFieldValues = async (route: string): Promise<{ data: { repo: Gith
         return userRepo;
     } catch (error) {
         console.error("Error with github fields values:", error);
-        return { data: { repo: [] } };
+        return { data: { repositories: [] } };
+    }
+}
+
+const getAsanaFieldValues = async (route: string): Promise<{ data: { workspaces: {data : AsanaParams[] } } }> => {
+    try {
+        const newRoute = route.slice(1);
+        console.log("new route ici : ", newRoute);
+        const workswapces = await axios.get(
+            `${import.meta.env.VITE_API_URL}${newRoute}`,
+            {
+                withCredentials: true
+            }
+        );
+
+        console.log("user workswapces ici : ", workswapces);
+
+        return workswapces;
+    } catch (error) {
+        console.error("Error with github fields values:", error);
+        return { data: { workspaces: {data: [] }} };
     }
 }
 
 const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
+    console.log("PARAM LA : ", param);
+
     if (param.route) {
         const serviceName = param.route.split("/")[1];
+
+        console.log("SERVICE NAME LA/", serviceName);
 
         if (serviceName === "gitlab") {
             const result = await getGitlabFieldValues(param.route);
@@ -70,9 +98,18 @@ const getFieldValues = async (param: Parameters): Promise<string[] | undefined> 
         if (serviceName === "github") {
             const result = await getGithubFieldValues(param.route);
 
-            if (result.data && Array.isArray(result.data.repo)) {
+            if (result.data && Array.isArray(result.data.repositories)) {
 
-                const values = result.data.repo.map((item) => item.name);
+                const values = result.data.repositories.map((item) => item.full_name);
+                return values;
+            }
+        }
+        if (serviceName === "asana") {
+            const result = await getAsanaFieldValues(param.route);
+
+            if (result.data && result.data.workspaces && Array.isArray(result.data.workspaces.data)) {
+
+                const values = result.data.workspaces.data.map((item) => item.name);
                 return values;
             }
         }
