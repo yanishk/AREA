@@ -111,3 +111,27 @@ func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
 		}
 	})
 }
+
+func TestDeleteUserServiceByUserId(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewUserServiceRepository(db)
+
+	sqlStatement := `DELETE FROM userservices WHERE userid = \(\$1\)`
+	mock.ExpectExec(sqlStatement).
+		WithArgs("userid").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = repo.DeleteUserServiceByUserId("userid")
+
+	assert.NoError(test, err)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
