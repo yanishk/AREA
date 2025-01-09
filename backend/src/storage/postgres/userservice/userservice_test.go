@@ -63,3 +63,51 @@ func TestFindUserServiceByServiceIdandUserId(test *testing.T) {
 		test.Errorf("Expectation fail")
 	}
 }
+
+func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewUserServiceRepository(db)
+
+	test.Run("Successful", func(test *testing.T) {
+		findSqlStatement := `SELECT \* FROM userservices WHERE userid = \(\$1\) AND serviceid = \(\$2\)`
+		mockRow := sqlmock.NewRows([]string{"id", "userid", "accesstoken", "refreshtoken", "expirydate", "serviceid"}).
+			AddRow("id", "userid", "oldtoken", "oldtokenrefresh", "expirydate", "serviceid")
+
+		mock.ExpectQuery(findSqlStatement).
+			WithArgs("userid", "serviceid").
+			WillReturnRows(mockRow)
+
+		updateSqlStatement := `UPDATE userservices SET token = \(\$1\), tokenrefresh = \(\$2\), expiry = \(\$3\) WHERE userid = \(\$4\) AND serviceid = \(\$5\)`
+		mock.ExpectExec(updateSqlStatement).
+			WithArgs("token", "tokenrefresh", "expiry", "userid", "serviceid").
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
+
+		assert.NoError(test, err)
+
+		err = mock.ExpectationsWereMet()
+		if err != nil {
+			test.Errorf("Expectation fail")
+		}
+	})
+
+	test.Run("Service doesn't exist for user", func(test *testing.T) {
+		updateSqlStatement := `UPDATE userservices SET token = \(\$1\), tokenrefresh = \(\$2\), expiry = \(\$3\) WHERE userid = \(\$4\) AND serviceid = \(\$5\)`
+		mock.ExpectExec(updateSqlStatement).
+			WithArgs("token", "tokenrefresh", "expiry", "userid", "serviceid").
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
+
+		err = mock.ExpectationsWereMet()
+		if err == nil {
+			test.Errorf("Expectation fail")
+		}
+	})
+}
