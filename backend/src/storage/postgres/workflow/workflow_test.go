@@ -1,6 +1,7 @@
 package workflow_repository
 
 import (
+	"backend/src/entities"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -106,6 +107,47 @@ func TestFindWorkflowsByActionId(test *testing.T) {
 	assert.Equal(test, "action", workflow[0].ActionId)
 	assert.Equal(test, "reaction", workflow[0].ReactionId)
 	assert.Equal(test, true, workflow[0].IsActivated)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
+
+func TestUpdateWorkflow(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewWorkflowRepository(db)
+
+	sqlStatement := `UPDATE workflows SET name = \(\$1\), actionid = \(\$2\), reactionid = \(\$3\), isactivated = \(\$4\), actionparam = \(\$5\), reactionparam = \(\$6\), actiondata = \(\$7\) WHERE id = \(\$8\)`
+
+	var workflowToUpdate entities.Workflow
+	workflowToUpdate.Id = "1234"
+	workflowToUpdate.Name = "name"
+	workflowToUpdate.IsActivated = false
+	workflowToUpdate.OwnerId = "owner"
+	workflowToUpdate.ActionId = "action"
+	workflowToUpdate.ReactionId = "reaction"
+	workflowToUpdate.ActionParam = map[string]interface{}{"key": "value"}
+	workflowToUpdate.ReactionParam = map[string]interface{}{"key": "value"}
+	workflowToUpdate.ActionData = map[string]interface{}{"key": "value"}
+
+	actionParamJson, reactionParamJson, actionDataJson, err := marshalWorkflowParameters(workflowToUpdate.ActionParam, workflowToUpdate.ReactionParam, workflowToUpdate.ActionData)
+	if err != nil {
+		test.Fatalf("Failed to marshal parameters: %v", err)
+	}
+
+	mock.ExpectExec(sqlStatement).
+		WithArgs("name", "action", "reaction", false, actionParamJson, reactionParamJson, actionDataJson, "1234").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = repo.UpdateWorkflow("1234", workflowToUpdate)
+
+	assert.NoError(test, err)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
