@@ -380,3 +380,55 @@ func TestRetrieveServiceById(test *testing.T) {
 	})
 
 }
+
+func TestGetDiscordGuildChannels(test *testing.T) {
+
+	secretKey := os.Getenv("SECRET_KEY")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":          "eva.legrand@epitech.eu",
+		"connectionType": "basic",
+		"exp":            time.Now().Add(time.Hour).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(secretKey))
+	require.NoError(test, err)
+
+	router := gin.Default()
+
+	router.Use(middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+
+	mockService := new(MockServiceService)
+
+	guildId := "12345"
+	expectedChannels := []map[string]interface{}{
+		{"name": "test1", "id": "1"},
+		{"name": "test2", "id": "2"},
+		{"name": "test3", "id": "3"},
+	}
+
+	router.GET("/discord/server/channels", func(c *gin.Context) {
+		self := &ServiceHandler{
+			ServiceService: mockService,
+		}
+		self.getDiscordGuildChannels(c)
+	})
+
+	createRequestWithJWT := func(method, url, guildId string) *http.Request {
+		req, _ := http.NewRequest(method, url+"?id="+guildId, nil)
+		req.AddCookie(&http.Cookie{Name: "JWToken", Value: tokenString})
+		return req
+	}
+
+	test.Run("Successful", func(t *testing.T) {
+		mockService.On("RetrieveDiscordGuildChannels", guildId).Return(expectedChannels, nil)
+
+		req := createRequestWithJWT("GET", "/discord/server/channels", guildId)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(t)
+	})
+}
