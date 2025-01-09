@@ -137,10 +137,56 @@ func TestUpdateUser(test *testing.T) {
 
 		err = repo.UpdateUser("email", "newpassword", "connectiontype")
 
+		err = mock.ExpectationsWereMet()
+		if err == nil {
+			test.Errorf("Expectation fail")
+		}
+	})
+}
+
+func TestDeleteUser(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewUserRepository(db)
+
+	test.Run("Successful", func(test *testing.T) {
+		findSqlStatement := `SELECT \* FROM users WHERE email = \(\$1\) AND connectiontype = \(\$2\)`
+		mockRow := sqlmock.NewRows([]string{"email", "password", "id", "createdat", "timezone", "connectiontype"}).
+			AddRow("email", "password", "id", "createdat", "timezone", "connectiontype")
+
+		mock.ExpectQuery(findSqlStatement).
+			WithArgs("email", "connectiontype").
+			WillReturnRows(mockRow)
+
+		sqlStatement := `DELETE FROM users WHERE email = \(\$1\)`
+		mock.ExpectExec(sqlStatement).
+			WithArgs("email").
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.DeleteUser("email", "connectiontype")
+
 		assert.NoError(test, err)
 
 		err = mock.ExpectationsWereMet()
 		if err != nil {
+			test.Errorf("Expectation fail")
+		}
+	})
+
+	test.Run("User doesn't exist", func(test *testing.T) {
+		sqlStatement := `DELETE FROM users WHERE email = \(\$1\)`
+		mock.ExpectExec(sqlStatement).
+			WithArgs("email").
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.DeleteUser("email", "connectiontype")
+
+		err = mock.ExpectationsWereMet()
+		if err == nil {
 			test.Errorf("Expectation fail")
 		}
 	})
