@@ -2,13 +2,17 @@ package service_handler
 
 import (
 	"backend/src/entities"
+	"backend/src/handler/middleware"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -177,5 +181,80 @@ func TestOAuth2Service(test *testing.T) {
 		require.JSONEq(test, `{"auth-url": "https://localhost:8080/authentication/Github/service/web"}`, w.Body.String())
 
 		mockService.AssertCalled(test, "OAuth2Service", "Github", "service", "web")
+	})
+}
+
+func TestRetrieveActionsFromService(test *testing.T) {
+	secretKey := os.Getenv("SECRET_KEY")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":          "eva.legrand@epitech.eu",
+		"connectionType": "basic",
+		"exp":            time.Now().Add(time.Hour).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(secretKey))
+	require.NoError(test, err)
+
+	router := gin.Default()
+
+	router.Use(middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
+
+	mockService := new(MockServiceService)
+
+	expectedActions := []entities.Action{
+		{Id: "1", Name: "action1"},
+		{Id: "2", Name: "action2"},
+	}
+
+	router.GET("/service/:service/actions", func(context *gin.Context) {
+		self := &ServiceHandler{
+			ServiceService: mockService,
+		}
+		self.retrieveActionsFromService(context)
+	})
+
+	createRequestWithJWT := func(method, url string) *http.Request {
+		req, _ := http.NewRequest(method, url, nil)
+		req.AddCookie(&http.Cookie{Name: "JWToken", Value: tokenString})
+		return req
+	}
+
+	test.Run("Successful", func(test *testing.T) {
+		mockService.On("RetrieveActionsFromService", "Reddit").Return(expectedActions, nil)
+		req := createRequestWithJWT("GET", "/service/Reddit/actions")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Unknown service", func(test *testing.T) {
+		var action []entities.Action
+		mockService.On("RetrieveActionsFromService", "false").Return(action, fmt.Errorf("service error"))
+		req := createRequestWithJWT("GET", "/service/false/actions")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Unknown service"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Invalid or missing JWT token", func(t *testing.T) {
+		mockService.On("RetrieveActionsFromService", "Reddit").Return(expectedActions, nil)
+		req := httptest.NewRequest("GET", "/service/Reddit/actions", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusUnauthorized, w.Code)
+		require.JSONEq(test, `{"error":"No Authentication Token"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
 	})
 }
