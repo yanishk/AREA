@@ -154,3 +154,27 @@ func TestUpdateWorkflow(test *testing.T) {
 		test.Errorf("Expectation fail")
 	}
 }
+
+func TestDeleteWorkflow(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewWorkflowRepository(db)
+
+	sqlStatement := `DELETE FROM workflows WHERE id = \(\$1\) AND ownerid = \(\$2\)`
+	mock.ExpectExec(sqlStatement).
+		WithArgs("123", "owner").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = repo.DeleteWorkflow("123", "owner")
+
+	assert.NoError(test, err)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
