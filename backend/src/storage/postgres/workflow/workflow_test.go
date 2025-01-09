@@ -34,3 +34,42 @@ func TestCreateWorkflow(test *testing.T) {
 		test.Errorf("Expectation fail")
 	}
 }
+
+func TestFindWorkflowById(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewWorkflowRepository(db)
+
+	id := "1234"
+	sqlStatement := `SELECT \* FROM workflows WHERE id = \(\$1\)`
+
+	rows := sqlmock.NewRows([]string{
+		"id", "name", "ownerid", "actionid", "reactionid", "isactivated", "createdat",
+		"actionparam", "reactionparam", "actiondata",
+	}).AddRow(id, "workflow", "owner", "action", "reaction", true, "2025-01-01T00:00:00Z",
+		[]byte(`{"key":"value"}`), []byte(`{"key":"value"}`), []byte(`{"key":"value"}`),
+	)
+
+	mock.ExpectQuery(sqlStatement).
+		WithArgs(id).
+		WillReturnRows(rows)
+
+	workflow, err := repo.FindWorkflowById(id)
+
+	assert.NoError(test, err)
+	assert.Equal(test, id, workflow.Id)
+	assert.Equal(test, "workflow", workflow.Name)
+	assert.Equal(test, "owner", workflow.OwnerId)
+	assert.Equal(test, "action", workflow.ActionId)
+	assert.Equal(test, "reaction", workflow.ReactionId)
+	assert.Equal(test, true, workflow.IsActivated)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
