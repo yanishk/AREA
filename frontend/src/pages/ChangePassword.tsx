@@ -35,7 +35,7 @@ const ChangePasswordPage = () => {
     }, []);
 
     const goHome = () => {
-        navigate("/");
+        navigate("/explore");
     };
 
     const handleSubmit = async () => {
