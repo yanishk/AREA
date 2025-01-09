@@ -2,15 +2,21 @@ package workflow_service
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/mock"
 )
 
-func TestconcatanateSlashToPath(t *testing.T) {
+type MockUserRepository struct {
+	mock.Mock
+}
+
+func TestConcatanateSlashToPath(t *testing.T) {
 	name := "test.go"
 	filepath := "path"
-	want := "/" + filepath + "/" + name
+	expected := "/" + filepath + "/" + name
 
-	answer := concatanateSlashToPath(filepath, name)
-	if answer != want {
-		t.Fatalf(`concatanateSlashToPath("path", "test.go") = %s, want match for %s, nil`, answer, want)
+	res := concatanateSlashToPath(filepath, name)
+	if res != expected {
+		t.Fatalf(`Got : %s but Expected -> %s`, res, expected)
 	}
 }
