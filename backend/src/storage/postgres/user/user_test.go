@@ -16,19 +16,43 @@ func TestCreateUserService(test *testing.T) {
 
 	repo := NewUserRepository(db)
 
-	sqlStatement := `INSERT INTO users \(email, password, connectiontype\) VALUES \(\$1, \$2, \$3\)`
-	mock.ExpectExec(sqlStatement).
-		WithArgs("email", "password", "connectiontype").
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	test.Run("Successful", func(test *testing.T) {
+		sqlStatement := `INSERT INTO users \(email, password, connectiontype\) VALUES \(\$1, \$2, \$3\)`
+		mock.ExpectExec(sqlStatement).
+			WithArgs("email", "password", "connectiontype").
+			WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = repo.CreateUser("email", "password", "connectiontype")
+		err = repo.CreateUser("email", "password", "connectiontype")
 
-	assert.NoError(test, err)
+		assert.NoError(test, err)
 
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		test.Errorf("Expectation fail")
-	}
+		err = mock.ExpectationsWereMet()
+		if err != nil {
+			test.Errorf("Expectation fail")
+		}
+	})
+
+	test.Run("User already exist", func(test *testing.T) {
+		findSqlStatement := `SELECT \* FROM users WHERE email = \(\$1\) AND connectiontype = \(\$2\)`
+		mockRow := sqlmock.NewRows([]string{"email", "password", "id", "createdat", "timezone", "connectiontype"}).
+			AddRow("email", "password", "id", "createdat", "timezone", "connectiontype")
+
+		mock.ExpectQuery(findSqlStatement).
+			WithArgs("email", "connectiontype").
+			WillReturnRows(mockRow)
+
+		sqlStatement := `DELETE FROM users WHERE email = \(\$1\)`
+		mock.ExpectExec(sqlStatement).
+			WithArgs("email").
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		err = repo.CreateUser("email", "password", "connectiontype")
+
+		err = mock.ExpectationsWereMet()
+		if err == nil {
+			test.Errorf("Expectation fail")
+		}
+	})
 }
 
 func TestFindUserByEmail(test *testing.T) {
