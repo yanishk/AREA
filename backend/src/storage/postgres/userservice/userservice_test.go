@@ -30,3 +30,36 @@ func TestCreateUserService(test *testing.T) {
 		test.Errorf("Expectation fail")
 	}
 }
+
+func TestFindUserServiceByServiceIdandUserId(test *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		test.Fatalf("Mock DB fail")
+	}
+	defer db.Close()
+
+	repo := NewUserServiceRepository(db)
+
+	sqlStatement := `SELECT \* FROM userservices WHERE userid = \(\$1\) AND serviceid = \(\$2\)`
+	mockRow := sqlmock.NewRows([]string{"id", "userid", "accesstoken", "refreshtoken", "expirydate", "serviceid"}).
+		AddRow("id", "userid", "accesstoken", "refreshtoken", "expirydate", "serviceid")
+
+	mock.ExpectQuery(sqlStatement).
+		WithArgs("userid", "serviceid").
+		WillReturnRows(mockRow)
+
+	userService, err := repo.FindUserServiceByServiceIdandUserId("userid", "serviceid")
+
+	assert.NoError(test, err)
+	assert.Equal(test, "id", userService.Id)
+	assert.Equal(test, "userid", userService.UserId)
+	assert.Equal(test, "accesstoken", userService.AccessToken)
+	assert.Equal(test, "refreshtoken", userService.RefreshToken)
+	assert.Equal(test, "expirydate", userService.ExpiryDate)
+	assert.Equal(test, "serviceid", userService.ServiceId)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
