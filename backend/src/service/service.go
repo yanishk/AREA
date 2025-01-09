@@ -24,6 +24,7 @@ type ServiceService interface {
 	FindServiceById(id string) (entities.Service, error)
 	FindServiceByActionId(id string) (entities.Service, error)
 	FindServiceByReactionId(id string) (entities.Service, error)
+	FindAllServices() ([]entities.Service, error)
 	RetrieveActionsFromService(serviceName string) ([]entities.Action, error)
 	RetrieveReactionsFromService(serviceName string) ([]entities.Reaction, error)
 	GetGoogleRefreshTokenRequest(refreshToken string) (*http.Request, error)
@@ -40,6 +41,7 @@ type ServiceService interface {
 	RequestToTimeApi() (entities.TimeResponse, error)
 	OAuth2Service(serviceName, callbackType, appType string) (string, error)
 	RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error)
+	RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error)
 	RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error)
 }
 
@@ -47,6 +49,7 @@ type UserServiceService interface {
 	CallApiAndRefresh(email, connectionType, serviceName string) (string, error)
 	UpdateTokenForService(code, serviceName, appType, email string, connectionType string) error
 	RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error)
+	RetrieveGitlabUserProjects(email, connectionType string) ([]entities.GitlabProject, error)
 	RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error)
 	RetrieveAsanaUserWorkspaces(email, connectionType string) (entities.AsanaWorkspacesInfo, error)
 	RetrieveAsanaWorkspaceAssignees(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error)
@@ -64,6 +67,7 @@ type WorkflowService interface {
 	CheckRedditActions() error
 	CheckWeatherActions() error
 	CheckNewGitlabWorkflows() error
+	CheckNewGithubWorkflows() error
 	CheckWebhooksWorkflows(serviceName string, request *http.Request) error
 }
 

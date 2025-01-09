@@ -15,7 +15,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/Asana/user/workspaces": {
+        "/about.json": {
+            "get": {
+                "description": "Get about.json file",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "About.json"
+                ],
+                "summary": "About.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/asana/user/workspaces": {
             "get": {
                 "description": "Retrieve the workspaces from the authenticated user",
                 "produces": [
@@ -41,7 +67,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Asana/workspace/assignees": {
+        "/asana/workspace/assignees": {
             "get": {
                 "description": "Retrieve the assignees from the selected workspace",
                 "produces": [
@@ -76,7 +102,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Asana/workspace/projects": {
+        "/asana/workspace/projects": {
             "get": {
                 "description": "Retrieve the projects from the selected workspace",
                 "produces": [
@@ -111,7 +137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Asana/workspace/tags": {
+        "/asana/workspace/tags": {
             "get": {
                 "description": "Retrieve the tags from the selected workspace",
                 "produces": [
@@ -146,7 +172,56 @@ const docTemplate = `{
                 }
             }
         },
-        "/Discord/server/channels": {
+        "/authentication": {
+            "get": {
+                "description": "Get Service OAuth2 URL",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Service OAuth2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Callback type (login or service)",
+                        "name": "callbacktype",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "App type (web or mobile)",
+                        "name": "apptype",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
                 "produces": [
@@ -181,7 +256,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Discord/user/servers": {
+        "/discord/user/servers": {
             "get": {
                 "description": "Retrieve the discord servers from the authenticated user",
                 "produces": [
@@ -207,7 +282,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/Github/user/repositories": {
+        "/github/user/repositories": {
             "get": {
                 "description": "Retrieve the repositories of the authenticated user",
                 "produces": [
@@ -233,76 +308,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/about.json": {
+        "/gitlab/user/projects": {
             "get": {
-                "description": "Get about.json file",
+                "description": "Retrieve the projects of the authenticated user",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "About.json"
+                    "Gitlab"
                 ],
-                "summary": "About.json",
+                "summary": "Retrieve User Projects",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_about.AboutGetAboutSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/docs_about.AboutGetAboutInternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/authentication/{service}/{callback-type}/{app-type}": {
-            "get": {
-                "description": "Get Service OAuth2 URL",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Service OAuth2",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Service name (Github, Spotify, Discord..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Callback type (login or service)",
-                        "name": "callback-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_service.ServiceOAuth2BadRequestResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse"
                         }
                     }
                 }
@@ -360,7 +386,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login-callback/{service}/{app-type}": {
+        "/login-callback": {
             "post": {
                 "description": "Callback for login",
                 "produces": [
@@ -373,24 +399,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "Callback informations",
+                        "name": "callback-informations",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.CallbackInformations"
+                        }
                     }
                 ],
                 "responses": {
@@ -410,6 +431,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserLoginCallbackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "description": "User logout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_user.UserLogoutUserInternalServerErrorResponse"
                         }
                     }
                 }
@@ -467,7 +514,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/service-callback/{service}/{app-type}": {
+        "/service-callback": {
             "post": {
                 "description": "Callback for services",
                 "produces": [
@@ -480,24 +527,19 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service name (Google, Spotify..)",
-                        "name": "service",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "App type (web or mobile)",
-                        "name": "app-type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "Authorization code given by the service",
                         "name": "code",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "Callback informations",
+                        "name": "callback-informations",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.CallbackInformations"
+                        }
                     }
                 ],
                 "responses": {
@@ -517,6 +559,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/services": {
+            "get": {
+                "description": "Retrieve services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Services"
+                ],
+                "summary": "Retrieve Services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceRetrieveAllServicesSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/docs_service.ServiceInternalServerErrorResponse"
                         }
                     }
                 }
@@ -1184,15 +1252,6 @@ const docTemplate = `{
                 }
             }
         },
-        "docs_service.ServiceReceiveServiceWeebhookSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "Webhook received"
-                }
-            }
-        },
         "docs_service.ServiceRetrieveActionsFromServiceBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1214,6 +1273,17 @@ const docTemplate = `{
             }
         },
         "docs_service.ServiceRetrieveActionsReactionsServicesSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Service"
+                    }
+                }
+            }
+        },
+        "docs_service.ServiceRetrieveAllServicesSuccessResponse": {
             "type": "object",
             "properties": {
                 "services": {
@@ -1293,7 +1363,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Internal server error"
+                    "example": "Could not find user"
                 }
             }
         },
@@ -1354,7 +1424,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization"
+                    "example": "Invalid request body-Invalid code authorization"
                 }
             }
         },
@@ -1400,6 +1470,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Could not find requested user-Wrong password"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find user"
+                }
+            }
+        },
+        "docs_user.UserLogoutUserSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Logout successful"
                 }
             }
         },
@@ -1612,12 +1700,32 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not retrieve the user's projects"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.GitlabProject"
+                    }
+                }
+            }
+        },
         "docs_userservice.UserServiceServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Invalid code authorization-Invalid app type"
+                    "example": "Invalid request body-Invalid code authorization-Invalid app type"
                 }
             }
         },
@@ -1699,6 +1807,24 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Email not found in token-Email is not a valid string-Connection type not found in token-Connection type is not a valid string"
+                }
+            }
+        },
+        "docs_workflow.WorkflowReceiveServiceWebhookBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "docs_workflow.WorkflowReceiveServiceWebhookSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "Webhook received"
                 }
             }
         },
@@ -1879,10 +2005,32 @@ const docTemplate = `{
                 }
             }
         },
+        "entities.CallbackInformations": {
+            "type": "object",
+            "properties": {
+                "apptype": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                }
+            }
+        },
         "entities.GithubRepository": {
             "type": "object",
             "properties": {
                 "full_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.GitlabProject": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }

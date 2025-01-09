@@ -9,7 +9,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 class AuthFunctions {
   static Future<String> getAuthLink(String callBackType, String service) async {
     String authLink = "";
-    Response response = await ApiRequest.get("authentication/$service/$callBackType/${Globaldata.appType}");
+    Response response = await ApiRequest.get("authentication?service=$service&callbacktype=$callBackType&apptype=${Globaldata.appType}");
     if (response.statusCode == 504) {
       developer.log('${response.body}');
       return authLink;
@@ -40,9 +40,9 @@ class AuthFunctions {
     );
   }
 
-  static String insertAppTypeInUrl(String url) {
-    final splitUrl = url.split("?code=");
-    String finalUrl = "${splitUrl.first}/${Globaldata.appType}?code=${splitUrl.last}";
+  static String removeServiceFromUrl(String url, String serviceName) {
+    final splitUrl = url.split("/$serviceName");
+    String finalUrl = "${splitUrl.first}${splitUrl.last}";
     return finalUrl;
   }
 }

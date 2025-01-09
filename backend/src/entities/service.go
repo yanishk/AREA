@@ -21,6 +21,11 @@ type UserInfo struct {
 	Email string `json:"email"`
 }
 
+type CallbackInformations struct {
+	Service string `json:"service"`
+	AppType string `json:"apptype"`
+}
+
 // Time & Date
 type TimeResponse struct {
 	Timezone  string `json:"timezone"`
@@ -90,6 +95,22 @@ type WeatherResponse struct {
 }
 
 // Github
+type GithubWebhookTriggeredResponse struct {
+	Repository struct {
+		Name string `json:"full_name"`
+	} `json:"repository"`
+}
+
+type GithubWebhookResponse struct {
+	Name   string `json:"name"`
+	Active bool   `json:"active"`
+	Config struct {
+		Url         string `json:"url"`
+		ContentType string `json:"content_type"`
+	} `json:"config"`
+	Events []string `json:"events"`
+}
+
 type GithubRepository struct {
 	Name string `json:"full_name"`
 }
@@ -111,10 +132,19 @@ type GithubIssue struct {
 }
 
 // Gitlab
-type GitlabWebhookResponse struct {
+type GitlabWebhookTriggeredResponse struct {
 	Project struct {
 		Id int `json:"id"`
 	} `json:"project"`
+}
+
+type GitlabUser struct {
+	Username string `json:"username"`
+}
+
+type GitlabProject struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // Linkedin

@@ -3,7 +3,7 @@ import axios from "axios";
 export const handleOAuthLogin = async (serviceName: string) => {
     try {
         const result = await axios.get(
-            `${import.meta.env.VITE_API_URL}authentication/${serviceName}/login/web`,
+            `${import.meta.env.VITE_API_URL}authentication?service=${serviceName}&callbacktype=login&apptype=web`,
             {
                 withCredentials: true,
             }
@@ -15,10 +15,8 @@ export const handleOAuthLogin = async (serviceName: string) => {
             return;
         }
 
-        const state = JSON.stringify({ service: serviceName });
-        const authUrlWithService = `${authUrl}&state=${encodeURIComponent(state)}`;
-
-        window.location.href = authUrlWithService;
+        sessionStorage.setItem("oauth2-login", serviceName)
+        window.location.href = authUrl;
     } catch (error) {
         console.error(`Error during ${serviceName} authentication:`, error);
     }
