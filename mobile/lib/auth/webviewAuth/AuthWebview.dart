@@ -9,7 +9,7 @@ import "package:namer_app/auth/authFunctions.dart";
 import "../../apiCall/apiErrorHandling.dart";
 import "../../globalData.dart";
 import "../../login/loginNavigator.dart";
-import "../../login/loadServicesList.dart";
+import "../../login/loadData/loadServicesData.dart";
 import "../../apiCall/apiData.dart";
 import "../authData.dart";
 
