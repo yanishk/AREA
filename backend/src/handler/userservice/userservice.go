@@ -5,7 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"backend/src/entities"
 	"backend/src/handler/middleware"
+	_ "backend/src/handler/service/docs"
 	_ "backend/src/handler/userservice/docs"
 	"backend/src/service"
 )
@@ -26,10 +28,11 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
-	private.POST("/service-callback/:service/:app-type", self.serviceCallback)
-	private.GET("/Github/user/repositories", self.getGithubUserRepositories)
-	private.GET("/Discord/user/servers", self.getDiscordUserServers)
-	asana := private.Group("/Asana")
+	private.POST("/service-callback", self.serviceCallback)
+	private.GET("/github/user/repositories", self.getGithubUserRepositories)
+	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
+	private.GET("/discord/user/servers", self.getDiscordUserServers)
+	asana := private.Group("/asana")
 	{
 		asana.GET("/user/workspaces", self.getAsanaUserWorkspaces)
 		asana.GET("/workspace/assignees", self.getAsanaWorkspaceAssignees)
@@ -42,19 +45,25 @@ func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 // @Description  Callback for services
 // @Tags         Callbacks
 // @Produce      json
-// @Param        service  path      string  true  "Service name (Google, Spotify..)"
-// @Param        app-type     path     string  true  "App type (web or mobile)"
 // @Param        code     query     string  true  "Authorization code given by the service"
+// @Param		callback-informations	body		entities.CallbackInformations true	"Callback informations"
 // @Failure		200		{object}	docs_userservice.UserServiceServiceCallbackSuccessResponse
 // @Failure		400		{object}	docs_userservice.UserServiceServiceCallbackBadRequestResponse
 // @Failure		500		{object}	docs_userservice.UserServiceServiceCallbackInternalServerErrorResponse
-// @Router       /service-callback/{service}/{app-type} [post]
+// @Router       /service-callback [post]
 func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
-	appType := context.Param("app-type")
-	serviceName := context.Param("service")
+	var callbackInformations entities.CallbackInformations
 	code := context.Query("code")
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
+
+	errorBody := context.ShouldBindJSON(&callbackInformations)
+	if errorBody != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request body",
+		})
+		return
+	}
 
 	if code == "" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -63,14 +72,14 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 		return
 	}
 
-	if appType != "web" && appType != "mobile" {
+	if callbackInformations.AppType != "web" && callbackInformations.AppType != "mobile" {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid app type",
 		})
 		return
 	}
 
-	errUpdate := self.UserServiceService.UpdateTokenForService(code, serviceName, appType, email, connectionType)
+	errUpdate := self.UserServiceService.UpdateTokenForService(code, callbackInformations.Service, callbackInformations.AppType, email, connectionType)
 	if errUpdate != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to update token",
@@ -89,7 +98,7 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 // @Produce      json
 // @Failure		200		{object}	docs_userservice.UserServiceGetGithubUserRepositoriesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetGithubUserRepositoriesInternalServerErrorResponse
-// @Router       /Github/user/repositories [get]
+// @Router       /github/user/repositories [get]
 func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -107,13 +116,37 @@ func (self *UserServiceHandler) getGithubUserRepositories(context *gin.Context) 
 	})
 }
 
+// @Summary      Retrieve User Projects
+// @Description  Retrieve the projects of the authenticated user
+// @Tags         Gitlab
+// @Produce      json
+// @Failure		200		{object}	docs_userservice.UserServiceGetGitlabUserProjectsSuccessResponse
+// @Failure		500		{object}	docs_userservice.UserServiceGetGitlabUserProjectsInternalServerErrorResponse
+// @Router       /gitlab/user/projects [get]
+func (self *UserServiceHandler) getGitlabUserProjects(context *gin.Context) {
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	projects, err := self.UserServiceService.RetrieveGitlabUserProjects(email, connectionType)
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not retrieve the user's projects",
+		})
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"projects": projects,
+	})
+}
+
 // @Summary		Retrieve Discord User Servers
 // @Description	Retrieve the discord servers from the authenticated user
 // @Tags			Discord
 // @Produce		json
 // @Success		200		{object}	docs_userservice.UserServiceGetDiscordUserServersSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetDiscordUserServersInternalServerErrorResponse
-// @Router			/Discord/user/servers [get]
+// @Router			/discord/user/servers [get]
 func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -137,7 +170,7 @@ func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 // @Produce		json
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaUserWorkspacesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaUserWorkspacesInternalServerErrorResponse
-// @Router /Asana/user/workspaces [get]
+// @Router /asana/user/workspaces [get]
 func (self *UserServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -162,7 +195,7 @@ func (self *UserServiceHandler) getAsanaUserWorkspaces(context *gin.Context) {
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceAssigneesSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceAssigneesInternalServerErrorResponse
-// @Router /Asana/workspace/assignees [get]
+// @Router /asana/workspace/assignees [get]
 func (self *UserServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -188,7 +221,7 @@ func (self *UserServiceHandler) getAsanaWorkspaceAssignees(context *gin.Context)
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceProjectsSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceProjectsInternalServerErrorResponse
-// @Router /Asana/workspace/projects [get]
+// @Router /asana/workspace/projects [get]
 func (self *UserServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
@@ -214,7 +247,7 @@ func (self *UserServiceHandler) getAsanaWorkspaceProjects(context *gin.Context) 
 // @Param        id  query      string  true  "workspace id"
 // @Success		200		{object}	docs_userservice.UserServiceGetAsanaWorkspaceTagsSuccessResponse
 // @Failure		500		{object}	docs_userservice.UserServiceGetAsanaWorkspaceTagsInternalServerErrorResponse
-// @Router /Asana/workspace/tags [get]
+// @Router /asana/workspace/tags [get]
 func (self *UserServiceHandler) getAsanaWorkspaceTags(context *gin.Context) {
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")

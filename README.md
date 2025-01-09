@@ -13,7 +13,7 @@ AREA is an application development project designed to replicate the functionali
 
 ## Project Description
 
-AREA's sole purpose is to make your life easier by automating tasks that can be troublesome or easily forgotten. For example, if you need to send a weekly email to your colleague to remind them to clean their desk, AREA can handle this task automatically.
+AREA's sole purpose is to make your life easier by automating tasks that can be troublesome or easily forgotten. For example, if you need to send yourself a weekly email to remind you to clean your desk, AREA can handle this task automatically.
 
 
 > [!NOTE]
@@ -33,6 +33,10 @@ sudo docker-compose up
 
 > [!NOTE]
 > If not working, make sure that your docker is running and that no other container is running on the port 8080 or 8081
+
+## Documentation
+
+- Implement a new service, action, reaction -> [`Developer Documentation`](backend/README.md)
 
 ## Authors
 

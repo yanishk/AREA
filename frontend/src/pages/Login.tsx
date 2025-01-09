@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faSpotify, faDiscord, faGithub} from '@fortawesome/free-brands-svg-icons';
+import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import axios from "axios";
@@ -104,14 +104,6 @@ const LoginForm = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
 
-                        <div
-                            className="flex justify-center mt-[2px]">
-                            <CallToActionLink
-                                href="/"
-                                underlinedText="Forgot your password?"
-                            />
-                        </div>
-
                         <ButtonValidation onClick={sendFormOnClick} text="Log in" />
                     </div>
 
@@ -125,21 +117,10 @@ const LoginForm = () => {
                     </div>
 
                     <SocialButton
-                        icon={faGoogle}
-                        bgColor="bg-[#E84A4A]"
-                        hoverColor="hover:bg-[#F55B5B]"
-                        text="Continue with Google"
-                        iconSize="size-10"
-                        iconPosition="left-[20px]"
-                        onClick={() => handleOAuthLogin("Google")}
-                    />
-                    <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
                         text="Continue with Spotify"
-                        iconSize="size-11"
-                        iconPosition="left-[19px]"
                         onClick={() => handleOAuthLogin("Spotify")}
                     />
                     <SocialButton
@@ -147,8 +128,6 @@ const LoginForm = () => {
                         bgColor="bg-[#7189DA]"
                         hoverColor="hover:bg-[#7a90da]"
                         text="Continue with Discord"
-                        iconPosition="left-[20px]"
-                        iconSize="size-11"
                         onClick={() => handleOAuthLogin("Discord")}
                     />
                     <SocialButton
@@ -156,11 +135,16 @@ const LoginForm = () => {
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
                         text="Continue with Github"
-                        iconPosition="left-[20px]"
-                        iconSize="size-11"
                         onClick={() => handleOAuthLogin("Github")}
                     />
-
+                    <SocialButton
+                        icon={faGitlab}
+                        bgColor="bg-[#FC6D27]"
+                        hoverColor="hover:bg-[#FD7A38]"
+                        text="Continue with Gitlab"
+                        iconSize="size-10"
+                        onClick={() => handleOAuthLogin("Gitlab")}
+                    />
                     <div
                         className="flex justify-center mt-8">
                         <CallToActionLink
