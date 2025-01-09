@@ -73,7 +73,7 @@ const WorkflowBuilder = () => {
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
-            navigate("/")
+            navigate("/explore")
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -502,7 +502,7 @@ const WorkflowBuilder = () => {
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/");
+        navigate("/explore");
     };
 
     const renderStep = () => {

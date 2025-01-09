@@ -6,7 +6,7 @@ function NonExistantRoute() {
 
     return (
         <Navigate
-            to="/"
+            to="/explore"
             state={{ error, errorTrigger }}
         />
     )
