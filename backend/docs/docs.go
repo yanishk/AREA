@@ -1665,7 +1665,7 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string",
-                    "example": "Could not retrieve the user's servers"
+                    "example": "Could not retrieve the user's repositories"
                 }
             }
         },
