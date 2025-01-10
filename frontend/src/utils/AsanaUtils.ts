@@ -22,10 +22,6 @@ const setDefaultWorkspace = (workspaces: Workspace[]) => {
 };
 
 export const getAsanaWorkspaces = async (): Promise<Workspace[]> => {
-    if (Workspaces.length > 0) {
-        return Workspaces;
-    }
-
     try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}asana/user/workspaces`, {
             withCredentials: true,
