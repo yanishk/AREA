@@ -297,7 +297,7 @@ const WorkflowBuilder = () => {
     const handleConnectService = async (selectedService: any) => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
+                `${import.meta.env.VITE_API_URL}authentication?service=${selectedService.name}&callbacktype=service&apptype=web`,
                 {
                     withCredentials: true,
                 }
@@ -369,9 +369,14 @@ const WorkflowBuilder = () => {
                 serviceType === "action" ? selectedActionService?.name : selectedReactionService?.name;
 
             await axios.post(
-                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
-                {},
-                { withCredentials: true }
+                `${import.meta.env.VITE_API_URL}service-callback/?code=${codeAuth}`,
+                {
+                    service: serviceName,
+                    apptype: "web"
+                },
+                {
+                    withCredentials: true
+                }
             );
         } catch (error) {
             console.error("Error with service callback:", error);

@@ -54,8 +54,8 @@ func (self *WorkflowHandler) privateRoutes(router *gin.Engine) {
 // // @Description	Receive webhook from a service
 // // @Tags			Webhooks
 // // @Produce		json
-// @Success		200		{object}	docs_service.WorkflowReceiveServiceWeebhookSuccessResponse
-// @Success		400		{object}	docs_service.WorkflowReceiveServiceWeebhookBadRequestResponse
+// @Success		200		{object}	docs_workflow.WorkflowReceiveServiceWebhookSuccessResponse
+// @Success		400		{object}	docs_workflow.WorkflowReceiveServiceWebhookBadRequestResponse
 // // @Router		/webhooks/{service} [post]
 func (self *WorkflowHandler) receiveServiceWebhook(context *gin.Context) {
 	serviceName := context.Param("service")

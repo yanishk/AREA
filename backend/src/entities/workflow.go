@@ -30,7 +30,3 @@ type UpdatedWorkflow struct {
 	ActionParam   *map[string]interface{} `json:"actionparam"`
 	ReactionParam *map[string]interface{} `json:"reactionparam"`
 }
-
-type ChangeActivationWorkflow struct {
-	WorkflowId string `json:"id"`
-}
