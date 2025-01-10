@@ -54,7 +54,7 @@ const AccountPage = () => {
     };
 
     const goHome = () => {
-        navigate("/");
+        navigate("/explore");
     };
 
     const handleShowModal = () => {

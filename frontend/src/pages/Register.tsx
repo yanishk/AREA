@@ -69,7 +69,7 @@ const RegisterForm = () => {
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
                     <a
-                        href="/"
+                        href="/explore"
                     >
                         AREA
                     </a>
