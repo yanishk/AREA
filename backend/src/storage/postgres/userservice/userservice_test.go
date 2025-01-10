@@ -1,27 +1,32 @@
 package userservice_repository
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUserService(test *testing.T) {
+func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *UserServiceRepository) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		test.Fatalf("Mock DB fail")
 	}
-	defer db.Close()
-
 	repo := NewUserServiceRepository(db)
+	return db, mock, repo
+}
+
+func TestCreateUserService(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
 
 	sqlStatement := `INSERT INTO userservices \(userid, token, tokenrefresh, expiry, serviceid\) VALUES \(\$1, \$2, \$3, \$4, \$5\)`
 	mock.ExpectExec(sqlStatement).
 		WithArgs("userid", "token", "tokenrefresh", "expiry", "serviceid").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = repo.CreateUserService("userid", "token", "tokenrefresh", "expiry", "serviceid")
+	err := repo.CreateUserService("userid", "token", "tokenrefresh", "expiry", "serviceid")
 
 	assert.NoError(test, err)
 
@@ -32,13 +37,8 @@ func TestCreateUserService(test *testing.T) {
 }
 
 func TestFindUserServiceByServiceIdandUserId(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserServiceRepository(db)
 
 	sqlStatement := `SELECT \* FROM userservices WHERE userid = \(\$1\) AND serviceid = \(\$2\)`
 	mockRow := sqlmock.NewRows([]string{"id", "userid", "accesstoken", "refreshtoken", "expirydate", "serviceid"}).
@@ -65,13 +65,8 @@ func TestFindUserServiceByServiceIdandUserId(test *testing.T) {
 }
 
 func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserServiceRepository(db)
 
 	test.Run("Successful", func(test *testing.T) {
 		findSqlStatement := `SELECT \* FROM userservices WHERE userid = \(\$1\) AND serviceid = \(\$2\)`
@@ -87,7 +82,7 @@ func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
 			WithArgs("token", "tokenrefresh", "expiry", "userid", "serviceid").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
+		err := repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
 
 		assert.NoError(test, err)
 
@@ -103,7 +98,7 @@ func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
 			WithArgs("token", "tokenrefresh", "expiry", "userid", "serviceid").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
+		err := repo.UpdateUserServiceByServiceIdAndUserId("userid", "token", "tokenrefresh", "expiry", "serviceid")
 
 		err = mock.ExpectationsWereMet()
 		if err == nil {
@@ -113,20 +108,15 @@ func TestUpdateUserServiceByServiceIdAndUserId(test *testing.T) {
 }
 
 func TestDeleteUserServiceByUserId(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserServiceRepository(db)
 
 	sqlStatement := `DELETE FROM userservices WHERE userid = \(\$1\)`
 	mock.ExpectExec(sqlStatement).
 		WithArgs("userid").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = repo.DeleteUserServiceByUserId("userid")
+	err := repo.DeleteUserServiceByUserId("userid")
 
 	assert.NoError(test, err)
 

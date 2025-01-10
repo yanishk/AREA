@@ -1,20 +1,35 @@
 package user_repository
 
 import (
+	"backend/src/entities"
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUser(test *testing.T) {
+func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *UserRepository) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		test.Fatalf("Mock DB fail")
 	}
-	defer db.Close()
-
 	repo := NewUserRepository(db)
+	return db, mock, repo
+}
+
+func assertUser(test *testing.T, user entities.User, email, connectionType, id, createdAt, timezone, password string) {
+	assert.Equal(test, email, user.Email)
+	assert.Equal(test, connectionType, user.ConnectionType)
+	assert.Equal(test, id, user.Id)
+	assert.Equal(test, createdAt, user.CreatedAt)
+	assert.Equal(test, timezone, user.Timezone)
+	assert.Equal(test, password, user.Password)
+}
+
+func TestCreateUser(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
 
 	test.Run("Successful", func(test *testing.T) {
 		sqlStatement := `INSERT INTO users \(email, password, connectiontype\) VALUES \(\$1, \$2, \$3\)`
@@ -22,7 +37,7 @@ func TestCreateUser(test *testing.T) {
 			WithArgs("email", "password", "connectiontype").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.CreateUser("email", "password", "connectiontype")
+		err := repo.CreateUser("email", "password", "connectiontype")
 
 		assert.NoError(test, err)
 
@@ -46,7 +61,7 @@ func TestCreateUser(test *testing.T) {
 			WithArgs("email").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.CreateUser("email", "password", "connectiontype")
+		err := repo.CreateUser("email", "password", "connectiontype")
 
 		err = mock.ExpectationsWereMet()
 		if err == nil {
@@ -56,13 +71,8 @@ func TestCreateUser(test *testing.T) {
 }
 
 func TestFindUserByEmail(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserRepository(db)
 
 	sqlStatement := `SELECT \* FROM users WHERE email = \(\$1\) AND connectiontype = \(\$2\)`
 	mockRow := sqlmock.NewRows([]string{"email", "password", "id", "createdat", "timezone", "connectiontype"}).
@@ -75,12 +85,7 @@ func TestFindUserByEmail(test *testing.T) {
 	user, err := repo.FindUserByEmail("email", "connectiontype")
 
 	assert.NoError(test, err)
-	assert.Equal(test, "email", user.Email)
-	assert.Equal(test, "connectiontype", user.ConnectionType)
-	assert.Equal(test, "id", user.Id)
-	assert.Equal(test, "createdat", user.CreatedAt)
-	assert.Equal(test, "timezone", user.Timezone)
-	assert.Equal(test, "connectiontype", user.ConnectionType)
+	assertUser(test, user, "email", "connectiontype", "id", "createdat", "timezone", "password")
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -89,13 +94,8 @@ func TestFindUserByEmail(test *testing.T) {
 }
 
 func TestFindUserById(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserRepository(db)
 
 	sqlStatement := `SELECT \* FROM users WHERE id = \(\$1\)`
 	mockRow := sqlmock.NewRows([]string{"email", "password", "id", "createdat", "timezone", "connectiontype"}).
@@ -108,11 +108,7 @@ func TestFindUserById(test *testing.T) {
 	user, err := repo.FindUserById("id")
 
 	assert.NoError(test, err)
-	assert.Equal(test, "email", user.Email)
-	assert.Equal(test, "connectiontype", user.ConnectionType)
-	assert.Equal(test, "id", user.Id)
-	assert.Equal(test, "createdat", user.CreatedAt)
-	assert.Equal(test, "timezone", user.Timezone)
+	assertUser(test, user, "email", "connectiontype", "id", "createdat", "timezone", "password")
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -121,13 +117,8 @@ func TestFindUserById(test *testing.T) {
 }
 
 func TestUpdateUser(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserRepository(db)
 
 	test.Run("Successful", func(test *testing.T) {
 		findSqlStatement := `SELECT \* FROM users WHERE email = \(\$1\) AND connectiontype = \(\$2\)`
@@ -143,7 +134,7 @@ func TestUpdateUser(test *testing.T) {
 			WithArgs("newpassword", "email").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.UpdateUser("email", "newpassword", "connectiontype")
+		err := repo.UpdateUser("email", "newpassword", "connectiontype")
 
 		assert.NoError(test, err)
 
@@ -159,7 +150,7 @@ func TestUpdateUser(test *testing.T) {
 			WithArgs("newpassword", "email").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.UpdateUser("email", "newpassword", "connectiontype")
+		err := repo.UpdateUser("email", "newpassword", "connectiontype")
 
 		err = mock.ExpectationsWereMet()
 		if err == nil {
@@ -169,13 +160,8 @@ func TestUpdateUser(test *testing.T) {
 }
 
 func TestDeleteUser(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewUserRepository(db)
 
 	test.Run("Successful", func(test *testing.T) {
 		findSqlStatement := `SELECT \* FROM users WHERE email = \(\$1\) AND connectiontype = \(\$2\)`
@@ -191,7 +177,7 @@ func TestDeleteUser(test *testing.T) {
 			WithArgs("email").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.DeleteUser("email", "connectiontype")
+		err := repo.DeleteUser("email", "connectiontype")
 
 		assert.NoError(test, err)
 
@@ -207,7 +193,7 @@ func TestDeleteUser(test *testing.T) {
 			WithArgs("email").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.DeleteUser("email", "connectiontype")
+		err := repo.DeleteUser("email", "connectiontype")
 
 		err = mock.ExpectationsWereMet()
 		if err == nil {

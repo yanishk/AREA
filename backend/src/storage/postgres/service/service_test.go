@@ -2,20 +2,35 @@ package service_repository
 
 import (
 	"backend/src/entities"
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateService(test *testing.T) {
+func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *ServiceRepository) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		test.Fatalf("Mock DB fail")
 	}
-	defer db.Close()
-
 	repo := NewServiceRepository(db)
+	return db, mock, repo
+}
+
+func assertService(test *testing.T, service entities.Service, id, name, color, logo string, hasActions, hasReactions, isAuthNeeded bool) {
+	assert.Equal(test, id, service.Id)
+	assert.Equal(test, name, service.Name)
+	assert.Equal(test, color, service.Color)
+	assert.Equal(test, logo, service.Logo)
+	assert.Equal(test, hasActions, service.HasActions)
+	assert.Equal(test, hasReactions, service.HasReactions)
+	assert.Equal(test, isAuthNeeded, service.IsAuthNeeded)
+}
+
+func TestCreateService(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
 
 	test.Run("Successful", func(test *testing.T) {
 		sqlStatement := `INSERT INTO services \(name, color, logo\) VALUES \(\$1, \$2, \$3\)`
@@ -23,7 +38,7 @@ func TestCreateService(test *testing.T) {
 			WithArgs("name", "color", "logo").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.CreateService("name", "color", "logo")
+		err := repo.CreateService("name", "color", "logo")
 
 		assert.NoError(test, err)
 
@@ -47,7 +62,7 @@ func TestCreateService(test *testing.T) {
 			WithArgs("name", "color", "logo").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err = repo.CreateService("name", "color", "logo")
+		err := repo.CreateService("name", "color", "logo")
 
 		err = mock.ExpectationsWereMet()
 		if err == nil {
@@ -56,24 +71,9 @@ func TestCreateService(test *testing.T) {
 	})
 }
 
-func assertService(test *testing.T, service entities.Service, id, name, color, logo string, hasActions, hasReactions, isAuthNeeded bool) {
-	assert.Equal(test, id, service.Id)
-	assert.Equal(test, name, service.Name)
-	assert.Equal(test, color, service.Color)
-	assert.Equal(test, logo, service.Logo)
-	assert.Equal(test, hasActions, service.HasActions)
-	assert.Equal(test, hasReactions, service.HasReactions)
-	assert.Equal(test, isAuthNeeded, service.IsAuthNeeded)
-}
-
 func TestFindServiceById(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewServiceRepository(db)
 
 	test.Run("Successful", func(test *testing.T) {
 

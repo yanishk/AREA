@@ -2,20 +2,34 @@ package workflow_repository
 
 import (
 	"backend/src/entities"
+	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateWorkflow(test *testing.T) {
+func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *WorkflowRepository) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		test.Fatalf("Mock DB fail")
 	}
-	defer db.Close()
-
 	repo := NewWorkflowRepository(db)
+	return db, mock, repo
+}
+
+func assertWorkflow(test *testing.T, workflow entities.Workflow, id, name, ownerId, actionId, reactionId string, isActivated bool) {
+	assert.Equal(test, id, workflow.Id)
+	assert.Equal(test, name, workflow.Name)
+	assert.Equal(test, ownerId, workflow.OwnerId)
+	assert.Equal(test, actionId, workflow.ActionId)
+	assert.Equal(test, reactionId, workflow.ReactionId)
+	assert.Equal(test, isActivated, workflow.IsActivated)
+}
+
+func TestCreateWorkflow(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
 
 	sqlStatement := `INSERT INTO workflows \(name, ownerid, actionid, reactionid, isactivated, actionparam, reactionparam, actiondata\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8\)`
 	mock.ExpectExec(sqlStatement).
@@ -26,7 +40,7 @@ func TestCreateWorkflow(test *testing.T) {
 	reactionParam := map[string]interface{}{"key": "value"}
 	actionData := map[string]interface{}{"key": "value"}
 
-	err = repo.CreateWorkflow("workflow", "owner", "action", "reaction", actionParam, reactionParam, actionData)
+	err := repo.CreateWorkflow("workflow", "owner", "action", "reaction", actionParam, reactionParam, actionData)
 
 	assert.NoError(test, err)
 
@@ -37,13 +51,8 @@ func TestCreateWorkflow(test *testing.T) {
 }
 
 func TestFindWorkflowById(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewWorkflowRepository(db)
 
 	id := "1234"
 	sqlStatement := `SELECT \* FROM workflows WHERE id = \(\$1\)`
@@ -51,7 +60,7 @@ func TestFindWorkflowById(test *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "name", "ownerid", "actionid", "reactionid", "isactivated", "createdat",
 		"actionparam", "reactionparam", "actiondata",
-	}).AddRow(id, "workflow", "owner", "action", "reaction", true, "2025-01-01T00:00:00Z",
+	}).AddRow(id, "workflow", "owner", "action", "reaction", true, "createdat",
 		[]byte(`{"key":"value"}`), []byte(`{"key":"value"}`), []byte(`{"key":"value"}`),
 	)
 
@@ -62,12 +71,7 @@ func TestFindWorkflowById(test *testing.T) {
 	workflow, err := repo.FindWorkflowById(id)
 
 	assert.NoError(test, err)
-	assert.Equal(test, id, workflow.Id)
-	assert.Equal(test, "workflow", workflow.Name)
-	assert.Equal(test, "owner", workflow.OwnerId)
-	assert.Equal(test, "action", workflow.ActionId)
-	assert.Equal(test, "reaction", workflow.ReactionId)
-	assert.Equal(test, true, workflow.IsActivated)
+	assertWorkflow(test, workflow, id, "workflow", "owner", "action", "reaction", true)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -76,13 +80,8 @@ func TestFindWorkflowById(test *testing.T) {
 }
 
 func TestFindWorkflowsByActionId(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewWorkflowRepository(db)
 
 	idAction := "1234"
 	sqlStatement := `SELECT \* FROM workflows WHERE actionid = \(\$1\)`
@@ -90,7 +89,7 @@ func TestFindWorkflowsByActionId(test *testing.T) {
 	rows := sqlmock.NewRows([]string{
 		"id", "name", "ownerid", "actionid", "reactionid", "isactivated", "createdat",
 		"actionparam", "reactionparam", "actiondata",
-	}).AddRow(idAction, "workflow", "owner", "action", "reaction", true, "2025-01-01T00:00:00Z",
+	}).AddRow(idAction, "workflow", "owner", "action", "reaction", true, "createdat",
 		[]byte(`{"key":"value"}`), []byte(`{"key":"value"}`), []byte(`{"key":"value"}`),
 	)
 
@@ -101,12 +100,7 @@ func TestFindWorkflowsByActionId(test *testing.T) {
 	workflow, err := repo.FindWorkflowsByActionId(idAction)
 
 	assert.NoError(test, err)
-	assert.Equal(test, idAction, workflow[0].Id)
-	assert.Equal(test, "workflow", workflow[0].Name)
-	assert.Equal(test, "owner", workflow[0].OwnerId)
-	assert.Equal(test, "action", workflow[0].ActionId)
-	assert.Equal(test, "reaction", workflow[0].ReactionId)
-	assert.Equal(test, true, workflow[0].IsActivated)
+	assertWorkflow(test, workflow[0], idAction, "workflow", "owner", "action", "reaction", true)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -115,13 +109,8 @@ func TestFindWorkflowsByActionId(test *testing.T) {
 }
 
 func TestUpdateWorkflow(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewWorkflowRepository(db)
 
 	sqlStatement := `UPDATE workflows SET name = \(\$1\), actionid = \(\$2\), reactionid = \(\$3\), isactivated = \(\$4\), actionparam = \(\$5\), reactionparam = \(\$6\), actiondata = \(\$7\) WHERE id = \(\$8\)`
 
@@ -156,20 +145,15 @@ func TestUpdateWorkflow(test *testing.T) {
 }
 
 func TestDeleteWorkflow(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewWorkflowRepository(db)
 
 	sqlStatement := `DELETE FROM workflows WHERE id = \(\$1\) AND ownerid = \(\$2\)`
 	mock.ExpectExec(sqlStatement).
 		WithArgs("123", "owner").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = repo.DeleteWorkflow("123", "owner")
+	err := repo.DeleteWorkflow("123", "owner")
 
 	assert.NoError(test, err)
 
@@ -180,20 +164,15 @@ func TestDeleteWorkflow(test *testing.T) {
 }
 
 func TestDeleteWorkflowByOwnerId(test *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		test.Fatalf("Mock DB fail")
-	}
+	db, mock, repo := createMockDb(test)
 	defer db.Close()
-
-	repo := NewWorkflowRepository(db)
 
 	sqlStatement := `DELETE FROM workflows WHERE ownerid = \(\$1\)`
 	mock.ExpectExec(sqlStatement).
 		WithArgs("owner").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = repo.DeleteWorkflowByOwnerId("owner")
+	err := repo.DeleteWorkflowByOwnerId("owner")
 
 	assert.NoError(test, err)
 
