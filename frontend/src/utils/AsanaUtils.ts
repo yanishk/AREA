@@ -132,7 +132,7 @@ export const getAsanaTags = async (workspaceId: string): Promise<AsanaItem[]> =>
         console.warn("No tags founded : ", workspaceId);
         return [];
     } catch (error) {
-        console.error("Error fetching Asana tags :", error);
+        console.error("Error fetching Asana tags : ", error);
         return [];
     }
 };

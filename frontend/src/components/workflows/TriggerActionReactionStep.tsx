@@ -126,9 +126,23 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 getAsanaTags(workspaceId),
             ]);
 
-            setProjects(projects.map((project) => project.name));
-            setAssignees(assignees.map((assignee) => assignee.name));
-            setTags(tags.map((tag) => tag.name));
+            if (projects.length === 0) {
+                setProjects(["No projects"]);
+            } else {
+                setProjects(projects.map((project) => project.name));
+            }
+
+            if (assignees.length === 0) {
+                setAssignees(["No assignees"]);
+            } else {
+                setAssignees(assignees.map((assignee) => assignee.name));
+            }
+
+            if (tags.length === 0) {
+                setTags(["No tags"]);
+            } else {
+                setTags(tags.map((tag) => tag.name));
+            }
         }
     };
 
