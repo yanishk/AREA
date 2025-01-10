@@ -67,6 +67,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     useEffect(() => {
         const fetchWorkspaces = async () => {
             const workspaces = await getAsanaWorkspaces();
+
             setWorkspaces(workspaces.map((ws) => ws.name));
             if (workspaces.length > 0) {
                 setSelectedWorkspace(workspaces[0].gid, workspaces[0].name);
@@ -107,7 +108,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     }, [selectedItem]);
 
     useEffect(() => {
-        console.log("params ici : ", selectedItem?.parameters);
         if (selectedItem?.parameters.some((param) => param.name === "project")) {
             setAdvancedField(true);
         }

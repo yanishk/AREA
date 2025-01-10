@@ -1,14 +1,8 @@
 import axios from "axios";
 import { Parameters } from "./ActionReactionParameters";
-import { AsanaItem, getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces } from "./AsanaUtils";
+import { getAsanaWorkspaces } from "./AsanaUtils";
 
 export const gitlabNameToIdMap: Record<string, number> = {};
-
-let selectedWorkspaceId: string | null = null;
-
-export const setSelectedWorkspaceId = (workspaceId: string) => {
-    selectedWorkspaceId = workspaceId;
-};
 
 interface GitlabParams {
     id: number;
@@ -53,113 +47,43 @@ const getGithubFieldValues = async (route: string): Promise<{ data: { repositori
     }
 }
 
-
-export const handleAsanaService = async (param: Parameters): Promise<string[] | undefined> => {
+const handleAsanaService = async (param: Parameters): Promise<string[] | undefined> => {
     if (param.route === "/asana/user/workspaces") {
         const workspaces = await getAsanaWorkspaces();
-
-        if (workspaces.length > 0) {
-            const firstWorkspaceId = workspaces[0].gid;
-            setSelectedWorkspaceId(firstWorkspaceId);
-        } else {
-            console.error("No workspaces found.");
-            return [];
-        }
-
         return workspaces.map((workspace) => workspace.name);
-    }
-
-    if (param.route === "/asana/workspace/projects") {
-        if (!selectedWorkspaceId) {
-            const workspaces = await getAsanaWorkspaces();
-
-            if (workspaces.length > 0) {
-                const firstWorkspaceId = workspaces[0].gid;
-                setSelectedWorkspaceId(firstWorkspaceId);
-            } else {
-                return [];
-            }
-        }
-
-        if (!selectedWorkspaceId) {
-            return;
-        }
-
-        const projects = await getAsanaProjects(selectedWorkspaceId);
-        return projects.map((project: AsanaItem) => project.name);
-    }
-
-    if (param.route === "/asana/workspace/assignees") {
-        if (!selectedWorkspaceId) {
-            const workspaces = await getAsanaWorkspaces();
-
-            if (workspaces.length > 0) {
-                const firstWorkspaceId = workspaces[0].gid;
-                setSelectedWorkspaceId(firstWorkspaceId);
-            } else {
-                return [];
-            }
-        }
-
-        if (!selectedWorkspaceId) {
-            return;
-        }
-
-        const assignees = await getAsanaAssignees(selectedWorkspaceId);
-        return assignees.map((assignee: AsanaItem) => assignee.name);
-    }
-
-    if (param.route === "/asana/workspace/tags") {
-        if (!selectedWorkspaceId) {
-            const workspaces = await getAsanaWorkspaces();
-
-            if (workspaces.length > 0) {
-                const firstWorkspaceId = workspaces[0].gid;
-                setSelectedWorkspaceId(firstWorkspaceId);
-            } else {
-                return [];
-            }
-        }
-
-        if (!selectedWorkspaceId) {
-            return;
-        }
-
-        const tags = await getAsanaTags(selectedWorkspaceId);
-        return tags.map((tag: AsanaItem) => tag.name);
     }
 }
 
 const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
 
-        if (param.route) {
-            const serviceName = param.route.split("/")[1];
+    if (param.route) {
+        const serviceName = param.route.split("/")[1];
 
-            if (serviceName === "gitlab") {
-                const result = await getGitlabFieldValues(param.route);
+        if (serviceName === "gitlab") {
+            const result = await getGitlabFieldValues(param.route);
 
-                if (result.data && Array.isArray(result.data.projects)) {
-                    result.data.projects.forEach((item) => {
-                        gitlabNameToIdMap[item.name] = item.id;
-                    });
+            if (result.data && Array.isArray(result.data.projects)) {
+                result.data.projects.forEach((item) => {
+                    gitlabNameToIdMap[item.name] = item.id;
+                });
 
-                    const values = result.data.projects.map((item) => item.name);
-                    return values;
-                }
+                const values = result.data.projects.map((item) => item.name);
+                return values;
             }
+        }
 
-            if (serviceName === "github") {
-                const result = await getGithubFieldValues(param.route);
+        if (serviceName === "github") {
+            const result = await getGithubFieldValues(param.route);
 
-                if (result.data && Array.isArray(result.data.repositories)) {
-                    const values = result.data.repositories.map((item) => item.full_name);
-                    return values;
-                }
+            if (result.data && Array.isArray(result.data.repositories)) {
+                const values = result.data.repositories.map((item) => item.full_name);
+                return values;
             }
+        }
 
-            if (serviceName === "asana") {
-                return handleAsanaService(param);
-            }
+        if (serviceName === "asana") {
+            return handleAsanaService(param);
+        }
     }
     if (param.values[0] === null) {
         return []
