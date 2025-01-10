@@ -109,7 +109,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     }, [selectedItem]);
 
     useEffect(() => {
-        if (selectedItem?.parameters.some((param) => param.name === "project")) {
+        if (selectedItem?.parameters.some((param) => param.route === "/asana/workspace/assignees")) {
             setAdvancedField(true);
         }
     });
