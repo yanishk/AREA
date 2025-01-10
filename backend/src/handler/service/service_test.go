@@ -128,6 +128,12 @@ func (m *MockServiceService) RetrieveDiscordGuildChannels(guildId string) ([]map
 	return args.Get(0).([]map[string]interface{}), args.Error(1)
 }
 
+func (m *MockServiceService) FindAllServices() ([]entities.Service, error) {
+	args := m.Called()
+	return args.Get(0).([]entities.Service), args.Error(1)
+
+}
+
 func TestOAuth2Service(test *testing.T) {
 	mockService := new(MockServiceService)
 	handler := &ServiceHandler{ServiceService: mockService}
@@ -253,7 +259,7 @@ func TestRetrieveActionsFromService(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No Authentication Token"}`, w.Body.String())
+		require.JSONEq(test, `{"error":"No authentication Token"}`, w.Body.String())
 
 		mockService.AssertExpectations(test)
 	})
@@ -328,7 +334,7 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No Authentication Token"}`, w.Body.String())
+		require.JSONEq(test, `{"error":"No authentication Token"}`, w.Body.String())
 
 		mockService.AssertExpectations(test)
 	})

@@ -116,7 +116,7 @@ func (self *ActionRepository) FindActionByNameAndServiceId(name, serviceId strin
 		return action, err
 	}
 
-	action, err = self.unmarshalParameters(parametersBytes, action)
+	action, err = unmarshalParameters(parametersBytes, action)
 	if err != nil {
 		return action, err
 	}
