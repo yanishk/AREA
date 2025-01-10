@@ -26,10 +26,7 @@ const MyWorkflow = () => {
                 </div>
                 <div className="mt-16 ml-[35px]">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                        {/* {availableItems?.map((element) => ( */}
                             <button
-                                // key={element.name}
-                                // style={{ backgroundColor: "#333333"}}
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 bg-[#333333] hover:bg-[#474747]"
                                 onClick={() => ("")}
                             >
@@ -39,7 +36,6 @@ const MyWorkflow = () => {
                                 </div>
                             </button>
 
-                        {/* ))} */}
                     </div>
                 </div>
             </MaxWidthWrapper>
