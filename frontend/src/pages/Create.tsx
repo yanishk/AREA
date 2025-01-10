@@ -274,7 +274,6 @@ const WorkflowBuilder = () => {
                 ...prev,
                 [id]: value,
             }));
-            console.log("selected reaction ici ", id, value)
         }
         else {
             console.error(`Invalid type parameter: ${type}`);
