@@ -18,7 +18,7 @@ type UserServiceServiceCallbackSuccessResponse struct {
 }
 
 type UserServiceServiceCallbackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization-Invalid app type"`
+	Msg string `json:"error"example:"Invalid request body-Invalid code authorization-Invalid app type"`
 }
 
 type UserServiceServiceCallbackInternalServerErrorResponse struct {
@@ -29,8 +29,18 @@ type UserServiceServiceCallbackInternalServerErrorResponse struct {
 type UserServiceGetGithubUserRepositoriesSuccessResponse struct {
 	Repositories []entities.GithubRepository
 }
+
 type UserServiceGetGithubUserRepositoriesInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Could not retrieve the user's repositories"`
+}
+
+// Gitlab Get User Projects
+type UserServiceGetGitlabUserProjectsSuccessResponse struct {
+	Projects []entities.GitlabProject
+}
+
+type UserServiceGetGitlabUserProjectsInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not retrieve the user's projects"`
 }
 
 // Discord Get User Servers
@@ -39,7 +49,7 @@ type UserServiceGetDiscordUserServersSuccessResponse struct {
 }
 
 type UserServiceGetDiscordUserServersInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Could not retrieve the user's servers"`
+	Msg string `json:"error"example:"Could not retrieve the user's repositories"`
 }
 
 // Asana Get User Workspaces

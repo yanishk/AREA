@@ -73,7 +73,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
 
   void storeServiceDescription(List<ActionOrReactionList> allActionOrReactionList) {
     for (int i = 0; i < allActionOrReactionList.length; i++) {
-      if (allActionOrReactionList[i].servicename == CreateData.serviceNameList[serviceIndex]) {
+      if (allActionOrReactionList[i].servicename == CreateData.actualServiceList[serviceIndex].name) {
         actionOrReactionList.add(ActionOrReactionData.optional(
           allActionOrReactionList[i].id,
           allActionOrReactionList[i].name,
@@ -93,7 +93,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     return Column(children: [
       Padding(padding: EdgeInsets.only(top: 15)),
       CustomButton(
-        backgroundColor: HexColor(CreateData.serviceColorList[serviceIndex]),
+        backgroundColor: HexColor(CreateData.actualServiceList[serviceIndex].color),
         text: ButtonText(text: actionOrReactionList[index].name,),
         onPressed: () {
           saveSelectedActionOrReaction(index);
@@ -123,7 +123,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
 
   @override
   Widget build(BuildContext context) {
-    colorTheme = HexColor(CreateData.serviceColorList[serviceIndex]);
+    colorTheme = HexColor(CreateData.actualServiceList[serviceIndex].color);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -131,8 +131,8 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
             ActionOrReactionDescription(
                 colorTheme: colorTheme,
                 title: "Select $apiRoute",
-                serviceIcon: CreateData.serviceIconsList[serviceIndex],
-                serviceName: CreateData.serviceNameList[serviceIndex],
+                serviceIcon: CreateData.actualServiceList[serviceIndex].icon,
+                serviceName: CreateData.actualServiceList[serviceIndex].name,
                 actionDescription: actionDescription),
             Padding(padding: EdgeInsets.only(top: 15)),
             Column(

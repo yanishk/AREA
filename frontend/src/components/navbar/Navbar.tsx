@@ -2,6 +2,7 @@ import NavbarLink from "./NavbarLink"
 import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
+import axios from "axios";
 
 interface NavbarProps {
     bgColor?: string;
@@ -19,8 +20,21 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
     const handleAccount = () => {
         navigate("/settings");
     };
+
     const handleCreate = () => {
         navigate("/create");
+    }
+
+    const handleLogout = async () => {
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL}logout`, {}, {
+                withCredentials: true
+            });
+            navigate("/");
+            window.location.reload();
+        } catch (error) {
+            console.error("Error during logout:", error);
+        }
     }
 
     return (
@@ -145,7 +159,13 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                                             text="Create"
                                         />
                                     </li>
-                                    <li>
+                                    <button
+                                onClick={handleLogout}
+                                className="text-[#222222] hover:text-[#444444] font-bold text-[20px] ml-3"
+                            >
+                            {"Log out"}
+                            </button>
+                            <li>
                                         <button
                                             className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center border-[3px] border-[#222222] cursor-pointer"
                                             onClick={handleAccount}

@@ -34,7 +34,7 @@ class MyWorkflowsfunctions {
     return responseData;
   }
 
-  static int getServiceLocalId(String uuid, List<String> seviceIdList) {
+  static int getServiceLocalId(String uuid) {
     String serviceID = "";
     for (int i = 0; i < Globaldata.actionServicesActions.length && serviceID.isEmpty; i++) {
       if (Globaldata.actionServicesActions[i].id == uuid) {
@@ -49,24 +49,12 @@ class MyWorkflowsfunctions {
     if (serviceID.isEmpty) {
       serviceID = uuid;
     }
-    for (int i = 0; i < seviceIdList.length; i++) {
-      if (seviceIdList[i] == serviceID) {
+    for (int i = 0; i < Globaldata.serviceList.length; i++) {
+      if (Globaldata.serviceList[i].id == serviceID) {
         return i;
       }
     }
-    return -1;
-  }
-
-  static String getServiceDataById (String serviceId, List<String> serviceActionDataList, List<String> serviceReactionDataList) {
-    int localActionId = getServiceLocalId(serviceId, Globaldata.actionServicesID);
-    int localReactionId = getServiceLocalId(serviceId, Globaldata.reactionServicesID);
-    if (localActionId != -1) {
-      return serviceActionDataList[localActionId];
-    }
-    if (localReactionId != -1) {
-      return serviceReactionDataList[localReactionId];
-    }
-    return "";
+    return 0;
   }
 
   static void storeServiceDescription(dynamic responseData, List<Widget> cardList, String workflowsResponseName, Future<void> onTapFunction(int index), String email) {
@@ -90,11 +78,7 @@ class MyWorkflowsfunctions {
           cardList.add(
             WorkflowCard(
               color: HexColor(
-                MyWorkflowsfunctions.getServiceDataById(
-                  MyWorkflowsData.allWorkflowsData[i].actionID,
-                  Globaldata.actionServicesColor,
-                  Globaldata.reactionServicesColor
-                ),
+                Globaldata.serviceList[getServiceLocalId(MyWorkflowsData.allWorkflowsData[i].actionID)].color
               ),
               content: WorkflowsTiles(
                 index: i,
