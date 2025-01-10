@@ -139,10 +139,10 @@ func TestOAuth2Service(test *testing.T) {
 	handler := &ServiceHandler{ServiceService: mockService}
 
 	router := gin.Default()
-	router.GET("/authentication/:service/:callback-type/:app-type", handler.oauth2Service)
+	router.GET("/authentication", handler.oauth2Service)
 
 	test.Run("Invalid app type", func(test *testing.T) {
-		req, _ := http.NewRequest("GET", "/authentication/Github/service/false", nil)
+		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=service&apptype=false", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -151,8 +151,8 @@ func TestOAuth2Service(test *testing.T) {
 		require.JSONEq(test, `{"error": "Invalid app type"}`, w.Body.String())
 	})
 
-	test.Run("Invalid callback type", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/authentication/Github/false/web", nil)
+	test.Run("Invalid callback type", func(test *testing.T) {
+		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=false&apptype=web", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -164,7 +164,7 @@ func TestOAuth2Service(test *testing.T) {
 	test.Run("Service error", func(test *testing.T) {
 		mockService.On("OAuth2Service", "false", "service", "web").Return("", fmt.Errorf("service error"))
 
-		req, _ := http.NewRequest("GET", "/authentication/false/service/web", nil)
+		req, _ := http.NewRequest("GET", "/authentication?service=false&callbacktype=service&apptype=web", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -178,7 +178,7 @@ func TestOAuth2Service(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
 		mockService.On("OAuth2Service", "Github", "service", "web").Return("https://localhost:8080/authentication/Github/service/web", nil)
 
-		req, _ := http.NewRequest("GET", "/authentication/Github/service/web", nil)
+		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=service&apptype=web", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -259,7 +259,7 @@ func TestRetrieveActionsFromService(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No authentication Token"}`, w.Body.String())
+		require.JSONEq(test, `{"error":"No authentication token"}`, w.Body.String())
 
 		mockService.AssertExpectations(test)
 	})
@@ -334,7 +334,7 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No authentication Token"}`, w.Body.String())
+		require.JSONEq(test, `{"error":"No authentication token"}`, w.Body.String())
 
 		mockService.AssertExpectations(test)
 	})
