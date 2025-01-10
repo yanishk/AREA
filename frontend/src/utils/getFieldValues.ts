@@ -54,7 +54,7 @@ const getGithubFieldValues = async (route: string): Promise<{ data: { repositori
 }
 
 
-const handleAsanaService = async (param: Parameters): Promise<string[] | undefined> => {
+export const handleAsanaService = async (param: Parameters): Promise<string[] | undefined> => {
     if (param.route === "/asana/user/workspaces") {
         const workspaces = await getAsanaWorkspaces();
 

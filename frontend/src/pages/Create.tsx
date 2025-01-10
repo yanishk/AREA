@@ -12,6 +12,7 @@ import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
 import getFieldValues, { gitlabNameToIdMap } from "../utils/getFieldValues";
+import { setSelectedWorkspace } from "../utils/AsanaUtils";
 
 type availableActionsType = {
     name: string;
@@ -270,7 +271,10 @@ const WorkflowBuilder = () => {
             }));
         }
         if (type === "reaction") {
-            setReactionFieldValues((prev) => ({
+            if (id === "workflow") {
+                setSelectedWorkspace(value, id);
+            }
+              setReactionFieldValues((prev) => ({
                 ...prev,
                 [id]: value,
             }));
