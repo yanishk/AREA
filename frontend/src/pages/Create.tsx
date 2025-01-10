@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { act, useEffect, useState } from "react";
+import {useEffect, useState } from "react";
 import axios from "axios";
 import HomeStep from "../components/workflows/HomeStep";
 import SummaryStep from "../components/workflows/SummaryStep";
@@ -274,6 +274,7 @@ const WorkflowBuilder = () => {
                 ...prev,
                 [id]: value,
             }));
+            console.log("selected reaction ici ", id, value)
         }
         else {
             console.error(`Invalid type parameter: ${type}`);
@@ -443,7 +444,6 @@ const WorkflowBuilder = () => {
                 await updateFieldValues(selectedAction.parameters, setActionFieldValues);
                 setIsServiceConnected(false);
             }
-
             if (selectedReaction?.parameters) {
                 if (isRequiredConnection("reaction") && !isServiceConnected) {
                     return;
