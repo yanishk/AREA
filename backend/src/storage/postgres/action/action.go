@@ -104,3 +104,21 @@ func (self *ActionRepository) FindActionsByServiceId(serviceId string) ([]entiti
 	}
 	return actions, nil
 }
+
+func (self *ActionRepository) FindActionByNameAndServiceId(name, serviceId string) (entities.Action, error) {
+	sqlStatement := `SELECT * FROM actions WHERE name = ($1) AND serviceid = ($2)`
+	var action entities.Action
+	var parametersBytes []byte
+
+	row := self.db.QueryRow(sqlStatement, name, serviceId)
+	err := row.Scan(&action.Id, &action.ServiceId, &action.Name, &action.Description, &action.NbParam, &parametersBytes)
+	if err != nil {
+		return action, err
+	}
+
+	action, err = self.unmarshalParameters(parametersBytes, action)
+	if err != nil {
+		return action, err
+	}
+	return action, nil
+}

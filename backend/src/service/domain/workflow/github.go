@@ -1,23 +1,52 @@
 package workflow_service
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"backend/src/entities"
 )
 
-const githubBaseUrl = "https://api.github.com/"
+func githubWebhooksEventsToActions() map[string]string {
+	return map[string]string{
+		"watch":        "New star",
+		"public":       "Visibility update",
+		"milestone":    "Milestone update",
+		"release":      "Release update",
+		"gollum":       "Wiki update",
+		"workflow_job": "Workflow job update",
+		"workflow_run": "Workflow run update",
+		"fork":         "Fork update",
+	}
+}
 
-func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, accessToken, endpoint string) (*http.Response, error) {
+func githubWebhookEvents() []string {
+	return []string{
+		"watch",
+		"public",
+		"milestone",
+		"release",
+		"gollum",
+		"workflow_job",
+		"workflow_run",
+		"fork",
+	}
+}
+
+const githubBaseUrl = "https://api.github.com/"
+const githubRepositoryEndpoint = "repos/"
+
+func (self *WorkflowService) executeGithubRequest(workflow entities.Workflow, method, accessToken, endpoint string) (*http.Response, error) {
 	repository, repositoryExists := workflow.ActionParam["repository"]
 	if !repositoryExists {
 		return nil, fmt.Errorf(errorMissingField)
 	}
 
-	url := githubBaseUrl + "repos/" + repository.(string) + endpoint
-	return self.ServiceService.ExecuteApiRequest(url, "GET", bearerType, accessToken, nil)
+	url := githubBaseUrl + githubRepositoryEndpoint + repository.(string) + endpoint
+	return self.ServiceService.ExecuteApiRequest(url, method, bearerType, accessToken, nil)
 }
 
 func (self *WorkflowService) checkActionDataLen(workflow entities.Workflow, lenActualTurn float64) error {
@@ -70,7 +99,7 @@ func (self *WorkflowService) checkGithubNewIssueAction(workflow entities.Workflo
 func (self *WorkflowService) checkGithubNewPullRequestAction(workflow entities.Workflow, accessToken string) error {
 	var pullRequests []entities.GithubRepository
 
-	resp, err := self.executeGithubRequest(workflow, accessToken, "/pulls")
+	resp, err := self.executeGithubRequest(workflow, "GET", accessToken, "/pulls")
 	if err != nil {
 		return err
 	}
@@ -86,7 +115,7 @@ func (self *WorkflowService) checkGithubNewPullRequestAction(workflow entities.W
 func (self *WorkflowService) checkGithubNewBranchAction(workflow entities.Workflow, accessToken string) error {
 	var branches []entities.GithubBranch
 
-	resp, err := self.executeGithubRequest(workflow, accessToken, "/branches")
+	resp, err := self.executeGithubRequest(workflow, "GET", accessToken, "/branches")
 	if err != nil {
 		return err
 	}
@@ -102,7 +131,7 @@ func (self *WorkflowService) checkGithubNewBranchAction(workflow entities.Workfl
 func (self *WorkflowService) checkGithubNewCommitAction(workflow entities.Workflow, accessToken string) error {
 	var commits []entities.GithubCommit
 
-	resp, err := self.executeGithubRequest(workflow, accessToken, "/commits")
+	resp, err := self.executeGithubRequest(workflow, "GET", accessToken, "/commits")
 	if err != nil {
 		return err
 	}
@@ -158,6 +187,164 @@ func (self *WorkflowService) CheckGithubActions() error {
 
 	for _, action := range actions {
 		err := self.checkWorkflowsWithGithubActions(action)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkGithubWebhooksWorkflow(workflow entities.Workflow, webhookRepository string) error {
+	userRepository, err := getWorkflowStringActionParam(workflow, "repository")
+	if err != nil {
+		return err
+	}
+
+	if userRepository == webhookRepository {
+		self.checkReactions(workflow)
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkGithubWebhooksWorkflows(headers http.Header, webhookJsonDataBytes []byte, eventsToActions map[string]string, serviceId string) error {
+	var webhookResponse entities.GithubWebhookTriggeredResponse
+	if len(webhookJsonDataBytes) > 0 {
+		err := json.Unmarshal(webhookJsonDataBytes, &webhookResponse)
+		if err != nil {
+			return err
+		}
+	}
+	if webhookResponse.Repository.Name == "" {
+		return fmt.Errorf("Incorrect repository name")
+	}
+
+	eventName := headers["X-Github-Event"][0]
+	if eventName == "ping" {
+		return nil
+	}
+
+	actionName, actionNameExists := eventsToActions[eventName]
+	if !actionNameExists {
+		return fmt.Errorf("No action mapped with this event")
+	}
+
+	action, err := self.ActionRepository.FindActionByNameAndServiceId(actionName, serviceId)
+	if err != nil {
+		return err
+	}
+
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		if !workflow.IsActivated {
+			continue
+		}
+		self.checkGithubWebhooksWorkflow(workflow, webhookResponse.Repository.Name)
+	}
+	return nil
+}
+
+func (self *WorkflowService) createNewWorkflowGithubWebhook(repository, accessToken string) error {
+	var webhook entities.GithubWebhookResponse
+	createWebhookUrl := githubBaseUrl + "repos/" + repository + "/hooks"
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Github"
+
+	webhook.Name = "web"
+	webhook.Active = true
+	webhook.Events = githubWebhookEvents()
+	webhook.Config.Url = webhookUrl
+	webhook.Config.ContentType = "json"
+	jsonBody, err := json.Marshal(webhook)
+	if err != nil {
+		return fmt.Errorf(errorMarshaling)
+	}
+
+	res, err := self.ServiceService.ExecuteApiRequest(createWebhookUrl, "POST", bearerType, accessToken, bytes.NewBuffer([]byte(jsonBody)))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func (self *WorkflowService) isGithubRepositoryWebhookPresent(repository, accessToken string) (bool, error) {
+	var webhooks []entities.GithubWebhookResponse
+	getWebhooksUrl := githubBaseUrl + githubRepositoryEndpoint + repository + "/hooks"
+	webhookUrl := os.Getenv("NGROK_APP_URL") + "/webhooks/Github"
+
+	res, err := self.ServiceService.ExecuteApiRequest(getWebhooksUrl, "GET", bearerType, accessToken, nil)
+	if err != nil {
+		return false, err
+	}
+	defer res.Body.Close()
+
+	err = json.NewDecoder(res.Body).Decode(&webhooks)
+	if err != nil {
+		return false, err
+	}
+
+	for _, webhook := range webhooks {
+		if webhook.Config.Url == webhookUrl {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (self *WorkflowService) checkNewWorkflowGithubWebhook(workflow entities.Workflow, accessToken string) error {
+	repository, err := getWorkflowStringActionParam(workflow, "repository")
+	if err != nil {
+		return err
+	}
+
+	isWebhookPresent, err := self.isGithubRepositoryWebhookPresent(repository, accessToken)
+	if err != nil {
+		return err
+	}
+
+	if !isWebhookPresent {
+		self.createNewWorkflowGithubWebhook(repository, accessToken)
+		err := self.WorkflowRepository.UpdateWorkflow(workflow.Id, workflow)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (self *WorkflowService) checkNewWorkflowsGithubWebhook(action entities.Action) error {
+	workflows, err := self.WorkflowRepository.FindWorkflowsByActionId(action.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, workflow := range workflows {
+		accessToken, err := self.getAccessToken("Github", workflow)
+		if err != nil {
+			continue
+		}
+		self.checkNewWorkflowGithubWebhook(workflow, accessToken)
+	}
+	return nil
+}
+
+func (self *WorkflowService) CheckNewGithubWorkflows() error {
+	service, err := self.ServiceService.FindServiceByName("Github")
+	if err != nil {
+		return err
+	}
+
+	actions, err := self.ActionRepository.FindActionsByServiceId(service.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, action := range actions {
+		err := self.checkNewWorkflowsGithubWebhook(action)
 		if err != nil {
 			return err
 		}

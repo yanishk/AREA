@@ -14,7 +14,7 @@ class SelectParamActionOrReactionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          scaffoldBackgroundColor: HexColor(CreateData.serviceColorList[CreateData.selectedServiceId])),
+          scaffoldBackgroundColor: HexColor(CreateData.actualServiceList[CreateData.selectedServiceId].color)),
       home: SelectParamActionOrReactionAPICall(),
     );
   }
@@ -51,7 +51,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         actionOrReactionParamListName = CreateData.reactionParamListName;
       });
     }
-    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
+    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
       CreateData.selectOrUpdateWorkflow = true;
       Navigator.pop(Globaldata.myContext);
     }
@@ -134,7 +134,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   }
 
   Future<void> getRouteData(String route, int index) async {
-    if (CreateData.serviceNameList[CreateData.selectedServiceId] == "Asana") {
+    if (CreateData.actualServiceList[CreateData.selectedServiceId].name == "Asana") {
       route = "$route?id=$asanaWorkspaceId";
     } else if (selectedParameterId[index - 1] != null) {
       route = "$route?id=${selectedParameterId[index - 1]}";
@@ -235,7 +235,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   }
 
   Widget connectButton() {
-    Color buttonColor = HexColor(CreateData.serviceColorList[CreateData.selectedServiceId]);
+    Color buttonColor = HexColor(CreateData.actualServiceList[CreateData.selectedServiceId].color);
     int r = buttonColor.red ~/ 2;
     int g = buttonColor.green ~/ 2;
     int b = buttonColor.blue ~/ 2;
@@ -249,9 +249,9 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
             color: Colors.white),
       ),
       onPressed: () {
-        ConnectServiceAuthWebview.connectService("service", CreateData.serviceNameList[CreateData.selectedServiceId]);
+        ConnectServiceAuthWebview.connectService("service", CreateData.actualServiceList[CreateData.selectedServiceId].name);
         setState(() {
-          CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId] = false;
+          CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded = false;
         });
         if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
           CreateData.selectOrUpdateWorkflow = true;
@@ -265,7 +265,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
 
   @override
   Widget build(BuildContext context) {
-    if (CreateData.serviceIsAuthNeeded[CreateData.selectedServiceId]) {
+    if (CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
       return Scaffold(
         body: SingleChildScrollView(
           child: Column(
@@ -274,12 +274,12 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               SelectActionOrReactionTopBar(title: "Connect service", color: Colors.white),
               Padding(padding: EdgeInsets.only(top: 75)),
               SafeWebImage(
-                url: "${Globaldata.domainName}${CreateData.serviceIconsList[CreateData.selectedServiceId]}",
+                url: "${Globaldata.domainName}${CreateData.actualServiceList[CreateData.selectedServiceId].icon}",
                 width: 120,
                 height: 120,
               ),
               AutoSizeText(
-                "Connect to ${CreateData.serviceNameList[CreateData.selectedServiceId]} to continue",
+                "Connect to ${CreateData.actualServiceList[CreateData.selectedServiceId].name} to continue",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -357,7 +357,7 @@ class CompleteActionOrReactionTop extends StatelessWidget {
       children: [
         SafeWebImage(
           url:
-              "${Globaldata.domainName}${CreateData.serviceIconsList[CreateData.selectedServiceId]}",
+              "${Globaldata.domainName}${CreateData.actualServiceList[CreateData.selectedServiceId].icon}",
           width: 75,
           height: 75,
         ),
