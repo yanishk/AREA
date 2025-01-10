@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUserService(test *testing.T) {
+func TestCreateUser(test *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		test.Fatalf("Mock DB fail")
