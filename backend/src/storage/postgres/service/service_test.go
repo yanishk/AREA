@@ -111,3 +111,69 @@ func TestFindServiceById(test *testing.T) {
 		}
 	})
 }
+
+func TestFindAllServices(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
+
+	sqlStatement := `SELECT \* FROM services`
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
+		AddRow("id", "name", "color", "logo", false, false, false)
+
+	mock.ExpectQuery(sqlStatement).
+		WillReturnRows(mockRow)
+
+	services, err := repo.FindAllServices()
+
+	assert.NoError(test, err)
+	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
+
+func TestFindActionsServices(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
+
+	sqlStatement := `SELECT \* FROM services WHERE hasactions = true`
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
+		AddRow("id", "name", "color", "logo", false, false, false)
+
+	mock.ExpectQuery(sqlStatement).
+		WillReturnRows(mockRow)
+
+	services, err := repo.FindActionsServices()
+
+	assert.NoError(test, err)
+	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
+
+func TestFindReactionsServices(test *testing.T) {
+	db, mock, repo := createMockDb(test)
+	defer db.Close()
+
+	sqlStatement := `SELECT \* FROM services WHERE hasreactions = true`
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
+		AddRow("id", "name", "color", "logo", false, false, false)
+
+	mock.ExpectQuery(sqlStatement).
+		WillReturnRows(mockRow)
+
+	services, err := repo.FindReactionsServices()
+
+	assert.NoError(test, err)
+	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		test.Errorf("Expectation fail")
+	}
+}
