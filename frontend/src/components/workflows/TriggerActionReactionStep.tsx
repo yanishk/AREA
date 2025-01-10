@@ -30,6 +30,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 }) => {
 
     const [isLoading, setIsLoading] = useState(true);
+    const [isWorkspaceLoaded, setIsWorkspaceLoaded] = useState(true);
     const [advancedField, setAdvancedField] = useState(false);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
@@ -114,6 +115,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     });
 
     const handleWorkspaceChange = async (workspaceName: string) => {
+        setIsWorkspaceLoaded(false);
         setSelectedWorkspaceName(workspaceName);
         const workspaceId = await getWorkspaceIdByName(workspaceName);
 
@@ -125,6 +127,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 getAsanaAssignees(workspaceId),
                 getAsanaTags(workspaceId),
             ]);
+
+            setIsWorkspaceLoaded(true);
 
             if (projects.length === 0) {
                 setProjects(["No projects"]);
@@ -188,7 +192,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     className="flex flex-col items-center"
                 >
                     {isLoading ? (
-                        <div />
+                        <></>
                     ) : (
                         <>
                             {advancedField ? (
@@ -200,26 +204,32 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                         onChange={(value) => handleWorkspaceChange(value)}
                                     />
 
-                                    <SelectField
-                                        label="Project"
-                                        value={itemFieldValues["project"] || ""}
-                                        options={projects}
-                                        onChange={(value) => handleFieldChange("project", value, type)}
-                                    />
+                                    {isWorkspaceLoaded ? (
+                                        <>
+                                            <SelectField
+                                                label="Project"
+                                                value={itemFieldValues["project"] || ""}
+                                                options={projects}
+                                                onChange={(value) => handleFieldChange("project", value, type)}
+                                            />
 
-                                    <SelectField
-                                        label="Assignee"
-                                        value={itemFieldValues["assignee"] || ""}
-                                        options={assignees}
-                                        onChange={(value) => handleFieldChange("assignee", value, type)}
-                                    />
+                                            <SelectField
+                                                label="Assignee"
+                                                value={itemFieldValues["assignee"] || ""}
+                                                options={assignees}
+                                                onChange={(value) => handleFieldChange("assignee", value, type)}
+                                            />
 
-                                    <SelectField
-                                        label="Tag"
-                                        value={itemFieldValues["tag"] || ""}
-                                        options={tags}
-                                        onChange={(value) => handleFieldChange("tag", value, type)}
-                                    />
+                                            <SelectField
+                                                label="Tag"
+                                                value={itemFieldValues["tag"] || ""}
+                                                options={tags}
+                                                onChange={(value) => handleFieldChange("tag", value, type)}
+                                            />
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </div>
                             ) : (
                                 <DynamicFields
