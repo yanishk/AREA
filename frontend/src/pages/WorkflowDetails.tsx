@@ -194,6 +194,7 @@ const WorkflowDetail = () => {
                                 onChange={(e) => setWorkflowName(e.target.value)}
                                 onBlur={handleSaveName}
                                 className="text-white text-[36px] h-[340px] w-full font-[800] mt-[10px] bg-transparent border-4 p-4 rounded-lg border-white outline-none break-words whitespace-normal"
+                                style={{overflow: "hidden"}}
                             />
                         ) : (
                             <h1
