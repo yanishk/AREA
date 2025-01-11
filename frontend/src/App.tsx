@@ -13,6 +13,7 @@ import MyWorkflow from './pages/MyWorkflows'
 import ProtectedRoute from './ProtectedRoute'
 import RedirectRoute from './RedirectRoute'
 import WorkflowDetail from './pages/WorkflowDetails'
+import ExplorePage from './pages/Explore'
 
 function App() {
   return (
@@ -52,7 +53,7 @@ function App() {
               <Route
                 path="/explore"
                 element={
-                  <HomePage />
+                  <ExplorePage />
                 }
               />
 
