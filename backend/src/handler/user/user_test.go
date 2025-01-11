@@ -3,6 +3,7 @@ package user_handler
 import (
 	"backend/src/entities"
 	"backend/src/handler/middleware"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -219,5 +220,40 @@ func TestLoginCallback(test *testing.T) {
 
 		require.Equal(test, http.StatusOK, w.Code)
 		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
+	})
+}
+
+func TestGetUser(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "service")
+	})
+	router.GET("/user", handler.getUser)
+
+	test.Run("Successful Logout", func(test *testing.T) {
+		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, nil)
+
+		req := requestForProtected("GET", "/user", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Error Finding User", func(test *testing.T) {
+		mockUserService.ExpectedCalls = nil
+		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, errors.New("user not found")).Once()
+
+		req := requestForProtected("GET", "/user", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.JSONEq(test, `{"error": "Could not find user"}`, w.Body.String())
 	})
 }
