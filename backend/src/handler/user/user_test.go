@@ -5,7 +5,9 @@ import (
 	"backend/src/handler/middleware"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -84,4 +86,25 @@ func createMockAndRoute(isProtected bool) (*UserHandler, *gin.Engine, *MockUserS
 	}
 
 	return handler, router, mockUserService
+}
+
+func TestCreateUser(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+	router.POST("/register", handler.createUser)
+
+	mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		Return(nil)
+
+	body := `{
+		"email": "eva.legrand@epitech.eu",
+		"password": "password"
+	}`
+
+	req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	require.Equal(test, http.StatusOK, w.Code)
+	require.JSONEq(test, `{"success": "New user created"}`, w.Body.String())
 }
