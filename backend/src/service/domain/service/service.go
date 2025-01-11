@@ -164,7 +164,7 @@ func oauth2Spotify(callbackType string) string {
 		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
 		codeResponseType +
 		redirectUriParam + callbackLink +
-		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify playlist-modify-public")
 }
 
 func oauth2Discord(callbackType string) string {
