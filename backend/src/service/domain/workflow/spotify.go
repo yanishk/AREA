@@ -13,7 +13,7 @@ func spotifyReactions() []string {
 		"Pause playback",
 		"Activate playback shuffle",
 		"Deactivate playback shuffle",
-		"Skip track",
+		"Skip to next track",
 		"Skip to previous track",
 		"Add track to playback queue",
 		"Save a track",
@@ -129,7 +129,7 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/shuffle?state=true", "PUT", bearerType, accessToken, nil)
 	case "Deactivate playback shuffle":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/shuffle?state=false", "PUT", bearerType, accessToken, nil)
-	case "Skip track":
+	case "Skip to next track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/next", "POST", bearerType, accessToken, nil)
 	case "Skip to previous track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/previous", "POST", bearerType, accessToken, nil)
