@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 import "../custom_widget.dart";
 import "../footer_page.dart";
 import "exploreCardListFiller.dart";
-import "topBarExplore.dart";
 import "exploreWidget.dart";
 import "explorePageData.dart";
 
@@ -27,23 +27,16 @@ class ExplorePageMain extends State<ExplorePageStateful> {
   @override
   void initState() {
     super.initState();
-    if (SelectedCardList.cardList.isEmpty) {
-      updateCardList();
+    if (SelectedCardList.cardList.isNotEmpty) {
+      SelectedCardList.cardList.clear();
     }
+    updateCardList();
   }
 
   Future<void> updateCardList() async {
     setState(() {
-      if (SelectedCardList.cardType == SelectedCardListEnum.All) {
-        FillServicesAndWorkflow.fillServicesAndWorkflowList();
-        SelectedCardList.cardList = FillServicesAndWorkflow.servicesAndWorkflow;
-      } else if (SelectedCardList.cardType == SelectedCardListEnum.Workflows) {
-        FillWorkflowsCard.fillWorkflowsCardList();
-        SelectedCardList.cardList = FillWorkflowsCard.workflowsCardList;
-      } else {
-        FillServicesCard.fillServicesCardList();
-        SelectedCardList.cardList = FillServicesCard.serviceCardList;
-      }
+      FillServicesCard.fillServicesCardList();
+      SelectedCardList.cardList = FillServicesCard.serviceCardList;
     });
   }
 
@@ -54,8 +47,15 @@ class ExplorePageMain extends State<ExplorePageStateful> {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            TopBarExplore(
-              onPressed: updateCardList,
+            AutoSizeText(
+              "AREA",
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+                decorationThickness: 2,
+              ),
+              maxLines: 1,
             ),
             MyDivider(),
             MySearchBar(),
