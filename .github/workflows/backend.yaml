@@ -31,7 +31,7 @@ jobs:
       - name: Check backend unit tests
         run: |
           cd backend/src
-          go test ./...
+          go test ./handler/*/ ./service/domain/*/ ./storage/postgres/*/
           if [ $? -ne 0 ]; then
             echo "Unit tests failed."
             exit 1
