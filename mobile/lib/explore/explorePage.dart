@@ -4,7 +4,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "../custom_widget.dart";
 import "../footer_page.dart";
 import "exploreCardListFiller.dart";
-import "exploreWidget.dart";
 import "explorePageData.dart";
 
 class ExplorePage extends StatelessWidget {
@@ -58,7 +57,6 @@ class ExplorePageMain extends State<ExplorePageStateful> {
               maxLines: 1,
             ),
             MyDivider(),
-            MySearchBar(),
             Column(
               children: SelectedCardList.cardList,
             ),
