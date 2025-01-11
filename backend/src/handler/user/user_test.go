@@ -293,3 +293,71 @@ func TestLogoutUser(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not find user"}`, w.Body.String())
 	})
 }
+
+func TestModifyPassword(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "service")
+	})
+	router.PUT("/modify-password", handler.modifyPassword)
+
+	expectedPasswordChange := entities.UserModifyPassword{
+		OldPassword: "oldpass",
+		Password:    "newpass",
+	}
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).Return(nil).Once()
+
+		body := `{
+			"oldpassword": "oldpass",
+			"password": "newpass"
+		}`
+
+		req := requestForProtected("PUT", "/modify-password", token, strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Password modified"}`, w.Body.String())
+	})
+
+	test.Run("User Not Found", func(test *testing.T) {
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).Return(errors.New("Could not find requested user")).Once()
+
+		body := `{
+			"oldpassword": "oldpass",
+			"password": "newpass"
+		}`
+
+		req := requestForProtected("PUT", "/modify-password", token, strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Could not find requested user"}`, w.Body.String())
+	})
+
+	test.Run("Old Password Incorrect", func(test *testing.T) {
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).Return(errors.New("Old password is incorrect")).Once()
+
+		body := `{
+			"oldpassword": "oldpass",
+			"password": "newpass"
+		}`
+
+		req := requestForProtected("PUT", "/modify-password", token, strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusForbidden, w.Code)
+		require.JSONEq(test, `{"error": "Old password is incorrect"}`, w.Body.String())
+	})
+}
