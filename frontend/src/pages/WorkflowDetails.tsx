@@ -94,6 +94,10 @@ const WorkflowDetail = () => {
 
     const handleSaveName = async () => {
         if (!workflow) return;
+
+        if (!workflowName.trim()) {
+            return;
+        }
         console.log("update name ici ", workflowName);
 
         const updatedWorkflow = {
@@ -188,21 +192,45 @@ const WorkflowDetail = () => {
                             />
                         </div>
                         {isEditing ? (
-                            <textarea
-                                ref={inputRef}
-                                value={workflowName}
-                                onChange={(e) => setWorkflowName(e.target.value)}
-                                onBlur={handleSaveName}
-                                className="text-white text-[36px] h-[340px] w-full font-[800] mt-[10px] bg-transparent border-4 p-4 rounded-lg border-white outline-none break-words whitespace-normal"
-                                style={{overflow: "hidden"}}
-                            />
+                            <>
+                                <textarea
+                                    ref={inputRef}
+                                    value={workflowName}
+                                    onChange={(e) => setWorkflowName(e.target.value)}
+                                    onBlur={handleSaveName}
+                                    className="text-white text-[36px] h-[340px] w-full font-[800] mt-[10px] bg-transparent border-4 p-4 rounded-lg border-white outline-none break-words whitespace-normal"
+                                    style={{overflow: "hidden"}}
+                                />
+                                <div
+                                    className="flex justify-end text-center"
+                                >
+                                    <p
+                                        className="text-white font-bold text-[16px] underline cursor-pointer"
+                                        onClick={() => setIsEditing(true)}
+                                    >
+                                        Save
+                                    </p>
+                                </div>
+                            </>
                         ) : (
-                            <h1
-                                className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer"
-                                onClick={() => setIsEditing(true)}
-                            >
-                                {workflowName}
-                            </h1>
+                            <>
+                                <h1
+                                    className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer"
+                                    onClick={() => setIsEditing(true)}
+                                >
+                                    {workflowName}
+                                </h1>
+                                <div
+                                    className="flex justify-end text-center"
+                                >
+                                    <p
+                                        className="text-white font-bold text-[16px] underline cursor-pointer"
+                                        onClick={() => setIsEditing(true)}
+                                    >
+                                        Edit title
+                                    </p>
+                                </div>
+                        </>
                         )}
                     </div>
 
