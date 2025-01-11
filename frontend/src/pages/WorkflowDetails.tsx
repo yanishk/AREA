@@ -12,6 +12,8 @@ const WorkflowDetail = () => {
     const [workflow, setWorkflow] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("You");
+    const [isWorkflowActivated, setIsWorkflowActivated] = useState(false);
+    const [buttonText, setButtonText] = useState("");
     const navigate = useNavigate();
 
     const getWorkflowDetails = async () => {
@@ -29,10 +31,14 @@ const WorkflowDetail = () => {
                 ...rightWorkflow,
                 actioncolor: actionDetails?.color,
                 actionlogo: actionDetails?.logo,
+                actionname: actionDetails?.name,
                 reactionlogo: reactionDetails?.logo,
             };
 
             setWorkflow(newWorkflow)
+            setIsWorkflowActivated(newWorkflow.isactivated);
+            setButtonText(newWorkflow.isactivated ? "Connected" : "Connect");
+            console.log("new workflow ici : ", newWorkflow);
         } catch (error) {
             console.error("Error fetching workflow details:", error);
         }
@@ -58,6 +64,30 @@ const WorkflowDetail = () => {
         }
     }
 
+    const handleActivation = async () => {
+        if (!workflow) return;
+
+        const updatedWorkflow = {
+            ...workflow,
+            isactivated: !isWorkflowActivated,
+        };
+
+        try {
+            await axios.put(
+                `${import.meta.env.VITE_API_URL}workflows/${workflowId}`,
+                updatedWorkflow,
+                {
+                    withCredentials: true
+                }
+            );
+
+            setIsWorkflowActivated(!isWorkflowActivated);
+            setButtonText(!isWorkflowActivated ? "Connected" : "Connect");
+        } catch (error) {
+            console.error("Error updating workflow activation:", error);
+        }
+    };
+
     useEffect(() => {
         const fetchUserName = async () => {
             try {
@@ -78,7 +108,7 @@ const WorkflowDetail = () => {
     return (
         <>
             <div
-                style={{ backgroundColor: workflow.actioncolor}}
+                style={{backgroundColor: workflow.actioncolor}}
             >
                 <Navbar
                     isWhiteMod={true}
@@ -127,6 +157,47 @@ const WorkflowDetail = () => {
                     </p>
                 </MaxWidthWrapper>
             </div>
+
+            <MaxWidthWrapper
+                maxWidth="450px"
+            >
+                <div
+                    style={{
+                        backgroundColor: "#222222",
+                        boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
+                    }}
+                    className="h-[100px] w-full mt-[22px] rounded-full relative flex items-center justify-between cursor-pointer"
+                    onClick={handleActivation}
+                >
+                    {isWorkflowActivated ? (
+                        <>
+                            <p
+                                className="text-white text-center flex-1 text-[29px] font-bold ml-[40px]"
+                            >
+                                {buttonText}
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <p
+                                className="text-white text-center flex-1 text-[29px] font-bold ml-[150px]"
+                            >
+                                {buttonText}
+                            </p>
+                        </>
+                    )}
+                   
+                    <div
+                        style={{
+                            backgroundColor: workflow.actioncolor,
+                            transform: isWorkflowActivated
+                            ? "translateX(0)"
+                            : "translateX(-348px)",
+                        }}
+                        className="h-[90px] w-[90px] rounded-full mr-[6px] transition-transform duration-300 ease-in-out">
+                    </div>
+                </div>
+            </MaxWidthWrapper>
 
             <div className="flex justify-center mt-[20px]">
                 <button
