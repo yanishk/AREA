@@ -9,7 +9,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
-    const { isAuthenticated } = useAuth();
+    const { isUserConnected } = useAuth();
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
@@ -29,7 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
             await axios.post(`${import.meta.env.VITE_API_URL}logout`, {}, {
                 withCredentials: true
             });
-            navigate("/");
+            navigate("/explore");
             window.location.reload();
         } catch (error) {
             console.error("Error during logout:", error);
@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                         <a
-                            href="/"
+                            href="/explore"
                         >
                             AREA
                         </a>
@@ -51,14 +51,8 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                 <ul
                     className="flex flex-row items-center gap-x-6 mr-4"
                 >
-                    {!isAuthenticated ? (
+                    {!isUserConnected ? (
                         <>
-                            <li>
-                                <NavbarLink
-                                    href="/"
-                                    text="Home"
-                                />
-                            </li>
                             <li>
                                 <NavbarLink
                                     href="/explore"
@@ -88,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                             </li>
                             <li>
                                 <NavbarLink
-                                    href="/myworkflows"
+                                    href="/my_workflows"
                                     text="My workflows"
                                 />
                             </li>
