@@ -117,7 +117,7 @@ func TestLoginAuthentication(test *testing.T) {
 
 	test.Run("Successful", func(t *testing.T) {
 		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
-			Return("token", nil)
+			Return("token", nil).Once()
 
 		body := `{
 			"email": "eva.legrand@epitech.eu",
@@ -133,9 +133,9 @@ func TestLoginAuthentication(test *testing.T) {
 		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
 	})
 
-	test.Run("User not found", func(t *testing.T) {
+	test.Run("User not found", func(test *testing.T) {
 		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
-			Return("", fmt.Errorf("Could not find requested user"))
+			Return("", fmt.Errorf("Could not find requested user")).Once()
 
 		body := `{
 			"email": "eva.legrand@epitech.eu",
@@ -143,12 +143,13 @@ func TestLoginAuthentication(test *testing.T) {
 		}`
 
 		req, _ := http.NewRequest("POST", "/login", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
-		require.Equal(t, http.StatusUnauthorized, w.Code)
-		require.JSONEq(t, `{"error": "Could not find requested user"}`, w.Body.String())
+		require.Equal(test, http.StatusUnauthorized, w.Code)
+		require.JSONEq(test, `{"error": "Could not find requested user"}`, w.Body.String())
 	})
 }
 
@@ -162,7 +163,7 @@ func TestLoginCallback(test *testing.T) {
 			"apptype": "web"
 		}`
 
-		req, _ := http.NewRequest("POST", "/login-callback", strings.NewReader(body)) // Missing ?code= in URL
+		req, _ := http.NewRequest("POST", "/login-callback", strings.NewReader(body))
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
