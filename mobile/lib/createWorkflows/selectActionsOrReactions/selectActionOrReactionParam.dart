@@ -234,6 +234,20 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     return Column();
   }
 
+  Future<void> handleServiceAuthButton() async {
+    final authResponce = await ConnectServiceAuthWebview.connectService("service", CreateData.actualServiceList[CreateData.selectedServiceId].name);
+    if (authResponce != true) {
+      return;
+    }
+    setState(() {
+      CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded = false;
+    });
+    if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
+      CreateData.selectOrUpdateWorkflow = true;
+      Navigator.pop(Globaldata.myContext);
+    }
+  }
+
   Widget connectButton() {
     Color buttonColor = HexColor(CreateData.actualServiceList[CreateData.selectedServiceId].color);
     int r = buttonColor.red ~/ 2;
@@ -249,14 +263,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
             color: Colors.white),
       ),
       onPressed: () {
-        ConnectServiceAuthWebview.connectService("service", CreateData.actualServiceList[CreateData.selectedServiceId].name);
-        setState(() {
-          CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded = false;
-        });
-        if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
-          CreateData.selectOrUpdateWorkflow = true;
-          Navigator.pop(Globaldata.myContext);
-        }
+        handleServiceAuthButton();
       },
       size: Size(double.infinity, 60),
       padding: EdgeInsets.symmetric(horizontal: 15.0),
