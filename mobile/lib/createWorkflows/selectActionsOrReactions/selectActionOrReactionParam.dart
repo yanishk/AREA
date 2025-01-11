@@ -67,18 +67,18 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
 
   void createDropdownFromRoute(int index, dynamic response, String listName) {
     List<ActionOrReactionsParameter> parameterList = CreateData.selectedActionOrReactionData.parameter;
-    List<dynamic> responceList = response[listName];
+    List<dynamic> responseList = response[listName];
     List<String> nameList = [];
     List<String> idList = [];
-    for (int i = 0; i < responceList.length; i++) {
-      String itemName = responceList[i].toString().split("name: ").last.split(",").first;
+    for (int i = 0; i < responseList.length; i++) {
+      String itemName = responseList[i].toString().split("name: ").last.split(",").first;
       if (!nameList.contains(itemName.split("}").first)) {
         nameList.add(itemName.split("}").first);
       }
       if (parameterList[index].name == "channel") {
-        idList.add(responceList[i]["id"]);
+        idList.add(responseList[i]["id"]);
       } else {
-        String itemId = responceList[i].toString().split("id: ").last.split(",").first;
+        String itemId = responseList[i].toString().split("id: ").last.split(",").first;
         idList.add(itemId.split("}").first);
       }
     }
@@ -145,10 +145,10 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     }
     String listName = response.toString().split(":").first.split("{").last;
     if (!(response[listName] is List<dynamic>)) {
-      developer.log("new responce : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
-      dynamic newResponce = ActionsOrReactionsFunctions.getMapKeyName(response);
-      listName = newResponce.toString().split(":").first.split("{").last;
-      createDropdownFromRoute(index, newResponce, listName);
+      developer.log("new response : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
+      dynamic newResponse = ActionsOrReactionsFunctions.getMapKeyName(response);
+      listName = newResponse.toString().split(":").first.split("{").last;
+      createDropdownFromRoute(index, newResponse, listName);
       return;
     }
     createDropdownFromRoute(index, response, listName);
@@ -235,8 +235,8 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   }
 
   Future<void> handleServiceAuthButton() async {
-    final authResponce = await ConnectServiceAuthWebview.connectService("service", CreateData.actualServiceList[CreateData.selectedServiceId].name);
-    if (authResponce != true) {
+    final authResponse = await ConnectServiceAuthWebview.connectService("service", CreateData.actualServiceList[CreateData.selectedServiceId].name);
+    if (!authResponse) {
       return;
     }
     setState(() {
