@@ -361,3 +361,38 @@ func TestModifyPassword(test *testing.T) {
 		require.JSONEq(test, `{"error": "Old password is incorrect"}`, w.Body.String())
 	})
 }
+
+func TestDeleteAccount(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "service")
+	})
+	router.DELETE("/user", handler.deleteAccount)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("DeleteAccount", "email", "service").Return(nil).Once()
+
+		req := requestForProtected("DELETE", "/user", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Account deleted"}`, w.Body.String())
+	})
+
+	test.Run("Error Deleting Account", func(test *testing.T) {
+		mockUserService.On("DeleteAccount", "email", "service").Return(errors.New("account not deleted")).Once()
+
+		req := requestForProtected("DELETE", "/user", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.JSONEq(test, `{"error": "Could not delete account"}`, w.Body.String())
+	})
+}
