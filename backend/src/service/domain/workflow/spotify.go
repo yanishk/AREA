@@ -36,6 +36,78 @@ func getSpotifyUrl(workflow entities.Workflow, baseUrl, parameterName, endUrl st
 	return (baseUrl + parameter.(string) + endUrl), nil
 }
 
+func (self *WorkflowService) executeAddTrackToPlaybackQueueSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/player/queue?uri=", "uri", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSaveTrackSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/tracks?ids=", "id", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSaveAlbumSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/albums?ids=", "id", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSaveAudiobookSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/audiobooks?ids=", "id", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSaveEpisodeSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/episodes?ids=", "id", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSaveShowSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/shows?ids=", "id", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeSetPlaybackVolumeSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/player/volume?volume_percent=", "volume", "")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeFollowPlaylistSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/playlists/", "id", "/followers")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+}
+
+func (self *WorkflowService) executeUnfollowPlaylistSpotifyRequest(workflow entities.Workflow, accessToken string) (*http.Response, error) {
+	url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/playlists/", "id", "/followers")
+	if err != nil {
+		return nil, err
+	}
+	return self.ServiceService.ExecuteApiRequest(url, "DELETE", bearerType, accessToken, nil)
+}
+
 func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) error {
 	reactionFound, errReaction := self.ReactionRepository.FindReactionById(workflow.ReactionId)
 	if errReaction != nil {
@@ -62,59 +134,23 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 	case "Skip to previous track":
 		resp, _ = self.ServiceService.ExecuteApiRequest("https://api.spotify.com/v1/me/player/previous", "POST", bearerType, accessToken, nil)
 	case "Add track to playback queue":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/player/queue?uri=", "uri", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "POST", bearerType, accessToken, nil)
+		resp, _ = self.executeAddTrackToPlaybackQueueSpotifyRequest(workflow, accessToken)
 	case "Save a track":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/tracks?ids=", "id", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSaveTrackSpotifyRequest(workflow, accessToken)
 	case "Save an album":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/albums?ids=", "id", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSaveAlbumSpotifyRequest(workflow, accessToken)
 	case "Save an audiobook":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/audiobooks?ids=", "id", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSaveAudiobookSpotifyRequest(workflow, accessToken)
 	case "Save an episode":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/episodes?ids=", "id", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSaveEpisodeSpotifyRequest(workflow, accessToken)
 	case "Save a show":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/shows?ids=", "id", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSaveShowSpotifyRequest(workflow, accessToken)
 	case "Set playback volume":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/player/volume?volume_percent=", "volume", "")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeSetPlaybackVolumeSpotifyRequest(workflow, accessToken)
 	case "Follow a playlist":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/playlists/", "id", "/followers")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
+		resp, _ = self.executeFollowPlaylistSpotifyRequest(workflow, accessToken)
 	case "Unfollow a playlist":
-		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/playlists/", "id", "/followers")
-		if err != nil {
-			return err
-		}
-		resp, _ = self.ServiceService.ExecuteApiRequest(url, "DELETE", bearerType, accessToken, nil)
+		resp, _ = self.executeUnfollowPlaylistSpotifyRequest(workflow, accessToken)
 	}
 
 	if resp != nil {
