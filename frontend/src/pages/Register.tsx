@@ -1,4 +1,4 @@
-import { faGoogle, faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
+import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "../components/errors/ErrorMessage";
@@ -69,7 +69,7 @@ const RegisterForm = () => {
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
                     <a
-                        href="/"
+                        href="/explore"
                     >
                         AREA
                     </a>
@@ -111,13 +111,6 @@ const RegisterForm = () => {
                     </div>
 
                     <SocialButton
-                        icon={faGoogle}
-                        bgColor="bg-[#E84A4A]"
-                        hoverColor="hover:bg-[#F55B5B]"
-                        text="Continue with Google"
-                        onClick={() => handleOAuthLogin("Google")}
-                    />
-                    <SocialButton
                         icon={faSpotify}
                         bgColor="bg-[#20ca5d]"
                         hoverColor="hover:bg-[#20d561]"
@@ -129,7 +122,6 @@ const RegisterForm = () => {
                         bgColor="bg-[#7189DA]"
                         hoverColor="hover:bg-[#7a90da]"
                         text="Continue with Discord"
-                        iconPosition="left-[27px]"
                         onClick={() => handleOAuthLogin("Discord")}
                     />
                     <SocialButton
@@ -137,8 +129,6 @@ const RegisterForm = () => {
                         bgColor="bg-[#222222]"
                         hoverColor="hover:bg-[#333333]"
                         text="Continue with Github"
-                        iconPosition="left-[20px]"
-                        iconSize="size-11"
                         onClick={() => handleOAuthLogin("Github")}
                     />
                     <SocialButton
@@ -146,7 +136,6 @@ const RegisterForm = () => {
                         bgColor="bg-[#FC6D27]"
                         hoverColor="hover:bg-[#FD7A38]"
                         text="Continue with Gitlab"
-                        iconPosition="left-[20px]"
                         iconSize="size-10"
                         onClick={() => handleOAuthLogin("Gitlab")}
                     />

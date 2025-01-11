@@ -65,7 +65,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 </div>
 
                 <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
-                    Complete trigger fields
+                    {type === "action" ? "Complete action fields" : "Complete reaction fields"}
                 </h1>
 
                 <div className="w-[100px]"></div>
@@ -96,7 +96,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         onChange={(id, value) => handleFieldChange(id, value, type)}
                     />
                     <TriggerButton
-                        text="Create Trigger"
+                        text={type === "action" ? "Create Action" : "Create Reaction"}
                         textColor="text-black"
                         bgColor="bg-white"
                         hoverColor="hover:bg-[#EEEEEE]"

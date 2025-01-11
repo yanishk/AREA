@@ -47,7 +47,7 @@ type UserLoginCallbackSuccessResponse struct {
 }
 
 type UserLoginCallbackBadRequestResponse struct {
-	Msg string `json:"error"example:"Invalid code authorization"`
+	Msg string `json:"error"example:"Invalid request body-Invalid code authorization"`
 }
 
 type UserLoginCallbackInternalServerErrorResponse struct {
@@ -64,7 +64,16 @@ type UserGetUserUnauthorizedResponse struct {
 }
 
 type UserGetUserInternalServerErrorResponse struct {
-	Msg string `json:"error"example:"Internal server error"`
+	Msg string `json:"error"example:"Could not find user"`
+}
+
+// Logout User Responses
+type UserLogoutUserSuccessResponse struct {
+	Msg string `json:"success"example:"Logout successful"`
+}
+
+type UserLogoutUserInternalServerErrorResponse struct {
+	Msg string `json:"error"example:"Could not find user"`
 }
 
 // Modify Password Responses

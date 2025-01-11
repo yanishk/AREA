@@ -79,6 +79,9 @@ func (self *ServiceService) FindServiceByReactionId(id string) (entities.Service
 	}
 	return self.ServiceRepository.FindServiceById(reaction.ServiceId)
 }
+func (self *ServiceService) FindAllServices() ([]entities.Service, error) {
+	return self.ServiceRepository.FindAllServices()
+}
 
 func (self *ServiceService) RetrieveActionsFromService(serviceName string) ([]entities.Action, error) {
 	foundService, errFoundService := self.ServiceRepository.FindServiceByName(serviceName)
@@ -161,7 +164,7 @@ func oauth2Spotify(callbackType string) string {
 		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
 		codeResponseType +
 		redirectUriParam + callbackLink +
-		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify playlist-modify-public")
 }
 
 func oauth2Discord(callbackType string) string {
@@ -416,11 +419,12 @@ func getAsanaOAuth2AccessTokenRequest(code, callbackType string) (*http.Request,
 
 	tokenUrl := "https://app.asana.com/-/oauth_token"
 	jsonBody := fmt.Sprintf(
-		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
-			clientSecretParam + os.Getenv("ASANA_CLIENT_SECRET") +
-			codeParam + code +
-			redirectUriParam + asanaCallback +
-			grantTypeParam + grantTypeAuthorization,
+		"client_id=%s&client_secret=%s&code=%s&redirect_uri=%s&grant_type=%s",
+		os.Getenv("ASANA_CLIENT_ID"),
+		os.Getenv("ASANA_CLIENT_SECRET"),
+		code,
+		asanaCallback,
+		grantTypeAuthorization,
 	)
 
 	request, errRequest := http.NewRequest("POST", tokenUrl, bytes.NewBuffer([]byte(jsonBody)))

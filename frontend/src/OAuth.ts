@@ -3,7 +3,7 @@ import axios from "axios";
 export const handleOAuthLogin = async (serviceName: string) => {
     try {
         const result = await axios.get(
-            `${import.meta.env.VITE_API_URL}authentication/${serviceName}/login/web`,
+            `${import.meta.env.VITE_API_URL}authentication?service=${serviceName}&callbacktype=login&apptype=web`,
             {
                 withCredentials: true,
             }
@@ -11,7 +11,7 @@ export const handleOAuthLogin = async (serviceName: string) => {
 
         const authUrl = result.data["auth-url"];
         if (!authUrl) {
-            console.error("Error: Authentication URL not received");
+            console.error("Authentication URL not received");
             return;
         }
 

@@ -73,7 +73,7 @@ const WorkflowBuilder = () => {
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
-            navigate("/")
+            navigate("/explore")
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -297,7 +297,7 @@ const WorkflowBuilder = () => {
     const handleConnectService = async (selectedService: any) => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_API_URL}authentication/${selectedService.name}/service/web`,
+                `${import.meta.env.VITE_API_URL}authentication?service=${selectedService.name}&callbacktype=service&apptype=web`,
                 {
                     withCredentials: true,
                 }
@@ -369,9 +369,14 @@ const WorkflowBuilder = () => {
                 serviceType === "action" ? selectedActionService?.name : selectedReactionService?.name;
 
             await axios.post(
-                `${import.meta.env.VITE_API_URL}service-callback/${serviceName}/web/?code=${codeAuth}`,
-                {},
-                { withCredentials: true }
+                `${import.meta.env.VITE_API_URL}service-callback/?code=${codeAuth}`,
+                {
+                    service: serviceName,
+                    apptype: "web"
+                },
+                {
+                    withCredentials: true
+                }
             );
         } catch (error) {
             console.error("Error with service callback:", error);
@@ -497,7 +502,7 @@ const WorkflowBuilder = () => {
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/");
+        navigate("/explore");
     };
 
     const renderStep = () => {
@@ -535,6 +540,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableActions}
                         handleSelect={handleSelectAction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_ACTION)}
+                        type="action"
                     />
                 )
 
@@ -567,6 +573,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableReactions}
                         handleSelect={handleSelectReaction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_REACTION)}
+                        type="reaction"
                     />
                 )
 

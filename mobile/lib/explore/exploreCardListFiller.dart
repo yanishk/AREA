@@ -1,69 +1,48 @@
 import 'package:flutter/material.dart';
+import "package:namer_app/globalData.dart";
 
 import "exploreWidget.dart";
 import "../custom_widget.dart";
-import "explorePageData.dart";
-
-class FillServicesAndWorkflow {
-  static List<Widget> servicesAndWorkflow = [];
-
-  static Widget serviceAndWorkflowTiles(int index, int serviceIndex) {
-    if (index % 2 == 0) {
-      if (serviceIndex < AllServicesList.allServiceNameList.length) {
-        return ServicesCard(
-          name: AllServicesList.allServiceNameList[serviceIndex],
-          color: HexColor(AllServicesList.allServiceColorList[serviceIndex]),
-          imageUrl: AllServicesList.allServiceIconsList[serviceIndex],
-        );
-      }
-    }
-    return WorkflowCard();
-  }
-
-  static void fillServicesAndWorkflowList() {
-    servicesAndWorkflow = [];
-    int serviceIndex = 0;
-    for (int allIndex = 0; allIndex < AllServicesList.allServiceNameList.length * 2; allIndex++) {
-      servicesAndWorkflow.add(serviceAndWorkflowTiles(allIndex, serviceIndex));
-      if (allIndex % 2 == 0) {
-        if (serviceIndex < AllServicesList.allServiceNameList.length) {
-          serviceIndex++;
-        }
-      }
-    }
-  }
-}
 
 class FillServicesCard {
   static List<Widget> serviceCardList = [];
+  static int serviceIndex = 0;
 
   static Widget serviceTiles(int index) {
-    return ServicesCard(
-      name: AllServicesList.allServiceNameList[index],
-      color: HexColor(AllServicesList.allServiceColorList[index]),
-      imageUrl: AllServicesList.allServiceIconsList[index],
+    if (index + 1 < Globaldata.serviceList.length && index % 2 == 0) {
+      serviceIndex++;
+      return Row(
+        children: [
+          MySquareServicesCard(
+            name: Globaldata.serviceList[index].name,
+            color: HexColor(Globaldata.serviceList[index].color),
+            imageUrl: Globaldata.serviceList[index].icon,
+            index: index++,
+          ),
+          MySquareServicesCard(
+            name: Globaldata.serviceList[index].name,
+            color: HexColor(Globaldata.serviceList[index].color),
+            imageUrl: Globaldata.serviceList[index].icon,
+            index: index,
+          ),
+        ],
+      );
+    }
+    return Row(
+      children: [
+        MySquareServicesCard(
+          name: Globaldata.serviceList[index].name,
+          color: HexColor(Globaldata.serviceList[index].color),
+          imageUrl: Globaldata.serviceList[index].icon,
+        ),
+      ],
     );
   }
 
   static void fillServicesCardList () {
     serviceCardList = [];
-    for (int i = 0; i < AllServicesList.allServiceNameList.length; i++) {
-      serviceCardList.add(serviceTiles(i));
-    }
-  }
-}
-
-class FillWorkflowsCard {
-  static List<Widget> workflowsCardList = [];
-
-  static Widget workflowsTiles(int index) {
-    return WorkflowCard();
-  }
-
-  static void fillWorkflowsCardList () {
-    workflowsCardList = [];
-    for (int i = 0; i < 5; i++) {
-      workflowsCardList.add(workflowsTiles(i));
+    for (serviceIndex = 0; serviceIndex < Globaldata.serviceList.length; serviceIndex++) {
+      serviceCardList.add(serviceTiles(serviceIndex));
     }
   }
 }

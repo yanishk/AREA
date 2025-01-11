@@ -2,13 +2,14 @@ import NavbarLink from "./NavbarLink"
 import NavbarButton from "./NavbarButton"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../pages/AuthContext";
+import axios from "axios";
 
 interface NavbarProps {
     bgColor?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
-    const { isAuthenticated } = useAuth();
+    const { isUserConnected } = useAuth();
     const navigate = useNavigate();
 
     const handleGetStarted = () => {
@@ -18,8 +19,21 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
     const handleAccount = () => {
         navigate("/settings");
     };
+
     const handleCreate = () => {
         navigate("/create");
+    }
+
+    const handleLogout = async () => {
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL}logout`, {}, {
+                withCredentials: true
+            });
+            navigate("/explore");
+            window.location.reload();
+        } catch (error) {
+            console.error("Error during logout:", error);
+        }
     }
 
     return (
@@ -28,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                         <a
-                            href="/"
+                            href="/explore"
                         >
                             AREA
                         </a>
@@ -37,14 +51,8 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                 <ul
                     className="flex flex-row items-center gap-x-6 mr-4"
                 >
-                    {!isAuthenticated ? (
+                    {!isUserConnected ? (
                         <>
-                            <li>
-                                <NavbarLink
-                                    href="/"
-                                    text="Home"
-                                />
-                            </li>
                             <li>
                                 <NavbarLink
                                     href="/explore"
@@ -74,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                             </li>
                             <li>
                                 <NavbarLink
-                                    href="/myworkflows"
+                                    href="/my_workflows"
                                     text="My workflows"
                                 />
                             </li>
@@ -84,6 +92,12 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor }) => {
                                     text="Create"
                                 />
                             </li>
+                            <button
+                                onClick={handleLogout}
+                                className="text-[#222222] hover:text-[#444444] font-bold text-[20px] ml-3"
+                            >
+                            {"Log out"}
+                            </button>
                             <li>
                                 <button
                                     className="bg-[#222222] hover:bg-[#333333] w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center border-[3px] border-[#222222] cursor-pointer"

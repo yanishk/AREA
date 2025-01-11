@@ -9,7 +9,7 @@ import "package:namer_app/auth/authFunctions.dart";
 import "../../apiCall/apiErrorHandling.dart";
 import "../../globalData.dart";
 import "../../login/loginNavigator.dart";
-import "../../login/loadServicesList.dart";
+import "../../login/loadData/loadServicesData.dart";
 import "../../apiCall/apiData.dart";
 import "../authData.dart";
 
@@ -45,7 +45,7 @@ class WebviewAuthAPICall extends StatefulWidget {
 class WebviewAuth extends State<WebviewAuthAPICall> {
   late InAppWebViewController webViewController;
   String newUrl = "";
-  String apiRoute = "service-callback/$authServiceName";
+  String apiRoute = "service-callback";
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
     if (authConnectionType == "login") {
       developer.log("authConnectionType : $authConnectionType");
       setState(() {
-        apiRoute = "login-callback/$authServiceName";
+        apiRoute = "login-callback";
       });
     }
   }
@@ -77,9 +77,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
     if (splitState.length == 1) {
       return url.split("&state=").first;
     }
-    developer.log("removeUrlState splitState : $splitState");
     final splitCode = splitState.last.split("&code=");
-    developer.log("removeUrlState splitCode : $splitCode");
     return "${splitState.first}?code=${splitCode.last}";
   }
 
@@ -100,10 +98,16 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
         onLoadStop: (controller, url) async {
           developer.log("onLoadStop url : ${url.toString()}");
           if (url != null &&
-              url.toString().contains(ApiData.apiUrl + apiRoute)) {
+              url.toString().contains(ApiData.apiUrl + "$apiRoute/$authServiceName")) {
             final urlSplit = url.toString().split(ApiData.apiUrl);
             String callBackUrl = removeUrlState(urlSplit.last);
-            final Response response = await ApiRequest.post(AuthFunctions.insertAppTypeInUrl(callBackUrl), jsonEncode(<String, dynamic>{}),);
+            final Response response = await ApiRequest.post(
+              AuthFunctions.removeServiceFromUrl(callBackUrl, authServiceName),
+              jsonEncode(<String, dynamic>{
+                "apptype" : Globaldata.appType,
+                "service" : authServiceName,
+              }),
+            );
 
             if (response.statusCode == 200) {
               developer.log("User connected");
@@ -111,7 +115,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
                 saveJWToken(response);
               }
               Navigator.pop(context);
-              Navigator.pop(Globaldata.myContext);
+              Navigator.pop(Globaldata.myContext, true);
             } else {
               final responseData = await errorHandler.basicResponseErrorHandler(response, "Error auth failed : ");
               if (responseData == null) {

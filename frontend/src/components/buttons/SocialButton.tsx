@@ -17,8 +17,8 @@ const SocialButton: React.FC<SocialButtonProps> = ({
     bgColor,
     hoverColor,
     text,
-    iconPosition = "left-6",
-    iconSize = "size-8",
+    iconPosition = "left-[20px]",
+    iconSize = "size-11",
     onClick,
 }) => {
     return (
