@@ -3,6 +3,7 @@ package user_handler
 import (
 	"backend/src/entities"
 	"backend/src/handler/middleware"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -107,4 +108,45 @@ func TestCreateUser(test *testing.T) {
 
 	require.Equal(test, http.StatusOK, w.Code)
 	require.JSONEq(test, `{"success": "New user created"}`, w.Body.String())
+}
+
+func TestLoginAuthentication(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+	router.POST("/login", handler.loginAuthentication)
+
+	test.Run("Successful", func(t *testing.T) {
+		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+			Return("token", nil)
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
+	})
+
+	test.Run("User not found", func(t *testing.T) {
+		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+			Return("", fmt.Errorf("Could not find requested user"))
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusUnauthorized, w.Code)
+		require.JSONEq(t, `{"error": "Could not find requested user"}`, w.Body.String())
+	})
 }
