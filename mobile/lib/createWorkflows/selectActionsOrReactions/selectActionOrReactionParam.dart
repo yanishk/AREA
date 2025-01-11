@@ -186,7 +186,11 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         if (dropdownStringList.first == "0") {
           selectedParamIndex--;
         }
-        CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParamIndex;
+        if (parameterList[index].type == "string") {
+          CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = dropdownStringList.first;
+        } else {
+          CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParamIndex;
+        }
       }
       return CreateDropdown(
         index: index,
@@ -198,7 +202,11 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
             if (dropdownStringList.first == "0") {
               selectedParamIndex--;
             }
-            CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParamIndex;
+            if (parameterList[index].type == "string") {
+              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = newValue;
+            } else {
+              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParamIndex;
+            }
             fillParameterFiledList();
           });
         },
