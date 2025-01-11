@@ -187,3 +187,59 @@ class MySearchBar extends StatelessWidget {
     );
   }
 }
+
+class MySquareServicesCard extends StatelessWidget {
+  const MySquareServicesCard({
+    super.key,
+    required this.name,
+    required this.color,
+    this.imageUrl = "",
+  });
+
+  final String name;
+  final Color color;
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          border: Border.all(
+            color: color,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(4.0),
+        ),
+        child: InkWell(
+          onTap: () {},
+          child: Column(
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
+                child: Column(children: [
+                  SafeWebImage(
+                      url: "${Globaldata.domainName}$imageUrl"),
+                  AutoSizeText(
+                    name,
+                    style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                    maxLines: 1,
+                  )
+                ]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

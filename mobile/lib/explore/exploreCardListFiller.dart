@@ -38,19 +38,41 @@ class FillServicesAndWorkflow {
 
 class FillServicesCard {
   static List<Widget> serviceCardList = [];
+  static int serviceIndex = 0;
 
   static Widget serviceTiles(int index) {
-    return ServicesCard(
-      name: Globaldata.serviceList[index].name,
-      color: HexColor(Globaldata.serviceList[index].color),
-      imageUrl: Globaldata.serviceList[index].icon,
+    if (index + 1 < Globaldata.serviceList.length && index % 2 == 0) {
+      serviceIndex++;
+      return Row(
+        children: [
+          MySquareServicesCard(
+            name: Globaldata.serviceList[index].name,
+            color: HexColor(Globaldata.serviceList[index].color),
+            imageUrl: Globaldata.serviceList[index++].icon,
+          ),
+          MySquareServicesCard(
+            name: Globaldata.serviceList[index].name,
+            color: HexColor(Globaldata.serviceList[index].color),
+            imageUrl: Globaldata.serviceList[index].icon,
+          ),
+        ],
+      );
+    }
+    return Row(
+      children: [
+        MySquareServicesCard(
+          name: Globaldata.serviceList[index].name,
+          color: HexColor(Globaldata.serviceList[index].color),
+          imageUrl: Globaldata.serviceList[index].icon,
+        ),
+      ],
     );
   }
 
   static void fillServicesCardList () {
     serviceCardList = [];
-    for (int i = 0; i < Globaldata.serviceList.length; i++) {
-      serviceCardList.add(serviceTiles(i));
+    for (serviceIndex = 0; serviceIndex < Globaldata.serviceList.length; serviceIndex++) {
+      serviceCardList.add(serviceTiles(serviceIndex));
     }
   }
 }
