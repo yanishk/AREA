@@ -4,8 +4,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import "../../custom_widget.dart";
 import "../../globalData.dart";
 
-class SelectActionOrReactionPage extends StatelessWidget {
-  const SelectActionOrReactionPage({
+class DisplayActionOrReactionPage extends StatelessWidget {
+  const DisplayActionOrReactionPage({
     super.key,
     required this.serviceIndex,
   });
@@ -16,24 +16,24 @@ class SelectActionOrReactionPage extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      home: SelectActionOrReactionAPICall(serviceIndex: serviceIndex),
+      home: DisplayActionOrReactionAPICall(serviceIndex: serviceIndex),
     );
   }
 }
 
-class SelectActionOrReactionAPICall extends StatefulWidget {
-  const SelectActionOrReactionAPICall({
+class DisplayActionOrReactionAPICall extends StatefulWidget {
+  const DisplayActionOrReactionAPICall({
     super.key,
     required this.serviceIndex,
   });
   final int serviceIndex;
 
   @override
-  SelectActionOrReaction createState() => SelectActionOrReaction(serviceIndex: serviceIndex);
+  DisplayActionOrReaction createState() => DisplayActionOrReaction(serviceIndex: serviceIndex);
 }
 
-class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
-  SelectActionOrReaction({
+class DisplayActionOrReaction extends State<DisplayActionOrReactionAPICall> {
+  DisplayActionOrReaction({
     required this.serviceIndex,
   });
   final int serviceIndex;
@@ -162,17 +162,13 @@ class ButtonText extends StatelessWidget {
   }
 }
 
-class SelectActionOrReactionTopBar extends StatelessWidget {
-  const SelectActionOrReactionTopBar({
+class TopBar extends StatelessWidget {
+  const TopBar({
     super.key,
-    this.title = "",
     this.color = Colors.black,
-    this.fontSize = 10,
   });
 
-  final String title;
   final Color color;
-  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -192,17 +188,7 @@ class SelectActionOrReactionTopBar extends StatelessWidget {
             ),
           ),
         ),
-        Center(
-          child: AutoSizeText(
-            title,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-            maxLines: 1,
-          ),
-        ),
+        Center(child: AutoSizeText("",),),
       ],
     );
   }
@@ -240,7 +226,7 @@ class ActionOrReactionDescription extends StatelessWidget {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 35)),
-            SelectActionOrReactionTopBar(title: title, color: Colors.white),
+            TopBar(color: Colors.white),
             SafeWebImage(
               url:
                   "${Globaldata.domainName}$serviceIcon",

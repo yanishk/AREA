@@ -85,7 +85,7 @@ class MySquareServicesCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => SelectActionOrReactionPage(serviceIndex: index,)));
+            Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => DisplayActionOrReactionPage(serviceIndex: index,)));
           },
           child: Column(
             children: [
