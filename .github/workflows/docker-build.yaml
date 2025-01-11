@@ -1,10 +1,11 @@
-name: docker
+name: docker-build
 
 on:
-  push:
+  pull_request:
+    branches: ["main"]
 
 jobs:
-  check-docker-build:
+  check-docker-compose-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
