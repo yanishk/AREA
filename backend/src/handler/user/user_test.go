@@ -150,3 +150,74 @@ func TestLoginAuthentication(test *testing.T) {
 		require.JSONEq(t, `{"error": "Could not find requested user"}`, w.Body.String())
 	})
 }
+
+func TestLoginCallback(test *testing.T) {
+	handler, router, mockUserService := createMockAndRoute(false)
+	router.POST("/login-callback", handler.loginCallback)
+
+	test.Run("Invalid code authorization", func(t *testing.T) {
+		body := `{
+			"service": "Github",
+			"apptype": "web"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login-callback", strings.NewReader(body)) // Missing ?code= in URL
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid code authorization"}`, w.Body.String())
+	})
+
+	test.Run("Invalid app type", func(test *testing.T) {
+		body := `{
+			"service": "Github",
+			"apptype": "unknown"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login-callback?code=valid-code", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid app type"}`, w.Body.String())
+	})
+
+	test.Run("Failed to connect", func(test *testing.T) {
+		mockUserService.On("LoginWithService", "code", "Github", "web").
+			Return("", fmt.Errorf("service error"))
+
+		body := `{
+			"service": "Github",
+			"apptype": "web"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login-callback?code=code", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Failed to connect with requested service"}`, w.Body.String())
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("LoginWithService", "code", "github", "web").
+			Return("token", nil)
+
+		body := `{
+			"service": "github",
+			"apptype": "web"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login-callback?code=code", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
+	})
+}
