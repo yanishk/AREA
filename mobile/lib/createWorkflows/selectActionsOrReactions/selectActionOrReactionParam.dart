@@ -104,12 +104,12 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       parameterFiledList.add(
         CreateDropdown(
           index: index,
-          onChanged: (String? newValue) {
+          onChanged: (String? selectedValue) {
             setState(() {
-              selectedItems[index] = newValue ?? "";
-              selectedParameterId[index] = idList[nameList.indexOf(newValue ?? "")];
+              selectedItems[index] = selectedValue ?? "";
+              selectedParameterId[index] = idList[nameList.indexOf(selectedValue ?? "")];
               int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-              actionOrReactionParamStringMap[index] = "$newValue";
+              actionOrReactionParamStringMap[index] = "$selectedValue";
               if (selectedParameterId[index]?[0] != "{") {
                 developer.log("selectedParameterId[index] : ${selectedParameterId[index]}");
                 CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
@@ -118,9 +118,9 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                 CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
               }
               if (parameterList[index].name == "workspace") {
-                asanaWorkspaceId = idList[nameList.indexOf(newValue ?? "")];
+                asanaWorkspaceId = idList[nameList.indexOf(selectedValue ?? "")];
                 selectedItems.clear();
-                selectedItems[index] = newValue ?? "";
+                selectedItems[index] = selectedValue ?? "";
               }
               fillParameterFiledList();
             });
@@ -194,16 +194,16 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       }
       return CreateDropdown(
         index: index,
-        onChanged: (String? newValue) {
+        onChanged: (String? selectedValue) {
           setState(() {
-            selectedItems[index] = newValue ?? "";
+            selectedItems[index] = selectedValue ?? "";
             int selectedParamIndex = dropdownStringList.indexOf(selectedItems[index] ?? "") + 1;
-            actionOrReactionParamStringMap[index] = "$newValue";
+            actionOrReactionParamStringMap[index] = "$selectedValue";
             if (dropdownStringList.first == "0") {
               selectedParamIndex--;
             }
             if (parameterList[index].type == "string") {
-              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = newValue;
+              CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedValue;
             } else {
               CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParamIndex;
             }
