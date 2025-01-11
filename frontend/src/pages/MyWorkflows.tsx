@@ -85,7 +85,10 @@ const MyWorkflow = () => {
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
-                                style={{ backgroundColor: workflow.actioncolor}}
+                                style={{
+                                    backgroundColor: workflow.actioncolor,
+                                    boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
+                                }}
                                 className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90"
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
                             >

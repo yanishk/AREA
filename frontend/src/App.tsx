@@ -12,7 +12,7 @@ import ChangePasswordPage from './pages/ChangePassword'
 import MyWorkflow from './pages/MyWorkflows'
 import ProtectedRoute from './ProtectedRoute'
 import RedirectRoute from './RedirectRoute'
-import WorkflowDetail from './pages/WorkflowDetail'
+import WorkflowDetail from './pages/WorkflowDetails'
 
 function App() {
   return (
