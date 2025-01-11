@@ -88,7 +88,6 @@ func (self *WorkflowService) checkSpotifyReactions(workflow entities.Workflow) e
 	case "Save an episode":
 		url, err := getSpotifyUrl(workflow, "https://api.spotify.com/v1/me/episodes?ids=", "id", "")
 		if err != nil {
-			fmt.Println("err episode")
 			return err
 		}
 		resp, _ = self.ServiceService.ExecuteApiRequest(url, "PUT", bearerType, accessToken, nil)
