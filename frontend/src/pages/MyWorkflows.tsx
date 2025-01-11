@@ -88,7 +88,9 @@ const MyWorkflow = () => {
                                     backgroundColor: workflow.actioncolor,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative"
+                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative ${
+                                    workflow.isactivated ? "opacity-100" : "opacity-50 hover:opacity-30"
+                                }`}
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
                             >
                                 <div className="flex flex-row pl-[25px] pt-[15px]">
@@ -122,28 +124,50 @@ const MyWorkflow = () => {
                                             style={{backgroundColor: "white"}}
                                             className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
                                         >
-                                            <p
-                                                className="text-black text-center flex-1 text-[14px] font-bold"
-                                            >
-                                                Connected
-                                            </p>
+                                            {workflow.isactivated ? (
+                                                <>
+                                                    <p
+                                                        className="text-black text-center flex-1 text-[14px] font-bold"
+                                                    >
+                                                        Connected
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p
+                                                        className="text-black text-center flex-1 text-[14px] font-bold ml-[50px]"
+                                                    >
+                                                        Connect
+                                                    </p>
+                                                </>
+                                            )}
+
                                             <div
-                                                style={{backgroundColor: workflow.actioncolor}}
+                                                style={{
+                                                    backgroundColor: workflow.actioncolor,
+                                                    transform: workflow.isactivated
+                                                    ? "translateX(0)"
+                                                    : "translateX(-120px)",
+                                                }}
                                                 className="h-[33px] w-[33px] rounded-full">
                                             </div>
                                         </div>
-                                        <div className="flex flex-row mt-[30px]">
-                                            <img
-                                                className="w-[14px] h-[18px]"
-                                                src="/user-icon.png"
-                                                alt="Avatar"
-                                            />
-                                            <span
-                                                className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
-                                            >
-                                                1
-                                            </span>
-                                        </div>
+                                        {workflow.isactivated ? (
+                                            <div className="flex flex-row mt-[30px]">
+                                                <img
+                                                    className="w-[14px] h-[18px]"
+                                                    src="/user-icon.png"
+                                                    alt="Avatar"
+                                                />
+                                                <span
+                                                    className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
+                                                >
+                                                    1
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-[60px]"></div>
+                                        )}
                                     </div>
                                 </div>
 

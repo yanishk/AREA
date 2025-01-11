@@ -206,7 +206,7 @@ const WorkflowDetail = () => {
                                 >
                                     <p
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
-                                        onClick={() => setIsEditing(true)}
+                                        onClick={handleSaveName}
                                     >
                                         Save
                                     </p>
