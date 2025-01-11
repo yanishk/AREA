@@ -85,7 +85,7 @@ func TestFindActionById(test *testing.T) {
 		action, err := repo.FindActionById("id")
 
 		assert.NoError(test, err)
-		assertAction(test, action, "i", "serviceid", "name", "description", 3)
+		assertAction(test, action, "id", "serviceid", "name", "description", 3)
 
 		err = mock.ExpectationsWereMet()
 		if err != nil {
