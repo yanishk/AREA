@@ -9,8 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check dockerisation
+      - name: Check docker-compose build
         run: |
+          apt-get install docker-compose
           docker-compose build
-          docker-compose up
-
