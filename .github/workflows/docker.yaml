@@ -1,0 +1,16 @@
+name: docker
+
+on:
+  push:
+
+jobs:
+  check-dockerisation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check dockerisation
+        run: |
+          docker-compose build
+          docker-compose up
+
