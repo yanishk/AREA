@@ -104,19 +104,35 @@ const MyWorkflow = () => {
                                 </div>
                                 <div className="text-left w-full px-[25px]">
                                     <h2
-                                        className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0"
+                                        className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0 break-words whitespace-normal"
                                     >
                                         {workflow.name}
                                     </h2>
                                     <p
-                                        className="text-white text-[15.7px] mt-[35px] mb-[110px]"
+                                        className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
                                     >
                                         by{' '}
                                         <span className="font-bold">
                                             {userName}
                                         </span>
                                     </p>
+
+                                    <div
+                                        style={{backgroundColor: "white"}}
+                                        className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
+                                    >
+                                        <p
+                                            className="text-black text-center flex-1 text-[14px] font-bold"
+                                        >
+                                            Connected
+                                        </p>
+                                        <div
+                                            style={{backgroundColor: workflow.actioncolor}}
+                                            className="h-[33px] w-[33px] rounded-full">
+                                        </div>
+                                    </div>
                                 </div>
+
                             </button>
 
                         ))}
