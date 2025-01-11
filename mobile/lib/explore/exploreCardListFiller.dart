@@ -16,12 +16,14 @@ class FillServicesCard {
           MySquareServicesCard(
             name: Globaldata.serviceList[index].name,
             color: HexColor(Globaldata.serviceList[index].color),
-            imageUrl: Globaldata.serviceList[index++].icon,
+            imageUrl: Globaldata.serviceList[index].icon,
+            index: index++,
           ),
           MySquareServicesCard(
             name: Globaldata.serviceList[index].name,
             color: HexColor(Globaldata.serviceList[index].color),
             imageUrl: Globaldata.serviceList[index].icon,
+            index: index,
           ),
         ],
       );

@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 
 import "../custom_widget.dart";
 import "../globalData.dart";
+import 'exploreDisplayActionsOrReactions.dart';
 
 class MySearchBar extends StatelessWidget {
   const MySearchBar({
@@ -61,11 +62,13 @@ class MySquareServicesCard extends StatelessWidget {
     required this.name,
     required this.color,
     this.imageUrl = "",
+    this.index = 0,
   });
 
   final String name;
   final Color color;
   final String imageUrl;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +84,9 @@ class MySquareServicesCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(4.0),
         ),
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => SelectActionOrReactionPage(serviceIndex: index,)));
+          },
           child: Column(
             children: [
               SizedBox(
