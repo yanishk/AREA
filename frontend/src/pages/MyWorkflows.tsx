@@ -40,7 +40,6 @@ const MyWorkflow = () => {
             );
 
             setUserWorkflows(workflowsDetails);
-            console.log("ici : ", workflowsDetails);
         } catch (err) {
             console.error("Error fetching workflows:", err);
         }
@@ -89,7 +88,7 @@ const MyWorkflow = () => {
                                     backgroundColor: workflow.actioncolor,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90"
+                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative"
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
                             >
                                 <div className="flex flex-row pl-[25px] pt-[15px]">
@@ -108,27 +107,42 @@ const MyWorkflow = () => {
                                     >
                                         {workflow.name}
                                     </h2>
-                                    <p
-                                        className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
-                                    >
-                                        by{' '}
-                                        <span className="font-bold">
-                                            {userName}
-                                        </span>
-                                    </p>
 
-                                    <div
-                                        style={{backgroundColor: "white"}}
-                                        className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
-                                    >
+                                    <div className="absolute bottom-[20px]">
                                         <p
-                                            className="text-black text-center flex-1 text-[14px] font-bold"
+                                            className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
                                         >
-                                            Connected
+                                            by{' '}
+                                            <span className="font-bold">
+                                                {userName}
+                                            </span>
                                         </p>
+
                                         <div
-                                            style={{backgroundColor: workflow.actioncolor}}
-                                            className="h-[33px] w-[33px] rounded-full">
+                                            style={{backgroundColor: "white"}}
+                                            className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
+                                        >
+                                            <p
+                                                className="text-black text-center flex-1 text-[14px] font-bold"
+                                            >
+                                                Connected
+                                            </p>
+                                            <div
+                                                style={{backgroundColor: workflow.actioncolor}}
+                                                className="h-[33px] w-[33px] rounded-full">
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-row mt-[30px]">
+                                            <img
+                                                className="w-[14px] h-[18px]"
+                                                src="/user-icon.png"
+                                                alt="Avatar"
+                                            />
+                                            <span
+                                                className="text-white ml-2"
+                                            >
+                                                1
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
