@@ -1,12 +1,13 @@
 package reaction_repository
 
 import (
-	"backend/src/entities"
 	"database/sql"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+
+	"backend/src/entities"
 )
 
 func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *ReactionRepository) {

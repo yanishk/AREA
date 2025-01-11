@@ -1,8 +1,6 @@
 package service_handler
 
 import (
-	"backend/src/entities"
-	"backend/src/handler/middleware"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +13,9 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
+	"backend/src/handler/middleware"
 )
 
 type MockServiceService struct {
@@ -131,7 +132,6 @@ func (m *MockServiceService) RetrieveDiscordGuildChannels(guildId string) ([]map
 func (m *MockServiceService) FindAllServices() ([]entities.Service, error) {
 	args := m.Called()
 	return args.Get(0).([]entities.Service), args.Error(1)
-
 }
 
 func requestForProtected(method, url, token string) *http.Request {
@@ -341,7 +341,6 @@ func TestRetrieveServiceById(test *testing.T) {
 
 		mockService.AssertExpectations(test)
 	})
-
 }
 
 func TestGetDiscordGuildChannels(test *testing.T) {
