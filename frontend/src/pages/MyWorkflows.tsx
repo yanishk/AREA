@@ -139,7 +139,7 @@ const MyWorkflow = () => {
                                                 alt="Avatar"
                                             />
                                             <span
-                                                className="text-white ml-2"
+                                                className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
                                             >
                                                 1
                                             </span>

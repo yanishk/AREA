@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar/Navbar";
 import getServiceDetails from "../utils/GetServiceDetails";
@@ -14,6 +14,9 @@ const WorkflowDetail = () => {
     const [username, setUsername] = useState("You");
     const [isWorkflowActivated, setIsWorkflowActivated] = useState(false);
     const [buttonText, setButtonText] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [workflowName, setWorkflowName] = useState("");
+    const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const navigate = useNavigate();
 
     const getWorkflowDetails = async () => {
@@ -37,6 +40,7 @@ const WorkflowDetail = () => {
 
             setWorkflow(newWorkflow)
             setIsWorkflowActivated(newWorkflow.isactivated);
+            setWorkflowName(newWorkflow.name);
             setButtonText(newWorkflow.isactivated ? "Connected" : "Connect");
             console.log("new workflow ici : ", newWorkflow);
         } catch (error) {
@@ -88,6 +92,32 @@ const WorkflowDetail = () => {
         }
     };
 
+    const handleSaveName = async () => {
+        if (!workflow) return;
+        console.log("update name ici ", workflowName);
+
+        const updatedWorkflow = {
+            ...workflow,
+            name: workflowName,
+        };
+
+
+        try {
+            await axios.put(
+                `${import.meta.env.VITE_API_URL}workflows/${workflowId}`,
+                updatedWorkflow,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            setWorkflow(updatedWorkflow);
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error updating workflow name:", error);
+        }
+    };
+
     useEffect(() => {
         const fetchUserName = async () => {
             try {
@@ -100,6 +130,23 @@ const WorkflowDetail = () => {
         getWorkflowDetails();
         fetchUserName();
     }, []);
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+            handleSaveName();
+        }
+    };
+
+    useEffect(() => {
+        if (isEditing) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isEditing]);
 
     if (loading) {
         return;
@@ -140,21 +187,44 @@ const WorkflowDetail = () => {
                                 className="size-[60px] ml-[10px]"
                             />
                         </div>
-                        <h1
-                            className="text-white text-[35px] font-[800] mt-2"
-                        >
-                            {workflow.name}
-                        </h1>
+                        {isEditing ? (
+                            <textarea
+                                ref={inputRef}
+                                value={workflowName}
+                                onChange={(e) => setWorkflowName(e.target.value)}
+                                onBlur={handleSaveName}
+                                className="text-white text-[36px] h-[340px] w-full font-[800] mt-[10px] bg-transparent border-4 p-4 rounded-lg border-white outline-none break-words whitespace-normal"
+                            />
+                        ) : (
+                            <h1
+                                className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer"
+                                onClick={() => setIsEditing(true)}
+                            >
+                                {workflowName}
+                            </h1>
+                        )}
                     </div>
 
                     <p
-                        className="text-white text-[15.7px] mt-[35px] pb-24"
+                        className="text-white text-[15.7px] mt-[35px] pb-[45px]"
                     >
                         by{' '}
                         <span className="font-bold">
                             {username}
                         </span>
                     </p>
+                    <div className="flex flex-row">
+                        <img
+                            className="w-[14px] h-[18px]"
+                            src="/user-icon.png"
+                            alt="Avatar"
+                        />
+                        <span
+                            className="text-white ml-2 text-[20px] font-bold -translate-y-1.5 mb-[10px]"
+                        >
+                            1
+                        </span>
+                    </div>
                 </MaxWidthWrapper>
             </div>
 
@@ -166,7 +236,7 @@ const WorkflowDetail = () => {
                         backgroundColor: "#222222",
                         boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                     }}
-                    className="h-[100px] w-full mt-[22px] rounded-full relative flex items-center justify-between cursor-pointer"
+                    className="h-[100px] w-full mt-[55px] rounded-full relative flex items-center justify-between cursor-pointer"
                     onClick={handleActivation}
                 >
                     {isWorkflowActivated ? (
@@ -186,7 +256,7 @@ const WorkflowDetail = () => {
                             </p>
                         </>
                     )}
-                   
+
                     <div
                         style={{
                             backgroundColor: workflow.actioncolor,
@@ -199,7 +269,7 @@ const WorkflowDetail = () => {
                 </div>
             </MaxWidthWrapper>
 
-            <div className="flex justify-center mt-[20px]">
+            <div className="flex justify-center mt-[55px] mb-[45px]">
                 <button
                     className="font-[700] text-[20px] text-[#BC5555] hover:opacity-85 hover:cursor-pointer"
                     onClick={handleDelete}
