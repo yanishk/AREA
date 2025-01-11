@@ -124,6 +124,13 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                                         />
                                     </li>
                                     <li>
+                                        <NavbarButton
+                                            onClick={handleLogout}
+                                            text="Logout"
+                                            isWhiteMod={true}
+                                        />
+                                    </li>
+                                    <li>
                                         <button
                                             className="bg-white hover:opacity-90 w-[55px] h-[55px] rounded-[30px] flex flex-col items-center justify-center text-center border-[3px] border-white cursor-pointer"
                                             onClick={handleAccount}
