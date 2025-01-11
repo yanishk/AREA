@@ -540,6 +540,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableActions}
                         handleSelect={handleSelectAction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_ACTION)}
+                        type="action"
                     />
                 )
 
@@ -572,6 +573,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableReactions}
                         handleSelect={handleSelectReaction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_REACTION)}
+                        type="reaction"
                     />
                 )
 
