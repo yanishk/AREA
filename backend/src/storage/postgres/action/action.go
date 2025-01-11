@@ -16,7 +16,7 @@ func NewActionRepository(db *sql.DB) *ActionRepository {
 	return &ActionRepository{db: db}
 }
 
-func (self *ActionRepository) unmarshalParameters(parametersBytes []byte, action entities.Action) (entities.Action, error) {
+func unmarshalParameters(parametersBytes []byte, action entities.Action) (entities.Action, error) {
 	if len(parametersBytes) > 0 {
 		err := json.Unmarshal(parametersBytes, &action.Parameters)
 		if err != nil {
@@ -52,7 +52,7 @@ func (self *ActionRepository) FindActionById(id string) (entities.Action, error)
 		return action, err
 	}
 
-	action, err = self.unmarshalParameters(parametersBytes, action)
+	action, err = unmarshalParameters(parametersBytes, action)
 	if err != nil {
 		return action, err
 	}
@@ -70,7 +70,7 @@ func (self *ActionRepository) FindActionByName(name string) (entities.Action, er
 		return action, err
 	}
 
-	action, err = self.unmarshalParameters(parametersBytes, action)
+	action, err = unmarshalParameters(parametersBytes, action)
 	if err != nil {
 		return action, err
 	}
@@ -96,7 +96,7 @@ func (self *ActionRepository) FindActionsByServiceId(serviceId string) ([]entiti
 			return nil, err
 		}
 
-		action, err = self.unmarshalParameters(parametersBytes, action)
+		action, err = unmarshalParameters(parametersBytes, action)
 		if err != nil {
 			return actions, err
 		}
@@ -116,7 +116,7 @@ func (self *ActionRepository) FindActionByNameAndServiceId(name, serviceId strin
 		return action, err
 	}
 
-	action, err = self.unmarshalParameters(parametersBytes, action)
+	action, err = unmarshalParameters(parametersBytes, action)
 	if err != nil {
 		return action, err
 	}
