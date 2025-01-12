@@ -108,8 +108,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     });
 
     const handleWorkspaceChange = async (workspaceName: string) => {
-        console.log("CA RENTRE LA DCP");
-        console.log("advanced field ? ", advancedField);
         setIsWorkspaceLoaded(false);
         setIsFieldLoading(true);
         setSelectedWorkspaceName(workspaceName);
