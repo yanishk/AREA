@@ -269,3 +269,40 @@ func TestGetGitlabUserProjects(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not retrieve the user's projects"}`, w.Body.String())
 	})
 }
+
+func TestGetDiscordUserServers(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/discord/user/servers", handler.getDiscordUserServers)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveDiscordUserServers", "email", "basic").
+			Return([]map[string]interface{}{}, nil).Once()
+
+		req := requestForProtected("GET", "/discord/user/servers", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail to get servers", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveDiscordUserServers", "email", "basic").
+			Return([]map[string]interface{}{}, errors.New("Fail retrieve servers")).Once()
+
+		req := requestForProtected("GET", "/discord/user/servers", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the user's servers"}`, w.Body.String())
+	})
+}
