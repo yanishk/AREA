@@ -29,21 +29,21 @@ func spotifyReactions() []string {
 
 func spotifyReactionsToRequestParameters() map[string]entities.SpotifyRequestParameters {
 	return map[string]entities.SpotifyRequestParameters{
-		"Start playback": {"https://api.spotify.com/v1/me/player/play", "", "", "PUT"},
-		"Pause playback": {"https://api.spotify.com/v1/me/player/pause", "", "", "PUT"},
-		"Activate playback shuffle": {"https://api.spotify.com/v1/me/player/shuffle?state=true", "", "", "PUT"},
+		"Start playback":              {"https://api.spotify.com/v1/me/player/play", "", "", "PUT"},
+		"Pause playback":              {"https://api.spotify.com/v1/me/player/pause", "", "", "PUT"},
+		"Activate playback shuffle":   {"https://api.spotify.com/v1/me/player/shuffle?state=true", "", "", "PUT"},
 		"Deactivate playback shuffle": {"https://api.spotify.com/v1/me/player/shuffle?state=false", "", "", "PUT"},
-		"Skip to previous track": {"https://api.spotify.com/v1/me/player/next", "", "", "POST"},
-		"Skip to next track": {"https://api.spotify.com/v1/me/player/next", "", "", "POST"},
+		"Skip to previous track":      {"https://api.spotify.com/v1/me/player/next", "", "", "POST"},
+		"Skip to next track":          {"https://api.spotify.com/v1/me/player/next", "", "", "POST"},
 		"Add track to playback queue": {"https://api.spotify.com/v1/me/player/queue?uri=", "uri", "", "POST"},
-		"Save a track": {"https://api.spotify.com/v1/me/tracks?ids=", "id", "", "PUT"},
-		"Save an album": {"https://api.spotify.com/v1/me/albums?ids=", "id", "", "PUT"},
-		"Save an audiobook": {"https://api.spotify.com/v1/me/audiobooks?ids=", "id", "", "PUT"},
-		"Save an episode": {"https://api.spotify.com/v1/me/episodes?ids=", "id", "", "PUT"},
-		"Save a show": {"https://api.spotify.com/v1/me/shows?ids=", "id", "", "PUT"},
-		"Set playback volume": {"https://api.spotify.com/v1/me/player/volume?volume_percent=", "volume", "", "PUT"},
-		"Follow a playlist": {"https://api.spotify.com/v1/playlists/", "id", "/followers", "PUT"},
-		"Unfollow a playlist": {"https://api.spotify.com/v1/playlists/", "id", "/followers", "DELETE"},
+		"Save a track":                {"https://api.spotify.com/v1/me/tracks?ids=", "id", "", "PUT"},
+		"Save an album":               {"https://api.spotify.com/v1/me/albums?ids=", "id", "", "PUT"},
+		"Save an audiobook":           {"https://api.spotify.com/v1/me/audiobooks?ids=", "id", "", "PUT"},
+		"Save an episode":             {"https://api.spotify.com/v1/me/episodes?ids=", "id", "", "PUT"},
+		"Save a show":                 {"https://api.spotify.com/v1/me/shows?ids=", "id", "", "PUT"},
+		"Set playback volume":         {"https://api.spotify.com/v1/me/player/volume?volume_percent=", "volume", "", "PUT"},
+		"Follow a playlist":           {"https://api.spotify.com/v1/playlists/", "id", "/followers", "PUT"},
+		"Unfollow a playlist":         {"https://api.spotify.com/v1/playlists/", "id", "/followers", "DELETE"},
 	}
 }
 
@@ -60,7 +60,7 @@ func (self *WorkflowService) executeSpotifyRequest(workflow entities.Workflow, r
 	var err error
 	url := requestParameters.BaseUrl
 
-	if (requestParameters.ParameterName != "") {
+	if requestParameters.ParameterName != "" {
 		url, err = getSpotifyUrl(workflow, requestParameters.BaseUrl, requestParameters.ParameterName, requestParameters.EndUrl)
 		if err != nil {
 			return nil, err

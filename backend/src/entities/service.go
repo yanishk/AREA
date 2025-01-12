@@ -162,8 +162,8 @@ type AsanaWorkspacesInfo struct {
 
 // Spotify
 type SpotifyRequestParameters struct {
-	BaseUrl string
+	BaseUrl       string
 	ParameterName string
-	EndUrl string
-	Method string
+	EndUrl        string
+	Method        string
 }
