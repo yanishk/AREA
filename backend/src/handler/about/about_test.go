@@ -1,7 +1,6 @@
 package about_handler
 
 import (
-	"backend/src/entities"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
 )
 
 type MockAbout struct {
