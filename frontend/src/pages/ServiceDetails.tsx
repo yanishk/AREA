@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar/Navbar"
 import axios from "axios";
-import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ServiceDetailsPage = () => {
     const { serviceName } = useParams();
     const navigate = useNavigate();
-    const [service, setService] = useState<any[]>([]);
+    const [service, setService] = useState<any | null>(null);
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -23,11 +22,9 @@ const ServiceDetailsPage = () => {
                 return;
             }
 
-            // setServices(result.data);
+            const matchedService = result.data.find((service: any) => service.name.toLowerCase() === serviceName?.toLowerCase());
 
-            const isServiceExist = result.data.some((service: any) => service.name.toLowerCase() === serviceName?.toLowerCase());
-
-            if (!isServiceExist) {
+            if (!matchedService) {
                 navigate("/explore", {
                     replace: true,
                     state: {
@@ -36,14 +33,14 @@ const ServiceDetailsPage = () => {
                     },
                 });
             } else {
+                setService(matchedService);
+
                 window.history.replaceState(
                     null,
                     '',
                     `/${serviceName?.toLowerCase()}`
                 );
             }
-
-            console.log("service ici : ", service);
         }
 
         fetchServices();
@@ -66,25 +63,17 @@ const ServiceDetailsPage = () => {
                     </div>
             </div>
 
-            {/* <MaxWidthWrapper maxWidth="1140px">
-                <div className="mt-16 ml-[35px]">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                        {services?.filter(service => service.name !== "Google").map((service) => (
-                            <button
-                                key={service.id}
-                                style={{
-                                    backgroundColor: service.color,
-                                    boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
-                                }}
-                                className={`h-[380px] flex flex-col items-center justify-center cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
-                            >
-                                <img src={`${import.meta.env.VITE_HOST_URL}${service.logo}`} className="w-[120px] h-[120px]" />
-                                <p className="mt-[35px] text-white text-[1.215em] font-extrabold">{service.name}</p>
-                            </button>
-                        ))}
-                    </div>
+            {service && (
+                <div>
+                    <h2 className="text-3xl font-bold">{service.name}</h2>
+                    <img
+                        src={`${import.meta.env.VITE_HOST_URL}${service.logo}`}
+                        alt={service.name}
+                        className="bg-red-500 w-32 h-32 mx-auto"
+                    />
                 </div>
-            </MaxWidthWrapper> */}
+            )}
+
         </>
     )
 }
