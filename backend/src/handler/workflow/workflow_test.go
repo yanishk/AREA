@@ -276,3 +276,41 @@ func TestUpdateWorkflows(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not update workflow"}`, w.Body.String())
 	})
 }
+
+func TestDeleteWorkflow(test *testing.T) {
+	handler, router, mock := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.DELETE("/workflows/:id", handler.deleteWorkflow)
+
+	test.Run("Successful", func(test *testing.T) {
+		mock.On("DeleteWorkflow", "email", "basic", "1").
+			Return(nil).Once()
+
+		req := requestForProtected("DELETE", "/workflows/1", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Workflow deleted"}`, w.Body.String())
+	})
+
+	test.Run("Fail delete", func(test *testing.T) {
+		mock.On("DeleteWorkflow", "email", "basic", "1").
+			Return(errors.New("Fail delete")).Once()
+
+		req := requestForProtected("DELETE", "/workflows/1", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not delete workflow"}`, w.Body.String())
+	})
+}
