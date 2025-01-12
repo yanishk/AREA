@@ -387,6 +387,49 @@ func TestRetrieveServiceById(test *testing.T) {
 	})
 }
 
+func TestRetrieveServiceByActionId(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/action/:actionid", handler.retrieveServiceByActionId)
+
+		mockService.On("FindServiceByActionId", "1").
+			Return(entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/action/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/action/:actionid", handler.retrieveServiceByActionId)
+
+		mockService.On("FindServiceByActionId", "1").
+			Return(entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/action/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve requested service"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
+	})
+}
+
 func TestRetrieveServiceByReactionId(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
 		handler, router, mockService := createMockAndRoute(true)
