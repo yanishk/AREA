@@ -31,12 +31,13 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     const [isLoading, setIsLoading] = useState(true);
     const [isWorkspaceLoaded, setIsWorkspaceLoaded] = useState(true);
+    const [isFieldLoading, setIsFieldLoading] = useState(false);
     const [advancedField, setAdvancedField] = useState(false);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
     const [tags, setTags] = useState<string[]>([]);
-    const [selectedWorkspace, setSelectedWorkspaceName] = useState<string | null>(null);
+    const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
 
     const getFieldType = (param: Parameters) => {
         if (!param.isexhaustive && param.route) {
@@ -116,6 +117,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     const handleWorkspaceChange = async (workspaceName: string) => {
         setIsWorkspaceLoaded(false);
+        setIsFieldLoading(true);
         setSelectedWorkspaceName(workspaceName);
         const workspaceId = await getWorkspaceIdByName(workspaceName);
 
@@ -129,6 +131,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             ]);
 
             setIsWorkspaceLoaded(true);
+            setIsFieldLoading(false);
 
             if (projects.length === 0) {
                 setProjects(["No projects"]);
@@ -199,7 +202,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                 <div className="w-full max-w-[520px] mx-auto">
                                     <SelectField
                                         label="Workspace"
-                                        value={selectedWorkspace || ""}
+                                        value={selectedWorkspaceName || ""}
                                         options={workspaces}
                                         onChange={(value) => handleWorkspaceChange(value)}
                                     />
@@ -238,13 +241,17 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                     onChange={(id, value) => handleFieldChange(id, value, type)}
                                 />
                             )}
-                            <TriggerButton
-                                text="Create Trigger"
-                                textColor="text-black"
-                                bgColor="bg-white"
-                                hoverColor="hover:bg-[#EEEEEE]"
-                                onClick={() => goToStep(Steps.HOME)}
-                            />
+                            {isFieldLoading ? (
+                                <></>
+                            ) : (
+                                <TriggerButton
+                                    text="Create Trigger"
+                                    textColor="text-black"
+                                    bgColor="bg-white"
+                                    hoverColor="hover:bg-[#EEEEEE]"
+                                    onClick={() => goToStep(Steps.HOME)}
+                                />
+                            )}
                         </>
                     )}
                 </div>

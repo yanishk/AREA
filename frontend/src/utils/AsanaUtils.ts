@@ -27,7 +27,7 @@ export const getAsanaWorkspaces = async (): Promise<Workspace[]> => {
             withCredentials: true,
         });
 
-        if (response.data && response.data.workspaces && Array.isArray(response.data.workspaces.data)) {
+        if (Array.isArray(response.data?.workspaces?.data)) {
             Workspaces = response.data.workspaces.data.map((workspace: { gid: string; name: string }) => ({
                 gid: workspace.gid,
                 name: workspace.name,
@@ -74,7 +74,7 @@ export const getAsanaProjects = async (workspaceId: string): Promise<AsanaItem[]
             }
         );
 
-        if (response.data && response.data.projects && Array.isArray(response.data.projects.data)) {
+        if (Array.isArray(response.data?.projects?.data)) {
             return response.data.projects.data.map((project: { gid: string; name: string }) => ({
                 gid: project.gid,
                 name: project.name,
@@ -98,7 +98,7 @@ export const getAsanaAssignees = async (workspaceId: string): Promise<AsanaItem[
             }
         );
 
-        if (response.data && response.data.assignees && Array.isArray(response.data.assignees.data)) {
+        if (Array.isArray(response.data?.assignees?.data)) {
             return response.data.assignees.data.map((assignee: { gid: string; name: string }) => ({
                 gid: assignee.gid,
                 name: assignee.name,
@@ -122,7 +122,7 @@ export const getAsanaTags = async (workspaceId: string): Promise<AsanaItem[]> =>
             }
         );
 
-        if (response.data && response.data.tags && Array.isArray(response.data.tags.data)) {
+        if (Array.isArray(response.data?.tags?.data)) {
             return response.data.tags.data.map((tag: { gid: string; name: string }) => ({
                 gid: tag.gid,
                 name: tag.name,

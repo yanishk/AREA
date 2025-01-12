@@ -42,9 +42,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <RedirectRoute dest='/explore'>
-                    <HomePage />
-                  </RedirectRoute>
+                  <RedirectRoute dest='/explore'/>
                 }
               />
 

@@ -371,7 +371,7 @@ const WorkflowBuilder = () => {
                 }
             );
 
-            if (result.data && result.data.success) {
+            if (result.data?.success) {
                 setIsServiceConnected(true);
             }
         } catch (error) {
@@ -480,25 +480,35 @@ const WorkflowBuilder = () => {
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
-        for (const key of Object.keys(valuesSelectedByUser)) {
-            const param = parameters.find((param) => param.name === key);
+        const handleIntParam = async (key: string, param: Parameters) => {
+            const valuesArray = await getFieldValues(param);
 
-            if (param) {
-                if (param.type === "int") {
-                    const valuesArray = await getFieldValues(param);
+            if (!valuesArray) {
+                return;
+            }
 
-                    if (valuesArray) {
-                        const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
+            const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
 
-                        if (index !== null) {
-                            params[key] = index;
-                        }
-                    }
-                } else {
-                    params[key] = valuesSelectedByUser[key];
-                }
+            if (index !== null) {
+                params[key] = index;
             }
         }
+
+        const processKeys = async (key: string) => {
+            const param = parameters.find((param) => param.name === key);
+
+            if (!param) {
+                return;
+            }
+
+            if (param.type === "int") {
+                await handleIntParam(key, param);
+            } else {
+                params[key] = valuesSelectedByUser[key];
+            }
+        }
+
+        await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
 
         return params;
     };
