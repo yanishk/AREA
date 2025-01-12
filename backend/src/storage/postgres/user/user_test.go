@@ -130,9 +130,9 @@ func TestUpdateUser(test *testing.T) {
 			WithArgs("email", "connectiontype").
 			WillReturnRows(mockRow)
 
-		sqlStatement := `UPDATE users SET password = \(\$1\) WHERE email = \(\$2\)`
+		sqlStatement := `UPDATE users SET password = \(\$1\) WHERE email = \(\$2\) AND connectiontype = \(\$3\)`
 		mock.ExpectExec(sqlStatement).
-			WithArgs("newpassword", "email").
+			WithArgs("newpassword", "email", "connectiontype").
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		err := repo.UpdateUser("email", "newpassword", "connectiontype")
