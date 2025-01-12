@@ -4,6 +4,7 @@ import Navbar from "../components/navbar/Navbar"
 import {useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
+import MaxWidthWrapper from "../components/MaxWidthWrapper";
 
 const ExplorePage = () => {
     const location = useLocation();
@@ -98,23 +99,27 @@ const ExplorePage = () => {
                     </div>
             </div>
 
-                    <div className="mt-16 ml-[35px]">
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                            {services?.map((service) => (
-                                <button
-                                    key={service.id}
-                                    style={{
-                                        backgroundColor: service.color,
-                                        boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
-                                    }}
-                                    className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
-                                >
-                                    <p>{service.name}</p>
-                                </button>
-
-                            ))}
-                        </div>
+            <MaxWidthWrapper maxWidth="1140px">
+                <div className="mt-16 ml-[35px]">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                        {services?.filter(service => service.name !== "Google").map((service) => (
+                            <button
+                                key={service.id}
+                                style={{
+                                    backgroundColor: service.color,
+                                    boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
+                                }}
+                                className={`h-[380px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
+                            >
+                                <div className="flex flex-col items-center justify-center">
+                                <img src={`${import.meta.env.VITE_HOST_URL}${service.logo}`} className="w-[120px] h-[120px]" />
+                                </div>
+                                <p>{service.name}</p>
+                            </button>
+                        ))}
                     </div>
+                </div>
+            </MaxWidthWrapper>
         </>
     )
 }
