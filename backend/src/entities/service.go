@@ -159,3 +159,11 @@ type AsanaWorkspacesInfo struct {
 		Name string `json:"name"`
 	} `json:"data"`
 }
+
+// Spotify
+type SpotifyRequestParameters struct {
+	BaseUrl string
+	ParameterName string
+	EndUrl string
+	Method string
+}
