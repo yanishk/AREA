@@ -22,7 +22,7 @@ const LoginForm = () => {
     const navigate = useNavigate();
 
     const goToHome = () => {
-        navigate("/");
+        navigate("/explore");
     }
 
     const goBack = () => {
@@ -75,7 +75,7 @@ const LoginForm = () => {
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">
                     <a
-                        href="/"
+                        href="/explore"
                     >
                         AREA
                     </a>

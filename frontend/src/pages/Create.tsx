@@ -75,7 +75,7 @@ const WorkflowBuilder = () => {
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
-            navigate("/")
+            navigate("/explore")
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -536,7 +536,7 @@ const WorkflowBuilder = () => {
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/");
+        navigate("/explore");
     };
 
     const renderStep = () => {
@@ -574,6 +574,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableActions}
                         handleSelect={handleSelectAction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_ACTION)}
+                        type="action"
                     />
                 )
 
@@ -606,6 +607,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableReactions}
                         handleSelect={handleSelectReaction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_REACTION)}
+                        type="reaction"
                     />
                 )
 

@@ -73,9 +73,11 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            AutoSizeText("My workflows",
-              style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.black,),
-              maxLines: 1,
+            Center(
+              child: AutoSizeText("My workflows",
+                style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.black,),
+                maxLines: 1,
+              ),
             ),
             Column(
               children: workflowsCardList,

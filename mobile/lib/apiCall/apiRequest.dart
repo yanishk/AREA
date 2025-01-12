@@ -29,7 +29,7 @@ class ApiRequest {
         },
       );
 
-      developer.log("GetApi responce :${jsonDecode(response.body)}\nstatusCode : ${response.statusCode}");
+      developer.log("GetApi response :${jsonDecode(response.body)}\nstatusCode : ${response.statusCode}");
       return response;
     } catch (e) {
       developer.log("GetApi ERROR: $e", level: 1);
@@ -49,7 +49,7 @@ class ApiRequest {
         body: body
       );
 
-      developer.log("PutApi responce :${jsonDecode(response.body)}");
+      developer.log("PutApi response :${jsonDecode(response.body)}");
       return response;
     } catch (e) {
       developer.log("PutApi ERROR: $e");
@@ -68,7 +68,7 @@ class ApiRequest {
         },
       );
 
-      developer.log("DeleteApi responce :${jsonDecode(response.body)}");
+      developer.log("DeleteApi response :${jsonDecode(response.body)}");
       return response;
     } catch (e) {
       developer.log("DeleteApi ERROR: $e");

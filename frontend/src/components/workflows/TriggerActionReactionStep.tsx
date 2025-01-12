@@ -166,7 +166,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 </div>
 
                 <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
-                    Complete trigger fields
+                    {type === "action" ? "Complete action fields" : "Complete reaction fields"}
                 </h1>
 
                 <div className="w-[100px]"></div>
