@@ -411,3 +411,40 @@ func TestGetAsanaWorkspaceAssignees(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not retrieve workspace's assignees"}`, w.Body.String())
 	})
 }
+
+func TestGetAsanaWorkspaceProjects(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/asana/workspace/projects", handler.getAsanaWorkspaceProjects)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveAsanaWorkspaceProjects", "email", "basic", "id").
+			Return(entities.AsanaWorkspacesInfo{}, nil).Once()
+
+		req := requestForProtected("GET", "/asana/workspace/projects?id=id", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail retrieve project", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveAsanaWorkspaceProjects", "email", "basic", "id").
+			Return(entities.AsanaWorkspacesInfo{}, errors.New("Fail retrieve project")).Once()
+
+		req := requestForProtected("GET", "/asana/workspace/projects?id=id", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve workspace's projects"}`, w.Body.String())
+	})
+}
