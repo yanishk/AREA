@@ -195,6 +195,20 @@ func TestServiceCallback(test *testing.T) {
 		require.Equal(test, http.StatusInternalServerError, w.Code)
 		require.JSONEq(test, `{"error": "Failed to update token"}`, w.Body.String())
 	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		mockUserServiceService.On("UpdateTokenForService", "code", "github", "web", "email", "basic").
+			Return(nil).Once()
+
+		req := requestForProtected("POST", "/service-callback?code=code", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
+
+	})
 }
 
 func TestGetGithubUserRepositories(test *testing.T) {
