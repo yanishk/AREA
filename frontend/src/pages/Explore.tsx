@@ -96,25 +96,25 @@ const ExplorePage = () => {
                             Explore
                         </h1>
                     </div>
+            </div>
 
                     <div className="mt-16 ml-[35px]">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-                        {services?.map((service) => (
-                            <button
-                                key={service.id}
-                                style={{
-                                    backgroundColor: service.color,
-                                    boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
-                                }}
-                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
-                            >
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                            {services?.map((service) => (
+                                <button
+                                    key={service.id}
+                                    style={{
+                                        backgroundColor: service.color,
+                                        boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
+                                    }}
+                                    className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
+                                >
+                                    <p>{service.name}</p>
+                                </button>
 
-                            </button>
-
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-                </div>
         </>
     )
 }
