@@ -40,7 +40,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
 
     const getFieldType = (param: Parameters) => {
-        if (param.isexhaustive || (param.route) || (param.values[0]?.length > 1)) {
+        if (param.isexhaustive || (!param.isexhaustive && param.route) || param.route || param.values[0]?.length >= 1) {
             return fieldType.SELECT;
         }
 

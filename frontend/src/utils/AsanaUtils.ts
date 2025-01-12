@@ -4,16 +4,16 @@ export interface AsanaItem {
     gid: string;
     name: string;
 }
-export interface Workspace {
+export interface AsanaWorkspace {
     gid: string;
     name: string;
 }
 
-let Workspaces: Workspace[] = [];
+let Workspaces: AsanaWorkspace[] = [];
 let selectedWorkspaceId: string | null = null;
 let selectedWorkspaceName: string | null = null;
 
-const setDefaultWorkspace = (workspaces: Workspace[]) => {
+const setDefaultWorkspace = (workspaces: AsanaWorkspace[]) => {
     if (workspaces.length === 0) {
         return;
     }
@@ -21,7 +21,7 @@ const setDefaultWorkspace = (workspaces: Workspace[]) => {
     selectedWorkspaceName = workspaces[0].name;
 };
 
-export const getAsanaWorkspaces = async (): Promise<Workspace[]> => {
+export const getAsanaWorkspaces = async (): Promise<AsanaWorkspace[]> => {
     try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}asana/user/workspaces`, {
             withCredentials: true,
@@ -81,7 +81,7 @@ export const getAsanaProjects = async (workspaceId: string): Promise<AsanaItem[]
             }));
         }
 
-        console.warn("No projects founded : ", workspaceId);
+        console.warn("No projects found : ", workspaceId);
         return [];
     } catch (error) {
         console.error("Error fetching Asana projects : ", error);
@@ -105,7 +105,7 @@ export const getAsanaAssignees = async (workspaceId: string): Promise<AsanaItem[
             }));
         }
 
-        console.warn("No assignees founded : ", workspaceId);
+        console.warn("No assignees found : ", workspaceId);
         return [];
     } catch (error) {
         console.error("Error fetching Asana assignees : ", error);
@@ -129,7 +129,7 @@ export const getAsanaTags = async (workspaceId: string): Promise<AsanaItem[]> =>
             }));
         }
 
-        console.warn("No tags founded : ", workspaceId);
+        console.warn("No tags found : ", workspaceId);
         return [];
     } catch (error) {
         console.error("Error fetching Asana tags : ", error);
