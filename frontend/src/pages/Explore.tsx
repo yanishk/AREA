@@ -64,11 +64,7 @@ const ExplorePage = () => {
                 return;
             }
 
-            console.log("result ici : ", result);
-            console.log("result data ici : ", result.data);
-
             setServices(result.data);
-            // console.log("services ici : ", setServices);
         }
 
         fetchServices();
