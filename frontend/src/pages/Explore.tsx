@@ -109,12 +109,10 @@ const ExplorePage = () => {
                                     backgroundColor: service.color,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className={`h-[380px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
+                                className={`h-[380px] flex flex-col items-center justify-center cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
                             >
-                                <div className="flex flex-col items-center justify-center">
                                 <img src={`${import.meta.env.VITE_HOST_URL}${service.logo}`} className="w-[120px] h-[120px]" />
-                                </div>
-                                <p>{service.name}</p>
+                                <p className="mt-[35px] text-white text-[1.215em] font-extrabold">{service.name}</p>
                             </button>
                         ))}
                     </div>
