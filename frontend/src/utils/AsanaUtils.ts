@@ -1,11 +1,10 @@
 import axios from "axios";
 
-export interface Workspace {
+export interface AsanaItem {
     gid: string;
     name: string;
 }
-
-export interface AsanaItem {
+export interface Workspace {
     gid: string;
     name: string;
 }
@@ -15,10 +14,11 @@ let selectedWorkspaceId: string | null = null;
 let selectedWorkspaceName: string | null = null;
 
 const setDefaultWorkspace = (workspaces: Workspace[]) => {
-    if (workspaces.length > 0) {
-        selectedWorkspaceId = workspaces[0].gid;
-        selectedWorkspaceName = workspaces[0].name;
+    if (workspaces.length === 0) {
+        return;
     }
+    selectedWorkspaceId = workspaces[0].gid;
+    selectedWorkspaceName = workspaces[0].name;
 };
 
 export const getAsanaWorkspaces = async (): Promise<Workspace[]> => {
@@ -38,7 +38,7 @@ export const getAsanaWorkspaces = async (): Promise<Workspace[]> => {
             return Workspaces;
         }
 
-        console.warn("No workspaces founded");
+        console.warn("No workspaces found");
         return [];
     } catch (error) {
         console.error("Error fetching Asana workspaces : ", error);

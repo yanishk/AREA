@@ -40,21 +40,10 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
 
     const getFieldType = (param: Parameters) => {
-        if (!param.isexhaustive && param.route) {
+        if (param.isexhaustive || (param.route) || (param.values[0]?.length > 1)) {
             return fieldType.SELECT;
         }
-        if (param.isexhaustive) {
-            return fieldType.SELECT;
-        }
-        if (!param.isexhaustive && param.values.length === 1 && param.route) {
-            return fieldType.SELECT;
-        }
-        if (!param.isexhaustive && param.route === null && !param.route) {
-            return fieldType.INPUT;
-        }
-        if (!param.isexhaustive && param.values[0].length > 1) {
-            return fieldType.SELECT;
-        }
+
         return fieldType.INPUT;
     };
 
@@ -67,6 +56,9 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     > ([]);
 
     useEffect(() => {
+        if (selectedService?.name != "Asana") {
+            return;
+        }
         const fetchWorkspaces = async () => {
             const workspaces = await getAsanaWorkspaces();
 
@@ -116,6 +108,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     });
 
     const handleWorkspaceChange = async (workspaceName: string) => {
+        console.log("CA RENTRE LA DCP");
+        console.log("advanced field ? ", advancedField);
         setIsWorkspaceLoaded(false);
         setIsFieldLoading(true);
         setSelectedWorkspaceName(workspaceName);
