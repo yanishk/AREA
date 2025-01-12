@@ -1,10 +1,13 @@
+import { useEffect, useState } from "react";
 import { Parameters } from "../../utils/ActionReactionParameters";
-import Steps from "../../utils/CreateSteps";
+import Steps from "../../utils/CreateStepsType";
 import { fieldType } from "../../utils/fieldType";
-import { getFieldValues } from "../../utils/getFieldValues";
+import getFieldValues from "../../utils/getFieldValues";
 import CancelButton from "../buttons/CancelButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
+import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
+import SelectField from "../inputs/SelectField";
 
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
@@ -26,28 +29,121 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     type,
 }) => {
 
+    const [isLoading, setIsLoading] = useState(true);
+    const [isWorkspaceLoaded, setIsWorkspaceLoaded] = useState(true);
+    const [isFieldLoading, setIsFieldLoading] = useState(false);
+    const [advancedField, setAdvancedField] = useState(false);
+    const [workspaces, setWorkspaces] = useState<string[]>([]);
+    const [projects, setProjects] = useState<string[]>([]);
+    const [assignees, setAssignees] = useState<string[]>([]);
+    const [tags, setTags] = useState<string[]>([]);
+    const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
+
     const getFieldType = (param: Parameters) => {
-        if (param.isexhaustive === true) {
+        if (param.isexhaustive || (!param.isexhaustive && param.route) || param.route || param.values[0]?.length >= 1) {
             return fieldType.SELECT;
-        }
-
-        if (param.isexhaustive === false && param.values.length === 1) {
-            return fieldType.SELECT;
-        }
-
-        if (param.isexhaustive === false && param.route === null) {
-            return fieldType.INPUT;
         }
 
         return fieldType.INPUT;
     };
 
-    const fields = selectedItem?.parameters.map((param) => ({
-        id: param.name,
-        label: param.name,
-        type: getFieldType(param),
-        options: getFieldValues(param),
-    })) || [];
+    const [fields, setFields] = useState<{
+        id: string;
+        label: string;
+        type: fieldType;
+        options?: string[]
+        }[]
+    > ([]);
+
+    useEffect(() => {
+        if (selectedService?.name != "Asana") {
+            return;
+        }
+        const fetchWorkspaces = async () => {
+            const workspaces = await getAsanaWorkspaces();
+
+            setWorkspaces(workspaces.map((ws) => ws.name));
+            if (workspaces.length > 0) {
+                setSelectedWorkspace(workspaces[0].gid, workspaces[0].name);
+                await handleWorkspaceChange(workspaces[0].name);
+            }
+        };
+
+        fetchWorkspaces();
+    }, []);
+
+    useEffect(() => {
+        const fetchFields = async () => {
+            if (!selectedItem) return;
+
+            setIsLoading(true);
+
+            const fetchedFields = await Promise.all(
+                selectedItem.parameters.map(async (param) => {
+                    const options =
+                        getFieldType(param) === fieldType.SELECT
+                            ? await getFieldValues(param)
+                            : undefined;
+
+                    return {
+                        id: param.name,
+                        label: param.name,
+                        type: getFieldType(param),
+                        options: options || [],
+                    };
+                })
+            );
+
+            setFields(fetchedFields);
+            setIsLoading(false);
+        };
+
+        fetchFields();
+    }, [selectedItem]);
+
+    useEffect(() => {
+        if (selectedItem?.parameters.some((param) => param.route === "/asana/workspace/projects")) {
+            setAdvancedField(true);
+        }
+    });
+
+    const handleWorkspaceChange = async (workspaceName: string) => {
+        setIsWorkspaceLoaded(false);
+        setIsFieldLoading(true);
+        setSelectedWorkspaceName(workspaceName);
+        const workspaceId = await getWorkspaceIdByName(workspaceName);
+
+        if (workspaceId) {
+            setSelectedWorkspace(workspaceId, workspaceName);
+
+            const [projects, assignees, tags] = await Promise.all([
+                getAsanaProjects(workspaceId),
+                getAsanaAssignees(workspaceId),
+                getAsanaTags(workspaceId),
+            ]);
+
+            setIsWorkspaceLoaded(true);
+            setIsFieldLoading(false);
+
+            if (projects.length === 0) {
+                setProjects(["No projects"]);
+            } else {
+                setProjects(projects.map((project) => project.name));
+            }
+
+            if (assignees.length === 0) {
+                setAssignees(["No assignees"]);
+            } else {
+                setAssignees(assignees.map((assignee) => assignee.name));
+            }
+
+            if (tags.length === 0) {
+                setTags(["No tags"]);
+            } else {
+                setTags(tags.map((tag) => tag.name));
+            }
+        }
+    };
 
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
@@ -90,18 +186,66 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 <div
                     className="flex flex-col items-center"
                 >
-                    <DynamicFields
-                        fields={fields}
-                        values={itemFieldValues}
-                        onChange={(id, value) => handleFieldChange(id, value, type)}
-                    />
-                    <TriggerButton
-                        text={type === "action" ? "Create Action" : "Create Reaction"}
-                        textColor="text-black"
-                        bgColor="bg-white"
-                        hoverColor="hover:bg-[#EEEEEE]"
-                        onClick={() => goToStep(Steps.HOME)}
-                    />
+                    {isLoading ? (
+                        <></>
+                    ) : (
+                        <>
+                            {advancedField ? (
+                                <div className="w-full max-w-[520px] mx-auto">
+                                    <SelectField
+                                        label="Workspace"
+                                        value={selectedWorkspaceName || ""}
+                                        options={workspaces}
+                                        onChange={(value) => handleWorkspaceChange(value)}
+                                    />
+
+                                    {isWorkspaceLoaded ? (
+                                        <>
+                                            <SelectField
+                                                label="Project"
+                                                value={itemFieldValues["project"] || ""}
+                                                options={projects}
+                                                onChange={(value) => handleFieldChange("project", value, type)}
+                                            />
+
+                                            <SelectField
+                                                label="Assignee"
+                                                value={itemFieldValues["assignee"] || ""}
+                                                options={assignees}
+                                                onChange={(value) => handleFieldChange("assignee", value, type)}
+                                            />
+
+                                            <SelectField
+                                                label="Tag"
+                                                value={itemFieldValues["tag"] || ""}
+                                                options={tags}
+                                                onChange={(value) => handleFieldChange("tag", value, type)}
+                                            />
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
+                                </div>
+                            ) : (
+                                <DynamicFields
+                                    fields={fields}
+                                    values={itemFieldValues}
+                                    onChange={(id, value) => handleFieldChange(id, value, type)}
+                                />
+                            )}
+                            {isFieldLoading ? (
+                                <></>
+                            ) : (
+                                <TriggerButton
+                                    text="Create Trigger"
+                                    textColor="text-black"
+                                    bgColor="bg-white"
+                                    hoverColor="hover:bg-[#EEEEEE]"
+                                    onClick={() => goToStep(Steps.HOME)}
+                                />
+                            )}
+                        </>
+                    )}
                 </div>
 
         </div>
