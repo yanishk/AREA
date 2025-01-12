@@ -1,8 +1,6 @@
 package userservice_handler
 
 import (
-	"backend/src/entities"
-	"backend/src/handler/middleware"
 	"errors"
 	"io"
 	"net/http"
@@ -16,6 +14,9 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
+	"backend/src/handler/middleware"
 )
 
 type MockUserServiceService struct {
