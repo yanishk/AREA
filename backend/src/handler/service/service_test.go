@@ -302,6 +302,46 @@ func TestRetrieveActionsServices(test *testing.T) {
 	})
 }
 
+func TestRetrieveReactionsServices(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reactions", handler.retrieveReactionsServices)
+
+		mockService.On("RetrieveReactionsServices").
+			Return([]entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/reactions", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reactions", handler.retrieveReactionsServices)
+
+		mockService.On("RetrieveReactionsServices").
+			Return([]entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/reactions", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Internal server error"}`, w.Body.String())
+	})
+}
+
 func TestRetrieveServiceByReactionId(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
 		handler, router, mockService := createMockAndRoute(true)
