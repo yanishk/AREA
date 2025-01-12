@@ -14,6 +14,7 @@ import ProtectedRoute from './ProtectedRoute'
 import RedirectRoute from './RedirectRoute'
 import WorkflowDetail from './pages/WorkflowDetails'
 import ExplorePage from './pages/Explore'
+import ServiceDetailsPage from './pages/ServiceDetails'
 
 function App() {
   return (
@@ -47,6 +48,13 @@ function App() {
                   <RedirectRoute dest='/explore'>
                     <HomePage />
                   </RedirectRoute>
+                }
+              />
+
+              <Route
+                path="/:serviceName"
+                element={
+                    <ServiceDetailsPage />
                 }
               />
 
