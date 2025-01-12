@@ -162,3 +162,40 @@ func TestCreateWorkflow(test *testing.T) {
 
 	})
 }
+
+func TestGetUserWorkflows(test *testing.T) {
+	handler, router, mock := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/workflows", handler.getUserWorkflows)
+
+	test.Run("Successful", func(test *testing.T) {
+		mock.On("GetUserWorkflows", "email", "basic").
+			Return([]entities.Workflow{}, nil).Once()
+
+		req := requestForProtected("GET", "/workflows", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail retrieve workflows", func(test *testing.T) {
+		mock.On("GetUserWorkflows", "email", "basic").
+			Return([]entities.Workflow{}, errors.New("Fail retrieve workflow")).Once()
+
+		req := requestForProtected("GET", "/workflows", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve user's workflows"}`, w.Body.String())
+	})
+}
