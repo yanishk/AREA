@@ -232,3 +232,40 @@ func TestGetGithubUserRepositories(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not retrieve the user's repositories"}`, w.Body.String())
 	})
 }
+
+func TestGetGitlabUserProjects(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/gitlab/user/projects", handler.getGitlabUserProjects)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveGitlabUserProjects", "email", "basic").
+			Return([]entities.GitlabProject{}, nil).Once()
+
+		req := requestForProtected("GET", "/gitlab/user/projects", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail retrieve project", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveGitlabUserProjects", "email", "basic").
+			Return([]entities.GitlabProject{}, errors.New("Fail retrieve project")).Once()
+
+		req := requestForProtected("GET", "/gitlab/user/projects", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the user's projects"}`, w.Body.String())
+	})
+}
