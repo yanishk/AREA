@@ -306,3 +306,71 @@ func TestGetDiscordUserServers(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not retrieve the user's servers"}`, w.Body.String())
 	})
 }
+
+func TestGetAsanaUserWorkspaces(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/asana/user/workspaces", handler.getAsanaUserWorkspaces)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockWorkspaces := entities.AsanaWorkspacesInfo{
+			Data: []struct {
+				Gid  string `json:"gid"`
+				Name string `json:"name"`
+			}{
+				{Gid: "gid", Name: "name"},
+			},
+		}
+
+		mockUserServiceService.On("RetrieveAsanaUserWorkspaces", "email", "basic").
+			Return(mockWorkspaces, nil).Once()
+
+		req := requestForProtected("GET", "/asana/user/workspaces", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Empty Data", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveAsanaUserWorkspaces", "email", "basic").
+			Return(entities.AsanaWorkspacesInfo{}, nil).Once()
+
+		req := requestForProtected("GET", "/asana/user/workspaces", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the user's workspaces"}`, w.Body.String())
+	})
+
+	test.Run("Fail get Workspace", func(test *testing.T) {
+		mockWorkspaces := entities.AsanaWorkspacesInfo{
+			Data: []struct {
+				Gid  string `json:"gid"`
+				Name string `json:"name"`
+			}{
+				{Gid: "gid", Name: "name"},
+			},
+		}
+
+		mockUserServiceService.On("RetrieveAsanaUserWorkspaces", "email", "basic").
+			Return(mockWorkspaces, errors.New("Fail get workspaces")).Once()
+
+		req := requestForProtected("GET", "/asana/user/workspaces", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the user's workspaces"}`, w.Body.String())
+	})
+}
