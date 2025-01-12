@@ -15,9 +15,9 @@ interface GithubParams {
 
 const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: GitlabParams[] } }> => {
     try {
-        const newRoute = route.slice(1);
+        const slicedRoute = route.slice(1);
         const userProject = await axios.get(
-            `${import.meta.env.VITE_API_URL}${newRoute}`,
+            `${import.meta.env.VITE_API_URL}${slicedRoute}`,
             {
                 withCredentials: true
             }
@@ -32,9 +32,9 @@ const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: 
 
 const getGithubFieldValues = async (route: string): Promise<{ data: { repositories: GithubParams[] } }> => {
     try {
-        const newRoute = route.slice(1);
+        const slicedRoute = route.slice(1);
         const userRepo = await axios.get(
-            `${import.meta.env.VITE_API_URL}${newRoute}`,
+            `${import.meta.env.VITE_API_URL}${slicedRoute}`,
             {
                 withCredentials: true
             }
