@@ -195,3 +195,40 @@ func TestServiceCallback(test *testing.T) {
 		require.JSONEq(test, `{"error": "Failed to update token"}`, w.Body.String())
 	})
 }
+
+func TestGetGithubUserRepositories(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/github/user/repositories", handler.getGithubUserRepositories)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveGithubUserRepositories", "email", "basic").
+			Return([]entities.GithubRepository{}, nil).Once()
+
+		req := requestForProtected("GET", "/github/user/repositories", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail retrieve repo", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveGithubUserRepositories", "email", "basic").
+			Return([]entities.GithubRepository{}, errors.New("Fail retrieve repo")).Once()
+
+		req := requestForProtected("GET", "/github/user/repositories", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the user's repositories"}`, w.Body.String())
+	})
+}
