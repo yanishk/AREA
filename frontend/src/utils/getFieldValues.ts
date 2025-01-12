@@ -47,59 +47,72 @@ const getGithubFieldValues = async (route: string): Promise<{ data: { repositori
     }
 }
 
-const handleAsanaService = async (param: Parameters): Promise<string[] | undefined> => {
-    if (param.route === "/asana/user/workspaces") {
-        const workspaces = await getAsanaWorkspaces();
-        return workspaces.map((workspace) => workspace.name);
-    }
-}
-
-const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
-
-    if (param.route) {
-        const serviceName = param.route.split("/")[1];
-
+const handleService = async (route: string, param: Parameters, serviceName: string): Promise<string[] | undefined> => {
         if (serviceName === "gitlab") {
-            const result = await getGitlabFieldValues(param.route);
+            const result = await getGitlabFieldValues(route);
 
-            if (result.data && Array.isArray(result.data.projects)) {
+            if (result.data?.projects) {
                 result.data.projects.forEach((item) => {
                     gitlabNameToIdMap[item.name] = item.id;
                 });
 
-                const values = result.data.projects.map((item) => item.name);
-                return values;
+                return result.data.projects.map((item) => item.name);
             }
         }
 
         if (serviceName === "github") {
-            const result = await getGithubFieldValues(param.route);
+            const result = await getGithubFieldValues(route);
 
-            if (result.data && Array.isArray(result.data.repositories)) {
-                const values = result.data.repositories.map((item) => item.full_name);
-                return values;
+            if (result.data?.repositories) {
+                return result.data.repositories.map((item) => item.full_name);
+            }
+
+            return undefined;
+        };
+
+        if (serviceName === "asana") {
+            if (param.route === "/asana/user/workspaces") {
+                const workspaces = await getAsanaWorkspaces();
+                return workspaces.map((workspace) => workspace.name);
             }
         }
 
-        if (serviceName === "asana") {
-            return handleAsanaService(param);
-        }
-    }
-    if (param.values[0] === null) {
-        return []
-    }
-    if (param.isexhaustive === true && param.values.length > 1) {
+        return undefined;
+    };
+
+const handleExhaustiveValues = (param: Parameters): string[] | undefined => {
+    if (param.isexhaustive && param.values.length > 1) {
         return param.values;
     }
 
-    if (param.isexhaustive === false && param.values.length === 1) {
+    if (!param.isexhaustive && param.values.length === 1) {
         const value = param.values[0];
         const [start, end] = value.split("-").map(Number);
-        const newArray = Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
-        return newArray;
+        return Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
     }
 
     return undefined;
+};
+
+const getFieldValues = async (param: Parameters): Promise<string[] | undefined> => {
+    if (param.route) {
+        const serviceName = param.route.split("/")[1];
+
+        switch (serviceName) {
+            case "gitlab":
+                return handleService(param.route, param, "gitlab");
+            case "github":
+                return handleService(param.route, param, "github");
+            case "asana":
+                return handleService(param.route, param, "asana");
+        }
+    }
+
+    if (param.values[0] === null) {
+        return [];
+    }
+
+    return handleExhaustiveValues(param);
 };
 
 export default getFieldValues
