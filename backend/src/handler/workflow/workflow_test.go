@@ -162,6 +162,22 @@ func TestCreateWorkflow(test *testing.T) {
 		require.JSONEq(test, `{"error": "Could not create workflow"}`, w.Body.String())
 
 	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		var newWorkflow entities.NewWorkflow
+
+		mock.On("CreateWorkflow", "email", "basic", newWorkflow).
+			Return(nil).Once()
+
+		req := requestForProtected("POST", "/workflows", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
+
+	})
 }
 
 func TestGetUserWorkflows(test *testing.T) {
@@ -232,32 +248,7 @@ func TestUpdateWorkflows(test *testing.T) {
 		require.JSONEq(test, `{"success": "Workflow successfully updated"}`, w.Body.String())
 	})
 
-	test.Run("Fail JSON Bind", func(test *testing.T) {
-		var workflow entities.UpdatedWorkflow
-
-		mock.On("UpdateWorkflow", "1", workflow).
-			Return(nil).Once()
-
-		req := requestForProtected("PUT", "/workflows/1", token, nil)
-		w := httptest.NewRecorder()
-
-		router.ServeHTTP(w, req)
-
-		require.Equal(test, http.StatusBadRequest, w.Code)
-		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
-	})
-
 	test.Run("Fail updating workflow", func(test *testing.T) {
-		handler, router, mock := createMockAndRoute(true)
-
-		token := createToken(test)
-
-		router.Use(func(c *gin.Context) {
-			c.Set("email", "email")
-			c.Set("connectionType", "basic")
-		})
-		router.PUT("/workflows/:id", handler.updateWorkflow)
-
 		var workflow entities.UpdatedWorkflow
 
 		body := `{
@@ -275,6 +266,21 @@ func TestUpdateWorkflows(test *testing.T) {
 
 		require.Equal(test, http.StatusInternalServerError, w.Code)
 		require.JSONEq(test, `{"error": "Could not update workflow"}`, w.Body.String())
+	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		var workflow entities.UpdatedWorkflow
+
+		mock.On("UpdateWorkflow", "1", workflow).
+			Return(nil).Once()
+
+		req := requestForProtected("PUT", "/workflows/1", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
 	})
 }
 
