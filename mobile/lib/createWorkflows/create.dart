@@ -42,7 +42,7 @@ class CreateWorkflows extends State<APICall> {
     if (firstButtonComplete) {
       return CreateSelectedButtonContent(
         firstText: "If ",
-        icon: CreateData.actionServiceList[Globaldata.firstService].icon,
+        icon: CreateData.serviceAction.icon,
         actionOrReactionName: CreateData.serviceAction.name,
       );
     }
@@ -78,7 +78,7 @@ class CreateWorkflows extends State<APICall> {
     } else if (secondButtonState == 2) {
       return CreateSelectedButtonContent(
         firstText: "Then ",
-        icon: CreateData.reactionServiceList[Globaldata.secondService].icon,
+        icon: CreateData.serviceReaction.icon,
         actionOrReactionName: CreateData.serviceReaction.name,
       );
     }

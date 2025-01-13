@@ -39,18 +39,6 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   @override
   void initState() {
     super.initState();
-    if (isAnAction) {
-      setState(() {
-        CreateData.actionParamListName = [];
-        actionOrReactionParamListName = CreateData.actionParamListName;
-      });
-    } else {
-      setState(() {
-        apiRoute = "reactions";
-        CreateData.reactionParamListName = [];
-        actionOrReactionParamListName = CreateData.reactionParamListName;
-      });
-    }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
       CreateData.selectOrUpdateWorkflow = true;
       Navigator.pop(Globaldata.myContext);
@@ -334,6 +322,16 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     color: Colors.white),
               ),
               onPressed: () {
+                if (isAnAction) {
+                  setState(() {
+                    actionOrReactionParamListName = CreateData.actionParamListName;
+                  });
+                } else {
+                  setState(() {
+                    apiRoute = "reactions";
+                    actionOrReactionParamListName = CreateData.reactionParamListName;
+                  });
+                }
                 Map<String, dynamic> parameterList = CreateData.selectedActionOrReactionData.parameterList;
                 for (int i = 0; i < textInputControllerIndexList.length; i++) {
                   int controllerIndex = textInputControllerIndexList[i];

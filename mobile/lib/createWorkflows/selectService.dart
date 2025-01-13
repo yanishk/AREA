@@ -131,6 +131,11 @@ class MySquareServicesCard extends StatelessWidget {
     );
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
       if (CreateData.selectOrUpdateWorkflow) {
+        if (isAnAction) {
+          Globaldata.firstService = servicesIndex;
+        } else {
+          Globaldata.secondService = servicesIndex;
+        }
         CreateData.selectOrUpdateWorkflow = false;
         Navigator.pop(Globaldata.myContext, CreateData.actualServiceList[servicesIndex].name);
       }
@@ -158,10 +163,8 @@ class MySquareServicesCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             if (isAnAction) {
-              Globaldata.firstService = servicesIndex;
               redirectToSelectActionOrReactionPage();
             } else {
-              Globaldata.secondService = servicesIndex;
               redirectToSelectActionOrReactionPage();
             }
           },
