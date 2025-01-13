@@ -401,6 +401,18 @@ definitions:
           $ref: '#/definitions/entities.GitlabProject'
         type: array
     type: object
+  docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse:
+    properties:
+      error:
+        example: Could not find requested user-Unknown service
+        type: string
+    type: object
+  docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse:
+    properties:
+      success:
+        example: User authenticated to ${service}-User not authenticated to ${service}
+        type: string
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -907,6 +919,29 @@ paths:
           schema:
             $ref: '#/definitions/docs_service.ServiceOAuth2BadRequestResponse'
       summary: Service OAuth2
+      tags:
+      - Authentication
+  /authentication-status:
+    get:
+      description: Checks if connected user is authenticated to the specified service
+      parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: query
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse'
+      summary: User Service Authentication Status
       tags:
       - Authentication
   /discord/server/channels:
