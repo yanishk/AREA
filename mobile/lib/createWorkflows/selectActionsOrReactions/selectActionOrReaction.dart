@@ -58,6 +58,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         CreateData.selectedServiceId = serviceIndex;
       });
     }
+    actionDescription = CreateData.actualServiceList[serviceIndex].description;
     getActionsOrReactions();
   }
 
@@ -81,7 +82,6 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           allActionOrReactionList[i].serviceid,
           allActionOrReactionList[i].parameter,
         ));
-        actionDescription = allActionOrReactionList[i].description;
         ActionOrReactionButtonsList.add(
           actionOrReactionButtons(actionOrReactionList.length - 1),
         );

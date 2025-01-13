@@ -58,6 +58,7 @@ class DisplayActionOrReaction extends State<DisplayActionOrReactionAPICall> {
       );
     }
     fillActionOrReactionButtons("Reactions", reactionList);
+    actionDescription = Globaldata.serviceList[serviceIndex].description;
   }
 
   void storeActionOrReactionsServices(List<ActionOrReactionList> src, List<ActionOrReactionList> dest) {
