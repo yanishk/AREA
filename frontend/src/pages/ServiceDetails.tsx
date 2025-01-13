@@ -136,7 +136,7 @@ const ServiceDetailsPage = () => {
                                 </h1>
 
                                 <p className="text-white text-[1.1rem] tracking-wider mt-[10px] mb-[35px]">
-                                    Spotify is a digital music service that gives you access to millions of songs. Applets can help you save your Discover Weekly and Release Radar playlists, share your favorite tunes, and much more.
+                                    {service?.description}
                                 </p>
 
                                 <div className="flex flex-row items-center justify-center w-full mb-[60px]">
