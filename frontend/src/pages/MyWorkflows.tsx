@@ -95,10 +95,12 @@ const MyWorkflow = () => {
                             >
                                 <div className="flex flex-row pl-[25px] pt-[15px]">
                                     <img
+                                        alt="icon"
                                         src={`${import.meta.env.VITE_HOST_URL}${workflow.actionlogo}`}
                                         className="size-[26px]"
                                     />
                                     <img
+                                        alt="icon"
                                         src={`${import.meta.env.VITE_HOST_URL}${workflow.reactionlogo}`}
                                         className="size-[26px] ml-[10px]"
                                     />
@@ -125,21 +127,17 @@ const MyWorkflow = () => {
                                             className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
                                         >
                                             {workflow.isactivated ? (
-                                                <>
-                                                    <p
-                                                        className="text-black text-center flex-1 text-[14px] font-bold"
-                                                    >
-                                                        Connected
-                                                    </p>
-                                                </>
+                                                <p
+                                                    className="text-black text-center flex-1 text-[14px] font-bold"
+                                                >
+                                                    Connected
+                                                </p>
                                             ) : (
-                                                <>
-                                                    <p
-                                                        className="text-black text-center flex-1 text-[14px] font-bold ml-[50px]"
-                                                    >
-                                                        Connect
-                                                    </p>
-                                                </>
+                                                <p
+                                                    className="text-black text-center flex-1 text-[14px] font-bold ml-[50px]"
+                                                >
+                                                    Connect
+                                                </p>
                                             )}
 
                                             <div

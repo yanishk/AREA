@@ -7,9 +7,20 @@ import ActionButton from "../components/buttons/ActionButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { getUserName } from "../utils/GetUserName";
 
+interface Workflow {
+    id: string;
+    name: string;
+    actionid: string;
+    reactionid: string;
+    isactivated: boolean;
+    actioncolor: string;
+    actionlogo: string;
+    reactionlogo: string;
+}
+
 const WorkflowDetail = () => {
     const { workflowId } = useParams();
-    const [workflow, setWorkflow] = useState<any | null>(null);
+    const [workflow, setWorkflow] = useState<Workflow | null>(null);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("You");
     const [isWorkflowActivated, setIsWorkflowActivated] = useState(false);
@@ -59,7 +70,7 @@ const WorkflowDetail = () => {
             });
 
             if (result.data.success) {
-                navigate("/");
+                navigate("/explore");
             }
 
         } catch (error) {
@@ -157,10 +168,10 @@ const WorkflowDetail = () => {
     return (
         <>
             <div
-                style={{backgroundColor: workflow.actioncolor}}
+                style={{backgroundColor: workflow?.actioncolor}}
             >
                 <Navbar
-                    isWhiteMod={true}
+                    isWhiteMode={true}
                 />
                 <div className="flex items-center justify-between px-10 py-5">
                     <div>
@@ -181,11 +192,13 @@ const WorkflowDetail = () => {
                     >
                         <div className="flex flex-row pt-[15px]">
                             <img
-                                src={`${import.meta.env.VITE_HOST_URL}${workflow.actionlogo}`}
+                                alt="icon"
+                                src={`${import.meta.env.VITE_HOST_URL}${workflow?.actionlogo}`}
                                 className="size-[60px]"
                             />
                             <img
-                                src={`${import.meta.env.VITE_HOST_URL}${workflow.reactionlogo}`}
+                                alt="icon"
+                                src={`${import.meta.env.VITE_HOST_URL}${workflow?.reactionlogo}`}
                                 className="size-[60px] ml-[10px]"
                             />
                         </div>
@@ -202,31 +215,31 @@ const WorkflowDetail = () => {
                                 <div
                                     className="flex justify-end text-center"
                                 >
-                                    <p
+                                    <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
                                         onClick={handleSaveName}
                                     >
                                         Save
-                                    </p>
+                                    </button>
                                 </div>
                             </>
                         ) : (
                             <>
-                                <h1
-                                    className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer"
+                                <button
+                                    className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer text-left"
                                     onClick={() => setIsEditing(true)}
                                 >
                                     {workflowName}
-                                </h1>
+                                </button>
                                 <div
                                     className="flex justify-end text-center"
                                 >
-                                    <p
+                                    <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
                                         onClick={() => setIsEditing(true)}
                                     >
                                         Edit title
-                                    </p>
+                                    </button>
                                 </div>
                         </>
                         )}
@@ -258,7 +271,7 @@ const WorkflowDetail = () => {
             <MaxWidthWrapper
                 maxWidth="450px"
             >
-                <div
+                <button
                     style={{
                         backgroundColor: "#222222",
                         boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
@@ -267,33 +280,29 @@ const WorkflowDetail = () => {
                     onClick={handleActivation}
                 >
                     {isWorkflowActivated ? (
-                        <>
-                            <p
-                                className="text-white text-center flex-1 text-[29px] font-bold ml-[40px]"
-                            >
-                                {buttonText}
-                            </p>
-                        </>
+                        <p
+                            className="text-white text-center flex-1 text-[29px] font-bold ml-[40px]"
+                        >
+                            {buttonText}
+                        </p>
                     ) : (
-                        <>
-                            <p
-                                className="text-white text-center flex-1 text-[29px] font-bold ml-[150px]"
-                            >
-                                {buttonText}
-                            </p>
-                        </>
+                        <p
+                            className="text-white text-center flex-1 text-[29px] font-bold ml-[150px]"
+                        >
+                            {buttonText}
+                        </p>
                     )}
 
                     <div
                         style={{
-                            backgroundColor: workflow.actioncolor,
+                            backgroundColor: workflow?.actioncolor,
                             transform: isWorkflowActivated
                             ? "translateX(0)"
                             : "translateX(-348px)",
                         }}
                         className="h-[90px] w-[90px] rounded-full mr-[6px] transition-transform duration-300 ease-in-out">
                     </div>
-                </div>
+                </button>
             </MaxWidthWrapper>
 
             <div className="flex justify-center mt-[55px] mb-[45px]">

@@ -6,10 +6,10 @@ import axios from "axios";
 
 interface NavbarProps {
     bgColor?: string;
-    isWhiteMod?: boolean;
+    isWhiteMode?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
+const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
     const { isUserConnected } = useAuth();
     const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
     return (
         <div className={`${bgColor}`}>
             <div className="pt-6 pb-6 flex justify-between items-center px-6">
-                {isWhiteMod ? (
+                {isWhiteMode ? (
                     <h1
                         className="text-4xl text-white hover:opacity-90 font-extrabold ml-4">
                             <a
@@ -90,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                         </>
                     ) : (
                         <>
-                            {isWhiteMod ? (
+                            {isWhiteMode ? (
                                 <>
                                     <li>
                                         <NavbarLink
@@ -112,15 +112,16 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                                         <NavbarButton
                                             onClick={handleCreate}
                                             text="Create"
-                                            isWhiteMod={true}
+                                            isWhiteMode={true}
                                         />
                                     </li>
                                     <li>
-                                        <NavbarButton
+                                        <button
                                             onClick={handleLogout}
-                                            text="Logout"
-                                            isWhiteMod={true}
-                                        />
+                                            className="text-white font-bold text-[20px]"
+                                        >
+                                            Logout
+                                        </button>
                                     </li>
                                     <li>
                                         <button
@@ -159,10 +160,12 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                                         />
                                     </li>
                                     <li>
-                                        <NavbarButton
+                                        <button
                                             onClick={handleLogout}
-                                            text="Logout"
-                                        />
+                                            className="text-[#222222] font-bold text-[20px]"
+                                        >
+                                            Logout
+                                        </button>
                                     </li>
                                     <li>
                                         <button
