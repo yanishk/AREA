@@ -23,6 +23,11 @@ type MockUserServiceService struct {
 	mock.Mock
 }
 
+func (m *MockUserServiceService) RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
+	args := m.Called(email, connectionType, serviceName)
+	return args.Bool(0), args.Error(1)
+}
+
 func (m *MockUserServiceService) CallApiAndRefresh(email, connectionType, serviceName string) (string, error) {
 	args := m.Called(email, connectionType, serviceName)
 	return args.String(0), args.Error(1)
