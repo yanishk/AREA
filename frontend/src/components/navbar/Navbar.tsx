@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
             <div className="pt-6 pb-6 flex justify-between items-center px-6">
                 {isWhiteMode ? (
                     <h1
-                        className="text-4xl text-white hover:opacity-90 font-extrabold ml-4">
+                        className="text-white text-4xl hover:opacity-90 font-extrabold ml-4">
                             <a
                                 href="/explore"
                             >

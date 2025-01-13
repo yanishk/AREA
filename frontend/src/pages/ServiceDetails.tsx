@@ -95,7 +95,7 @@ const ServiceDetailsPage = () => {
                 style={{background: service?.color}}
             >
                 <Navbar
-                    isWhiteMod={true}
+                    isWhiteMode={true}
                 />
 
                 <div
