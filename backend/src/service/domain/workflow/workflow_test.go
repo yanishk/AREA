@@ -126,6 +126,11 @@ func (m *MockUserServiceRepository) RetrieveAsanaWorkspaceTags(email, connection
 	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
 }
 
+func (m *MockUserServiceRepository) RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
+	args := m.Called(email, connectionType, serviceName)
+	return args.Bool(0), args.Error(1)
+}
+
 func TestCreateWorkflow(test *testing.T) {
 	mockUserRepo := new(MockUserRepository)
 	mockWorkflowRepo := new(MockWorkflowRepository)
