@@ -42,7 +42,7 @@ func (self *UserServiceService) GetUser(email, connectionType string) (entities.
 	return foundUser, nil
 }
 
-func (self *UserServiceService) UserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
+func (self *UserServiceService) RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
 	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
 	if err != nil {
 		return false, fmt.Errorf("Could not find requested user")

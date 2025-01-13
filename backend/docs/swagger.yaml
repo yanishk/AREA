@@ -401,6 +401,18 @@ definitions:
           $ref: '#/definitions/entities.GitlabProject'
         type: array
     type: object
+  docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse:
+    properties:
+      error:
+        example: Could not find requested user-Unknown service
+        type: string
+    type: object
+  docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse:
+    properties:
+      success:
+        example: User authenticated to ${service}-User not authenticated to ${service}
+        type: string
+    type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
       error:
@@ -417,18 +429,6 @@ definitions:
     properties:
       success:
         example: Token generated
-        type: string
-    type: object
-  docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse:
-    properties:
-      error:
-        example: Could not find requested user-Unknown service
-        type: string
-    type: object
-  docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse:
-    properties:
-      success:
-        example: User authenticated to ${service}-User not authenticated to ${service}
         type: string
     type: object
   docs_workflow.WorkflowCreateWorkflowBadRequestResponse:
@@ -936,11 +936,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse'
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse'
       summary: User Service Authentication Status
       tags:
       - Authentication

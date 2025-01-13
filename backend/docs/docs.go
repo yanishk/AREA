@@ -244,13 +244,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse"
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse"
                         }
                     }
                 }
@@ -1755,6 +1755,24 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested user-Unknown service"
+                }
+            }
+        },
+        "docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "User authenticated to ${service}-User not authenticated to ${service}"
+                }
+            }
+        },
         "docs_userservice.UserServiceServiceCallbackBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -1779,24 +1797,6 @@ const docTemplate = `{
                 "success": {
                     "type": "string",
                     "example": "Token generated"
-                }
-            }
-        },
-        "docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Could not find requested user-Unknown service"
-                }
-            }
-        },
-        "docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "User authenticated to ${service}-User not authenticated to ${service}"
                 }
             }
         },

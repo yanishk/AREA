@@ -46,7 +46,7 @@ type ServiceService interface {
 }
 
 type UserServiceService interface {
-	UserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error)
+	RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error)
 	CallApiAndRefresh(email, connectionType, serviceName string) (string, error)
 	UpdateTokenForService(code, serviceName, appType, email string, connectionType string) error
 	RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error)

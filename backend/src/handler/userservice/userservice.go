@@ -30,7 +30,7 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback", self.serviceCallback)
-	private.GET("/authentication-status", self.userServiceAuthenticationStatus)
+	private.GET("/authentication-status", self.getUserServiceAuthenticationStatus)
 	private.GET("/github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/discord/user/servers", self.getDiscordUserServers)
@@ -99,15 +99,15 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 // @Tags         Authentication
 // @Produce      json
 // @Param        service     query     string  true  "Service name (Github, Spotify, Discord..)"
-// @Failure		200		{object}	docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse
-// @Failure		400		{object}	docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse
+// @Failure		200		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse
+// @Failure		400		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse
 // @Router       /authentication-status [get]
-func (self *UserServiceHandler) userServiceAuthenticationStatus(context *gin.Context) {
+func (self *UserServiceHandler) getUserServiceAuthenticationStatus(context *gin.Context) {
 	serviceName := context.Query("service")
 	email := context.GetString("email")
 	connectionType := context.GetString("connectionType")
 
-	isUserAuthenticated, err := self.UserServiceService.UserServiceAuthenticationStatus(email, connectionType, serviceName)
+	isUserAuthenticated, err := self.UserServiceService.RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName)
 	if err != nil {
 		context.IndentedJSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),

@@ -26,11 +26,11 @@ type UserServiceServiceCallbackInternalServerErrorResponse struct {
 }
 
 // User Service Authentication Status Responses
-type UserServiceUserServiceAuthenticationStatusSuccessResponse struct {
+type UserServiceGetUserServiceAuthenticationStatusSuccessResponse struct {
 	Msg string `json:"success"example:"User authenticated to ${service}-User not authenticated to ${service}"`
 }
 
-type UserServiceUserServiceAuthenticationStatusBadRequestResponse struct {
+type UserServiceGetUserServiceAuthenticationStatusBadRequestResponse struct {
 	Msg string `json:"error"example:"Could not find requested user-Unknown service"`
 }
 
