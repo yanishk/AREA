@@ -13,6 +13,7 @@ class FillServicesCard {
       serviceIndex++;
       return Row(
         children: [
+          Padding(padding: EdgeInsets.only(right: 5)),
           MySquareServicesCard(
             name: Globaldata.serviceList[index].name,
             color: HexColor(Globaldata.serviceList[index].color),
@@ -30,6 +31,7 @@ class FillServicesCard {
     }
     return Row(
       children: [
+        Padding(padding: EdgeInsets.only(right: 5)),
         MySquareServicesCard(
           name: Globaldata.serviceList[index].name,
           color: HexColor(Globaldata.serviceList[index].color),
