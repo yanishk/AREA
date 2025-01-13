@@ -5,6 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import ActionButton from "../components/buttons/ActionButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 
+type serviceType = {
+    name: string;
+    color: string;
+    logo: string;
+    description: string;
+}
+
 type serviceItemType = {
     id: string;
     name: string,
@@ -14,7 +21,7 @@ type serviceItemType = {
 const ServiceDetailsPage = () => {
     const { serviceName } = useParams();
     const navigate = useNavigate();
-    const [service, setService] = useState<any | null>(null);
+    const [service, setService] = useState<serviceType | null>(null);
     const [serviceActions, setServiceActions] = useState<serviceItemType[] | null>(null);
     const [serviceReactions, setServiceReactions] = useState<serviceItemType[] | null>(null);
 

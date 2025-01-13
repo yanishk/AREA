@@ -108,7 +108,7 @@ const ExplorePage = () => {
                                 className={`h-[380px] flex flex-col items-center justify-center cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative`}
                                 onClick={() => navigate(`/${service.name}`)}
                             >
-                                <img src={`${import.meta.env.VITE_HOST_URL}${service.logo}`} className="w-[120px] h-[120px]" />
+                                <img alt="icon" src={`${import.meta.env.VITE_HOST_URL}${service.logo}`} className="w-[120px] h-[120px]" />
                                 <p className="mt-[35px] text-white text-[1.215em] font-extrabold">{service.name}</p>
                             </button>
                         ))}
