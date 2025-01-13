@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import InputField from "../components/inputs/InputsField";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import CancelButton from "../components/buttons/CancelButton";
+import ActionButton from "../components/buttons/ActionButton";
 import Modal from "../components/modals/Modal";
 import Navbar from "../components/navbar/Navbar";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
@@ -85,7 +85,7 @@ const AccountPage = () => {
                 className="flex items-center justify-between px-10 py-5"
             >
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Cancel"
                         textColor="text-[#222222]"
                         borderColor="border-[#222222]"

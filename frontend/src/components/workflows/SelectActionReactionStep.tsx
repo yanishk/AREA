@@ -1,4 +1,4 @@
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 
 type Parameters = {
     isexhaustive: boolean;
@@ -30,7 +30,7 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
                     className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
                 >
                     <div>
-                        <CancelButton
+                        <ActionButton
                             text="Back"
                             textColor="text-white"
                             borderColor="border-white"

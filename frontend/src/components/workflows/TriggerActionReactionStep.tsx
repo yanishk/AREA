@@ -2,7 +2,7 @@ import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateSteps";
 import { fieldType } from "../../utils/fieldType";
 import { getFieldValues } from "../../utils/getFieldValues";
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 
@@ -55,7 +55,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Back"
                         textColor="text-white"
                         borderColor="border-white"

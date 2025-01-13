@@ -5,7 +5,7 @@ import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";
 import ButtonThenCustom from "../buttons/ButtonThenCustom";
 import ButtonThenDefault from "../buttons/ButtonThenDefault";
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 import TriggerButton from "../buttons/TriggerButton";
 
 interface HomeStepProps {
@@ -67,7 +67,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
             className="flex items-center justify-between px-10 py-5"
         >
             <div>
-                <CancelButton
+                <ActionButton
                     text="Cancel"
                     textColor="text-[#222222]"
                     borderColor="border-[#222222]"
