@@ -338,16 +338,67 @@ func TestDeleteWorkflow(test *testing.T) {
 func TestGetAccessToken(test *testing.T) {
 	mockUserRepo := new(MockUserRepository)
 	mockWorkflowRepo := new(MockWorkflowRepository)
+	MockUserServiceRepo := new(MockUserServiceRepository)
 	service := &WorkflowService{
 		UserRepository:     mockUserRepo,
 		WorkflowRepository: mockWorkflowRepo,
+		UserServiceService: MockUserServiceRepo,
 	}
 
 	test.Run("User not found", func(test *testing.T) {
-		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+		var workflow entities.Workflow
+
+		workflow.OwnerId = "1"
+
+		mockUserRepo.On("FindUserById", "1").
 			Return(entities.User{}, errors.New("user not found")).Once()
 
-		err := service.DeleteWorkflow("test@test.com", "basic", "1")
-		require.EqualError(test, err, "user not found")
+		_, err := service.getAccessToken("service", workflow)
+		require.EqualError(test, err, "Error finding user")
+	})
+
+	test.Run("Fail refresh", func(test *testing.T) {
+		var workflow entities.Workflow
+		var user entities.User
+
+		workflow.OwnerId = "1"
+		user.Email = "test@test.com"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserById", "1").
+			Return(user, nil).Once()
+
+		MockUserServiceRepo.On("CallApiAndRefresh", "test@test.com", "basic", "service").
+			Return("accessToken", errors.New("Refresh Failed"))
+
+		_, err := service.getAccessToken("service", workflow)
+		require.EqualError(test, err, "Refresh Failed")
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+		MockUserServiceRepo := new(MockUserServiceRepository)
+		service := &WorkflowService{
+			UserRepository:     mockUserRepo,
+			WorkflowRepository: mockWorkflowRepo,
+			UserServiceService: MockUserServiceRepo,
+		}
+
+		var workflow entities.Workflow
+		var user entities.User
+
+		workflow.OwnerId = "1"
+		user.Email = "test@test.com"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserById", "1").
+			Return(user, nil).Once()
+
+		MockUserServiceRepo.On("CallApiAndRefresh", "test@test.com", "basic", "service").
+			Return("accessToken", nil)
+
+		_, err := service.getAccessToken("service", workflow)
+		require.NoError(test, err)
 	})
 }
