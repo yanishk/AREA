@@ -273,7 +273,7 @@ const WorkflowDetail = () => {
             <MaxWidthWrapper
                 maxWidth="450px"
             >
-                <div
+                <button
                     style={{
                         backgroundColor: "#222222",
                         boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
@@ -282,21 +282,17 @@ const WorkflowDetail = () => {
                     onClick={handleActivation}
                 >
                     {isWorkflowActivated ? (
-                        <>
-                            <p
-                                className="text-white text-center flex-1 text-[29px] font-bold ml-[40px]"
-                            >
-                                {buttonText}
-                            </p>
-                        </>
+                        <p
+                            className="text-white text-center flex-1 text-[29px] font-bold ml-[40px]"
+                        >
+                            {buttonText}
+                        </p>
                     ) : (
-                        <>
-                            <p
-                                className="text-white text-center flex-1 text-[29px] font-bold ml-[150px]"
-                            >
-                                {buttonText}
-                            </p>
-                        </>
+                        <p
+                            className="text-white text-center flex-1 text-[29px] font-bold ml-[150px]"
+                        >
+                            {buttonText}
+                        </p>
                     )}
 
                     <div
@@ -308,7 +304,7 @@ const WorkflowDetail = () => {
                         }}
                         className="h-[90px] w-[90px] rounded-full mr-[6px] transition-transform duration-300 ease-in-out">
                     </div>
-                </div>
+                </button>
             </MaxWidthWrapper>
 
             <div className="flex justify-center mt-[55px] mb-[45px]">
