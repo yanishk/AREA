@@ -76,11 +76,11 @@ class SelectActionOrReactionTopBar extends StatelessWidget {
             ),
           ),
         ),
-        Center(
+        Center (
           child: AutoSizeText(
             title,
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 25,
               fontWeight: FontWeight.bold,
               color: color,
             ),
