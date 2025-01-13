@@ -11,7 +11,7 @@ export const handleOAuthLogin = async (serviceName: string) => {
 
         const authUrl = result.data["auth-url"];
         if (!authUrl) {
-            console.error("Error: Authentication URL not received");
+            console.error("Authentication URL not received");
             return;
         }
 

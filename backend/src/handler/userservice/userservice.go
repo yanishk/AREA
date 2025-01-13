@@ -154,7 +154,7 @@ func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 	servers, err := self.UserServiceService.RetrieveDiscordUserServers(email, connectionType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's repositories",
+			"error": "Could not retrieve the user's servers",
 		})
 		return
 	}

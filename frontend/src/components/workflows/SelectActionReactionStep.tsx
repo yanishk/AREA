@@ -11,15 +11,17 @@ type Parameters = {
 interface SelectActionReactionStepProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
     availableItems: { name: string; description: string; id: string; parameters: Parameters[] } [] | null;
-    goBack: () => void;
     handleSelect: (name: string, id: string, parameters: Parameters[]) => void;
+    goBack: () => void;
+    type: "action" | "reaction";
 }
 
 const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
     selectedService,
     availableItems,
-    goBack,
     handleSelect,
+    goBack,
+    type,
 }) => {
     return (
         <div className="min-h-screen bg-gray-100">
@@ -40,7 +42,7 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
                     </div>
 
                     <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
-                        Choose a trigger
+                        {type === "action" ? "Choose an action" : "Choose a reaction"}
                     </h1>
 
                     <div className="w-[100px]"></div>

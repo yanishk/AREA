@@ -30,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
             await axios.post(`${import.meta.env.VITE_API_URL}logout`, {}, {
                 withCredentials: true
             });
-            navigate("/");
+            navigate("/explore");
             window.location.reload();
         } catch (error) {
             console.error("Error during logout:", error);
@@ -44,7 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                     <h1
                         className="text-4xl text-white hover:opacity-90 font-extrabold ml-4">
                             <a
-                                href="/"
+                                href="/explore"
                             >
                                 AREA
                             </a>
@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                     <h1
                         className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold ml-4">
                             <a
-                                href="/"
+                                href="/explore"
                             >
                                 AREA
                             </a>
@@ -65,14 +65,6 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMod }) => {
                 >
                     {!isUserConnected ? (
                         <>
-                            <li>
-                                <NavbarLink
-                                    href="/"
-                                    text="Home"
-                                    textColor="text-[#222222]"
-                                    hoverColor="hover:text-[#444444]"
-                                />
-                            </li>
                             <li>
                                 <NavbarLink
                                     href="/explore"

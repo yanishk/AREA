@@ -115,7 +115,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
                 saveJWToken(response);
               }
               Navigator.pop(context);
-              Navigator.pop(Globaldata.myContext);
+              Navigator.pop(Globaldata.myContext, true);
             } else {
               final responseData = await errorHandler.basicResponseErrorHandler(response, "Error auth failed : ");
               if (responseData == null) {

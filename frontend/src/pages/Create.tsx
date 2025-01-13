@@ -7,11 +7,12 @@ import SelectActionReactionStep from "../components/workflows/SelectActionReacti
 import ConnectServiceStep from "../components/workflows/ConnectServiceStep";
 import SelectServiceStep from "../components/workflows/ServiceActionReactionStep";
 import TriggerActionReactionStep from "../components/workflows/TriggerActionReactionStep";
-import Steps from "../utils/CreateSteps";
-import { getFieldValues } from "../utils/getFieldValues";
+import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
+import getFieldValues, { gitlabNameToIdMap } from "../utils/getFieldValues";
+import { setSelectedWorkspace } from "../utils/AsanaUtils";
 
 type availableActionsType = {
     name: string;
@@ -48,6 +49,7 @@ const WorkflowBuilder = () => {
     const [actionServices, setActionServices] = useState([]);
     const [reactionServices, setReactionServices] = useState([]);
     const [currentStep, setCurrentStep] = useState<Steps>(Steps.HOME);
+    const [isServiceConnected, setIsServiceConnected] = useState(false);
 
     const goToStep = (step: Steps) => {
         setCurrentStep(step);
@@ -73,7 +75,7 @@ const WorkflowBuilder = () => {
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
-            navigate("/")
+            navigate("/explore")
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -269,7 +271,10 @@ const WorkflowBuilder = () => {
             }));
         }
         if (type === "reaction") {
-            setReactionFieldValues((prev) => ({
+            if (id === "workflow") {
+                setSelectedWorkspace(value, id);
+            }
+              setReactionFieldValues((prev) => ({
                 ...prev,
                 [id]: value,
             }));
@@ -294,7 +299,7 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const handleConnectService = async (selectedService: any) => {
+    const handleConnectService = async (selectedService: any, type: "action" | "reaction") => {
         try {
             const result = await axios.get(
                 `${import.meta.env.VITE_API_URL}authentication?service=${selectedService.name}&callbacktype=service&apptype=web`,
@@ -316,59 +321,46 @@ const WorkflowBuilder = () => {
                 selectedReaction,
                 actionFieldValues,
                 reactionFieldValues,
+                selectedService,
+                type
             };
-            const state = encodeURIComponent(JSON.stringify(stateData));
 
-            const redirectUrl = `${authUrl}&state=${state}`;
+            sessionStorage.setItem("state-data", JSON.stringify(stateData));
 
-            window.location.href = redirectUrl;
+            window.location.href = authUrl;
         } catch (error) {
             console.error("Error during authentication:", error);
         }
     }
 
-    const decodeState = (state: string | null) => {
-        if (!state) return null;
+    const updateStateFromSession = (state: any) => {
+        if (!state) return;
 
-        try {
-            return JSON.parse(decodeURIComponent(state));
-        } catch (error) {
-            console.error("Error parsing state:", error);
-            return null;
+        if (state.selectedActionService) {
+            setSelectedActionService(state.selectedActionService);
+        }
+        if (state.selectedReactionService) {
+            setSelectedReactionService(state.selectedReactionService);
+        }
+        if (state.selectedAction) {
+            setSelectedAction(state.selectedAction);
+        }
+        if (state.selectedReaction) {
+            setSelectedReaction(state.selectedReaction);
+        }
+        if (state.actionFieldValues) {
+            setActionFieldValues(state.actionFieldValues);
+        }
+        if (state.reactionFieldValues) {
+            setReactionFieldValues(state.reactionFieldValues);
         }
     };
 
-    const updateStateFromDecoded = (decodedState: any) => {
-        if (!decodedState) return;
-
-        if (decodedState.selectedActionService) {
-            setSelectedActionService(decodedState.selectedActionService);
-        }
-        if (decodedState.selectedReactionService) {
-            setSelectedReactionService(decodedState.selectedReactionService);
-        }
-        if (decodedState.selectedAction) {
-            setSelectedAction(decodedState.selectedAction);
-        }
-        if (decodedState.selectedReaction) {
-            setSelectedReaction(decodedState.selectedReaction);
-        }
-        if (decodedState.actionFieldValues) {
-            setActionFieldValues(decodedState.actionFieldValues);
-        }
-        if (decodedState.reactionFieldValues) {
-            setReactionFieldValues(decodedState.reactionFieldValues);
-        }
-    };
-
-    const handleServiceCallback = async (codeAuth: string, serviceType: string | undefined) => {
-        if (!codeAuth || !serviceType) return;
+    const handleServiceCallback = async (codeAuth: string, serviceName: string) => {
+        if (!codeAuth || !serviceName) return;
 
         try {
-            const serviceName =
-                serviceType === "action" ? selectedActionService?.name : selectedReactionService?.name;
-
-            await axios.post(
+            const result = await axios.post(
                 `${import.meta.env.VITE_API_URL}service-callback/?code=${codeAuth}`,
                 {
                     service: serviceName,
@@ -378,6 +370,10 @@ const WorkflowBuilder = () => {
                     withCredentials: true
                 }
             );
+
+            if (result.data?.success) {
+                setIsServiceConnected(true);
+            }
         } catch (error) {
             console.error("Error with service callback:", error);
         }
@@ -390,47 +386,77 @@ const WorkflowBuilder = () => {
     };
 
     useEffect(() => {
-        const getDataFromUrl = async () => {
+        const getSavedData = async () => {
             const params = new URLSearchParams(window.location.search);
             const codeAuth = params.get("code");
-            const state = params.get("state");
 
-            const decodedState = decodeState(state);
-            updateStateFromDecoded(decodedState);
+            const state = sessionStorage.getItem("state-data");
+
+            if (!state) {
+                console.error("Undetected state into session storage");
+                return;
+            }
+
+            const jsonState = JSON.parse(state);
+
+            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+                goToStep(Steps.TRIGGER_ACTION);
+            }
+            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+                goToStep(Steps.TRIGGER_REACTION);
+            }
+
+            const serviceAuth = jsonState.selectedService;
+
+            updateStateFromSession(jsonState);
 
             if (!codeAuth) {
                 return;
             }
 
-            await handleServiceCallback(codeAuth, decodedState?.serviceType);
+            await handleServiceCallback(codeAuth, serviceAuth.name);
+
+            sessionStorage.removeItem("state-data");
 
             clearUrlParams();
         };
 
-        getDataFromUrl();
+        getSavedData();
     }, []);
 
+    const updateFieldValues = async (parameters: Parameters[], setFieldValues: React.Dispatch<React.SetStateAction<Record<string, string>>>) => {
+        const defaultValues: Record<string, string> = {};
+
+        for (const param of parameters) {
+            const options = await getFieldValues(param);
+
+            if (options && options.length > 0) {
+                defaultValues[param.name] = options[0];
+            }
+        }
+
+        setFieldValues((prev) => ({ ...defaultValues, ...prev }));
+    };
+
     useEffect(() => {
-        const updateFieldValues = (parameters: Parameters[], setFieldValues: React.Dispatch<React.SetStateAction<Record<string, string>>>) => {
-            const defaultValues: Record<string, string> = {};
-
-            parameters.forEach((param) => {
-                const options = getFieldValues(param);
-                if (options && options.length > 0) {
-                    defaultValues[param.name] = options[0];
+        const fetchFieldValues = async () => {
+            if (selectedAction?.parameters) {
+                if (isRequiredConnection("action") && !isServiceConnected) {
+                    return;
                 }
-            });
-
-            setFieldValues((prev) => ({ ...defaultValues, ...prev }));
+                await updateFieldValues(selectedAction.parameters, setActionFieldValues);
+                setIsServiceConnected(false);
+            }
+            if (selectedReaction?.parameters) {
+                if (isRequiredConnection("reaction") && !isServiceConnected) {
+                    return;
+                }
+                await updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
+                setIsServiceConnected(false);
+            }
         };
 
-        if (selectedAction?.parameters) {
-            updateFieldValues(selectedAction.parameters, setActionFieldValues);
-        }
-
-        if (selectedReaction?.parameters) {
-            updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
-        }
+        fetchFieldValues();
 
     }, [selectedAction, selectedReaction]);
 
@@ -448,42 +474,60 @@ const WorkflowBuilder = () => {
         return index + 1;
     };
 
-    const getActionReactionParams = (
+    const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
         parameters: Parameters[]
-    ): Record<string, any> => {
-        return Object.keys(valuesSelectedByUser).reduce((params, key) => {
-            const param = parameters.find((param) => param.name === key);
+    ): Promise<Record<string, any>> => {
+        const params: Record<string, any> = {};
 
-            if (param) {
-                if (param.type === "int") {
-                    const valuesArray = getFieldValues(param);
+        const handleIntParam = async (key: string, param: Parameters) => {
+            const valuesArray = await getFieldValues(param);
 
-                    if (valuesArray) {
-                        const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
-
-                        if (index !== null) {
-                            params[key] = index;
-                        }
-                    }
-
-                } else {
-                    params[key] = valuesSelectedByUser[key];
-                }
+            if (!valuesArray) {
+                return;
             }
 
-            return params;
-        }, {} as Record<string, any>);
+            const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
+
+            if (index !== null) {
+                params[key] = index;
+            }
+        }
+
+        const processKeys = async (key: string) => {
+            const param = parameters.find((param) => param.name === key);
+
+            if (!param) {
+                return;
+            }
+
+            if (param.type === "int") {
+                await handleIntParam(key, param);
+            } else {
+                params[key] = valuesSelectedByUser[key];
+            }
+        }
+
+        await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
+
+        return params;
     };
 
     const handleCreateWorkflow = async (workflowTitle: string) => {
         const actionParams = selectedAction
-            ? getActionReactionParams(actionFieldValues, selectedAction.parameters)
+            ? await getActionReactionParams(actionFieldValues, selectedAction.parameters)
             : null;
 
         const reactionParams = selectedReaction
-            ? getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
+            ? await getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
             : null;
+
+            if (selectedActionService?.name === "Gitlab" && actionParams) {
+                Object.keys(actionParams).forEach((key) => {
+                    const value = actionParams[key];
+                    actionParams[key] = gitlabNameToIdMap[value];
+                });
+            }
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
@@ -502,7 +546,7 @@ const WorkflowBuilder = () => {
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/");
+        navigate("/explore");
     };
 
     const renderStep = () => {
@@ -540,6 +584,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableActions}
                         handleSelect={handleSelectAction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_ACTION)}
+                        type="action"
                     />
                 )
 
@@ -572,6 +617,7 @@ const WorkflowBuilder = () => {
                         availableItems={availableReactions}
                         handleSelect={handleSelectReaction}
                         goBack={() => goToStep(Steps.SELECT_SERVICE_REACTION)}
+                        type="reaction"
                     />
                 )
 
@@ -593,7 +639,7 @@ const WorkflowBuilder = () => {
                         <ConnectServiceStep
                             selectedService={selectedActionService}
                             goBack={goBack}
-                            handleConnect={() => handleConnectService(selectedActionService)}
+                            handleConnect={() => handleConnectService(selectedActionService, "action")}
                         />
                     )
 
@@ -602,7 +648,7 @@ const WorkflowBuilder = () => {
                     <ConnectServiceStep
                         selectedService={selectedReactionService}
                         goBack={() => goBack()}
-                        handleConnect={() => handleConnectService(selectedReactionService)}
+                        handleConnect={() => handleConnectService(selectedReactionService, "reaction")}
                     />
                 )
 
