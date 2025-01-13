@@ -195,3 +195,48 @@ func TestGetUserWorkflows(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestUpdateWorkflow(test *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockWorkflowRepo := new(MockWorkflowRepository)
+	service := &WorkflowService{
+		UserRepository:     mockUserRepo,
+		WorkflowRepository: mockWorkflowRepo,
+	}
+
+	test.Run("User not found", func(test *testing.T) {
+		var updateWorkflow entities.UpdatedWorkflow
+
+		mockWorkflowRepo.On("FindWorkflowById", "1").
+			Return(entities.Workflow{}, errors.New("user not found")).Once()
+
+		err := service.UpdateWorkflow("1", updateWorkflow)
+		require.EqualError(test, err, "user not found")
+	})
+
+	test.Run("Fail update workflow", func(test *testing.T) {
+		var updateWorkflow entities.UpdatedWorkflow
+
+		mockWorkflowRepo.On("FindWorkflowById", "1").
+			Return(entities.Workflow{}, nil).Once()
+
+		mockWorkflowRepo.On("UpdateWorkflow", "1", entities.Workflow{}).
+			Return(errors.New("Fail update workflow")).Once()
+
+		err := service.UpdateWorkflow("1", updateWorkflow)
+		require.EqualError(test, err, "Fail update workflow")
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		var updateWorkflow entities.UpdatedWorkflow
+
+		mockWorkflowRepo.On("FindWorkflowById", "1").
+			Return(entities.Workflow{}, nil).Once()
+
+		mockWorkflowRepo.On("UpdateWorkflow", "1", entities.Workflow{}).
+			Return(nil).Once()
+
+		err := service.UpdateWorkflow("1", updateWorkflow)
+		require.NoError(test, err)
+	})
+}
