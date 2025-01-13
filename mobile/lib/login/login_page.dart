@@ -129,10 +129,6 @@ class _APICallState extends State<APICall> {
                   hint: 'Password',
                   controller: passwordController,
                   obscureText: true),
-              Text(
-                "Forgot your password?",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
               SizedBox(height: 20),
               CustomButton(
                 backgroundColor: Color.fromARGB(255, 34, 34, 34),

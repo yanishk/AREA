@@ -43,6 +43,7 @@ class SelectService extends State<APICall> {
       serviceIndex++;
       return Row(
         children: [
+          Padding(padding: EdgeInsets.only(right: 5)),
           MySquareServicesCard(
             servicesIndex: index++,
           ),
@@ -54,6 +55,7 @@ class SelectService extends State<APICall> {
     }
     return Row(
       children: [
+        Padding(padding: EdgeInsets.only(right: 5)),
         MySquareServicesCard(
           servicesIndex: index,
         ),
@@ -129,6 +131,11 @@ class MySquareServicesCard extends StatelessWidget {
     );
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
       if (CreateData.selectOrUpdateWorkflow) {
+        if (isAnAction) {
+          Globaldata.firstService = servicesIndex;
+        } else {
+          Globaldata.secondService = servicesIndex;
+        }
         CreateData.selectOrUpdateWorkflow = false;
         Navigator.pop(Globaldata.myContext, CreateData.actualServiceList[servicesIndex].name);
       }
@@ -141,47 +148,43 @@ class MySquareServicesCard extends StatelessWidget {
       return Column();
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Container(
+        width: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
+        height: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
         decoration: BoxDecoration(
           color: HexColor(CreateData.actualServiceList[servicesIndex].color),
           border: Border.all(
             color: HexColor(CreateData.actualServiceList[servicesIndex].color),
             width: 2.0,
           ),
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: BorderRadius.circular(6.0),
         ),
         child: InkWell(
           onTap: () {
             if (isAnAction) {
-              Globaldata.firstService = servicesIndex;
               redirectToSelectActionOrReactionPage();
             } else {
-              Globaldata.secondService = servicesIndex;
               redirectToSelectActionOrReactionPage();
             }
           },
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
+              SafeWebImage(
+                url: "${Globaldata.domainName}${CreateData.actualServiceList[servicesIndex].icon}",
+                width: 50,
+                height: 50,
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                child: Column(children: [
-                  SafeWebImage(
-                      url:
-                          "${Globaldata.domainName}${CreateData.actualServiceList[servicesIndex].icon}"),
-                  AutoSizeText(
-                    CreateData.actualServiceList[servicesIndex].name,
-                    style: const TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                    maxLines: 1,
-                  )
-                ]),
+              Padding(padding: EdgeInsets.only(top: 20)),
+              AutoSizeText(
+                CreateData.actualServiceList[servicesIndex].name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white
+                ),
+                maxLines: 1,
               ),
             ],
           ),

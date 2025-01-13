@@ -40,9 +40,9 @@ class SaveNewWorkflows extends State<APICall> {
   @override
   void initState() {
     super.initState();
-    defaultWorkflowName = "If ${CreateData.serviceAction.name} ";
     developer.log("${CreateData.actionParamListName}");
     developer.log("${CreateData.reactionParamListName}");
+    defaultWorkflowName = "If ${CreateData.serviceAction.name} ";
     for (int i = 0; i < CreateData.actionParamListName.length; i++) {
       defaultWorkflowName += "${CreateData.actionParamListName[i]} ";
     }
@@ -112,14 +112,14 @@ class SaveNewWorkflows extends State<APICall> {
                       children: [
                         SafeWebImage(
                           url:
-                              "${Globaldata.domainName}${CreateData.actionServiceList[Globaldata.firstService].icon}",
+                              "${Globaldata.domainName}${CreateData.serviceAction.icon}",
                           width: 30,
                           height: 30,
                         ),
                         Padding(padding: EdgeInsets.only(left: 10)),
                         SafeWebImage(
                           url:
-                              "${Globaldata.domainName}${CreateData.reactionServiceList[Globaldata.secondService].icon}",
+                              "${Globaldata.domainName}${CreateData.serviceReaction.icon}",
                           width: 30,
                           height: 30,
                         ),
