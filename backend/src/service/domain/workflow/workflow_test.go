@@ -150,3 +150,48 @@ func TestCreateWorkflow(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestGetUserWorkflows(test *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockWorkflowRepo := new(MockWorkflowRepository)
+	service := &WorkflowService{
+		UserRepository:     mockUserRepo,
+		WorkflowRepository: mockWorkflowRepo,
+	}
+
+	test.Run("User not found", func(test *testing.T) {
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("user not found")).Once()
+
+		err := service.CreateWorkflow("test@test.com", "basic", entities.NewWorkflow{})
+		require.EqualError(test, err, "user not found")
+	})
+
+	test.Run("Fail retrieve workflow", func(test *testing.T) {
+		var user entities.User
+		user.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil).Once()
+
+		mockWorkflowRepo.On("FindWorkflowsByOwnerId", "1").
+			Return([]entities.Workflow{}, errors.New("Fail retrieve workflow")).Once()
+
+		_, err := service.GetUserWorkflows("test@test.com", "basic")
+		require.EqualError(test, err, "Fail retrieve workflow")
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+		user.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil).Once()
+
+		mockWorkflowRepo.On("FindWorkflowsByOwnerId", "1").
+			Return([]entities.Workflow{}, nil).Once()
+
+		_, err := service.GetUserWorkflows("test@test.com", "basic")
+		require.NoError(test, err)
+	})
+}
