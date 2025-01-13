@@ -227,12 +227,12 @@ const WorkflowDetail = () => {
                             </>
                         ) : (
                             <>
-                                <h1
-                                    className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer"
+                                <button
+                                    className="text-white text-[36px] font-[800] mt-2 break-words whitespace-normal cursor-pointer text-left"
                                     onClick={() => setIsEditing(true)}
                                 >
                                     {workflowName}
-                                </h1>
+                                </button>
                                 <div
                                     className="flex justify-end text-center"
                                 >
