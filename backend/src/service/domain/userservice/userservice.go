@@ -52,7 +52,7 @@ func (self *UserServiceService) RetrieveUserServiceAuthenticationStatus(email, c
 	if err != nil {
 		return false, fmt.Errorf("Unknown service")
 	}
-	if (!service.IsAuthNeeded) {
+	if !service.IsAuthNeeded {
 		return true, nil
 	}
 
