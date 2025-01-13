@@ -34,6 +34,7 @@ class ServiceData {
   String color;
   String icon;
   String id;
+  String description;
   bool isAuthNeeded;
   bool hasActions;
   bool hasReactions;
@@ -43,6 +44,7 @@ class ServiceData {
     this.color = "",
     this.icon = "",
     this.id = "",
+    this.description = "",
     this.isAuthNeeded = false,
     this.hasActions = false,
     this.hasReactions = false,
