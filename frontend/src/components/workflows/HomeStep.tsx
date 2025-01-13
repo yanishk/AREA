@@ -1,5 +1,5 @@
 import { ActionType } from "../../utils/ActionType";
-import Steps from "../../utils/CreateSteps";
+import Steps from "../../utils/CreateStepsType";
 import { ReactionType } from "../../utils/ReactionType";
 import ButtonIfCustom from "../buttons/ButtonIfCustom";
 import ButtonIfDefault from "../buttons/ButtonIfDefault";

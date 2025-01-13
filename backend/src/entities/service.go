@@ -8,6 +8,7 @@ type Service struct {
 	HasActions   bool   `json:"hasactions"`
 	HasReactions bool   `json:"hasreactions"`
 	IsAuthNeeded bool   `json:"isauthneeded"`
+	Description  string `json:"description"`
 }
 
 type ResultToken struct {

@@ -55,14 +55,14 @@ func (self *UserRepository) FindUserById(userId string) (entities.User, error) {
 }
 
 func (self *UserRepository) UpdateUser(email, password, connectionType string) error {
-	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2)`
+	sqlStatement := `UPDATE users SET password = ($1) WHERE email = ($2) AND connectiontype = ($3)`
 
 	_, err := self.FindUserByEmail(email, connectionType)
 	if err != nil {
 		return fmt.Errorf("User doesn't exist")
 	}
 
-	_, err = self.db.Exec(sqlStatement, password, email)
+	_, err = self.db.Exec(sqlStatement, password, email, connectionType)
 	if err != nil {
 		return err
 	}
