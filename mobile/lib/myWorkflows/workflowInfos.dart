@@ -51,7 +51,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
       if (editNameMode) {
         editNameButtonText = "Save";
       } else {
-        editNameButtonText = "Edit name";
+        editNameButtonText = "Edit title";
         ApiRequest.put(
           "workflows/$workflowID",
           jsonEncode(<String, dynamic>{
@@ -141,7 +141,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
             CustomButton(
               backgroundColor: Color.fromARGB(255, 240, 240, 240),
               text: AutoSizeText(
-                "Delete my Workflow",
+                "Delete workflow",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
