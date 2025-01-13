@@ -25,6 +25,15 @@ type UserServiceServiceCallbackInternalServerErrorResponse struct {
 	Msg string `json:"error"example:"Failed to get email-Failed to update token"`
 }
 
+// User Service Authentication Status Responses
+type UserServiceGetUserServiceAuthenticationStatusSuccessResponse struct {
+	Msg string `json:"success"example:"User authenticated to ${service}-User not authenticated to ${service}"`
+}
+
+type UserServiceGetUserServiceAuthenticationStatusBadRequestResponse struct {
+	Msg string `json:"error"example:"Could not find requested user-Unknown service"`
+}
+
 // Github Get User Repositories
 type UserServiceGetGithubUserRepositoriesSuccessResponse struct {
 	Repositories []entities.GithubRepository

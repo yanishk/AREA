@@ -34,12 +34,33 @@ func NewUserServiceService(ServiceRepository storage.ServiceRepository, UserRepo
 	}
 }
 
-func (self *UserServiceService) GetUser(emailStr, connectionTypeStr string) (entities.User, error) {
-	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(emailStr, connectionTypeStr)
+func (self *UserServiceService) GetUser(email, connectionType string) (entities.User, error) {
+	foundUser, errSeekMail := self.UserRepository.FindUserByEmail(email, connectionType)
 	if errSeekMail != nil || len(foundUser.Email) <= 0 {
 		return foundUser, fmt.Errorf("Could not find requested user")
 	}
 	return foundUser, nil
+}
+
+func (self *UserServiceService) RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
+	user, err := self.UserRepository.FindUserByEmail(email, connectionType)
+	if err != nil {
+		return false, fmt.Errorf("Could not find requested user")
+	}
+
+	service, err := self.ServiceRepository.FindServiceByName(serviceName)
+	if err != nil {
+		return false, fmt.Errorf("Unknown service")
+	}
+	if (!service.IsAuthNeeded) {
+		return true, nil
+	}
+
+	_, err = self.UserServiceRepository.FindUserServiceByServiceIdandUserId(user.Id, service.Id)
+	if err != nil {
+		return false, nil
+	}
+	return true, nil
 }
 
 func (self *UserServiceService) refreshToken(refreshToken, userId, serviceName string) (entities.ResultToken, error) {
