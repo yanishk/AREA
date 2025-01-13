@@ -1,4 +1,4 @@
-import { act, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/navbar/Navbar"
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -83,7 +83,6 @@ const ServiceDetailsPage = () => {
     }, []);
 
     useEffect(() => {
-        console.log("service actions ici : ", serviceActions);
         if (service) {
             getServiceActions();
             getServiceReactions();
@@ -193,7 +192,7 @@ const ServiceDetailsPage = () => {
                                     <div
                                         key={action.id}
                                         style={{background: service?.color}}
-                                        className="h-[220px] flex flex-col items-left justify-center px-10 rounded-[10px] hover:opacity-90 relative overflow-hidden"
+                                        className="h-[220px] flex flex-col items-left justify-center px-10 rounded-[10px] relative overflow-hidden"
                                     >
                                         <p className="text-white text-[1.4em] font-[800] mb-2 whitespace-normal">
                                             {action.name}
@@ -223,7 +222,7 @@ const ServiceDetailsPage = () => {
                                     <div
                                         key={reaction.id}
                                         style={{background: service?.color}}
-                                        className="h-[220px] flex flex-col items-left justify-center px-10 rounded-[10px] hover:opacity-90 relative overflow-hidden"
+                                        className="h-[220px] flex flex-col items-left justify-center px-10 rounded-[10px] relative overflow-hidden"
                                     >
                                         <p className="text-white text-[1.4em] font-[800] mb-2 whitespace-normal">
                                             {reaction.name}
