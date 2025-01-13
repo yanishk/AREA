@@ -237,7 +237,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                 <></>
                             ) : (
                                 <TriggerButton
-                                    text={type === "action" ? "Create Action" : "Create Reaction"}                                    textColor="text-black"
+                                    text={type === "action" ? "Create Action" : "Create Reaction"}
+                                    textColor="text-black"
                                     bgColor="bg-white"
                                     hoverColor="hover:bg-[#EEEEEE]"
                                     onClick={() => goToStep(Steps.HOME)}
