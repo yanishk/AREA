@@ -120,7 +120,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                                             onClick={handleLogout}
                                             className="text-white font-bold text-[20px]"
                                         >
-                                            Logout
+                                            Log out
                                         </button>
                                     </li>
                                     <li>
@@ -164,7 +164,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                                             onClick={handleLogout}
                                             className="text-[#222222] font-bold text-[20px]"
                                         >
-                                            Logout
+                                            Log out
                                         </button>
                                     </li>
                                     <li>
