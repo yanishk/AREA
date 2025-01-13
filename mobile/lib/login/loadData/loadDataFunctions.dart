@@ -141,6 +141,7 @@ class LoadDataFunctions {
             service['color'] ?? '',
             service['logo'] ?? '',
             service['id'] ?? '',
+            service['description'] ?? '',
             service['isauthneeded'] ?? false,
             hasActions,
             hasReactions,
