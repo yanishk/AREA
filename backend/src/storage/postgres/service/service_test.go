@@ -19,7 +19,7 @@ func createMockDb(test *testing.T) (*sql.DB, sqlmock.Sqlmock, *ServiceRepository
 	return db, mock, repo
 }
 
-func assertService(test *testing.T, service entities.Service, id, name, color, logo string, hasActions, hasReactions, isAuthNeeded bool) {
+func assertService(test *testing.T, service entities.Service, id, name, color, logo, description string, hasActions, hasReactions, isAuthNeeded bool) {
 	assert.Equal(test, id, service.Id)
 	assert.Equal(test, name, service.Name)
 	assert.Equal(test, color, service.Color)
@@ -27,6 +27,7 @@ func assertService(test *testing.T, service entities.Service, id, name, color, l
 	assert.Equal(test, hasActions, service.HasActions)
 	assert.Equal(test, hasReactions, service.HasReactions)
 	assert.Equal(test, isAuthNeeded, service.IsAuthNeeded)
+	assert.Equal(test, description, service.Description)
 }
 
 func TestCreateService(test *testing.T) {
@@ -51,8 +52,8 @@ func TestCreateService(test *testing.T) {
 
 	test.Run("Service already exist", func(test *testing.T) {
 		findSqlStatement := `SELECT \* FROM services WHERE name = \(\$1\)`
-		mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
-			AddRow("id", "name", "color", "logo", false, false, false)
+		mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded", "description"}).
+			AddRow("id", "name", "color", "logo", false, false, false, "description")
 
 		mock.ExpectQuery(findSqlStatement).
 			WithArgs("name").
@@ -79,8 +80,8 @@ func TestFindServiceById(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
 
 		sqlStatement := `SELECT \* FROM services WHERE id = \(\$1\)`
-		mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
-			AddRow("id", "name", "color", "logo", false, false, false)
+		mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded", "description"}).
+			AddRow("id", "name", "color", "logo", false, false, false, "description")
 
 		mock.ExpectQuery(sqlStatement).
 			WithArgs("id").
@@ -89,7 +90,7 @@ func TestFindServiceById(test *testing.T) {
 		service, err := repo.FindServiceById("id")
 
 		assert.NoError(test, err)
-		assertService(test, service, "id", "name", "color", "logo", false, false, false)
+		assertService(test, service, "id", "name", "color", "logo", "description", false, false, false)
 
 		err = mock.ExpectationsWereMet()
 		if err != nil {
@@ -118,8 +119,8 @@ func TestFindAllServices(test *testing.T) {
 	defer db.Close()
 
 	sqlStatement := `SELECT \* FROM services`
-	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
-		AddRow("id", "name", "color", "logo", false, false, false)
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded", "description"}).
+		AddRow("id", "name", "color", "logo", false, false, false, "description")
 
 	mock.ExpectQuery(sqlStatement).
 		WillReturnRows(mockRow)
@@ -127,7 +128,7 @@ func TestFindAllServices(test *testing.T) {
 	services, err := repo.FindAllServices()
 
 	assert.NoError(test, err)
-	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+	assertService(test, services[0], "id", "name", "color", "logo", "description", false, false, false)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -140,8 +141,8 @@ func TestFindActionsServices(test *testing.T) {
 	defer db.Close()
 
 	sqlStatement := `SELECT \* FROM services WHERE hasactions = true`
-	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
-		AddRow("id", "name", "color", "logo", false, false, false)
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded", "description"}).
+		AddRow("id", "name", "color", "logo", false, false, false, "description")
 
 	mock.ExpectQuery(sqlStatement).
 		WillReturnRows(mockRow)
@@ -149,7 +150,7 @@ func TestFindActionsServices(test *testing.T) {
 	services, err := repo.FindActionsServices()
 
 	assert.NoError(test, err)
-	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+	assertService(test, services[0], "id", "name", "color", "logo", "description", false, false, false)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -162,8 +163,8 @@ func TestFindReactionsServices(test *testing.T) {
 	defer db.Close()
 
 	sqlStatement := `SELECT \* FROM services WHERE hasreactions = true`
-	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded"}).
-		AddRow("id", "name", "color", "logo", false, false, false)
+	mockRow := sqlmock.NewRows([]string{"id", "name", "color", "logo", "hasactions", "hasreactions", "isauthneeded", "description"}).
+		AddRow("id", "name", "color", "logo", false, false, false, "description")
 
 	mock.ExpectQuery(sqlStatement).
 		WillReturnRows(mockRow)
@@ -171,7 +172,7 @@ func TestFindReactionsServices(test *testing.T) {
 	services, err := repo.FindReactionsServices()
 
 	assert.NoError(test, err)
-	assertService(test, services[0], "id", "name", "color", "logo", false, false, false)
+	assertService(test, services[0], "id", "name", "color", "logo", "description", false, false, false)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
