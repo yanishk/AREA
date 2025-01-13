@@ -77,6 +77,55 @@ func (m *MockUserRepository) DeleteUser(email, connectionType string) error {
 	return args.Error(0)
 }
 
+type MockUserServiceRepository struct {
+	mock.Mock
+}
+
+func (m *MockUserServiceRepository) CallApiAndRefresh(email, connectionType, serviceName string) (string, error) {
+	args := m.Called(email, connectionType, serviceName)
+	return args.String(0), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) UpdateTokenForService(code, serviceName, appType, email, connectionType string) error {
+	args := m.Called(code, serviceName, appType, email, connectionType)
+	return args.Error(0)
+}
+
+func (m *MockUserServiceRepository) RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error) {
+	args := m.Called(email, connectionType)
+	return args.Get(0).([]entities.GithubRepository), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveGitlabUserProjects(email, connectionType string) ([]entities.GitlabProject, error) {
+	args := m.Called(email, connectionType)
+	return args.Get(0).([]entities.GitlabProject), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error) {
+	args := m.Called(email, connectionType)
+	return args.Get(0).([]map[string]interface{}), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveAsanaUserWorkspaces(email, connectionType string) (entities.AsanaWorkspacesInfo, error) {
+	args := m.Called(email, connectionType)
+	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveAsanaWorkspaceAssignees(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	args := m.Called(email, connectionType, workspaceId)
+	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveAsanaWorkspaceProjects(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	args := m.Called(email, connectionType, workspaceId)
+	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
+}
+
+func (m *MockUserServiceRepository) RetrieveAsanaWorkspaceTags(email, connectionType, workspaceId string) (entities.AsanaWorkspacesInfo, error) {
+	args := m.Called(email, connectionType, workspaceId)
+	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
+}
+
 func TestConcatanateSlashToPath(t *testing.T) {
 	name := "test.go"
 	filepath := "path"
@@ -283,5 +332,22 @@ func TestDeleteWorkflow(test *testing.T) {
 
 		err := service.DeleteWorkflow("test@test.com", "basic", "1")
 		require.NoError(test, err)
+	})
+}
+
+func TestGetAccessToken(test *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockWorkflowRepo := new(MockWorkflowRepository)
+	service := &WorkflowService{
+		UserRepository:     mockUserRepo,
+		WorkflowRepository: mockWorkflowRepo,
+	}
+
+	test.Run("User not found", func(test *testing.T) {
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("user not found")).Once()
+
+		err := service.DeleteWorkflow("test@test.com", "basic", "1")
+		require.EqualError(test, err, "user not found")
 	})
 }

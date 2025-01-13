@@ -47,7 +47,7 @@ type ServiceService interface {
 
 type UserServiceService interface {
 	CallApiAndRefresh(email, connectionType, serviceName string) (string, error)
-	UpdateTokenForService(code, serviceName, appType, email string, connectionType string) error
+	UpdateTokenForService(code, serviceName, appType, email, connectionType string) error
 	RetrieveGithubUserRepositories(email, connectionType string) ([]entities.GithubRepository, error)
 	RetrieveGitlabUserProjects(email, connectionType string) ([]entities.GitlabProject, error)
 	RetrieveDiscordUserServers(email, connectionType string) ([]map[string]interface{}, error)
