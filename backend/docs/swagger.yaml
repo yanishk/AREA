@@ -650,6 +650,8 @@ definitions:
     properties:
       color:
         type: string
+      description:
+        type: string
       hasactions:
         type: boolean
       hasreactions:

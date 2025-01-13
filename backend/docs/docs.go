@@ -2094,6 +2094,9 @@ const docTemplate = `{
                 "color": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "hasactions": {
                     "type": "boolean"
                 },
