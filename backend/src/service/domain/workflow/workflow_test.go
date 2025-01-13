@@ -126,17 +126,6 @@ func (m *MockUserServiceRepository) RetrieveAsanaWorkspaceTags(email, connection
 	return args.Get(0).(entities.AsanaWorkspacesInfo), args.Error(1)
 }
 
-func TestConcatanateSlashToPath(t *testing.T) {
-	name := "test.go"
-	filepath := "path"
-	expected := "/" + filepath + "/" + name
-
-	res := concatanateSlashToPath(filepath, name)
-	if res != expected {
-		t.Fatalf(`Got : %s but Expected -> %s`, res, expected)
-	}
-}
-
 func TestCreateWorkflow(test *testing.T) {
 	mockUserRepo := new(MockUserRepository)
 	mockWorkflowRepo := new(MockWorkflowRepository)
@@ -337,11 +326,9 @@ func TestDeleteWorkflow(test *testing.T) {
 
 func TestGetAccessToken(test *testing.T) {
 	mockUserRepo := new(MockUserRepository)
-	mockWorkflowRepo := new(MockWorkflowRepository)
 	MockUserServiceRepo := new(MockUserServiceRepository)
 	service := &WorkflowService{
 		UserRepository:     mockUserRepo,
-		WorkflowRepository: mockWorkflowRepo,
 		UserServiceService: MockUserServiceRepo,
 	}
 
@@ -377,11 +364,9 @@ func TestGetAccessToken(test *testing.T) {
 
 	test.Run("Successful", func(test *testing.T) {
 		mockUserRepo := new(MockUserRepository)
-		mockWorkflowRepo := new(MockWorkflowRepository)
 		MockUserServiceRepo := new(MockUserServiceRepository)
 		service := &WorkflowService{
 			UserRepository:     mockUserRepo,
-			WorkflowRepository: mockWorkflowRepo,
 			UserServiceService: MockUserServiceRepo,
 		}
 
@@ -400,5 +385,42 @@ func TestGetAccessToken(test *testing.T) {
 
 		_, err := service.getAccessToken("service", workflow)
 		require.NoError(test, err)
+	})
+}
+
+func TestConcatanateSlashToPath(t *testing.T) {
+	name := "test.go"
+	filepath := "path"
+	expected := "/" + filepath + "/" + name
+
+	res := concatanateSlashToPath(filepath, name)
+	if res != expected {
+		t.Fatalf(`Got : %s but Expected -> %s`, res, expected)
+	}
+}
+
+func TestGetWorkflowStringActionParam(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var workflow entities.Workflow
+		workflow.ActionParam = map[string]interface{}{"key": "value"}
+
+		_, err := getWorkflowStringActionParam(workflow, "key")
+		require.NoError(test, err)
+	})
+
+	test.Run("ParamKey does not exist", func(test *testing.T) {
+		var workflow entities.Workflow
+		workflow.ActionParam = map[string]interface{}{"key": "value"}
+
+		_, err := getWorkflowStringActionParam(workflow, "false")
+		require.EqualError(test, err, "Missing required field")
+	})
+
+	test.Run("ParamKey does not exist", func(test *testing.T) {
+		var workflow entities.Workflow
+		workflow.ActionParam = map[string]interface{}{"key": 1}
+
+		_, err := getWorkflowStringActionParam(workflow, "key")
+		require.EqualError(test, err, "Missing required field")
 	})
 }
