@@ -3,13 +3,13 @@ import React from "react";
 interface NavbarButtonProps {
     onClick: () => void;
     text: string;
-    isWhiteMod?: boolean;
+    isWhiteMode?: boolean;
 }
 
-const NavbarButton: React.FC<NavbarButtonProps> = ({ onClick, text, isWhiteMod }) => {
+const NavbarButton: React.FC<NavbarButtonProps> = ({ onClick, text, isWhiteMode }) => {
     return (
         <>
-            {isWhiteMod ? (
+            {isWhiteMode ? (
                 <button
                     onClick={onClick}
                     className="bg-white text-[#222222] font-[900] px-10 tracking-wider py-4 rounded-full hover:opacity-90"

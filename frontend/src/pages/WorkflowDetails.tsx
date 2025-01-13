@@ -53,7 +53,6 @@ const WorkflowDetail = () => {
             setIsWorkflowActivated(newWorkflow.isactivated);
             setWorkflowName(newWorkflow.name);
             setButtonText(newWorkflow.isactivated ? "Connected" : "Connect");
-            console.log("new workflow ici : ", newWorkflow);
         } catch (error) {
             console.error("Error fetching workflow details:", error);
         }
@@ -71,7 +70,7 @@ const WorkflowDetail = () => {
             });
 
             if (result.data.success) {
-                navigate("/");
+                navigate("/explore");
             }
 
         } catch (error) {
@@ -109,7 +108,6 @@ const WorkflowDetail = () => {
         if (!workflowName.trim()) {
             return;
         }
-        console.log("update name ici ", workflowName);
 
         const updatedWorkflow = {
             ...workflow,
@@ -173,7 +171,7 @@ const WorkflowDetail = () => {
                 style={{backgroundColor: workflow?.actioncolor}}
             >
                 <Navbar
-                    isWhiteMod={true}
+                    isWhiteMode={true}
                 />
                 <div className="flex items-center justify-between px-10 py-5">
                     <div>
