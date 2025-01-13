@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import Navbar from "../components/navbar/Navbar"
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -178,6 +178,37 @@ const ServiceDetailsPage = () => {
             <MaxWidthWrapper
                 maxWidth="1060px"
             >
+
+                {serviceActions && serviceActions.length > 0 ? (
+                    <div
+                        className="mt-[60px]"
+                    >
+                        <h3
+                            className="text-[#222222] text-[1.5rem] font-[800] mb-[25px]"
+                        >
+                            Actions
+                        </h3>
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 ml-2 mb-[20px]">
+                                {serviceActions.map((action) => (
+                                    <div
+                                        key={action.id}
+                                        style={{background: service?.color}}
+                                        className="h-[220px] flex flex-col items-left justify-center px-10 rounded-[10px] hover:opacity-90 relative overflow-hidden"
+                                    >
+                                        <p className="text-white text-[1.4em] font-[800] mb-2 whitespace-normal">
+                                            {action.name}
+                                        </p>
+                                        <p className="text-white text-[18px] overflow-hidden text-ellipsis whitespace-normal line-clamp-3">
+                                            {action.description}
+                                        </p>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                ) : (
+                    <></>
+                )}
+
                 {serviceReactions && serviceReactions.length > 0 ? (
                     <div
                         className="mt-[60px]"
