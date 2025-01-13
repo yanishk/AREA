@@ -150,7 +150,7 @@ func TestFindActionsServices(test *testing.T) {
 	services, err := repo.FindActionsServices()
 
 	assert.NoError(test, err)
-	assertService(test, services[0], "id", "name", "color", "logo",  "description", false, false, false)
+	assertService(test, services[0], "id", "name", "color", "logo", "description", false, false, false)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -172,7 +172,7 @@ func TestFindReactionsServices(test *testing.T) {
 	services, err := repo.FindReactionsServices()
 
 	assert.NoError(test, err)
-	assertService(test, services[0], "id", "name", "color", "logo",  "description", false, false, false)
+	assertService(test, services[0], "id", "name", "color", "logo", "description", false, false, false)
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
