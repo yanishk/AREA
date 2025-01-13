@@ -1,7 +1,62 @@
+import axios from "axios";
 import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
+import { useEffect, useState } from "react";
+import { getUserName } from "../utils/GetUserName";
+import { useNavigate } from "react-router-dom";
+import getServiceDetails from "../utils/GetServiceDetails";
 
 const MyWorkflow = () => {
+
+    const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
+    const [userName, setUserName] = useState("You");
+    const navigate = useNavigate();
+
+    const getUserWorkflows = async () => {
+        try {
+            const result = await axios.get(`${import.meta.env.VITE_API_URL}workflows`, {
+                withCredentials: true,
+            });
+
+            if (!result) {
+                console.error("Error fetching workflows");
+                return;
+            }
+
+            const workflows = result.data.workflows;
+
+            const workflowsDetails = await Promise.all(
+                workflows.map(async (workflow: any) => {
+                    const actionDetails = await getServiceDetails(workflow.actionid, "action");
+                    const reactionDetails = await getServiceDetails(workflow.reactionid, "reaction");
+
+                    return {
+                        ...workflow,
+                        actioncolor: actionDetails?.color,
+                        actionlogo: actionDetails?.logo,
+                        reactionlogo: reactionDetails?.logo,
+                    };
+                })
+            );
+
+            setUserWorkflows(workflowsDetails);
+        } catch (err) {
+            console.error("Error fetching workflows:", err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchUserName = async () => {
+            try {
+                const username = await getUserName();
+                setUserName(username);
+            } catch (error) {
+                console.error("Failed to get username: ", error);
+            }
+        }
+        getUserWorkflows();
+        fetchUserName();
+    }, []);
 
     return (
         <>
@@ -26,16 +81,97 @@ const MyWorkflow = () => {
                 </div>
                 <div className="mt-16 ml-[35px]">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                        {userWorkflows?.map((workflow) => (
                             <button
-                                className="h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 bg-[#333333] hover:bg-[#474747]"
-                                onClick={() => ("")}
+                                key={workflow.id}
+                                style={{
+                                    backgroundColor: workflow.actioncolor,
+                                    boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
+                                }}
+                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative ${
+                                    workflow.isactivated ? "opacity-100" : "opacity-50 hover:opacity-30"
+                                }`}
+                                onClick={() => navigate(`/workflows/${workflow.id}`)}
                             >
-                                <div className="text-left w-full pl-[30px]">
-                                    <h2 className="text-white text-lg text-[1.6em] font-[800] leading-[1.125] mt-6 m-0 p-0">aaa</h2>
-                                    <h2 className="text-white text-lg text-[1.3em] font-[400] mt-6 mr-4">aaa</h2>
+                                <div className="flex flex-row pl-[25px] pt-[15px]">
+                                    <img
+                                        alt="icon"
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow.actionlogo}`}
+                                        className="size-[26px]"
+                                    />
+                                    <img
+                                        alt="icon"
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow.reactionlogo}`}
+                                        className="size-[26px] ml-[10px]"
+                                    />
                                 </div>
+                                <div className="text-left w-full px-[25px]">
+                                    <h2
+                                        className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0 break-words whitespace-normal"
+                                    >
+                                        {workflow.name}
+                                    </h2>
+
+                                    <div className="absolute bottom-[20px]">
+                                        <p
+                                            className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
+                                        >
+                                            by{' '}
+                                            <span className="font-bold">
+                                                {userName}
+                                            </span>
+                                        </p>
+
+                                        <div
+                                            style={{backgroundColor: "white"}}
+                                            className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
+                                        >
+                                            {workflow.isactivated ? (
+                                                <p
+                                                    className="text-black text-center flex-1 text-[14px] font-bold"
+                                                >
+                                                    Connected
+                                                </p>
+                                            ) : (
+                                                <p
+                                                    className="text-black text-center flex-1 text-[14px] font-bold ml-[50px]"
+                                                >
+                                                    Connect
+                                                </p>
+                                            )}
+
+                                            <div
+                                                style={{
+                                                    backgroundColor: workflow.actioncolor,
+                                                    transform: workflow.isactivated
+                                                    ? "translateX(0)"
+                                                    : "translateX(-120px)",
+                                                }}
+                                                className="h-[33px] w-[33px] rounded-full">
+                                            </div>
+                                        </div>
+                                        {workflow.isactivated ? (
+                                            <div className="flex flex-row mt-[30px]">
+                                                <img
+                                                    className="w-[14px] h-[18px]"
+                                                    src="/user-icon.png"
+                                                    alt="Avatar"
+                                                />
+                                                <span
+                                                    className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
+                                                >
+                                                    1
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-[60px]"></div>
+                                        )}
+                                    </div>
+                                </div>
+
                             </button>
 
+                        ))}
                     </div>
                 </div>
             </MaxWidthWrapper>

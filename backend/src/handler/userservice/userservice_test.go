@@ -23,6 +23,11 @@ type MockUserServiceService struct {
 	mock.Mock
 }
 
+func (m *MockUserServiceService) RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName string) (bool, error) {
+	args := m.Called(email, connectionType, serviceName)
+	return args.Bool(0), args.Error(1)
+}
+
 func (m *MockUserServiceService) CallApiAndRefresh(email, connectionType, serviceName string) (string, error) {
 	args := m.Called(email, connectionType, serviceName)
 	return args.String(0), args.Error(1)
@@ -208,6 +213,57 @@ func TestServiceCallback(test *testing.T) {
 		require.Equal(test, http.StatusBadRequest, w.Code)
 		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
 
+	})
+}
+
+func TestGetUserServiceAuthenticationStatus(test *testing.T) {
+	handler, router, mockUserServiceService := createMockAndRoute(true)
+
+	token := createToken(test)
+
+	router.Use(func(c *gin.Context) {
+		c.Set("email", "email")
+		c.Set("connectionType", "basic")
+	})
+	router.GET("/authentication-status", handler.getUserServiceAuthenticationStatus)
+
+	test.Run("User is Authenticated", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
+			Return(true, nil).Once()
+
+		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "User authenticated to Github"}`, w.Body.String())
+	})
+
+	test.Run("User is not Authenticated", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
+			Return(false, nil).Once()
+
+		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "User not authenticated to Github"}`, w.Body.String())
+	})
+
+	test.Run("Fail retrieving user's services", func(test *testing.T) {
+		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
+			Return(false, errors.New("Could not retrieve user's services")).Once()
+
+		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve user's services"}`, w.Body.String())
 	})
 }
 
