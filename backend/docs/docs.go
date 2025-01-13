@@ -221,6 +221,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/authentication-status": {
+            "get": {
+                "description": "Checks if connected user is authenticated to the specified service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Service Authentication Status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
@@ -1747,6 +1782,24 @@ const docTemplate = `{
                 }
             }
         },
+        "docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Could not find requested user-Unknown service"
+                }
+            }
+        },
+        "docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "example": "User authenticated to ${service}-User not authenticated to ${service}"
+                }
+            }
+        },
         "docs_workflow.WorkflowCreateWorkflowBadRequestResponse": {
             "type": "object",
             "properties": {
@@ -2092,6 +2145,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "color": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "hasactions": {

@@ -1,6 +1,7 @@
 package userservice_handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback", self.serviceCallback)
+	private.GET("/authentication-status", self.userServiceAuthenticationStatus)
 	private.GET("/github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/discord/user/servers", self.getDiscordUserServers)
@@ -89,6 +91,37 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Token generated",
+	})
+}
+
+// @Summary       User Service Authentication Status
+// @Description  Checks if connected user is authenticated to the specified service
+// @Tags         Authentication
+// @Produce      json
+// @Param        service     query     string  true  "Service name (Github, Spotify, Discord..)"
+// @Failure		200		{object}	docs_userservice.UserServiceUserServiceAuthenticationStatusSuccessResponse
+// @Failure		400		{object}	docs_userservice.UserServiceUserServiceAuthenticationStatusBadRequestResponse
+// @Router       /authentication-status [get]
+func (self *UserServiceHandler) userServiceAuthenticationStatus(context *gin.Context) {
+	serviceName := context.Query("service")
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	isUserAuthenticated, err := self.UserServiceService.UserServiceAuthenticationStatus(email, connectionType, serviceName)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if isUserAuthenticated {
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"success": fmt.Sprintf("User authenticated to %s", serviceName),
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": fmt.Sprintf("User not authenticated to %s", serviceName),
 	})
 }
 
