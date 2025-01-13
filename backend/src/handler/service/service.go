@@ -35,10 +35,7 @@ func (self *ServiceHandler) setupRoutes(router *gin.Engine) {
 
 func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 	router.GET("/authentication", self.oauth2Service)
-	services := router.Group("/services")
-	{
-		services.GET("", self.retrieveAllServices)
-	}
+	router.GET("/services", self.retrieveAllServices)
 	service := router.Group("/:service")
 	{
 		service.GET("/actions", self.retrieveActionsFromService)
