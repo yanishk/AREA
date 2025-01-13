@@ -7,9 +7,20 @@ import CancelButton from "../components/buttons/CancelButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { getUserName } from "../utils/GetUserName";
 
+interface Workflow {
+    id: string;
+    name: string;
+    actionid: string;
+    reactionid: string;
+    isactivated: boolean;
+    actioncolor: string;
+    actionlogo: string;
+    reactionlogo: string;
+}
+
 const WorkflowDetail = () => {
     const { workflowId } = useParams();
-    const [workflow, setWorkflow] = useState<any | null>(null);
+    const [workflow, setWorkflow] = useState<Workflow | null>(null);
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState("You");
     const [isWorkflowActivated, setIsWorkflowActivated] = useState(false);
@@ -159,7 +170,7 @@ const WorkflowDetail = () => {
     return (
         <>
             <div
-                style={{backgroundColor: workflow.actioncolor}}
+                style={{backgroundColor: workflow?.actioncolor}}
             >
                 <Navbar
                     isWhiteMod={true}
@@ -183,11 +194,11 @@ const WorkflowDetail = () => {
                     >
                         <div className="flex flex-row pt-[15px]">
                             <img
-                                src={`${import.meta.env.VITE_HOST_URL}${workflow.actionlogo}`}
+                                src={`${import.meta.env.VITE_HOST_URL}${workflow?.actionlogo}`}
                                 className="size-[60px]"
                             />
                             <img
-                                src={`${import.meta.env.VITE_HOST_URL}${workflow.reactionlogo}`}
+                                src={`${import.meta.env.VITE_HOST_URL}${workflow?.reactionlogo}`}
                                 className="size-[60px] ml-[10px]"
                             />
                         </div>
@@ -288,7 +299,7 @@ const WorkflowDetail = () => {
 
                     <div
                         style={{
-                            backgroundColor: workflow.actioncolor,
+                            backgroundColor: workflow?.actioncolor,
                             transform: isWorkflowActivated
                             ? "translateX(0)"
                             : "translateX(-348px)",
