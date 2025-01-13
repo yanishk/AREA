@@ -86,9 +86,7 @@ class SelectService extends State<APICall> {
       for (serviceIndex = 0;
         serviceIndex < CreateData.actualServiceList.length;
         serviceIndex++) {
-          if (CreateData.actualServiceList[serviceIndex].hasActions == isAnAction) {
-            services.add(serviceTiles(serviceIndex));
-          }
+          services.add(serviceTiles(serviceIndex));
       }
     });
   }
