@@ -217,12 +217,12 @@ const WorkflowDetail = () => {
                                 <div
                                     className="flex justify-end text-center"
                                 >
-                                    <p
+                                    <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
                                         onClick={handleSaveName}
                                     >
                                         Save
-                                    </p>
+                                    </button>
                                 </div>
                             </>
                         ) : (
@@ -236,12 +236,12 @@ const WorkflowDetail = () => {
                                 <div
                                     className="flex justify-end text-center"
                                 >
-                                    <p
+                                    <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
                                         onClick={() => setIsEditing(true)}
                                     >
                                         Edit title
-                                    </p>
+                                    </button>
                                 </div>
                         </>
                         )}
