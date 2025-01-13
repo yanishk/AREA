@@ -39,7 +39,21 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   @override
   void initState() {
     super.initState();
+    if (!isAnAction) {
+      setState(() {
+        apiRoute = "reactions";
+      });
+    }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+      if (isAnAction) {
+        setState(() {
+          CreateData.actionParamListName = [];
+        });
+      } else {
+        setState(() {
+          CreateData.reactionParamListName = [];
+        });
+      }
       CreateData.selectOrUpdateWorkflow = true;
       Navigator.pop(Globaldata.myContext);
     }
@@ -324,11 +338,13 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
               onPressed: () {
                 if (isAnAction) {
                   setState(() {
+                    CreateData.actionParamListName = [];
                     actionOrReactionParamListName = CreateData.actionParamListName;
                   });
                 } else {
                   setState(() {
                     apiRoute = "reactions";
+                    CreateData.reactionParamListName = [];
                     actionOrReactionParamListName = CreateData.reactionParamListName;
                   });
                 }
