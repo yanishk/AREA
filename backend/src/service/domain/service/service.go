@@ -164,7 +164,7 @@ func oauth2Spotify(callbackType string) string {
 		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
 		codeResponseType +
 		redirectUriParam + callbackLink +
-		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify")
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify playlist-modify-public")
 }
 
 func oauth2Discord(callbackType string) string {
@@ -539,12 +539,12 @@ func getRedditOAuth2AccessTokenRequest(code, callbackType string) (*http.Request
 
 	if callbackType == "service" {
 		redditCallback = os.Getenv("REDDIT_SERVICE_CALLBACK")
-		redditClientID = os.Getenv("REDDIT_SERVICE_CLIENT_ID")
-		redditClientSecret = os.Getenv("REDDIT_SERVICE_CLIENT_SECRET")
+		redditClientID = url.QueryEscape(os.Getenv("REDDIT_SERVICE_CLIENT_ID"))
+		redditClientSecret = url.QueryEscape(os.Getenv("REDDIT_SERVICE_CLIENT_SECRET"))
 	} else if callbackType == "login" {
 		redditCallback = os.Getenv("REDDIT_LOGIN_CALLBACK")
-		redditClientID = os.Getenv("REDDIT_LOGIN_CLIENT_ID")
-		redditClientSecret = os.Getenv("REDDIT_LOGIN_CLIENT_SECRET")
+		redditClientID = url.QueryEscape(os.Getenv("REDDIT_LOGIN_CLIENT_ID"))
+		redditClientSecret = url.QueryEscape(os.Getenv("REDDIT_LOGIN_CLIENT_SECRET"))
 	} else {
 		return nil, fmt.Errorf(invalidCallbackTypeMessage)
 	}
@@ -660,7 +660,7 @@ func (self *ServiceService) GetRedditRefreshTokenRequest(refreshToken string) (*
 		return request, err
 	}
 
-	request.SetBasicAuth(os.Getenv("REDDIT_SERVICE_CLIENT_ID"), os.Getenv("REDDIT_SERVICE_CLIENT_SECRET"))
+	request.SetBasicAuth(url.QueryEscape(os.Getenv("REDDIT_SERVICE_CLIENT_ID")), url.QueryEscape(os.Getenv("REDDIT_SERVICE_CLIENT_SECRET")))
 	request.Header.Set(contentType, contentTypeUrlEncoded)
 	request.Header.Set("User-Agent", os.Getenv("REDDIT_SERVICE_USER_AGENT"))
 

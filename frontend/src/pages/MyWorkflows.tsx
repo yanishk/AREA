@@ -1,4 +1,3 @@
-import axios from "axios";
 import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";

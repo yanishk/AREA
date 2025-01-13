@@ -12,7 +12,7 @@ const isAuthenticated = async () => {
 
         return false;
     } catch (error) {
-        console.error("error: ", error);
+        console.error("Failed to get user's informations : ", error);
         return false;
     }
 };

@@ -1,0 +1,19 @@
+name: docker-build
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  check-docker-compose-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install docker-compose
+        run: sudo apt-get install docker-compose -y
+
+      - name: Check docker-compose build
+        run: |
+          cp mobile/.env.example mobile/.env
+          docker-compose build

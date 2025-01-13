@@ -57,6 +57,7 @@ class LoadService extends State<APICall> {
   @override
   void initState() {
     super.initState();
+    Globaldata.resetActionReactionServicesList();
     LoadDataFunctions.storeUserInfos();
     getServices();
   }

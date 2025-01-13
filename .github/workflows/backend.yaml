@@ -22,13 +22,31 @@ jobs:
             exit 0
           fi
 
+  check-unit-tests:
+    runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'backend')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run backend unit tests
+        run: |
+          cd backend/src
+          go test ./handler/*/ ./service/domain/*/ ./storage/postgres/*/
+          if [ $? -ne 0 ]; then
+            echo "Unit tests failed."
+            exit 1
+          else
+            echo "Unit tests succeed."
+            exit 0
+          fi
+
   check-formatting:
     runs-on: ubuntu-latest
     if: contains(github.head_ref, 'backend')
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Golang formatting
+      - name: Run golang formatting on backend code
         run: |
           cd backend
           gofmt -w -s .

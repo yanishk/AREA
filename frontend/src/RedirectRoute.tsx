@@ -1,21 +1,11 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "./pages/AuthContext";
 
 interface RedirectRouteProps {
-    children: React.ReactNode;
     dest: string,
 }
 
-const RedirectRoute: React.FC<RedirectRouteProps> = ({ children, dest }) => {
-    const { isUserConnected } = useAuth();
-
-    if (!isUserConnected) {
-        return <>
-            {children}
-        </>;
-    }
-
+const RedirectRoute: React.FC<RedirectRouteProps> = ({ dest }) => {
     return <Navigate to={`${dest}`} replace />;
 };
 
