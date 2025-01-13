@@ -44,7 +44,7 @@ const ServiceDetailsPage = () => {
                 );
             }
         }
-        console.log("serviceNameici: ", serviceName);
+
         fetchServices();
     }, []);
 

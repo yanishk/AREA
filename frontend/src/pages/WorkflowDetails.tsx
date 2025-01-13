@@ -42,7 +42,6 @@ const WorkflowDetail = () => {
             setIsWorkflowActivated(newWorkflow.isactivated);
             setWorkflowName(newWorkflow.name);
             setButtonText(newWorkflow.isactivated ? "Connected" : "Connect");
-            console.log("new workflow ici : ", newWorkflow);
         } catch (error) {
             console.error("Error fetching workflow details:", error);
         }
@@ -98,7 +97,6 @@ const WorkflowDetail = () => {
         if (!workflowName.trim()) {
             return;
         }
-        console.log("update name ici ", workflowName);
 
         const updatedWorkflow = {
             ...workflow,
