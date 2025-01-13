@@ -163,7 +163,7 @@ func TestGetUserWorkflows(test *testing.T) {
 		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
 			Return(entities.User{}, errors.New("user not found")).Once()
 
-		err := service.CreateWorkflow("test@test.com", "basic", entities.NewWorkflow{})
+		_, err := service.GetUserWorkflows("test@test.com", "basic")
 		require.EqualError(test, err, "user not found")
 	})
 
@@ -237,6 +237,51 @@ func TestUpdateWorkflow(test *testing.T) {
 			Return(nil).Once()
 
 		err := service.UpdateWorkflow("1", updateWorkflow)
+		require.NoError(test, err)
+	})
+}
+
+func TestDeleteWorkflow(test *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockWorkflowRepo := new(MockWorkflowRepository)
+	service := &WorkflowService{
+		UserRepository:     mockUserRepo,
+		WorkflowRepository: mockWorkflowRepo,
+	}
+
+	test.Run("User not found", func(test *testing.T) {
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("user not found")).Once()
+
+		err := service.DeleteWorkflow("test@test.com", "basic", "1")
+		require.EqualError(test, err, "user not found")
+	})
+
+	test.Run("Fail delete workflow", func(test *testing.T) {
+		var user entities.User
+		user.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil).Once()
+
+		mockWorkflowRepo.On("DeleteWorkflow", "1", user.Id).
+			Return(errors.New("Fail delete workflow")).Once()
+
+		err := service.DeleteWorkflow("test@test.com", "basic", "1")
+		require.EqualError(test, err, "Fail delete workflow")
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+		user.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil).Once()
+
+		mockWorkflowRepo.On("DeleteWorkflow", "1", user.Id).
+			Return(nil).Once()
+
+		err := service.DeleteWorkflow("test@test.com", "basic", "1")
 		require.NoError(test, err)
 	})
 }
