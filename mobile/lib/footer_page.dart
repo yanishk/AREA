@@ -45,7 +45,7 @@ class FooterNavigationBar extends StatelessWidget {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.call_to_action_outlined),
-          label: 'My Workflow',
+          label: 'My Workflows',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.search),

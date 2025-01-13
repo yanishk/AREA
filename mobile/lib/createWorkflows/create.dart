@@ -164,7 +164,7 @@ class CreateWorkflows extends State<APICall> {
           children: [
             const Padding(padding: EdgeInsets.only(top: 46)),
             const AutoSizeText(
-              "Create workflows",
+              "Create workflow",
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
