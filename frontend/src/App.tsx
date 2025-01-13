@@ -52,16 +52,16 @@ function App() {
               />
 
               <Route
-                path="/:serviceName"
+                path="/explore"
                 element={
-                    <ServiceDetailsPage />
+                  <ExplorePage />
                 }
               />
 
               <Route
-                path="/explore"
+                path="/:serviceName"
                 element={
-                  <ExplorePage />
+                    <ServiceDetailsPage />
                 }
               />
 
