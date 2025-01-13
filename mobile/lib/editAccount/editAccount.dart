@@ -29,7 +29,7 @@ class APICall extends StatefulWidget {
 }
 
 class EditAccount extends State<APICall> {
-  String apiRoute = 'user/delete-account';
+  String apiRoute = 'user';
   final TextEditingController emailController = new TextEditingController(
     text: Globaldata.userInfos.email,
   );
