@@ -4,6 +4,7 @@ import 'package:flutter_switch/flutter_switch.dart';
 import "../globalData.dart";
 import 'myWorkflowsData.dart';
 import '../custom_widget.dart';
+import 'myWorkflowsFunctions.dart';
 
 class WorkflowCard extends StatelessWidget {
   const WorkflowCard({
@@ -115,6 +116,28 @@ class WorkflowsTiles extends StatelessWidget {
       child: Column (
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              SafeWebImage(
+                url:
+                  "${Globaldata.domainName}${
+                    Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[index].actionID)].icon
+                  }",
+                width: 40,
+                height: 40,
+              ),
+              Padding(padding: EdgeInsets.only(right: 10),),
+              SafeWebImage(
+                url:
+                  "${Globaldata.domainName}${
+                    Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[index].reactionId)].icon
+                  }",
+                width: 40,
+                height: 40,
+              ),
+            ],
+          ),
+          Padding(padding: EdgeInsets.only(top: 20),),
           Text(
             MyWorkflowsData.allWorkflowsData[index].name,
             style: TextStyle(
