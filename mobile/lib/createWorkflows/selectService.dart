@@ -49,9 +49,9 @@ class SelectService extends State<APICall> {
     if (isAnAction && CreateData.serviceAction.name.length != 0 || !isAnAction && CreateData.serviceReaction.name.length != 0) {
       if (CreateData.selectOrUpdateWorkflow) {
         if (isAnAction) {
-          Globaldata.firstService = servicesIndex;
+          Globaldata.actionServiceIndex = servicesIndex;
         } else {
-          Globaldata.secondService = servicesIndex;
+          Globaldata.reactionServiceIndex = servicesIndex;
         }
         CreateData.selectOrUpdateWorkflow = false;
         Navigator.pop(Globaldata.myContext, CreateData.actualServiceList[servicesIndex].name);
