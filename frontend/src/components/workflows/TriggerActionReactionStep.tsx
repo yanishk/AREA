@@ -260,6 +260,24 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         </div>
     );
 
+    const renderFields = () => {
+        if (asanaField) {
+            return renderAsanaFields();
+        }
+
+        if (discordField) {
+            return renderDiscordFields();
+        }
+
+        return (
+            <DynamicFields
+                fields={fields}
+                values={itemFieldValues}
+                onChange={(id, value) => handleFieldChange(id, value, type)}
+            />
+        );
+    };
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -303,13 +321,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         <></>
                     ) : (
                         <>
-                            {asanaField ? renderAsanaFields() : discordField ? renderDiscordFields() : (
-                                <DynamicFields
-                                    fields={fields}
-                                    values={itemFieldValues}
-                                    onChange={(id, value) => handleFieldChange(id, value, type)}
-                                />
-                            )}
+                            {renderFields()}
 
                             {isFieldLoading ? (
                                 <></>
