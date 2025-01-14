@@ -30,6 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
             await axios.post(`${import.meta.env.VITE_API_URL}logout`, {}, {
                 withCredentials: true
             });
+
             navigate("/explore");
             window.location.reload();
         } catch (error) {
@@ -42,7 +43,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
             <div className="pt-6 pb-6 flex justify-between items-center px-6">
                 {isWhiteMode ? (
                     <h1
-                        className="text-4xl text-white hover:opacity-90 font-extrabold ml-4">
+                        className="text-white text-4xl hover:opacity-90 font-extrabold ml-4">
                             <a
                                 href="/explore"
                             >
@@ -65,28 +66,58 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                 >
                     {!isUserConnected ? (
                         <>
-                            <li>
-                                <NavbarLink
-                                    href="/explore"
-                                    text="Explore"
-                                    textColor="text-[#222222]"
-                                    hoverColor="hover:text-[#444444]"
-                                />
-                            </li>
-                            <li>
-                                <NavbarLink
-                                    href="/login"
-                                    text="Log in"
-                                    textColor="text-[#222222]"
-                                    hoverColor="hover:text-[#444444]"
-                                   />
-                                </li>
-                            <li>
-                                <NavbarButton
-                                    onClick={handleGetStarted}
-                                    text="Get Started"
-                                 />
-                            </li>
+                            {!isWhiteMode ? (
+                                <>
+                                    <li>
+                                        <NavbarLink
+                                            href="/explore"
+                                            text="Explore"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                    </li>
+                                    <li>
+                                        <NavbarLink
+                                            href="/login"
+                                            text="Log in"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                        </li>
+                                    <li>
+                                        <NavbarButton
+                                            onClick={handleGetStarted}
+                                            text="Get Started"
+                                        />
+                                    </li>
+                                </>
+                            ) : (
+                                <>
+                                    <li>
+                                        <NavbarLink
+                                            href="/explore"
+                                            text="Explore"
+                                            textColor="text-white"
+                                            hoverColor="hover:opacity-90"
+                                        />
+                                    </li>
+                                    <li>
+                                        <NavbarLink
+                                            href="/login"
+                                            text="Log in"
+                                            textColor="text-white"
+                                            hoverColor="hover:opacity-90"
+                                        />
+                                    </li>
+                                    <li>
+                                        <NavbarButton
+                                            onClick={handleGetStarted}
+                                            text="Get Started"
+                                            isWhiteMode={true}
+                                        />
+                                    </li>
+                                </>
+                            )}
                         </>
                     ) : (
                         <>
@@ -120,7 +151,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                                             onClick={handleLogout}
                                             className="text-white font-bold text-[20px]"
                                         >
-                                            Logout
+                                            Log out
                                         </button>
                                     </li>
                                     <li>
@@ -164,7 +195,7 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                                             onClick={handleLogout}
                                             className="text-[#222222] font-bold text-[20px]"
                                         >
-                                            Logout
+                                            Log out
                                         </button>
                                     </li>
                                     <li>

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 import RegisterForm from './pages/Register'
 import LoginForm from './pages/Login'
-import HomePage from './pages/Home'
 import CreatePage from './pages/Create'
 import { AuthProvider } from './pages/AuthContext'
 import AccountPage from './pages/AccountPage'
@@ -13,6 +12,8 @@ import MyWorkflow from './pages/MyWorkflows'
 import ProtectedRoute from './ProtectedRoute'
 import RedirectRoute from './RedirectRoute'
 import WorkflowDetail from './pages/WorkflowDetails'
+import ExplorePage from './pages/Explore'
+import ServiceDetailsPage from './pages/ServiceDetails'
 
 function App() {
   return (
@@ -50,7 +51,14 @@ function App() {
               <Route
                 path="/explore"
                 element={
-                  <HomePage />
+                  <ExplorePage />
+                }
+              />
+
+              <Route
+                path="/:serviceName"
+                element={
+                    <ServiceDetailsPage />
                 }
               />
 

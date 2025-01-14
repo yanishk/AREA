@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 import TriggerButton from "../buttons/TriggerButton";
 import BasicInput from "../inputs/BasicInput";
 import MaxWidthWrapper from "../MaxWidthWrapper";
@@ -65,7 +65,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                 className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Back"
                         textColor="text-white"
                         borderColor="border-white"

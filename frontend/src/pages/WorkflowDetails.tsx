@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar/Navbar";
 import getServiceDetails from "../utils/GetServiceDetails";
-import CancelButton from "../components/buttons/CancelButton";
+import ActionButton from "../components/buttons/ActionButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { getUserName } from "../utils/GetUserName";
 
@@ -175,7 +175,7 @@ const WorkflowDetail = () => {
                 />
                 <div className="flex items-center justify-between px-10 py-5">
                     <div>
-                        <CancelButton
+                        <ActionButton
                             text="Back"
                             textColor="text-white"
                             borderColor="border-white"
