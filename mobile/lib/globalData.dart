@@ -6,8 +6,8 @@ class Globaldata {
       "Could not find the server\nPlease try again later";
   static String ErrorBackendDown = "Gateway Time-out\nPlease try again later";
   static BuildContext myContext = myContext;
-  static int firstService = -1;
-  static int secondService = -1;
+  static int actionServiceIndex = -1;
+  static int reactionServiceIndex = -1;
 
   static List<ActionOrReactionList> actionServicesActions = [];
 
@@ -34,6 +34,7 @@ class ServiceData {
   String color;
   String icon;
   String id;
+  String description;
   bool isAuthNeeded;
   bool hasActions;
   bool hasReactions;
@@ -43,6 +44,7 @@ class ServiceData {
     this.color = "",
     this.icon = "",
     this.id = "",
+    this.description = "",
     this.isAuthNeeded = false,
     this.hasActions = false,
     this.hasReactions = false,

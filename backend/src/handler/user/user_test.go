@@ -95,28 +95,106 @@ func TestCreateUser(test *testing.T) {
 	handler, router, mockUserService := createMockAndRoute(false)
 	router.POST("/register", handler.createUser)
 
-	mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
-		Return(nil)
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+			Return(nil)
 
-	body := `{
-		"email": "eva.legrand@epitech.eu",
-		"password": "password"
-	}`
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
 
-	req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
-	w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
+		w := httptest.NewRecorder()
 
-	router.ServeHTTP(w, req)
+		router.ServeHTTP(w, req)
 
-	require.Equal(test, http.StatusOK, w.Code)
-	require.JSONEq(test, `{"success": "New user created"}`, w.Body.String())
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "New user created"}`, w.Body.String())
+	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+			Return(nil)
+
+		req, _ := http.NewRequest("POST", "/register", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
+	})
+
+	test.Run("Fail connection type", func(test *testing.T) {
+		handler, router, mockUserService := createMockAndRoute(false)
+		router.POST("/register", handler.createUser)
+
+		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+			Return(errors.New("Connection type doesn't exist"))
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Connection type doesn't exist"}`, w.Body.String())
+	})
+
+	test.Run("Email already used", func(test *testing.T) {
+		handler, router, mockUserService := createMockAndRoute(false)
+		router.POST("/register", handler.createUser)
+
+		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+			Return(errors.New("Email address already used"))
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusConflict, w.Code)
+		require.JSONEq(test, `{"error": "Email address already used"}`, w.Body.String())
+	})
+
+	test.Run("Other error", func(test *testing.T) {
+		handler, router, mockUserService := createMockAndRoute(false)
+		router.POST("/register", handler.createUser)
+
+		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+			Return(errors.New("other error"))
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/register", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "other error"}`, w.Body.String())
+	})
 }
 
 func TestLoginAuthentication(test *testing.T) {
 	handler, router, mockUserService := createMockAndRoute(false)
 	router.POST("/login", handler.loginAuthentication)
 
-	test.Run("Successful", func(t *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
 		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
 			Return("token", nil).Once()
 
@@ -152,11 +230,60 @@ func TestLoginAuthentication(test *testing.T) {
 		require.Equal(test, http.StatusUnauthorized, w.Code)
 		require.JSONEq(test, `{"error": "Could not find requested user"}`, w.Body.String())
 	})
+
+	test.Run("Other error", func(test *testing.T) {
+		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+			Return("token", errors.New("Other errors")).Once()
+
+		body := `{
+			"email": "eva.legrand@epitech.eu",
+			"password": "password"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Other errors"}`, w.Body.String())
+	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+			Return("token", nil).Once()
+
+		req, _ := http.NewRequest("POST", "/login", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
+	})
 }
 
 func TestLoginCallback(test *testing.T) {
 	handler, router, mockUserService := createMockAndRoute(false)
 	router.POST("/login-callback", handler.loginCallback)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("LoginWithService", "code", "github", "web").
+			Return("token", nil)
+
+		body := `{
+			"service": "github",
+			"apptype": "web"
+		}`
+
+		req, _ := http.NewRequest("POST", "/login-callback?code=code", strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
+	})
 
 	test.Run("Invalid code authorization", func(t *testing.T) {
 		body := `{
@@ -206,22 +333,14 @@ func TestLoginCallback(test *testing.T) {
 		require.JSONEq(test, `{"error": "Failed to connect with requested service"}`, w.Body.String())
 	})
 
-	test.Run("Successful", func(test *testing.T) {
-		mockUserService.On("LoginWithService", "code", "github", "web").
-			Return("token", nil)
-
-		body := `{
-			"service": "github",
-			"apptype": "web"
-		}`
-
-		req, _ := http.NewRequest("POST", "/login-callback?code=code", strings.NewReader(body))
+	test.Run("Fail JSON Bind", func(t *testing.T) {
+		req, _ := http.NewRequest("POST", "/login-callback", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
-		require.Equal(test, http.StatusOK, w.Code)
-		require.JSONEq(test, `{"success": "Connection successful"}`, w.Body.String())
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
 	})
 }
 
@@ -236,8 +355,9 @@ func TestGetUser(test *testing.T) {
 	})
 	router.GET("/user", handler.getUser)
 
-	test.Run("Successful Logout", func(test *testing.T) {
-		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, nil)
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("GetUser", "email", "service").
+			Return(entities.UserInfos{}, nil)
 
 		req := requestForProtected("GET", "/user", token, nil)
 		w := httptest.NewRecorder()
@@ -249,7 +369,8 @@ func TestGetUser(test *testing.T) {
 
 	test.Run("Error Finding User", func(test *testing.T) {
 		mockUserService.ExpectedCalls = nil
-		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, errors.New("user not found")).Once()
+		mockUserService.On("GetUser", "email", "service").
+			Return(entities.UserInfos{}, errors.New("user not found")).Once()
 
 		req := requestForProtected("GET", "/user", token, nil)
 		w := httptest.NewRecorder()
@@ -271,8 +392,9 @@ func TestLogoutUser(test *testing.T) {
 	})
 	router.POST("/logout", handler.logoutUser)
 
-	test.Run("Successful Logout", func(test *testing.T) {
-		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, nil)
+	test.Run("Successful", func(test *testing.T) {
+		mockUserService.On("GetUser", "email", "service").
+			Return(entities.UserInfos{}, nil)
 
 		req := requestForProtected("POST", "/logout", token, nil)
 		w := httptest.NewRecorder()
@@ -285,7 +407,8 @@ func TestLogoutUser(test *testing.T) {
 
 	test.Run("Error Finding User", func(test *testing.T) {
 		mockUserService.ExpectedCalls = nil
-		mockUserService.On("GetUser", "email", "service").Return(entities.UserInfos{}, errors.New("user not found")).Once()
+		mockUserService.On("GetUser", "email", "service").
+			Return(entities.UserInfos{}, errors.New("user not found")).Once()
 
 		req := requestForProtected("POST", "/logout", token, nil)
 		w := httptest.NewRecorder()
@@ -330,7 +453,8 @@ func TestModifyPassword(test *testing.T) {
 	})
 
 	test.Run("User Not Found", func(test *testing.T) {
-		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).Return(errors.New("Could not find requested user")).Once()
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).
+			Return(errors.New("Could not find requested user")).Once()
 
 		body := `{
 			"oldpassword": "oldpass",
@@ -347,7 +471,8 @@ func TestModifyPassword(test *testing.T) {
 	})
 
 	test.Run("Old Password Incorrect", func(test *testing.T) {
-		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).Return(errors.New("Old password is incorrect")).Once()
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).
+			Return(errors.New("Old password is incorrect")).Once()
 
 		body := `{
 			"oldpassword": "oldpass",
@@ -361,6 +486,34 @@ func TestModifyPassword(test *testing.T) {
 
 		require.Equal(test, http.StatusForbidden, w.Code)
 		require.JSONEq(test, `{"error": "Old password is incorrect"}`, w.Body.String())
+	})
+
+	test.Run("Other errors", func(test *testing.T) {
+		mockUserService.On("ModifyPassword", "email", "service", expectedPasswordChange).
+			Return(errors.New("Other errors")).Once()
+
+		body := `{
+			"oldpassword": "oldpass",
+			"password": "newpass"
+		}`
+
+		req := requestForProtected("PUT", "/modify-password", token, strings.NewReader(body))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Other errors"}`, w.Body.String())
+	})
+
+	test.Run("Fail JSON Bind", func(test *testing.T) {
+		req := requestForProtected("PUT", "/modify-password", token, nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusBadRequest, w.Code)
+		require.JSONEq(test, `{"error": "Invalid request body"}`, w.Body.String())
 	})
 }
 

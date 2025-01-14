@@ -34,7 +34,7 @@ func (self *ServiceRepository) findServiceWithParam(sqlStatement, param string) 
 	var service entities.Service
 
 	row := self.db.QueryRow(sqlStatement, param)
-	err := row.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded)
+	err := row.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded, &service.Description)
 	if err != nil {
 		return service, err
 	}
@@ -52,7 +52,7 @@ func (self *ServiceRepository) findServices(sqlStatement string) ([]entities.Ser
 
 	for rows.Next() {
 		var service entities.Service
-		err := rows.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded)
+		err := rows.Scan(&service.Id, &service.Name, &service.Color, &service.Logo, &service.HasActions, &service.HasReactions, &service.IsAuthNeeded, &service.Description)
 		if err != nil {
 			return services, err
 		}

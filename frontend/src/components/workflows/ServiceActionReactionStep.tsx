@@ -1,4 +1,4 @@
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 
 interface SelectServiceStepProps {
     services: any;
@@ -15,7 +15,7 @@ const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
         <div className="min-h-screen bg-gray-100">
             <div className="flex items-center justify-between px-10 py-5">
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Cancel"
                         textColor="text-[#222222]"
                         borderColor="border-[#222222]"

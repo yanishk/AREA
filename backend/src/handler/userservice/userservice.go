@@ -1,6 +1,7 @@
 package userservice_handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback", self.serviceCallback)
+	private.GET("/authentication-status", self.getUserServiceAuthenticationStatus)
 	private.GET("/github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/discord/user/servers", self.getDiscordUserServers)
@@ -89,6 +91,37 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"success": "Token generated",
+	})
+}
+
+// @Summary       User Service Authentication Status
+// @Description  Checks if connected user is authenticated to the specified service
+// @Tags         Authentication
+// @Produce      json
+// @Param        service     query     string  true  "Service name (Github, Spotify, Discord..)"
+// @Failure		200		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse
+// @Failure		400		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse
+// @Router       /authentication-status [get]
+func (self *UserServiceHandler) getUserServiceAuthenticationStatus(context *gin.Context) {
+	serviceName := context.Query("service")
+	email := context.GetString("email")
+	connectionType := context.GetString("connectionType")
+
+	isUserAuthenticated, err := self.UserServiceService.RetrieveUserServiceAuthenticationStatus(email, connectionType, serviceName)
+	if err != nil {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if isUserAuthenticated {
+		context.IndentedJSON(http.StatusOK, gin.H{
+			"success": fmt.Sprintf("User authenticated to %s", serviceName),
+		})
+		return
+	}
+	context.IndentedJSON(http.StatusOK, gin.H{
+		"success": fmt.Sprintf("User not authenticated to %s", serviceName),
 	})
 }
 
@@ -154,7 +187,7 @@ func (self *UserServiceHandler) getDiscordUserServers(context *gin.Context) {
 	servers, err := self.UserServiceService.RetrieveDiscordUserServers(email, connectionType)
 	if err != nil {
 		context.IndentedJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not retrieve the user's repositories",
+			"error": "Could not retrieve the user's servers",
 		})
 		return
 	}

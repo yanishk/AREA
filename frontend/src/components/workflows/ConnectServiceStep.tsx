@@ -1,4 +1,4 @@
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 import TriggerButton from "../buttons/TriggerButton";
 
 interface ConnectServiceProps {
@@ -19,7 +19,7 @@ const ConnectServiceStep: React.FC<ConnectServiceProps> = ({
         >
             <div className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]">
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Back"
                         textColor="text-white"
                         borderColor="border-white"

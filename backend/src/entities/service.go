@@ -8,6 +8,7 @@ type Service struct {
 	HasActions   bool   `json:"hasactions"`
 	HasReactions bool   `json:"hasreactions"`
 	IsAuthNeeded bool   `json:"isauthneeded"`
+	Description  string `json:"description"`
 }
 
 type ResultToken struct {
@@ -158,4 +159,12 @@ type AsanaWorkspacesInfo struct {
 		Gid  string `json:"gid"`
 		Name string `json:"name"`
 	} `json:"data"`
+}
+
+// Spotify
+type SpotifyRequestParameters struct {
+	BaseUrl       string
+	ParameterName string
+	EndUrl        string
+	Method        string
 }

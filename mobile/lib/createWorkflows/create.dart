@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
 import "package:namer_app/custom_widget.dart";
 import "package:namer_app/footer_page.dart";
 import "package:namer_app/createWorkflows/selectService.dart";
+
 import "../globalData.dart";
 import "saveNewWorkflows.dart";
 import "createWorkflowsData.dart";
@@ -40,13 +40,11 @@ class CreateWorkflows extends State<APICall> {
 
   Widget firstButton() {
     if (firstButtonComplete) {
-      return LeftWidget(
-          padding: EdgeInsets.symmetric(horizontal: 0),
-          child: AutoSizeText(
-            "If $firstSelectedService",
-            style: TextStyle(
-                fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-          ));
+      return CreateSelectedButtonContent(
+        firstText: "If ",
+        icon: CreateData.serviceAction.icon,
+        actionOrReactionName: CreateData.serviceAction.name,
+      );
     }
     return PlaceableWidget(
       left: MediaQuery.sizeOf(Globaldata.myContext).width / 10,
@@ -78,13 +76,11 @@ class CreateWorkflows extends State<APICall> {
             left: MediaQuery.sizeOf(Globaldata.myContext).width / 10),
       );
     } else if (secondButtonState == 2) {
-      return LeftWidget(
-          padding: EdgeInsets.symmetric(horizontal: 0),
-          child: AutoSizeText(
-            "Then $secondSelectedService",
-            style: TextStyle(
-                fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
-          ));
+      return CreateSelectedButtonContent(
+        firstText: "Then ",
+        icon: CreateData.serviceReaction.icon,
+        actionOrReactionName: CreateData.serviceReaction.name,
+      );
     }
     return const AutoSizeText(
       "Then That",
@@ -127,13 +123,12 @@ class CreateWorkflows extends State<APICall> {
       if (firstButtonComplete == false && result != null) {
         firstButtonComplete = true;
         secondButtonState++;
-        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.firstService].color);
+        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.actionServiceIndex].color);
         secondButtonColor = enableButton;
-        firstButtonHight = 50;
       }
       if (result != null) {
         firstSelectedService = "$result";
-        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.firstService].color);
+        firstButtonColor = HexColor(CreateData.actionServiceList[Globaldata.actionServiceIndex].color);
       }
     });
   }
@@ -148,7 +143,7 @@ class CreateWorkflows extends State<APICall> {
       );
       setState(() {
         if (result != null) {
-          secondButtonColor = HexColor(CreateData.reactionServiceList[Globaldata.secondService].color);
+          secondButtonColor = HexColor(CreateData.reactionServiceList[Globaldata.reactionServiceIndex].color);
           secondButtonState = 2;
           secondSelectedService = "$result";
         }
@@ -164,10 +159,10 @@ class CreateWorkflows extends State<APICall> {
           children: [
             const Padding(padding: EdgeInsets.only(top: 46)),
             const AutoSizeText(
-              "Create workflows",
+              "Create",
               style: TextStyle(
                 fontSize: 30,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w900,
                 color: Colors.black,
               ),
               maxLines: 1,
@@ -182,7 +177,7 @@ class CreateWorkflows extends State<APICall> {
               },
               size: Size(double.infinity, firstButtonHight),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              borderCircularRadius: 10,
+              borderCircularRadius: 8,
             ),
             const MyVerticalDivider(
               height: 40,
@@ -198,7 +193,7 @@ class CreateWorkflows extends State<APICall> {
               },
               size: const Size(double.infinity, 70),
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              borderCircularRadius: 10,
+              borderCircularRadius: 8,
             ),
             Padding(padding: EdgeInsets.only(top: 50)),
             continueButton(),
@@ -207,6 +202,50 @@ class CreateWorkflows extends State<APICall> {
         ),
       ),
       bottomNavigationBar: FooterNavigationBar(currentIndex: 2),
+    );
+  }
+}
+
+class CreateSelectedButtonContent extends StatelessWidget {
+  const CreateSelectedButtonContent({
+    super.key,
+    required this.firstText,
+    required this.icon,
+    required this.actionOrReactionName,
+  });
+  final String firstText;
+  final String icon;
+  final String actionOrReactionName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        AutoSizeText(
+          firstText,
+          style: TextStyle (
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white
+          ),
+        ),
+        SafeWebImage(
+          url: "${Globaldata.domainName}$icon",
+          width: 30,
+          height: 30,
+        ),
+        Padding(padding: EdgeInsets.only(right: 10)),
+        Expanded(
+          child: AutoSizeText(
+            " $actionOrReactionName",
+            style: TextStyle (
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white
+            ),
+          ),
+        )
+      ]
     );
   }
 }

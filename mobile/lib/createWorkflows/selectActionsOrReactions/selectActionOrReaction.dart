@@ -58,6 +58,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         CreateData.selectedServiceId = serviceIndex;
       });
     }
+    actionDescription = CreateData.actualServiceList[serviceIndex].description;
     getActionsOrReactions();
   }
 
@@ -79,9 +80,9 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           allActionOrReactionList[i].name,
           allActionOrReactionList[i].description,
           allActionOrReactionList[i].serviceid,
+          CreateData.actualServiceList[serviceIndex].icon,
           allActionOrReactionList[i].parameter,
         ));
-        actionDescription = allActionOrReactionList[i].description;
         ActionOrReactionButtonsList.add(
           actionOrReactionButtons(actionOrReactionList.length - 1),
         );
@@ -112,6 +113,10 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       Globaldata.myContext,
       MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
     );
+    if (!CreateData.selectOrUpdateWorkflow) {
+      Navigator.pop(Globaldata.myContext);
+      return;
+    }
     actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];

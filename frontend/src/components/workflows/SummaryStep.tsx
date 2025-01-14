@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import CancelButton from "../buttons/CancelButton";
+import ActionButton from "../buttons/ActionButton";
 import TriggerButton from "../buttons/TriggerButton";
 import BasicInput from "../inputs/BasicInput";
 import MaxWidthWrapper from "../MaxWidthWrapper";
-import axios from "axios";
+import { getUserName } from "../../utils/GetUserName";
 
 interface SummaryStepProps {
     selectedActionService: {name: string; color: string; iconPath: string } | null;
@@ -44,24 +44,16 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
 
     const [userName, setUserName] = useState("You");
 
-    const getUserName = async () => {
-        try {
-            const result = await axios.get(`${import.meta.env.VITE_API_URL}user`, {
-                withCredentials: true,
-            });
-
-            const email = result.data.user.email;
-
-            const username = email.split('@')[0].replace(/\./g, '');
-
-            setUserName(username);
-        } catch (error) {
-            console.error("Failed to get email : ", error);
-        }
-    };
-
     useEffect(() => {
-        getUserName();
+        const fetchUserName = async () => {
+            try {
+                const username = await getUserName();
+                setUserName(username);
+            } catch (error) {
+                console.error("Failed to get username: ", error);
+            }
+        }
+        fetchUserName();
     }, []);
 
     return (
@@ -73,7 +65,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                 className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
-                    <CancelButton
+                    <ActionButton
                         text="Back"
                         textColor="text-white"
                         borderColor="border-white"

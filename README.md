@@ -36,7 +36,11 @@ sudo docker-compose up
 
 ## Documentation
 
+- The user documentation for web version -> [`Web User Documentation`](docs/webUserDocumentation.pdf)
+- The user documentation for mobile version -> [`Mobile User Documentation`](docs/mobileUserDocumentation.pdf)
 - Implement a new service, action, reaction -> [`Developer Documentation`](backend/README.md)
+- Database structure and relationships -> [`Conceptual Data Model`](backend/docs/conceptualDataModel.pdf)
+- REST API overview -> [`REST API Diagram`](backend/docs/restAPIDiagram.pdf)
 
 ## Authors
 

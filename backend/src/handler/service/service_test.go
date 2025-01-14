@@ -1,6 +1,7 @@
 package service_handler
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,16 +29,18 @@ func (m *MockServiceService) OAuth2Service(serviceName, callbackType, appType st
 }
 
 func (m *MockServiceService) RetrieveActionsServices() ([]entities.Service, error) {
-	return nil, nil
+	args := m.Called()
+	return args.Get(0).([]entities.Service), args.Error(1)
 }
 
 func (m *MockServiceService) RetrieveReactionsServices() ([]entities.Service, error) {
-	return nil, nil
+	args := m.Called()
+	return args.Get(0).([]entities.Service), args.Error(1)
 }
 
 func (m *MockServiceService) FindServiceByName(name string) (entities.Service, error) {
-	var test entities.Service
-	return test, nil
+	args := m.Called(name)
+	return args.Get(0).(entities.Service), args.Error(1)
 }
 
 func (m *MockServiceService) FindServiceById(id string) (entities.Service, error) {
@@ -170,6 +173,20 @@ func TestOAuth2Service(test *testing.T) {
 	handler, router, mockService := createMockAndRoute(false)
 	router.GET("/authentication", handler.oauth2Service)
 
+	test.Run("Successful", func(test *testing.T) {
+		mockService.On("OAuth2Service", "Github", "service", "web").
+			Return("https://localhost:8080/authentication/Github/service/web", nil)
+
+		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=service&apptype=web", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertCalled(test, "OAuth2Service", "Github", "service", "web")
+	})
+
 	test.Run("Invalid app type", func(test *testing.T) {
 		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=service&apptype=false", nil)
 		w := httptest.NewRecorder()
@@ -191,7 +208,8 @@ func TestOAuth2Service(test *testing.T) {
 	})
 
 	test.Run("Service error", func(test *testing.T) {
-		mockService.On("OAuth2Service", "false", "service", "web").Return("", fmt.Errorf("service error"))
+		mockService.On("OAuth2Service", "false", "service", "web").
+			Return("", fmt.Errorf("service error"))
 
 		req, _ := http.NewRequest("GET", "/authentication?service=false&callbacktype=service&apptype=web", nil)
 		w := httptest.NewRecorder()
@@ -203,25 +221,257 @@ func TestOAuth2Service(test *testing.T) {
 
 		mockService.AssertCalled(test, "OAuth2Service", "false", "service", "web")
 	})
+}
 
+func TestRetrieveAllService(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
-		mockService.On("OAuth2Service", "Github", "service", "web").Return("https://localhost:8080/authentication/Github/service/web", nil)
+		handler, router, mockService := createMockAndRoute(false)
 
-		req, _ := http.NewRequest("GET", "/authentication?service=Github&callbacktype=service&apptype=web", nil)
+		router.GET("/services", handler.retrieveAllServices)
+
+		mockService.On("FindAllServices").
+			Return([]entities.Service{}, nil)
+
+		req, _ := http.NewRequest("GET", "/services", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(false)
+
+		router.GET("/services", handler.retrieveAllServices)
+
+		mockService.On("FindAllServices").
+			Return([]entities.Service{}, errors.New("Fail"))
+
+		req, _ := http.NewRequest("GET", "/services", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Internal server error"}`, w.Body.String())
+	})
+}
+
+func TestRetrieveActionsServices(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/actions", handler.retrieveActionsServices)
+
+		mockService.On("RetrieveActionsServices").
+			Return([]entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/actions", token)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusOK, w.Code)
 
-		mockService.AssertCalled(test, "OAuth2Service", "Github", "service", "web")
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/actions", handler.retrieveActionsServices)
+
+		mockService.On("RetrieveActionsServices").
+			Return([]entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/actions", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Internal server error"}`, w.Body.String())
+	})
+}
+
+func TestRetrieveReactionsServices(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reactions", handler.retrieveReactionsServices)
+
+		mockService.On("RetrieveReactionsServices").
+			Return([]entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/reactions", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reactions", handler.retrieveReactionsServices)
+
+		mockService.On("RetrieveReactionsServices").
+			Return([]entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/reactions", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Internal server error"}`, w.Body.String())
+	})
+}
+
+func TestRetrieveServiceById(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+		expectedService := entities.Service{Id: "1", Name: "service"}
+
+		router.GET("/services/:id", handler.retrieveServiceById)
+
+		mockService.On("FindServiceById", "1").
+			Return(expectedService, nil)
+
+		req := requestForProtected("GET", "/services/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+		expectedService := entities.Service{Id: "1", Name: "service"}
+
+		router.GET("/services/:id", handler.retrieveServiceById)
+
+		mockService.On("FindServiceById", "1").
+			Return(expectedService, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve requested service"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
+	})
+}
+
+func TestRetrieveServiceByActionId(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/action/:actionid", handler.retrieveServiceByActionId)
+
+		mockService.On("FindServiceByActionId", "1").
+			Return(entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/action/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/action/:actionid", handler.retrieveServiceByActionId)
+
+		mockService.On("FindServiceByActionId", "1").
+			Return(entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/action/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve requested service"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
+	})
+}
+
+func TestRetrieveServiceByReactionId(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reaction/:reactionid", handler.retrieveServiceByReactionId)
+
+		mockService.On("FindServiceByReactionId", "1").
+			Return(entities.Service{}, nil)
+
+		req := requestForProtected("GET", "/services/reaction/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(test)
+	})
+
+	test.Run("Fail", func(test *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		router.GET("/services/reaction/:reactionid", handler.retrieveServiceByReactionId)
+
+		mockService.On("FindServiceByReactionId", "1").
+			Return(entities.Service{}, errors.New("Fail"))
+
+		req := requestForProtected("GET", "/services/reaction/1", token)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(test, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve requested service"}`, w.Body.String())
+
+		mockService.AssertExpectations(test)
 	})
 }
 
 func TestRetrieveActionsFromService(test *testing.T) {
-	handler, router, mockService := createMockAndRoute(true)
+	handler, router, mockService := createMockAndRoute(false)
 
-	token := createToken(test)
 	expectedActions := []entities.Action{
 		{Id: "1", Name: "action1"},
 		{Id: "2", Name: "action2"},
@@ -231,7 +481,8 @@ func TestRetrieveActionsFromService(test *testing.T) {
 
 	test.Run("Successful", func(test *testing.T) {
 		mockService.On("RetrieveActionsFromService", "Reddit").Return(expectedActions, nil)
-		req := requestForProtected("GET", "/service/Reddit/actions", token)
+
+		req, _ := http.NewRequest("GET", "/service/Reddit/actions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -245,7 +496,8 @@ func TestRetrieveActionsFromService(test *testing.T) {
 		var action []entities.Action
 
 		mockService.On("RetrieveActionsFromService", "false").Return(action, fmt.Errorf("service error"))
-		req := requestForProtected("GET", "/service/false/actions", token)
+
+		req, _ := http.NewRequest("GET", "/service/false/actions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -255,25 +507,11 @@ func TestRetrieveActionsFromService(test *testing.T) {
 
 		mockService.AssertExpectations(test)
 	})
-
-	test.Run("Invalid or missing JWT token", func(t *testing.T) {
-		mockService.On("RetrieveActionsFromService", "Reddit").Return(expectedActions, nil)
-		req := httptest.NewRequest("GET", "/service/Reddit/actions", nil)
-		w := httptest.NewRecorder()
-
-		router.ServeHTTP(w, req)
-
-		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No authentication token"}`, w.Body.String())
-
-		mockService.AssertExpectations(test)
-	})
 }
 
 func TestRetrieveReactionsFromService(test *testing.T) {
-	handler, router, mockService := createMockAndRoute(true)
+	handler, router, mockService := createMockAndRoute(false)
 
-	token := createToken(test)
 	expectedReactions := []entities.Reaction{
 		{Id: "1", Name: "reaction1"},
 		{Id: "2", Name: "reaction2"},
@@ -283,7 +521,8 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 
 	test.Run("Successful", func(test *testing.T) {
 		mockService.On("RetrieveReactionsFromService", "Reddit").Return(expectedReactions, nil)
-		req := requestForProtected("GET", "/service/Reddit/reactions", token)
+
+		req, _ := http.NewRequest("GET", "/service/Reddit/reactions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -295,49 +534,16 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 
 	test.Run("Unknown service", func(test *testing.T) {
 		var reactions []entities.Reaction
+
 		mockService.On("RetrieveReactionsFromService", "false").Return(reactions, fmt.Errorf("service error"))
-		req := requestForProtected("GET", "/service/false/reactions", token)
+
+		req, _ := http.NewRequest("GET", "/service/false/reactions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusBadRequest, w.Code)
 		require.JSONEq(test, `{"error": "Unknown service"}`, w.Body.String())
-
-		mockService.AssertExpectations(test)
-	})
-
-	test.Run("Invalid or missing JWT token", func(test *testing.T) {
-		mockService.On("RetrieveReactionsFromService", "Reddit").Return(expectedReactions, nil)
-		req := httptest.NewRequest("GET", "/service/Reddit/reactions", nil)
-		w := httptest.NewRecorder()
-
-		router.ServeHTTP(w, req)
-
-		require.Equal(test, http.StatusUnauthorized, w.Code)
-		require.JSONEq(test, `{"error":"No authentication token"}`, w.Body.String())
-
-		mockService.AssertExpectations(test)
-	})
-}
-
-func TestRetrieveServiceById(test *testing.T) {
-	handler, router, mockService := createMockAndRoute(true)
-
-	token := createToken(test)
-	expectedService := entities.Service{Id: "1", Name: "service"}
-
-	router.GET("/services/:id", handler.retrieveServiceById)
-
-	test.Run("Successful", func(t *testing.T) {
-		mockService.On("FindServiceById", "1").Return(expectedService, nil)
-
-		req := requestForProtected("GET", "/services/1", token)
-		w := httptest.NewRecorder()
-
-		router.ServeHTTP(w, req)
-
-		require.Equal(test, http.StatusOK, w.Code)
 
 		mockService.AssertExpectations(test)
 	})
@@ -365,7 +571,8 @@ func TestGetDiscordGuildChannels(test *testing.T) {
 	}
 
 	test.Run("Successful", func(t *testing.T) {
-		mockService.On("RetrieveDiscordGuildChannels", guildId).Return(expectedChannels, nil)
+		mockService.On("RetrieveDiscordGuildChannels", guildId).
+			Return(expectedChannels, nil)
 
 		req := createRequestWithJWT("GET", "/discord/server/channels", guildId)
 		w := httptest.NewRecorder()
@@ -373,6 +580,40 @@ func TestGetDiscordGuildChannels(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
+
+		mockService.AssertExpectations(t)
+	})
+
+	test.Run("Fail", func(t *testing.T) {
+		handler, router, mockService := createMockAndRoute(true)
+
+		token := createToken(test)
+
+		guildId := "12345"
+		expectedChannels := []map[string]interface{}{
+			{"name": "test1", "id": "1"},
+			{"name": "test2", "id": "2"},
+			{"name": "test3", "id": "3"},
+		}
+
+		router.GET("/discord/server/channels", handler.getDiscordGuildChannels)
+
+		createRequestWithJWT := func(method, url, guildId string) *http.Request {
+			req, _ := http.NewRequest(method, url+"?id="+guildId, nil)
+			req.AddCookie(&http.Cookie{Name: "JWToken", Value: token})
+			return req
+		}
+
+		mockService.On("RetrieveDiscordGuildChannels", guildId).
+			Return(expectedChannels, errors.New("Fail"))
+
+		req := createRequestWithJWT("GET", "/discord/server/channels", guildId)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		require.Equal(t, http.StatusInternalServerError, w.Code)
+		require.JSONEq(test, `{"error": "Could not retrieve the server's channels"}`, w.Body.String())
 
 		mockService.AssertExpectations(t)
 	})
