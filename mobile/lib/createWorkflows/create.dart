@@ -219,24 +219,24 @@ class CreateSelectedButtonContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LeftWidget(
-      padding: EdgeInsets.symmetric(horizontal: 0),
-      child: Row(
-        children: [
-          AutoSizeText(
-            firstText,
-            style: TextStyle (
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-            ),
+    return Row(
+      children: [
+        AutoSizeText(
+          firstText,
+          style: TextStyle (
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: Colors.white
           ),
-          SafeWebImage(
-            url: "${Globaldata.domainName}$icon",
-            width: 30,
-            height: 30,
-          ),
-          AutoSizeText(
+        ),
+        SafeWebImage(
+          url: "${Globaldata.domainName}$icon",
+          width: 30,
+          height: 30,
+        ),
+        Padding(padding: EdgeInsets.only(right: 10)),
+        Expanded(
+          child: AutoSizeText(
             " $actionOrReactionName",
             style: TextStyle (
               fontSize: 20,
@@ -244,8 +244,8 @@ class CreateSelectedButtonContent extends StatelessWidget {
               color: Colors.white
             ),
           ),
-        ]
-      )
+        )
+      ]
     );
   }
 }
