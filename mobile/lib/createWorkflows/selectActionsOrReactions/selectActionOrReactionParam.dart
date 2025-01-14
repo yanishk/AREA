@@ -39,19 +39,21 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
   @override
   void initState() {
     super.initState();
-    if (isAnAction) {
-      setState(() {
-        CreateData.actionParamListName = [];
-        actionOrReactionParamListName = CreateData.actionParamListName;
-      });
-    } else {
+    if (!isAnAction) {
       setState(() {
         apiRoute = "reactions";
-        CreateData.reactionParamListName = [];
-        actionOrReactionParamListName = CreateData.reactionParamListName;
       });
     }
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+      if (isAnAction) {
+        setState(() {
+          CreateData.actionParamListName = [];
+        });
+      } else {
+        setState(() {
+          CreateData.reactionParamListName = [];
+        });
+      }
       CreateData.selectOrUpdateWorkflow = true;
       Navigator.pop(Globaldata.myContext);
     }
@@ -325,15 +327,27 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
             ),
             Padding(padding: EdgeInsets.only(top: 15)),
             CustomButton(
-              backgroundColor: Color.fromARGB(255, 34, 34, 34),
+              backgroundColor: ActionsOrReactionsFunctions.fadeColor(HexColor(CreateData.actualServiceList[CreateData.selectedServiceId].color), 2),
               text: AutoSizeText(
                 "Continue",
                 style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
               onPressed: () {
+                if (isAnAction) {
+                  setState(() {
+                    CreateData.actionParamListName = [];
+                    actionOrReactionParamListName = CreateData.actionParamListName;
+                  });
+                } else {
+                  setState(() {
+                    apiRoute = "reactions";
+                    CreateData.reactionParamListName = [];
+                    actionOrReactionParamListName = CreateData.reactionParamListName;
+                  });
+                }
                 Map<String, dynamic> parameterList = CreateData.selectedActionOrReactionData.parameterList;
                 for (int i = 0; i < textInputControllerIndexList.length; i++) {
                   int controllerIndex = textInputControllerIndexList[i];
@@ -355,7 +369,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                 CreateData.selectOrUpdateWorkflow = true;
                 Navigator.pop(Globaldata.myContext);
               },
-              size: Size(double.infinity, 60),
+              size: Size(double.infinity, 70),
               padding: EdgeInsets.symmetric(horizontal: 15.0),
             ),
           ],

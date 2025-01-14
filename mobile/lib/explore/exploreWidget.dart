@@ -73,41 +73,39 @@ class MySquareServicesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Container(
+        width: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
+        height: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
         decoration: BoxDecoration(
           color: color,
           border: Border.all(
             color: color,
             width: 2.0,
           ),
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: BorderRadius.circular(6.0),
         ),
         child: InkWell(
           onTap: () {
             Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => DisplayActionOrReactionPage(serviceIndex: index,)));
           },
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: MediaQuery.sizeOf(Globaldata.myContext).width / 2.5,
+              SafeWebImage(
+                url: "${Globaldata.domainName}$imageUrl",
+                width: 50,
+                height: 50,
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-                child: Column(children: [
-                  SafeWebImage(
-                      url: "${Globaldata.domainName}$imageUrl"),
-                  AutoSizeText(
-                    name,
-                    style: const TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                    maxLines: 1,
-                  )
-                ]),
-              ),
+              AutoSizeText(
+                name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white
+                ),
+                maxLines: 1,
+              )
             ],
           ),
         ),

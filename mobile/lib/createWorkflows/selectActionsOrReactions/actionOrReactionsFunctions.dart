@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
 import 'dart:convert';
@@ -24,5 +25,12 @@ class ActionsOrReactionsFunctions {
       return getMapKeyName(data[mapKeyName]);
     }
     return data;
+  }
+
+  static Color fadeColor(Color color, double ratio) {
+    int r = color.red ~/ 2;
+    int g = color.green ~/ 2;
+    int b = color.blue ~/ 2;
+    return Color.fromARGB(255, r, g, b);
   }
 }
