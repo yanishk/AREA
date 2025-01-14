@@ -78,26 +78,6 @@ class GoBackArrow extends StatelessWidget {
   }
 }
 
-class EditWheel extends StatelessWidget {
-  const EditWheel({
-    super.key,
-    this.onPressed,
-  });
-  final void Function()? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(
-        Icons.settings,
-        size: 32,
-        color: Colors.white,
-      ),
-    );
-  }
-}
-
 class WorkflowsTiles extends StatelessWidget {
   const WorkflowsTiles({
     super.key,
