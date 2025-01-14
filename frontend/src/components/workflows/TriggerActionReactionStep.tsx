@@ -8,6 +8,7 @@ import ActionButton from "../buttons/ActionButton";
 import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
 import SelectField from "../inputs/SelectField";
 import getFieldValues from "../../utils/getFieldValues";
+import { getDiscordChannels, getDiscordServers, getServerIdByName, setSelectedServer } from "../../utils/DiscordUtils";
 
 interface TriggerActionReactionProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
@@ -31,13 +32,18 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     const [isLoading, setIsLoading] = useState(true);
     const [isWorkspaceLoaded, setIsWorkspaceLoaded] = useState(true);
+    const [isServerLoaded, setIsServerLoaded] = useState(true);
     const [isFieldLoading, setIsFieldLoading] = useState(false);
-    const [advancedField, setAdvancedField] = useState(false);
+    const [asanaField, setAsanaField] = useState(false);
+    const [discordField, setDiscordField] = useState(false);
+    const [servers, setServers] = useState<string[]>([]);
+    const [channels, setChannels] = useState<string[]>([]);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
     const [tags, setTags] = useState<string[]>([]);
     const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
+    const [selectedServerName, setSelectedServerName] = useState<string | null>(null);
 
     const getFieldType = (param: Parameters) => {
         if (param.isexhaustive || (!param.isexhaustive && param.route) || param.route || param.values[0]?.length >= 1) {
@@ -56,20 +62,34 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     > ([]);
 
     useEffect(() => {
-        if (selectedService?.name != "Asana") {
-            return;
+        if (selectedService?.name === "Asana") {
+            const fetchWorkspaces = async () => {
+                const workspaces = await getAsanaWorkspaces();
+
+                setWorkspaces(workspaces.map((ws) => ws.name));
+                if (workspaces.length > 0) {
+                    setSelectedWorkspace(workspaces[0].gid, workspaces[0].name);
+                    await handleWorkspaceChange(workspaces[0].name);
+                }
+            };
+
+            fetchWorkspaces();
         }
-        const fetchWorkspaces = async () => {
-            const workspaces = await getAsanaWorkspaces();
 
-            setWorkspaces(workspaces.map((ws) => ws.name));
-            if (workspaces.length > 0) {
-                setSelectedWorkspace(workspaces[0].gid, workspaces[0].name);
-                await handleWorkspaceChange(workspaces[0].name);
-            }
-        };
+        if (selectedService?.name === "Discord") {
+            const fetchServers = async () => {
+                const servers = await getDiscordServers();
 
-        fetchWorkspaces();
+                setServers(servers.map((server) => server.name));
+                if (servers.length > 0) {
+                    setSelectedServer(servers[0].id, servers[0].name);
+                    await handleServerChange(servers[0].name);
+                }
+            };
+
+            fetchServers();
+        }
+
     }, []);
 
     useEffect(() => {
@@ -103,7 +123,10 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
     useEffect(() => {
         if (selectedItem?.parameters.some((param) => param.route === "/asana/workspace/projects")) {
-            setAdvancedField(true);
+            setAsanaField(true);
+        }
+        if (selectedItem?.parameters.some((param) => param.route === "/discord/user/servers")) {
+            setDiscordField(true);
         }
     });
 
@@ -145,6 +168,116 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         }
     };
 
+    const handleServerChange = async (serverName: string) => {
+        setIsServerLoaded(false);
+        setIsFieldLoading(true);
+        setSelectedServerName(serverName);
+        const serverId = await getServerIdByName(serverName);
+
+        if (serverId) {
+            setSelectedServer(serverId, serverName);
+
+            const channels = await getDiscordChannels(serverId);
+
+            setIsServerLoaded(true);
+            setIsFieldLoading(false);
+
+            if (channels.length === 0) {
+                setChannels(["No channels"]);
+            } else {
+                setChannels(channels.map((channel) => channel.name));
+            }
+        }
+    };
+
+    const renderAsanaFields = () => (
+        <div className="w-full max-w-[520px] mx-auto">
+            <SelectField
+                label="Workspace"
+                value={selectedWorkspaceName || ""}
+                options={workspaces}
+                onChange={(value) => handleWorkspaceChange(value)}
+            />
+
+            {isWorkspaceLoaded ? (
+                <>
+                    <SelectField
+                        label="Project"
+                        value={itemFieldValues["project"] || ""}
+                        options={projects}
+                        onChange={(value) => handleFieldChange("project", value, type)}
+                    />
+
+                    <SelectField
+                        label="Assignee"
+                        value={itemFieldValues["assignee"] || ""}
+                        options={assignees}
+                        onChange={(value) => handleFieldChange("assignee", value, type)}
+                    />
+
+                    <SelectField
+                        label="Tag"
+                        value={itemFieldValues["tag"] || ""}
+                        options={tags}
+                        onChange={(value) => handleFieldChange("tag", value, type)}
+                    />
+                </>
+            ) : (
+                <></>
+            )}
+        </div>
+    );
+
+    const renderDiscordFields = () => (
+        <div className="w-full max-w-[520px] mx-auto">
+            <SelectField
+                label="server"
+                value={selectedServerName || ""}
+                options={servers}
+                onChange={(value) => handleServerChange(value)}
+            />
+
+            {isServerLoaded ? (
+                <>
+                    <SelectField
+                        label="channel"
+                        value={itemFieldValues["channel"] || ""}
+                        options={channels}
+                        onChange={(value) => handleFieldChange("channel", value, type)}
+                    />
+
+                    <input
+                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
+                        type="text"
+                        value={itemFieldValues["message"]}
+                        onChange={(event) => handleFieldChange("message", event?.target.value, type)}
+                    />
+
+                </>
+            ) : (
+                <></>
+            )}
+        </div>
+    );
+
+    const renderFields = () => {
+        if (asanaField) {
+            return renderAsanaFields();
+        }
+
+        if (discordField) {
+            return renderDiscordFields();
+        }
+
+        return (
+            <DynamicFields
+                fields={fields}
+                values={itemFieldValues}
+                onChange={(id, value) => handleFieldChange(id, value, type)}
+            />
+        );
+    };
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -183,56 +316,13 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     </h2>
                 </div>
 
-                <div
-                    className="flex flex-col items-center"
-                >
+                <div className="flex flex-col items-center">
                     {isLoading ? (
                         <></>
                     ) : (
                         <>
-                            {advancedField ? (
-                                <div className="w-full max-w-[520px] mx-auto">
-                                    <SelectField
-                                        label="Workspace"
-                                        value={selectedWorkspaceName || ""}
-                                        options={workspaces}
-                                        onChange={(value) => handleWorkspaceChange(value)}
-                                    />
+                            {renderFields()}
 
-                                    {isWorkspaceLoaded ? (
-                                        <>
-                                            <SelectField
-                                                label="Project"
-                                                value={itemFieldValues["project"] || ""}
-                                                options={projects}
-                                                onChange={(value) => handleFieldChange("project", value, type)}
-                                            />
-
-                                            <SelectField
-                                                label="Assignee"
-                                                value={itemFieldValues["assignee"] || ""}
-                                                options={assignees}
-                                                onChange={(value) => handleFieldChange("assignee", value, type)}
-                                            />
-
-                                            <SelectField
-                                                label="Tag"
-                                                value={itemFieldValues["tag"] || ""}
-                                                options={tags}
-                                                onChange={(value) => handleFieldChange("tag", value, type)}
-                                            />
-                                        </>
-                                    ) : (
-                                        <></>
-                                    )}
-                                </div>
-                            ) : (
-                                <DynamicFields
-                                    fields={fields}
-                                    values={itemFieldValues}
-                                    onChange={(id, value) => handleFieldChange(id, value, type)}
-                                />
-                            )}
                             {isFieldLoading ? (
                                 <></>
                             ) : (
