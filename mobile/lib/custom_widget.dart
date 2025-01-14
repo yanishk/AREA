@@ -579,3 +579,24 @@ class SquareServicesCard extends StatelessWidget {
   }
 }
 
+class EditWheel extends StatelessWidget {
+  const EditWheel({
+    super.key,
+    this.onPressed,
+    this.color = Colors.white,
+  });
+  final void Function()? onPressed;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.settings,
+        size: 32,
+        color: color,
+      ),
+    );
+  }
+}
