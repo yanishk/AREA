@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:convert';
 import "package:http/src/response.dart";
+import "package:namer_app/apiCall/apiData.dart";
 import 'dart:developer' as developer;
 
 import "../custom_widget.dart";
@@ -18,7 +19,9 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: new ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        dialogBackgroundColor: const Color.fromARGB(255, 255, 255, 255)
+      ),
       home: APICall(),
     );
   }
@@ -97,6 +100,57 @@ class _APICallState extends State<APICall> {
     saveJWToken(response);
   }
 
+  Future<void> changeIpDialog() async {
+    final TextEditingController ipController = new TextEditingController(text: ApiData.apiUrl);
+    return showDialog<void>(
+      context: Globaldata.myContext,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("Select new backend ip",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                CustomClassicForm(
+                  hint: 'ip : ',
+                  controller: ipController,
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            CustomButton(
+              backgroundColor: const Color.fromARGB(255, 34, 34, 34),
+              text: Text("Save",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+              onPressed: () {
+                setState(() {
+                  ApiData.apiUrl = ipController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              size: const Size(double.infinity, 55),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            ),
+            Center(
+              child: CustomTextButton(
+                text: Text("Cancel",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),),
+                onPressed: () {Navigator.of(context).pop();},
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Globaldata.myContext = context;
@@ -106,9 +160,16 @@ class _APICallState extends State<APICall> {
           child: Column(
             children: [
               Padding(padding: EdgeInsets.only(top: 30)),
-              Text(
-                "AREA",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  EditWheel(
+                    color: Colors.black,
+                    onPressed: changeIpDialog,
+                  ),
+                  Text("AREA",style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
+                  Padding(padding: EdgeInsets.only(left: 48)),
+                ],
               ),
               Text(
                 "Log in",

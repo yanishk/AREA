@@ -32,7 +32,7 @@ class APICall extends StatefulWidget {
 class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
-          "If ${CreateData.serviceAction.name}, Then ${CreateData.reactionServiceList[Globaldata.secondService].name} : ${CreateData.serviceReaction.name}");
+          "If ${CreateData.serviceAction.name}, Then ${CreateData.reactionServiceList[Globaldata.reactionServiceIndex].name} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflows";
   String email = Globaldata.userInfos.email;
   String defaultWorkflowName = "";
@@ -46,7 +46,7 @@ class SaveNewWorkflows extends State<APICall> {
     for (int i = 0; i < CreateData.actionParamListName.length; i++) {
       defaultWorkflowName += "${CreateData.actionParamListName[i]} ";
     }
-    defaultWorkflowName += ", Then ${CreateData.reactionServiceList[Globaldata.secondService].name} ${CreateData.serviceReaction.name} ";
+    defaultWorkflowName += ", Then ${CreateData.reactionServiceList[Globaldata.reactionServiceIndex].name} ${CreateData.serviceReaction.name} ";
     for (int i = 0; i < CreateData.reactionParamListName.length; i++) {
       defaultWorkflowName += "${CreateData.reactionParamListName[i]} ";
     }
