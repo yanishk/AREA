@@ -225,16 +225,14 @@ func TestOAuth2Service(test *testing.T) {
 
 func TestRetrieveAllService(test *testing.T) {
 	test.Run("Successful", func(test *testing.T) {
-		handler, router, mockService := createMockAndRoute(true)
-
-		token := createToken(test)
+		handler, router, mockService := createMockAndRoute(false)
 
 		router.GET("/services", handler.retrieveAllServices)
 
 		mockService.On("FindAllServices").
 			Return([]entities.Service{}, nil)
 
-		req := requestForProtected("GET", "/services", token)
+		req, _ := http.NewRequest("GET", "/services", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -243,16 +241,14 @@ func TestRetrieveAllService(test *testing.T) {
 	})
 
 	test.Run("Fail", func(test *testing.T) {
-		handler, router, mockService := createMockAndRoute(true)
-
-		token := createToken(test)
+		handler, router, mockService := createMockAndRoute(false)
 
 		router.GET("/services", handler.retrieveAllServices)
 
 		mockService.On("FindAllServices").
 			Return([]entities.Service{}, errors.New("Fail"))
 
-		req := requestForProtected("GET", "/services", token)
+		req, _ := http.NewRequest("GET", "/services", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -474,9 +470,8 @@ func TestRetrieveServiceByReactionId(test *testing.T) {
 }
 
 func TestRetrieveActionsFromService(test *testing.T) {
-	handler, router, mockService := createMockAndRoute(true)
+	handler, router, mockService := createMockAndRoute(false)
 
-	token := createToken(test)
 	expectedActions := []entities.Action{
 		{Id: "1", Name: "action1"},
 		{Id: "2", Name: "action2"},
@@ -486,7 +481,8 @@ func TestRetrieveActionsFromService(test *testing.T) {
 
 	test.Run("Successful", func(test *testing.T) {
 		mockService.On("RetrieveActionsFromService", "Reddit").Return(expectedActions, nil)
-		req := requestForProtected("GET", "/service/Reddit/actions", token)
+
+		req, _ := http.NewRequest("GET", "/service/Reddit/actions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -500,7 +496,8 @@ func TestRetrieveActionsFromService(test *testing.T) {
 		var action []entities.Action
 
 		mockService.On("RetrieveActionsFromService", "false").Return(action, fmt.Errorf("service error"))
-		req := requestForProtected("GET", "/service/false/actions", token)
+
+		req, _ := http.NewRequest("GET", "/service/false/actions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -513,9 +510,8 @@ func TestRetrieveActionsFromService(test *testing.T) {
 }
 
 func TestRetrieveReactionsFromService(test *testing.T) {
-	handler, router, mockService := createMockAndRoute(true)
+	handler, router, mockService := createMockAndRoute(false)
 
-	token := createToken(test)
 	expectedReactions := []entities.Reaction{
 		{Id: "1", Name: "reaction1"},
 		{Id: "2", Name: "reaction2"},
@@ -525,7 +521,8 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 
 	test.Run("Successful", func(test *testing.T) {
 		mockService.On("RetrieveReactionsFromService", "Reddit").Return(expectedReactions, nil)
-		req := requestForProtected("GET", "/service/Reddit/reactions", token)
+
+		req, _ := http.NewRequest("GET", "/service/Reddit/reactions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
@@ -537,8 +534,10 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 
 	test.Run("Unknown service", func(test *testing.T) {
 		var reactions []entities.Reaction
+
 		mockService.On("RetrieveReactionsFromService", "false").Return(reactions, fmt.Errorf("service error"))
-		req := requestForProtected("GET", "/service/false/reactions", token)
+
+		req, _ := http.NewRequest("GET", "/service/false/reactions", nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
