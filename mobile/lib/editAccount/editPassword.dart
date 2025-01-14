@@ -15,7 +15,7 @@ class EditPasswordPage extends StatelessWidget {
     return MaterialApp(
       theme: new ThemeData(
           scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
-      title: "Account",
+      title: "Change password",
       home: APICall(),
     );
   }
@@ -174,7 +174,7 @@ class EditPassword extends State<APICall> {
             CustomButton(
               backgroundColor: Color.fromARGB(255, 34, 34, 34),
               text: AutoSizeText(
-                "Save",
+                "Change",
                 style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -212,10 +212,10 @@ class EditPasswordTopBar extends StatelessWidget {
         ),
         Center(
           child: AutoSizeText(
-            "Account",
+            "Change password",
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
               color: Colors.black,
             ),
             maxLines: 1,
