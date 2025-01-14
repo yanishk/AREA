@@ -11,7 +11,7 @@ import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
-import getFieldValues, { gitlabNameToIdMap } from "../utils/getFieldValues";
+import getFieldValues from "../utils/getFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
 
 type availableActionsType = {
@@ -275,7 +275,7 @@ const WorkflowBuilder = () => {
             if (id === "workflow") {
                 setSelectedWorkspace(value, id);
             }
-              setReactionFieldValues((prev) => ({
+            setReactionFieldValues((prev) => ({
                 ...prev,
                 [id]: value,
             }));
@@ -404,7 +404,7 @@ const WorkflowBuilder = () => {
             const state = sessionStorage.getItem("state-data");
 
             if (!state) {
-                console.error("Undetected state into session storage");
+                console.warn("Undetected state into session storage");
                 return;
             }
 
@@ -524,6 +524,35 @@ const WorkflowBuilder = () => {
         return params;
     };
 
+    const getGitlabProjectId = async (actionParams: any) => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}gitlab/user/projects`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                const gitlabProjects = result.data.projects;
+
+                Object.keys(actionParams).forEach((key) => {
+                    const projectName = actionParams[key];
+
+                    const project = gitlabProjects.find((item: { name: string }) => item.name === projectName);
+
+                    if (!project) {
+                        console.error("No gitlab projects found");
+                        return;
+                    }
+
+                    actionParams[key] = project.id;
+                }
+            );
+        } catch (error) {
+            console.error("Error with fetch gitlab projects", error);
+        }
+    }
+
     const handleCreateWorkflow = async (workflowTitle: string) => {
         const actionParams = selectedAction
             ? await getActionReactionParams(actionFieldValues, selectedAction.parameters)
@@ -534,10 +563,7 @@ const WorkflowBuilder = () => {
             : null;
 
             if (selectedActionService?.name === "Gitlab" && actionParams) {
-                Object.keys(actionParams).forEach((key) => {
-                    const value = actionParams[key];
-                    actionParams[key] = gitlabNameToIdMap[value];
-                });
+                await getGitlabProjectId(actionParams);
             }
 
         await axios.post(

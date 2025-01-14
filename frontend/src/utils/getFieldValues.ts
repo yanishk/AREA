@@ -3,8 +3,6 @@ import { Parameters } from "./ActionReactionParameters";
 import { getAsanaWorkspaces } from "./AsanaUtils";
 import { getDiscordServers } from "./DiscordUtils";
 
-export const gitlabNameToIdMap: Record<string, number> = {};
-
 interface GitlabParams {
     id: number;
     name: string;
@@ -52,13 +50,7 @@ const handleService = async (route: string, param: Parameters, serviceName: stri
         if (serviceName === "gitlab") {
             const result = await getGitlabFieldValues(route);
 
-            if (result.data?.projects) {
-                result.data.projects.forEach((item) => {
-                    gitlabNameToIdMap[item.name] = item.id;
-                });
-
-                return result.data.projects.map((item) => item.name);
-            }
+            return result.data.projects.map((item) => item.name);
         }
 
         if (serviceName === "github") {

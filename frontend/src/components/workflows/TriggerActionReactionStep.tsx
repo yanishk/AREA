@@ -105,6 +105,10 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                             ? await getFieldValues(param)
                             : undefined;
 
+                            if (!itemFieldValues[param.name] && options && options.length > 0) {
+                                handleFieldChange(param.name, options[0], type);
+                            }
+
                     return {
                         id: param.name,
                         label: param.name,
