@@ -35,6 +35,7 @@ sudo docker-compose up
 > If not working, make sure that your docker is running and that no other container is running on the port 8080 or 8081
 
 ## Documentation
+
 - The user documentation for web version -> [`Web User Documentation`](docs/webUserDocumentation.pdf)
 - The user documentation for mobile version -> [`Mobile User Documentation`](docs/mobileUserDocumentation.pdf)
 - Implement a new service, action, reaction -> [`Developer Documentation`](backend/README.md)
