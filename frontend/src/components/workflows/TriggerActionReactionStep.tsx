@@ -190,6 +190,76 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         }
     };
 
+    const renderAsanaFields = () => (
+        <div className="w-full max-w-[520px] mx-auto">
+            <SelectField
+                label="Workspace"
+                value={selectedWorkspaceName || ""}
+                options={workspaces}
+                onChange={(value) => handleWorkspaceChange(value)}
+            />
+
+            {isWorkspaceLoaded ? (
+                <>
+                    <SelectField
+                        label="Project"
+                        value={itemFieldValues["project"] || ""}
+                        options={projects}
+                        onChange={(value) => handleFieldChange("project", value, type)}
+                    />
+
+                    <SelectField
+                        label="Assignee"
+                        value={itemFieldValues["assignee"] || ""}
+                        options={assignees}
+                        onChange={(value) => handleFieldChange("assignee", value, type)}
+                    />
+
+                    <SelectField
+                        label="Tag"
+                        value={itemFieldValues["tag"] || ""}
+                        options={tags}
+                        onChange={(value) => handleFieldChange("tag", value, type)}
+                    />
+                </>
+            ) : (
+                <></>
+            )}
+        </div>
+    );
+
+    const renderDiscordFields = () => (
+        <div className="w-full max-w-[520px] mx-auto">
+            <SelectField
+                label="server"
+                value={selectedServerName || ""}
+                options={servers}
+                onChange={(value) => handleServerChange(value)}
+            />
+
+            {isServerLoaded ? (
+                <>
+                    <SelectField
+                        label="channel"
+                        value={itemFieldValues["channel"] || ""}
+                        options={channels}
+                        onChange={(value) => handleFieldChange("channel", value, type)}
+                    />
+
+                    <input
+                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
+                        type="text"
+                        value={itemFieldValues["message"]}
+                        onChange={(event) => handleFieldChange("message", event?.target.value, type)}
+                    />
+
+                </>
+            ) : (
+                <></>
+            )}
+        </div>
+    );
+
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
@@ -228,86 +298,19 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     </h2>
                 </div>
 
-                <div
-                    className="flex flex-col items-center"
-                >
+                <div className="flex flex-col items-center">
                     {isLoading ? (
                         <></>
                     ) : (
                         <>
-                            {asanaField ? (
-                                <div className="w-full max-w-[520px] mx-auto">
-                                    <SelectField
-                                        label="Workspace"
-                                        value={selectedWorkspaceName || ""}
-                                        options={workspaces}
-                                        onChange={(value) => handleWorkspaceChange(value)}
-                                    />
-
-                                    {isWorkspaceLoaded ? (
-                                        <>
-                                            <SelectField
-                                                label="Project"
-                                                value={itemFieldValues["project"] || ""}
-                                                options={projects}
-                                                onChange={(value) => handleFieldChange("project", value, type)}
-                                            />
-
-                                            <SelectField
-                                                label="Assignee"
-                                                value={itemFieldValues["assignee"] || ""}
-                                                options={assignees}
-                                                onChange={(value) => handleFieldChange("assignee", value, type)}
-                                            />
-
-                                            <SelectField
-                                                label="Tag"
-                                                value={itemFieldValues["tag"] || ""}
-                                                options={tags}
-                                                onChange={(value) => handleFieldChange("tag", value, type)}
-                                            />
-                                        </>
-                                    ) : (
-                                        <></>
-                                    )}
-                                </div>
-                            ) : discordField ? (
-                                    <div className="w-full max-w-[520px] mx-auto">
-                                        <SelectField
-                                            label="server"
-                                            value={selectedServerName || ""}
-                                            options={servers}
-                                            onChange={(value) => handleServerChange(value)}
-                                        />
-
-                                        {isServerLoaded ? (
-                                            <>
-                                                <SelectField
-                                                    label="channel"
-                                                    value={itemFieldValues["channel"] || ""}
-                                                    options={channels}
-                                                    onChange={(value) => handleFieldChange("channel", value, type)}
-                                                />
-
-                                                <input
-                                                    className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                                                    type="text"
-                                                    value={itemFieldValues["message"]}
-                                                    onChange={(event) => handleFieldChange("message", event?.target.value, type)}
-                                                />
-
-                                            </>
-                                        ) : (
-                                            <></>
-                                        )}
-                                    </div>
-                            ) : (
+                            {asanaField ? renderAsanaFields() : discordField ? renderDiscordFields() : (
                                 <DynamicFields
                                     fields={fields}
                                     values={itemFieldValues}
                                     onChange={(id, value) => handleFieldChange(id, value, type)}
                                 />
                             )}
+
                             {isFieldLoading ? (
                                 <></>
                             ) : (
