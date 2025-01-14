@@ -144,23 +144,6 @@ const WorkflowDetail = () => {
         fetchUserName();
     }, []);
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-            handleSaveName();
-        }
-    };
-
-    useEffect(() => {
-        if (isEditing) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isEditing]);
-
     if (loading) {
         return;
     }
@@ -217,7 +200,6 @@ const WorkflowDetail = () => {
                                 >
                                     <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
-                                        onClick={handleSaveName}
                                     >
                                         Save
                                     </button>
