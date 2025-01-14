@@ -19,7 +19,9 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: new ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        dialogBackgroundColor: const Color.fromARGB(255, 255, 255, 255)
+      ),
       home: APICall(),
     );
   }
