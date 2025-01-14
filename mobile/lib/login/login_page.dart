@@ -117,7 +117,7 @@ class _APICallState extends State<APICall> {
                   textAlign: TextAlign.center,
                 ),
                 CustomClassicForm(
-                  hint: 'Email',
+                  hint: 'ip : ',
                   controller: ipController,
                   maxLines: 2,
                 ),
@@ -139,10 +139,7 @@ class _APICallState extends State<APICall> {
             ),
             Center(
               child: CustomTextButton(
-                text: Text(
-                  "Cancel",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                ),
+                text: Text("Cancel",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),),
                 onPressed: () {Navigator.of(context).pop();},
               ),
             ),
