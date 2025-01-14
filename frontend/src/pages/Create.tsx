@@ -75,19 +75,20 @@ const WorkflowBuilder = () => {
 
     const goBack = () => {
         if (currentStep == Steps.HOME) {
+            handleDeleteAction();
+            handleDeleteReaction();
+            sessionStorage.removeItem("state-data");
             navigate("/explore")
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
             goToStep(Steps.HOME)
-            setSelectedActionService(null)
-            setSelectedAction(null);
+            handleDeleteAction();
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_REACTION) {
             goToStep(Steps.HOME)
-            setSelectedReactionService(null)
-            setSelectedReaction(null);
+            handleDeleteReaction();
             return;
         }
         if (currentStep == Steps.SUMMARY) {
@@ -356,15 +357,24 @@ const WorkflowBuilder = () => {
         }
     };
 
+    let isCallbackSent = false;
+
     const handleServiceCallback = async (codeAuth: string, serviceName: string) => {
         if (!codeAuth || !serviceName) return;
+
+        if (isCallbackSent) {
+            console.warn("Callback already sent");
+            return;
+        }
+
+        isCallbackSent = true;
 
         try {
             const result = await axios.post(
                 `${import.meta.env.VITE_API_URL}service-callback/?code=${codeAuth}`,
                 {
-                    service: serviceName,
-                    apptype: "web"
+                    apptype: "web",
+                    service: serviceName
                 },
                 {
                     withCredentials: true
@@ -374,6 +384,7 @@ const WorkflowBuilder = () => {
             if (result.data?.success) {
                 setIsServiceConnected(true);
             }
+
         } catch (error) {
             console.error("Error with service callback:", error);
         }
