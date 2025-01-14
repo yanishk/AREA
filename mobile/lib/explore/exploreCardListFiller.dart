@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import "package:namer_app/globalData.dart";
 
-import "exploreWidget.dart";
 import "../custom_widget.dart";
+import 'exploreDisplayActionsOrReactions.dart';
 
 class FillServicesCard {
   static List<Widget> serviceCardList = [];
@@ -14,17 +14,21 @@ class FillServicesCard {
       return Row(
         children: [
           Padding(padding: EdgeInsets.only(right: 5)),
-          MySquareServicesCard(
+          SquareServicesCard(
             name: Globaldata.serviceList[index].name,
             color: HexColor(Globaldata.serviceList[index].color),
             imageUrl: Globaldata.serviceList[index].icon,
-            index: index++,
+            onTap: () {
+              Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => DisplayActionOrReactionPage(serviceIndex: index,)));
+            },
           ),
-          MySquareServicesCard(
-            name: Globaldata.serviceList[index].name,
-            color: HexColor(Globaldata.serviceList[index].color),
-            imageUrl: Globaldata.serviceList[index].icon,
-            index: index,
+          SquareServicesCard(
+            name: Globaldata.serviceList[index + 1].name,
+            color: HexColor(Globaldata.serviceList[index + 1].color),
+            imageUrl: Globaldata.serviceList[index + 1].icon,
+            onTap: () {
+              Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => DisplayActionOrReactionPage(serviceIndex: index + 1,)));
+            },
           ),
         ],
       );
@@ -32,10 +36,13 @@ class FillServicesCard {
     return Row(
       children: [
         Padding(padding: EdgeInsets.only(right: 5)),
-        MySquareServicesCard(
+        SquareServicesCard(
           name: Globaldata.serviceList[index].name,
           color: HexColor(Globaldata.serviceList[index].color),
           imageUrl: Globaldata.serviceList[index].icon,
+          onTap: () {
+            Navigator.push(Globaldata.myContext, MaterialPageRoute(builder: (context) => DisplayActionOrReactionPage(serviceIndex: index,)));
+          },
         ),
       ],
     );
