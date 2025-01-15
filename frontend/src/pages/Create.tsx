@@ -570,10 +570,6 @@ const WorkflowBuilder = () => {
             });
         }
 
-        console.log("action ici : ", actionParams);
-
-        return;
-
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
             {
