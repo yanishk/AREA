@@ -14,6 +14,7 @@ import { ReactionType } from "../utils/ReactionType";
 import getFieldValues from "../utils/getFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
 import { monthType } from "../utils/monthType";
+import { getDiscordChannels, getServerIdByName, setSelectedServer } from "../utils/DiscordUtils";
 
 type availableActionsType = {
     name: string;
@@ -265,7 +266,7 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const handleFieldChange = (id: string, value: string, type: "action" | "reaction") => {
+    const handleFieldChange = async (id: string, value: string, type: "action" | "reaction") => {
         if (type === "action") {
             setActionFieldValues((prev) => ({
                 ...prev,
@@ -273,18 +274,34 @@ const WorkflowBuilder = () => {
             }));
         }
         if (type === "reaction") {
+            if (id === "server") {
+                setSelectedServer(value, id);
+
+                const serverId = await getServerIdByName(value);
+                if (serverId) {
+                    const channels = await getDiscordChannels(serverId);
+
+                    if (channels.length > 0) {
+                        setReactionFieldValues((prev) => ({
+                            ...prev,
+                            channel: channels[0].name,
+                        }));
+                    }
+                }
+            }
+
             if (id === "workflow") {
                 setSelectedWorkspace(value, id);
             }
+
             setReactionFieldValues((prev) => ({
                 ...prev,
                 [id]: value,
             }));
-        }
-        else {
+        } else {
             console.error(`Invalid type parameter: ${type}`);
         }
-    }
+    };
 
     const handleSelectReactionService = (name: string, color: string, iconPath: string, isauthneeded: boolean) => {
         setSelectedReactionService({ name, color, iconPath, isauthneeded });
@@ -478,17 +495,9 @@ const WorkflowBuilder = () => {
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
-        const processKeys = async (key: string) => {
-            const param = parameters.find((param) => param.name === key);
-
-            if (!param) {
-                return;
-            }
-
-            params[key] = valuesSelectedByUser[key];
+        for (const param of parameters) {
+            params[param.name] = valuesSelectedByUser[param.name];
         }
-
-        await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
 
         return params;
     };
@@ -522,6 +531,35 @@ const WorkflowBuilder = () => {
         }
     }
 
+    const handleDiscordParameters = async (reactionParams: any) => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}discord/user/servers`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                const discordServers = result.data.servers;
+
+                Object.keys(reactionParams).forEach((key) => {
+                    const projectName = reactionParams[key];
+
+                    const server = discordServers.find((item: { name: string }) => item.name === projectName);
+
+                    if (!server) {
+                        console.error("No discord servers found");
+                        return;
+                    }
+
+                    reactionParams[key] = server.id;
+                }
+            );
+        } catch (error) {
+            console.error("Error with fetch discord servers", error);
+        }
+    }
+
     const handleCreateWorkflow = async (workflowTitle: string) => {
         const actionParams = selectedAction
             ? await getActionReactionParams(actionFieldValues, selectedAction.parameters)
@@ -535,6 +573,10 @@ const WorkflowBuilder = () => {
             await getGitlabProjectId(actionParams);
         }
 
+        if (selectedReactionService?.name === "Discord" && reactionParams) {
+            await handleDiscordParameters(reactionParams);
+        }
+
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
                 if (param.type === "int" && actionParams && actionParams[param.name]) {
@@ -543,8 +585,7 @@ const WorkflowBuilder = () => {
                         return actionParams[param.name] = monthType[monthName] || null;
                     }
                     if (param.name === "hour" && actionParams && actionParams[param.name]) {
-                        const hourValue = actionParams[param.name];
-                        const [hour, period] = hourValue.split(" ");
+                        const [hour, period] = actionParams[param.name].split(" ");
                         let hourInt = parseInt(hour, 10);
 
                         if (period === "PM" && hourInt !== 12) {
@@ -564,11 +605,13 @@ const WorkflowBuilder = () => {
 
         if (selectedReaction?.parameters) {
             selectedReaction.parameters.forEach((param) => {
-                if (param.type === "int" && reactionParams && reactionParams[param.name]) {
+                if (param.type === "int" && reactionParams && reactionParams[param.name] && param?.name != "server" && param?.name != "channel") {
                     reactionParams[param.name] = parseInt(reactionParams[param.name], 10);
                 }
             });
         }
+
+        navigate("/explore");
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
@@ -584,10 +627,10 @@ const WorkflowBuilder = () => {
             }
         );
 
+        sessionStorage.removeItem("state-data");
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/explore");
     };
 
     const renderStep = () => {

@@ -232,37 +232,61 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         </div>
     );
 
-    const renderDiscordFields = () => (
+    const renderDiscordFields = () => {
+    if (!selectedItem) return null;
+
+    return (
         <div className="w-full max-w-[520px] mx-auto">
-            <SelectField
-                label="server"
-                value={selectedServerName || ""}
-                options={servers}
-                onChange={(value) => handleServerChange(value)}
-            />
-
             {isServerLoaded ? (
-                <>
-                    <SelectField
-                        label="channel"
-                        value={itemFieldValues["channel"] || ""}
-                        options={channels}
-                        onChange={(value) => handleFieldChange("channel", value, type)}
-                    />
+                selectedItem.parameters.map((param) => {
+                    if (param.name === "server") {
+                        return (
+                            <SelectField
+                                key={param.name}
+                                label="Server"
+                                value={selectedServerName || ""}
+                                options={servers}
+                                onChange={(value) => handleServerChange(value)}
+                            />
+                        );
+                    }
 
-                    <input
-                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                        type="text"
-                        value={itemFieldValues["message"]}
-                        onChange={(event) => handleFieldChange("message", event?.target.value, type)}
-                    />
+                    if (param.name === "channel") {
+                        return (
+                            <SelectField
+                                key={param.name}
+                                label="Channel"
+                                value={itemFieldValues["channel"] || ""}
+                                options={channels}
+                                onChange={(value) => handleFieldChange("channel", value, type)}
+                            />
+                        );
+                    }
 
-                </>
+                    if (param.name === "message" || param.name === "title") {
+                        return (
+                            <input
+                                key={param.name}
+                                className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
+                                placeholder={param.name}
+                                type="text"
+                                value={itemFieldValues[param.name] || ""}
+                                onChange={(event) =>
+                                    handleFieldChange(param.name, event.target.value, type)
+                                }
+                            />
+                        );
+                    }
+
+                    return null;
+                })
             ) : (
                 <></>
             )}
         </div>
     );
+};
+
 
     const renderFields = () => {
         if (asanaField) {

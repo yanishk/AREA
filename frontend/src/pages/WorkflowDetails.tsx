@@ -70,7 +70,7 @@ const WorkflowDetail = () => {
             });
 
             if (result.data.success) {
-                navigate("/explore");
+                navigate("/my_workflows");
             }
 
         } catch (error) {
