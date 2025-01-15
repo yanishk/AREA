@@ -1129,3 +1129,167 @@ func TestRetrieveGitlabUserProjects(test *testing.T) {
 		require.EqualError(test, err, "Call api refresh fail")
 	})
 }
+
+func TestRetrieveDiscordUserServers(test *testing.T) {
+	var user entities.User
+	var service entities.Service
+	var serviceOfUser entities.UserService
+
+	user.Email = "test@test.com"
+	user.Id = "1"
+
+	service.Id = "1"
+
+	serviceOfUser.AccessToken = "accessToken"
+	serviceOfUser.RefreshToken = "refreshToken"
+	serviceOfUser.ExpiryDate = time.Now().Add(time.Hour).Format(formattingDate)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`
+				[
+					{
+						"id":"460797762129231873",
+						"name":"Tek-KMU",
+						"icon":"0fbf50ba2c34c12324417f02b25e27ef",
+						"banner":null,
+						"owner":false,
+						"permissions":"2222085186641473",
+						"features":["CHANNEL_ICON_EMOJIS_GENERATED","SOUNDBOARD"]
+					}
+				]`,
+			))}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Discord").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := userService.RetrieveDiscordUserServers("test@test.com", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail API Refresh", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Discord").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, errors.New("Fail API Request"))
+
+		_, err := userService.RetrieveDiscordUserServers("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail API Request")
+	})
+
+	test.Run("Successful", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`
+				[
+					{
+						"id":"460797762129231873",
+						"name":"Tek-KMU",
+						"icon":"0fbf50ba2c34c12324417f02b25e27ef",
+						"banner":null,
+						"owner":false,
+						"permissions":"2222085186641473",
+						"features":["CHANNEL_ICON_EMOJIS_GENERATED","SOUNDBOARD"]
+					}
+				]`,
+			))}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Discord").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, errors.New("Fail execute API"))
+
+		_, err := userService.RetrieveDiscordUserServers("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail execute API")
+	})
+
+	test.Run("Fail Decode", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`invalid json`)),
+		}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Discord").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://discord.com/api/v10/users/@me/guilds", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := userService.RetrieveDiscordUserServers("test@test.com", "basic")
+
+		require.Error(test, err)
+	})
+}
