@@ -609,3 +609,62 @@ func TestGetUser(test *testing.T) {
 		require.EqualError(test, err, "Fail find user")
 	})
 }
+
+func TestModifyPassword(test *testing.T) {
+	test.Run("Could not modify password", func(test *testing.T) {
+		var modifyUser entities.UserModifyPassword
+
+		userService := &UserService{}
+
+		modifyUser.OldPassword = "test"
+		modifyUser.Password = "new"
+
+		err := userService.ModifyPassword("test@test.com", "service", modifyUser)
+
+		require.EqualError(test, err, "Could not modify the password")
+	})
+
+	test.Run("Fail find user", func(test *testing.T) {
+		var modifyUser entities.UserModifyPassword
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		modifyUser.OldPassword = "test"
+		modifyUser.Password = "new"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("Fail find user"))
+
+		err := userService.ModifyPassword("test@test.com", "basic", modifyUser)
+
+		require.EqualError(test, err, "Could not find requested user")
+	})
+
+	test.Run("Incorrect old password", func(test *testing.T) {
+		var foundUser entities.User
+		var modifyUser entities.UserModifyPassword
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Password = "$2a$12$FcfBupWu3kUpoW.Y9UNI..YOWOaaY2B4m9jkcb7EjK61Y78T6gKRu"
+
+		modifyUser.OldPassword = "fail"
+		modifyUser.Password = "new"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, nil)
+
+		err := userService.ModifyPassword("test@test.com", "basic", modifyUser)
+
+		require.EqualError(test, err, "Old password is incorrect")
+	})
+}
