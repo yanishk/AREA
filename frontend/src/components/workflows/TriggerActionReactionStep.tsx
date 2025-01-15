@@ -157,19 +157,19 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             if (projects.length === 0) {
                 setProjects(["No projects"]);
             } else {
-                setProjects(projects.map((project) => project.name));
+                setProjects(projects.map((project) => project.gid));
             }
 
             if (assignees.length === 0) {
                 setAssignees(["No assignees"]);
             } else {
-                setAssignees(assignees.map((assignee) => assignee.name));
+                setAssignees(assignees.map((assignee) => assignee.gid));
             }
 
             if (tags.length === 0) {
                 setTags(["No tags"]);
             } else {
-                setTags(tags.map((tag) => tag.name));
+                setTags(tags.map((tag) => tag.gid));
             }
         }
     };
@@ -199,43 +199,85 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
         }
     };
 
-    const renderAsanaFields = () => (
-        <div className="w-full max-w-[520px] mx-auto">
-            <SelectField
-                label="Workspace"
-                value={selectedWorkspaceName || ""}
-                options={workspaces}
-                onChange={(value) => handleWorkspaceChange(value)}
-            />
+    const renderAsanaFields = () => {
+        if (!selectedItem) return null;
 
-            {isWorkspaceLoaded ? (
-                <>
-                    <SelectField
-                        label="Project"
-                        value={itemFieldValues["project"] || ""}
-                        options={projects}
-                        onChange={(value) => handleFieldChange("project", value, type)}
-                    />
+        return (
+            <div className="w-full max-w-[520px] mx-auto">
+                {isWorkspaceLoaded ? (
+                    selectedItem.parameters.map((param) => {
+                        console.log(param.name)
+                        if (param.name === "workspace") {
+                            return (
+                                <SelectField
+                                    label="Workspace"
+                                    value={itemFieldValues["workspace"] || ""}
+                                    options={workspaces}
+                                    onChange={(value) => handleFieldChange("workspace", value, type)}
+                                />
+                            );
+                        }
 
-                    <SelectField
-                        label="Assignee"
-                        value={itemFieldValues["assignee"] || ""}
-                        options={assignees}
-                        onChange={(value) => handleFieldChange("assignee", value, type)}
-                    />
+                        if (param.name === "project") {
+                            return (
+                                <SelectField
+                                    label="Project"
+                                    value={itemFieldValues["project"] || ""}
+                                    options={projects}
+                                    onChange={(value) => handleFieldChange("project", value, type)}
+                                />
+                            );
+                        }
 
-                    <SelectField
-                        label="Tag"
-                        value={itemFieldValues["tag"] || ""}
-                        options={tags}
-                        onChange={(value) => handleFieldChange("tag", value, type)}
-                    />
-                </>
-            ) : (
-                <></>
-            )}
-        </div>
-    );
+                        if (param.name === "assignee") {
+                            return (
+                                <SelectField
+                                    label="Assignee"
+                                    value={itemFieldValues["assignee"] || ""}
+                                    options={assignees}
+                                    onChange={(value) => handleFieldChange("assignee", value, type)}
+                                />
+                            );
+                        }
+
+                        if (param.name === "tag") {
+                            return (
+                                <SelectField
+                                    label="Tag"
+                                    value={itemFieldValues["tag"] || ""}
+                                    options={tags}
+                                    onChange={(value) => handleFieldChange("tag", value, type)}
+                                />
+                            );
+                        }
+
+
+                        if (param.name === "due" || param.name === "notes" || param.name === "name") {
+                            return (
+                                <div className="pt-4 pb-2">
+                                    <h3 className="text-white font-[900] text-[1.6rem] pb-2">{param.name}</h3>
+                                    <input
+                                        key={param.name}
+                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
+                                        placeholder={param.name}
+                                        type="text"
+                                        value={itemFieldValues[param.name] || ""}
+                                        onChange={(event) =>
+                                            handleFieldChange(param.name, event.target.value, type)
+                                        }
+                                    />
+                                </div>
+                            );
+                        }
+
+                        return null;
+                    })
+                ) : (
+                    <></>
+                )}
+            </div>
+        );
+    };
 
     const renderDiscordFields = () => {
     if (!selectedItem) return null;
