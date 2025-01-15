@@ -577,3 +577,35 @@ func TestLoginWithService(test *testing.T) {
 		require.EqualError(test, err, "Email address already used")
 	})
 }
+
+func TestGetUser(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, nil)
+
+		_, err := userService.GetUser("test@test.com", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("Fail find user"))
+
+		_, err := userService.GetUser("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail find user")
+	})
+}
