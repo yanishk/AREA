@@ -325,3 +325,9 @@ func TestCreateUser(test *testing.T) {
 		require.EqualError(test, err, "Email address already used")
 	})
 }
+
+func TestCreateToken(test *testing.T) {
+	_, err := createToken("email", "basic")
+
+	require.NoError(test, err)
+}
