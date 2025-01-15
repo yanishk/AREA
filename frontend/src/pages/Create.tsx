@@ -495,6 +495,10 @@ const WorkflowBuilder = () => {
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
+        if (!parameters) {
+            return params;
+        }
+
         for (const param of parameters) {
             params[param.name] = valuesSelectedByUser[param.name];
         }
@@ -522,8 +526,7 @@ const WorkflowBuilder = () => {
                         console.error("No gitlab projects found");
                         return;
                     }
-
-                    actionParams[key] = project.id;
+                    actionParams[key] = project.id.toString();
                 }
             );
         } catch (error) {
@@ -564,18 +567,20 @@ const WorkflowBuilder = () => {
         const actionParams = selectedAction
             ? await getActionReactionParams(actionFieldValues, selectedAction.parameters)
             : null;
-
+        console.log("pass 2");
         const reactionParams = selectedReaction
             ? await getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
             : null;
-
+        console.log("pass 3");
         if (selectedActionService?.name === "Gitlab" && actionParams) {
             await getGitlabProjectId(actionParams);
         }
+        console.log("pass 4");
 
         if (selectedReactionService?.name === "Discord" && reactionParams) {
             await handleDiscordParameters(reactionParams);
         }
+        console.log("pass 5");
 
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
@@ -602,6 +607,7 @@ const WorkflowBuilder = () => {
                 }
             });
         }
+        console.log("pass 6");
 
         if (selectedReaction?.parameters) {
             selectedReaction.parameters.forEach((param) => {
@@ -610,6 +616,7 @@ const WorkflowBuilder = () => {
                 }
             });
         }
+        console.log("pass 7");
 
         navigate("/explore");
 
@@ -626,6 +633,7 @@ const WorkflowBuilder = () => {
                 withCredentials: true,
             }
         );
+        console.log("pass 8"    );
 
         sessionStorage.removeItem("state-data");
         setSelectedActionService(null);
