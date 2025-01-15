@@ -41,7 +41,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [channels, setChannels] = useState<string[]>([]);
     const [channelsId, setChannelsId] = useState<string[]>([]);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
-    const [workspacesId, setWorkspacesId] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
     const [projectsId, setProjectsId] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
@@ -229,6 +228,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         if (param.name === "workspace") {
                             return (
                                 <SelectField
+                                    key={param.name}
                                     label="Workspace"
                                     value={selectedWorkspaceName || ""}
                                     options={workspaces}
