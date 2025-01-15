@@ -540,10 +540,24 @@ const WorkflowBuilder = () => {
                 if (param.type === "int" && actionParams && actionParams[param.name]) {
                     if (param.name === "month" && actionParams && actionParams[param.name]) {
                         const monthName = actionParams[param.name];
-                        actionParams[param.name] = monthType[monthName] || null;
-                    } else {
-                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                        return actionParams[param.name] = monthType[monthName] || null;
                     }
+                    if (param.name === "hour" && actionParams && actionParams[param.name]) {
+                        const hourValue = actionParams[param.name];
+                        const [hour, period] = hourValue.split(" ");
+                        let hourInt = parseInt(hour, 10);
+
+                        if (period === "PM" && hourInt !== 12) {
+                            hourInt += 12;
+                        }
+                        if (period === "AM" && hourInt === 12) {
+                            hourInt = 0;
+                        }
+
+                        return actionParams[param.name] = hourInt;
+                    }
+
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
                 }
             });
         }
@@ -555,6 +569,10 @@ const WorkflowBuilder = () => {
                 }
             });
         }
+
+        console.log("action ici : ", actionParams);
+
+        return;
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
