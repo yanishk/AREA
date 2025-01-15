@@ -1,10 +1,13 @@
 package user_service
 
 import (
+	"errors"
 	"io"
 	"net/http"
+	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"backend/src/entities"
 )
@@ -262,4 +265,63 @@ func (m *MockUserServiceRepository) UpdateUserServiceByServiceIdAndUserId(userId
 func (m *MockUserServiceRepository) DeleteUserServiceByUserId(userId string) error {
 	args := m.Called(userId)
 	return args.Error(0)
+}
+
+func TestCreateUser(test *testing.T) {
+	test.Run("Successful No Basic", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+
+		userService := &UserService{
+			UserRepository:    mockUserRepo,
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Spotify").
+			Return(entities.Service{}, nil)
+
+		mockUserRepo.On("CreateUser", "test@test.com", "", "Spotify").
+			Return(nil)
+
+		err := userService.CreateUser("test@test.com", "test", "Spotify")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+
+		userService := &UserService{
+			UserRepository:    mockUserRepo,
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Spotify").
+			Return(entities.Service{}, errors.New("Fail Find Service"))
+
+		err := userService.CreateUser("test@test.com", "test", "Spotify")
+
+		require.EqualError(test, err, "Connection type doesn't exist")
+	})
+
+	test.Run("Fail Create User", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+
+		userService := &UserService{
+			UserRepository:    mockUserRepo,
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Spotify").
+			Return(entities.Service{}, nil)
+
+		mockUserRepo.On("CreateUser", "test@test.com", "", "Spotify").
+			Return(errors.New("Fail Create User"))
+
+		err := userService.CreateUser("test@test.com", "test", "Spotify")
+
+		require.EqualError(test, err, "Email address already used")
+	})
 }
