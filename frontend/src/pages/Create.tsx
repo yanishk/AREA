@@ -13,6 +13,7 @@ import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
 import getFieldValues from "../utils/getFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
+import { monthType } from "../utils/monthType";
 
 type availableActionsType = {
     name: string;
@@ -471,56 +472,20 @@ const WorkflowBuilder = () => {
 
     }, [selectedAction, selectedReaction]);
 
-    const getIndexFromValues = (value: string, valuesArray: string[]): number | null => {
-        const index = valuesArray.indexOf(value);
-
-        if (index === -1) {
-            return null;
-        }
-
-        if (valuesArray[0] === "0") {
-            return index;
-        }
-
-        return index + 1;
-    };
-
     const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
         parameters: Parameters[]
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
-        // const handleIntParam = async (key: string, param: Parameters) => {
-        //     const valuesArray = await getFieldValues(param);
-
-        //     if (!valuesArray) {
-        //         return;
-        //     }
-
-        //     const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
-
-        //     console.log("array ici : ", Array);
-
-        //     if (index !== null) {
-        //         params[key] = index;
-        //     }
-        // }
-
         const processKeys = async (key: string) => {
             const param = parameters.find((param) => param.name === key);
-            console.log("key ici ", key);
-            console.log("param ici : ", param);
 
             if (!param) {
                 return;
             }
 
-            // if (param.type === "int") {
-            //     await handleIntParam(key, param);
-            // } else {
-                params[key] = valuesSelectedByUser[key];
-            // }
+            params[key] = valuesSelectedByUser[key];
         }
 
         await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
@@ -570,12 +535,15 @@ const WorkflowBuilder = () => {
             await getGitlabProjectId(actionParams);
         }
 
-        console.log("params ici : ", selectedAction?.parameters);
-
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
                 if (param.type === "int" && actionParams && actionParams[param.name]) {
-                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                    if (param.name === "month" && actionParams && actionParams[param.name]) {
+                        const monthName = actionParams[param.name];
+                        actionParams[param.name] = monthType[monthName] || null;
+                    } else {
+                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                    }
                 }
             });
         }
@@ -587,11 +555,6 @@ const WorkflowBuilder = () => {
                 }
             });
         }
-        console.log("action field value ici : ", actionFieldValues);
-        console.log("action param ici : ", actionParams);
-        console.log("reaction param ici : ", reactionParams);
-
-        return;
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
