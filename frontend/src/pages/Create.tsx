@@ -593,7 +593,10 @@ const WorkflowBuilder = () => {
                 }
                 if (param.name === "day") {
                     const dayName = actionParams?.[param.name];
-                    actionParams[param.name] = dayType[dayName];
+                    if (dayType[dayName] != null)
+                        actionParams[param.name] = dayType[dayName];
+                    else
+                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
                     return actionParams[param.name];
                 }
                 if (param.name === "hour") {
