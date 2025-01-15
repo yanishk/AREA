@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -608,5 +609,245 @@ func TestRefreshToken(test *testing.T) {
 		_, err := userService.refreshToken("refreshToken", "1", "Google")
 
 		require.EqualError(test, err, "Fail update service")
+	})
+}
+
+func TestCallApiAndRefresh(test *testing.T) {
+	test.Run("User not found", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("user not found"))
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.EqualError(test, err, "Could not find requested user")
+	})
+
+	test.Run("Fail Retrieving Service", func(t *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(entities.Service{}, errors.New("service not found"))
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.EqualError(t, err, "service not found")
+	})
+
+	test.Run("Fail Retrieving User service", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(entities.UserService{}, errors.New("user service not found"))
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.EqualError(test, err, "user service not found")
+	})
+
+	test.Run("Refresh successful", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+		var serviceOfUser entities.UserService
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "1"
+
+		serviceOfUser.AccessToken = "accessToken"
+		serviceOfUser.RefreshToken = "refreshToken"
+		serviceOfUser.ExpiryDate = time.Now().Add(-time.Hour).Format(formattingDate)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+				"access_token": "accessToken",
+				"refresh_token": "refreshToken",
+				"expires_in": 3600
+			}`)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, nil)
+
+		mockUserServiceRepo.On("UpdateUserServiceByServiceIdAndUserId", "1", "accessToken", "refreshToken", mock.Anything, "1").
+			Return(nil)
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail refresh", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+		var serviceOfUser entities.UserService
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "1"
+
+		serviceOfUser.AccessToken = "accessToken"
+		serviceOfUser.RefreshToken = "refreshToken"
+		serviceOfUser.ExpiryDate = time.Now().Add(-time.Hour).Format(formattingDate)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+					"access_token": "accessToken",
+					"refresh_token": "refreshToken",
+					"expires_in": 3600
+				}`)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mock.Anything).
+			Return(mockResponse, errors.New("refresh token failed"))
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.EqualError(test, err, "refresh token failed")
+	})
+
+	test.Run("Token not expired", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+		var serviceOfUser entities.UserService
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "1"
+
+		serviceOfUser.AccessToken = "accessToken"
+		serviceOfUser.RefreshToken = "refreshToken"
+		serviceOfUser.ExpiryDate = time.Now().Add(time.Hour).Format(formattingDate)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
+
+		require.NoError(test, err)
 	})
 }
