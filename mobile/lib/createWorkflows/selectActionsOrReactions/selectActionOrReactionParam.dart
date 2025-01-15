@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:developer' as developer;
+import 'package:fluttertoast/fluttertoast.dart';
 
 import "../../custom_widget.dart";
 import "../../globalData.dart";
@@ -93,7 +94,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       actionOrReactionParamStringMap[index] = "${selectedItems[index]}";
       selectedParameterId[index] = idList.first;
       int selectedParamIndex = nameList.indexOf(selectedItems[index] ?? "");
-      if (selectedParameterId[index] != "{") {
+      if (selectedParameterId[index]?[0] != "{") {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = selectedParameterId[index];
       } else {
         CreateData.selectedActionOrReactionData.parameterList[parameterList[index].name] = nameList[selectedParamIndex];
@@ -355,7 +356,28 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
                     String controlerText = textInputController[controllerIndex]!.text;
                     ActionOrReactionsParameter thisParameter = CreateData.selectedActionOrReactionData.parameter[controllerIndex];
                     if (thisParameter.type == "int") {
-                      parameterList[thisParameter.name] = int.parse(controlerText);
+                      if (controlerText.isEmpty) {
+                        Fluttertoast.showToast(
+                          msg: "Parameter ${thisParameter.name} is missing",
+                          toastLength: Toast.LENGTH_SHORT,
+                          backgroundColor: const Color.fromARGB(255, 70, 70, 70),
+                          textColor: Colors.white,
+                          fontSize: 24.0
+                        );
+                        return;
+                      }
+                      try {
+                        parameterList[thisParameter.name] = int.parse(controlerText);
+                      } catch (e) {
+                        Fluttertoast.showToast(
+                          msg: "Parameter ${thisParameter.name} is not a number",
+                          toastLength: Toast.LENGTH_SHORT,
+                          backgroundColor: const Color.fromARGB(255, 70, 70, 70),
+                          textColor: Colors.white,
+                          fontSize: 24.0
+                        );
+                        return;
+                      }
                     } else {
                       parameterList[thisParameter.name] = controlerText;
                     }
