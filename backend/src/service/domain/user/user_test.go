@@ -811,3 +811,20 @@ func TestDeleteAccount(test *testing.T) {
 		require.EqualError(test, err, "Could not delete account")
 	})
 }
+
+func TestFindUserById(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		mockUserRepo.On("FindUserById", "1").
+			Return(entities.User{}, nil)
+
+		_, err := userService.FindUserById("1")
+
+		require.NoError(test, err)
+	})
+}
