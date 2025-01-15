@@ -14,6 +14,7 @@ import { ReactionType } from "../utils/ReactionType";
 import getFieldValues from "../utils/getFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
 import { monthType } from "../utils/monthType";
+import { dayType } from "../utils/dayType";
 import { getDiscordChannels, getServerIdByName, setSelectedServer } from "../utils/DiscordUtils";
 
 type availableActionsType = {
@@ -586,6 +587,10 @@ const WorkflowBuilder = () => {
                     if (param.name === "month" && actionParams && actionParams[param.name]) {
                         const monthName = actionParams[param.name];
                         return actionParams[param.name] = monthType[monthName] || null;
+                    }
+                    if (param.name === "day" && actionParams && actionParams[param.name]) {
+                        const dayName = actionParams[param.name];
+                        return actionParams[param.name] = dayType[dayName] || parseInt(actionParams[param.name], 10);
                     }
                     if (param.name === "hour" && actionParams && actionParams[param.name]) {
                         const [hour, period] = actionParams[param.name].split(" ");
