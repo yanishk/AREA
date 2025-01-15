@@ -263,3 +263,139 @@ func TestGetUser(test *testing.T) {
 		require.EqualError(test, err, "Could not find requested user")
 	})
 }
+
+func TestRetrieveUserServiceAuthenticationStatus(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "2"
+		service.IsAuthNeeded = true
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "2").
+			Return(entities.UserService{}, nil)
+
+		_, err := userService.RetrieveUserServiceAuthenticationStatus("test@test.com", "basic", "Github")
+		require.NoError(test, err)
+	})
+
+	test.Run("User not found", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "2"
+		service.IsAuthNeeded = true
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, errors.New("Could not find requested user"))
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "2").
+			Return(entities.UserService{}, nil)
+
+		_, err := userService.RetrieveUserServiceAuthenticationStatus("test@test.com", "basic", "Github")
+		require.EqualError(test, err, "Could not find requested user")
+	})
+
+	test.Run("Unknown service", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "2"
+		service.IsAuthNeeded = true
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, errors.New("Unknown service"))
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "2").
+			Return(entities.UserService{}, nil)
+
+		_, err := userService.RetrieveUserServiceAuthenticationStatus("test@test.com", "basic", "Github")
+		require.EqualError(test, err, "Unknown service")
+	})
+
+	test.Run("User service not found", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "2"
+		service.IsAuthNeeded = true
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "2").
+			Return(entities.UserService{}, errors.New("User Service not found"))
+
+		answer, err := userService.RetrieveUserServiceAuthenticationStatus("test@test.com", "basic", "Github")
+
+		require.NoError(test, err)
+		require.False(test, answer)
+	})
+}
