@@ -583,31 +583,34 @@ const WorkflowBuilder = () => {
 
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
-                if (param.type === "int" && actionParams && actionParams[param.name]) {
-                    if (param.name === "month" && actionParams && actionParams[param.name]) {
-                        const monthName = actionParams[param.name];
-                        return actionParams[param.name] = monthType[monthName] || null;
-                    }
-                    if (param.name === "day" && actionParams && actionParams[param.name]) {
-                        const dayName = actionParams[param.name];
-                        return actionParams[param.name] = dayType[dayName] || parseInt(actionParams[param.name], 10);
-                    }
-                    if (param.name === "hour" && actionParams && actionParams[param.name]) {
-                        const [hour, period] = actionParams[param.name].split(" ");
-                        let hourInt = parseInt(hour, 10);
-
-                        if (period === "PM" && hourInt !== 12) {
-                            hourInt += 12;
-                        }
-                        if (period === "AM" && hourInt === 12) {
-                            hourInt = 0;
-                        }
-
-                        return actionParams[param.name] = hourInt;
-                    }
-
-                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                if (param.type != "int" || actionParams === null) {
+                    return null;
                 }
+                if (param.name === "month") {
+                    const monthName = actionParams?.[param.name];
+                    actionParams[param.name] = monthType[monthName];
+                    return actionParams[param.name];
+                }
+                if (param.name === "day") {
+                    const dayName = actionParams?.[param.name];
+                    actionParams[param.name] = dayType[dayName];
+                    return actionParams[param.name];
+                }
+                if (param.name === "hour") {
+                    const [hour, period] = actionParams?.[param.name].split(" ");
+                    let hourInt = parseInt(hour, 10);
+
+                    if (period === "PM" && hourInt !== 12) {
+                        hourInt += 12;
+                    }
+                    if (period === "AM" && hourInt === 12) {
+                        hourInt = 0;
+                    }
+                    actionParams[param.name] = hourInt;
+                    return actionParams[param.name];
+                }
+                actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                return actionParams[param.name];
             });
         }
 
