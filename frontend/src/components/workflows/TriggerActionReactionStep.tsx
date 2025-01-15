@@ -288,8 +288,8 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
 
                         if (param.name === "due" || param.name === "notes" || param.name === "name") {
                             return (
-                                <div className="pt-4 pb-2">
-                                    <h3 className="text-white font-[900] text-[1.6rem] pb-2">{param.name}</h3>
+                                <div className="pt-4 pb-2" key={param.name}>
+                                    <h3 className="text-white font-[900] text-[1.6rem] pb-2" key={param.name}>{param.name}</h3>
                                     <input
                                         key={param.name}
                                         className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
