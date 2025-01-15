@@ -41,9 +41,13 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [channels, setChannels] = useState<string[]>([]);
     const [channelsId, setChannelsId] = useState<string[]>([]);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
+    const [workspacesId, setWorkspacesId] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
+    const [projectsId, setProjectsId] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
+    const [assigneesId, setAssigneesId] = useState<string[]>([]);
     const [tags, setTags] = useState<string[]>([]);
+    const [tagsId, setTagsId] = useState<string[]>([]);
     const [selectedWorkspaceName, setSelectedWorkspaceName] = useState<string | null>(null);
     const [selectedServerName, setSelectedServerName] = useState<string | null>(null);
 
@@ -151,26 +155,42 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                 getAsanaTags(workspaceId),
             ]);
 
+            const [projectsId, assigneesId, tagsId] = await Promise.all([
+                getAsanaProjects(workspaceId),
+                getAsanaAssignees(workspaceId),
+                getAsanaTags(workspaceId),
+            ]);
+
             setIsWorkspaceLoaded(true);
             setIsFieldLoading(false);
 
             if (projects.length === 0) {
                 setProjects(["No projects"]);
+                setProjectsId(["No projects"]);
             } else {
-                setProjects(projects.map((project) => project.gid));
+                setProjects(projects.map((project) => project.name));
+                setProjectsId(projectsId.map((project) => project.gid));
             }
 
             if (assignees.length === 0) {
                 setAssignees(["No assignees"]);
+                setAssigneesId(["No assignees"]);
             } else {
-                setAssignees(assignees.map((assignee) => assignee.gid));
+                setAssignees(assignees.map((assignee) => assignee.name));
+                setAssigneesId(assigneesId.map((assignee) => assignee.gid));
             }
 
             if (tags.length === 0) {
                 setTags(["No tags"]);
+                setTagsId(["No tags"]);
             } else {
-                setTags(tags.map((tag) => tag.gid));
+                setTags(tags.map((tag) => tag.name));
+                setTagsId(tagsId.map((tag) => tag.gid));
             }
+            handleFieldChange("project", projectsId[0].gid, type);
+            handleFieldChange("assignee", assigneesId[0].gid, type);
+            handleFieldChange("tag", tagsId[0].gid, type);
+            handleFieldChange("workspace", workspaceId, type);
         }
     };
 
@@ -210,7 +230,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                             return (
                                 <SelectField
                                     label="Workspace"
-                                    value={itemFieldValues["workspace"] || ""}
+                                    value={selectedWorkspaceName || ""}
                                     options={workspaces}
                                     onChange={(value) => handleWorkspaceChange(value)}
                                 />
@@ -218,33 +238,48 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         }
 
                         if (param.name === "project") {
+                            const paramMap = projects.reduce<Record<string, string>>((acc, project, index) => {
+                              acc[project] = projectsId[index];
+                              return acc;
+                            }, {});
                             return (
-                                <SelectField
+                                <SelectFieldId
+                                    key={param.name}
                                     label="Project"
                                     value={itemFieldValues["project"] || ""}
-                                    options={projects}
+                                    paramMap={paramMap}
                                     onChange={(value) => handleFieldChange("project", value, type)}
                                 />
                             );
                         }
 
                         if (param.name === "assignee") {
+                            const paramMap = assignees.reduce<Record<string, string>>((acc, assignee, index) => {
+                              acc[assignee] = assigneesId[index];
+                              return acc;
+                            }, {});
                             return (
-                                <SelectField
+                                <SelectFieldId
+                                    key={param.name}
                                     label="Assignee"
                                     value={itemFieldValues["assignee"] || ""}
-                                    options={assignees}
+                                    paramMap={paramMap}
                                     onChange={(value) => handleFieldChange("assignee", value, type)}
                                 />
                             );
                         }
 
                         if (param.name === "tag") {
+                            const paramMap = tags.reduce<Record<string, string>>((acc, tag, index) => {
+                              acc[tag] = tagsId[index];
+                              return acc;
+                            }, {});
                             return (
-                                <SelectField
+                                <SelectFieldId
+                                    key={param.name}
                                     label="Tag"
                                     value={itemFieldValues["tag"] || ""}
-                                    options={tags}
+                                    paramMap={paramMap}
                                     onChange={(value) => handleFieldChange("tag", value, type)}
                                 />
                             );
