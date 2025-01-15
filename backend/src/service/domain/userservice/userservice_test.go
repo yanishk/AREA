@@ -979,3 +979,78 @@ func TestUpdateTokenForService(test *testing.T) {
 		require.EqualError(test, err, "Could not find requested user")
 	})
 }
+
+func TestRetrieveGithubUserRepositories(test *testing.T) {
+	var user entities.User
+	var service entities.Service
+	var serviceOfUser entities.UserService
+
+	user.Email = "test@test.com"
+	user.Id = "1"
+
+	service.Id = "1"
+
+	serviceOfUser.AccessToken = "accessToken"
+	serviceOfUser.RefreshToken = "refreshToken"
+	serviceOfUser.ExpiryDate = time.Now().Add(time.Hour).Format(formattingDate)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("RequestGithubUserRepositories", "accessToken").
+			Return([]entities.GithubRepository{{}}, nil)
+
+		_, err := userService.RetrieveGithubUserRepositories("test@test.com", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Call api fail", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, errors.New("Call api refresh fail"))
+
+		mockServiceService.On("RequestGithubUserRepositories", "accessToken").
+			Return([]entities.GithubRepository{{}}, nil)
+
+		_, err := userService.RetrieveGithubUserRepositories("test@test.com", "basic")
+
+		require.EqualError(test, err, "Call api refresh fail")
+	})
+}
