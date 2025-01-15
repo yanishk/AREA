@@ -417,3 +417,163 @@ func TestLoginAuthentication(test *testing.T) {
 		require.EqualError(test, err, "Wrong password")
 	})
 }
+
+func TestLoginWithService(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var userInfo entities.UserInfo
+		var user entities.User
+		var resultToken entities.ResultToken
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		userService := &UserService{
+			UserRepository:    mockUserRepo,
+			ServiceRepository: mockServiceRepo,
+			ServiceService:    mockServiceServiceRepo,
+		}
+
+		userInfo.Email = "test@test.com"
+		user.Email = "test@test.com"
+
+		resultToken.AccessToken = "accessToken"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockServiceServiceRepo.On("GetResultTokenFromCode", "code", "service", "login", "web").
+			Return(resultToken, nil)
+
+		mockServiceServiceRepo.On("GetUserInfoFromService", "accessToken", "service").
+			Return(userInfo, nil)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "service").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockUserRepo.On("CreateUser", "test@test.com", "", "service").
+			Return(nil)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "service").
+			Return(user, nil)
+
+		_, err := userService.LoginWithService("code", "service", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceRepo := new(MockServiceRepository)
+
+		userService := &UserService{
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, errors.New("Fail Find Service"))
+
+		_, err := userService.LoginWithService("code", "service", "web")
+
+		require.EqualError(test, err, "Fail Find Service")
+	})
+
+	test.Run("Fail Get Token From Code", func(test *testing.T) {
+		var resultToken entities.ResultToken
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		userService := &UserService{
+			ServiceRepository: mockServiceRepo,
+			ServiceService:    mockServiceServiceRepo,
+		}
+
+		resultToken.AccessToken = "accessToken"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockServiceServiceRepo.On("GetResultTokenFromCode", "code", "service", "login", "web").
+			Return(resultToken, errors.New("Fail get token from code"))
+
+		_, err := userService.LoginWithService("code", "service", "web")
+
+		require.EqualError(test, err, "Fail get token from code")
+	})
+
+	test.Run("Fail Get User Info", func(test *testing.T) {
+		var userInfo entities.UserInfo
+		var resultToken entities.ResultToken
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		userService := &UserService{
+			ServiceRepository: mockServiceRepo,
+			ServiceService:    mockServiceServiceRepo,
+		}
+
+		userInfo.Email = "test@test.com"
+
+		resultToken.AccessToken = "accessToken"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockServiceServiceRepo.On("GetResultTokenFromCode", "code", "service", "login", "web").
+			Return(resultToken, nil)
+
+		mockServiceServiceRepo.On("GetUserInfoFromService", "accessToken", "service").
+			Return(userInfo, errors.New("Fail get user info"))
+
+		_, err := userService.LoginWithService("code", "service", "web")
+
+		require.EqualError(test, err, "Fail get user info")
+	})
+
+	test.Run("Email address already used", func(test *testing.T) {
+		var userInfo entities.UserInfo
+		var user entities.User
+		var resultToken entities.ResultToken
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		userService := &UserService{
+			UserRepository:    mockUserRepo,
+			ServiceRepository: mockServiceRepo,
+			ServiceService:    mockServiceServiceRepo,
+		}
+
+		userInfo.Email = "test@test.com"
+		user.Email = "test@test.com"
+
+		resultToken.AccessToken = "accessToken"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockServiceServiceRepo.On("GetResultTokenFromCode", "code", "service", "login", "web").
+			Return(resultToken, nil)
+
+		mockServiceServiceRepo.On("GetUserInfoFromService", "accessToken", "service").
+			Return(userInfo, nil)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "service").
+			Return(user, errors.New("Fail find user"))
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, nil)
+
+		mockUserRepo.On("CreateUser", "test@test.com", "", "service").
+			Return(errors.New("Fail create user"))
+
+		_, err := userService.LoginWithService("code", "service", "web")
+
+		require.EqualError(test, err, "Email address already used")
+	})
+}
