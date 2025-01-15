@@ -597,7 +597,8 @@ const WorkflowBuilder = () => {
                     return actionParams[param.name];
                 }
                 if (param.name === "hour") {
-                    const [hour, period] = actionParams?.[param.name].split(" ");
+                    const hourParams = actionParams?.[param.name];
+                    const [hour, period] = hourParams.split(" ");
                     let hourInt = parseInt(hour, 10);
 
                     if (period === "PM" && hourInt !== 12) {
@@ -610,13 +611,14 @@ const WorkflowBuilder = () => {
                     return actionParams[param.name];
                 }
                 actionParams[param.name] = parseInt(actionParams[param.name], 10);
-                return actionParams[param.name];
             });
         }
 
         if (selectedReaction?.parameters) {
             selectedReaction.parameters.forEach((param) => {
-                if (param.type === "int" && reactionParams && reactionParams[param.name] && param?.name != "server" && param?.name != "channel") {
+                if (param.type != "int" || reactionParams === null)
+                    return null;
+                if (param?.name != "server" && param?.name != "channel") {
                     reactionParams[param.name] = parseInt(reactionParams[param.name], 10);
                 }
             });
