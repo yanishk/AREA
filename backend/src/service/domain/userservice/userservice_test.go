@@ -1,11 +1,15 @@
 package userservice_service
 
 import (
-	"backend/src/entities"
+	"errors"
 	"io"
 	"net/http"
+	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
 )
 
 type MockUserRepository struct {
@@ -222,4 +226,40 @@ func (m *MockServiceServiceRepository) RequestGitlabUserProjects(accessToken str
 func (m *MockServiceServiceRepository) RetrieveDiscordGuildChannels(guildId string) ([]map[string]interface{}, error) {
 	args := m.Called(guildId)
 	return args.Get(0).([]map[string]interface{}), args.Error(1)
+}
+
+func TestGetUser(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		userService := &UserServiceService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		_, err := userService.GetUser("test@test.com", "basic")
+		require.NoError(test, err)
+	})
+
+	test.Run("User not found", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		userService := &UserServiceService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, errors.New("User not found"))
+
+		_, err := userService.GetUser("test@test.com", "basic")
+		require.EqualError(test, err, "Could not find requested user")
+	})
 }
