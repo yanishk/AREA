@@ -668,3 +668,146 @@ func TestModifyPassword(test *testing.T) {
 		require.EqualError(test, err, "Old password is incorrect")
 	})
 }
+
+func TestDeleteAccount(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var foundUser entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserService{
+			UserRepository:        mockUserRepo,
+			WorkflowRepository:    mockWorkflowRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, nil)
+
+		mockWorkflowRepo.On("DeleteWorkflowByOwnerId", foundUser.Id).
+			Return(nil)
+
+		mockUserServiceRepo.On("DeleteUserServiceByUserId", foundUser.Id).
+			Return(nil)
+
+		mockUserRepo.On("DeleteUser", "test@test.com", "basic").
+			Return(nil)
+
+		err := userService.DeleteAccount("test@test.com", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail find user", func(test *testing.T) {
+		var foundUser entities.User
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, errors.New("Fail find user"))
+
+		err := userService.DeleteAccount("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail find user")
+	})
+
+	test.Run("Fail Delete Workflow", func(test *testing.T) {
+		var foundUser entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		userService := &UserService{
+			UserRepository:     mockUserRepo,
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, nil)
+
+		mockWorkflowRepo.On("DeleteWorkflowByOwnerId", foundUser.Id).
+			Return(errors.New("Fail delete workflow"))
+
+		err := userService.DeleteAccount("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail delete workflow")
+	})
+
+	test.Run("Fail deleter user service", func(test *testing.T) {
+		var foundUser entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserService{
+			UserRepository:        mockUserRepo,
+			WorkflowRepository:    mockWorkflowRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, nil)
+
+		mockWorkflowRepo.On("DeleteWorkflowByOwnerId", foundUser.Id).
+			Return(nil)
+
+		mockUserServiceRepo.On("DeleteUserServiceByUserId", foundUser.Id).
+			Return(errors.New("Fail delete user service"))
+
+		err := userService.DeleteAccount("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail delete user service")
+	})
+
+	test.Run("Fail delete user", func(test *testing.T) {
+		var foundUser entities.User
+
+		mockUserRepo := new(MockUserRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserService{
+			UserRepository:        mockUserRepo,
+			WorkflowRepository:    mockWorkflowRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		foundUser.Email = "test@test.com"
+		foundUser.Id = "1"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(foundUser, nil)
+
+		mockWorkflowRepo.On("DeleteWorkflowByOwnerId", foundUser.Id).
+			Return(nil)
+
+		mockUserServiceRepo.On("DeleteUserServiceByUserId", foundUser.Id).
+			Return(nil)
+
+		mockUserRepo.On("DeleteUser", "test@test.com", "basic").
+			Return(errors.New("Fail delete user"))
+
+		err := userService.DeleteAccount("test@test.com", "basic")
+
+		require.EqualError(test, err, "Could not delete account")
+	})
+}
