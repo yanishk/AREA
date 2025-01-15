@@ -21,6 +21,7 @@ func main() {
 	_, errCronCreationEveryMinute := cronJob.AddFunc("@every 1m", func() {
 		services.WorkflowService.CheckTimeAndDateActions()
 		services.WorkflowService.CheckNewGitlabWorkflows()
+		services.WorkflowService.CheckNewGithubWorkflows()
 		services.WorkflowService.CheckGithubActions()
 	})
 	if errCronCreationEveryMinute != nil {
