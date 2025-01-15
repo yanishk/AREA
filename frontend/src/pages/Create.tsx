@@ -491,32 +491,36 @@ const WorkflowBuilder = () => {
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
-        const handleIntParam = async (key: string, param: Parameters) => {
-            const valuesArray = await getFieldValues(param);
+        // const handleIntParam = async (key: string, param: Parameters) => {
+        //     const valuesArray = await getFieldValues(param);
 
-            if (!valuesArray) {
-                return;
-            }
+        //     if (!valuesArray) {
+        //         return;
+        //     }
 
-            const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
+        //     const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
 
-            if (index !== null) {
-                params[key] = index;
-            }
-        }
+        //     console.log("array ici : ", Array);
+
+        //     if (index !== null) {
+        //         params[key] = index;
+        //     }
+        // }
 
         const processKeys = async (key: string) => {
             const param = parameters.find((param) => param.name === key);
+            console.log("key ici ", key);
+            console.log("param ici : ", param);
 
             if (!param) {
                 return;
             }
 
-            if (param.type === "int") {
-                await handleIntParam(key, param);
-            } else {
+            // if (param.type === "int") {
+            //     await handleIntParam(key, param);
+            // } else {
                 params[key] = valuesSelectedByUser[key];
-            }
+            // }
         }
 
         await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
@@ -562,9 +566,32 @@ const WorkflowBuilder = () => {
             ? await getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
             : null;
 
-            if (selectedActionService?.name === "Gitlab" && actionParams) {
-                await getGitlabProjectId(actionParams);
-            }
+        if (selectedActionService?.name === "Gitlab" && actionParams) {
+            await getGitlabProjectId(actionParams);
+        }
+
+        console.log("params ici : ", selectedAction?.parameters);
+
+        if (selectedAction?.parameters) {
+            selectedAction.parameters.forEach((param) => {
+                if (param.type === "int" && actionParams && actionParams[param.name]) {
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                }
+            });
+        }
+
+        if (selectedReaction?.parameters) {
+            selectedReaction.parameters.forEach((param) => {
+                if (param.type === "int" && reactionParams && reactionParams[param.name]) {
+                    reactionParams[param.name] = parseInt(reactionParams[param.name], 10);
+                }
+            });
+        }
+        console.log("action field value ici : ", actionFieldValues);
+        console.log("action param ici : ", actionParams);
+        console.log("reaction param ici : ", reactionParams);
+
+        return;
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
