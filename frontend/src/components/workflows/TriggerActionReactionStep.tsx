@@ -189,7 +189,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             if (channels.length === 0) {
                 setChannels(["No channels"]);
             } else {
-                setChannels(channels.map((channel) => channel.name));
+                setChannels(channels.map((channel) => channel.id));
             }
         }
     };
