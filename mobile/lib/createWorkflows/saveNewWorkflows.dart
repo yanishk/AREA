@@ -32,7 +32,7 @@ class APICall extends StatefulWidget {
 class SaveNewWorkflows extends State<APICall> {
   TextEditingController workflowTitleController = new TextEditingController(
       text:
-          "If ${CreateData.serviceAction.name}, Then ${CreateData.reactionServiceList[Globaldata.secondService].name} : ${CreateData.serviceReaction.name}");
+          "If ${CreateData.serviceAction.name}, Then ${CreateData.reactionServiceList[Globaldata.reactionServiceIndex].name} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflows";
   String email = Globaldata.userInfos.email;
   String defaultWorkflowName = "";
@@ -40,13 +40,13 @@ class SaveNewWorkflows extends State<APICall> {
   @override
   void initState() {
     super.initState();
-    defaultWorkflowName = "If ${CreateData.serviceAction.name} ";
     developer.log("${CreateData.actionParamListName}");
     developer.log("${CreateData.reactionParamListName}");
+    defaultWorkflowName = "If ${CreateData.serviceAction.name} ";
     for (int i = 0; i < CreateData.actionParamListName.length; i++) {
       defaultWorkflowName += "${CreateData.actionParamListName[i]} ";
     }
-    defaultWorkflowName += ", Then ${CreateData.reactionServiceList[Globaldata.secondService].name} ${CreateData.serviceReaction.name} ";
+    defaultWorkflowName += ", Then ${CreateData.reactionServiceList[Globaldata.reactionServiceIndex].name} ${CreateData.serviceReaction.name} ";
     for (int i = 0; i < CreateData.reactionParamListName.length; i++) {
       defaultWorkflowName += "${CreateData.reactionParamListName[i]} ";
     }
@@ -112,14 +112,14 @@ class SaveNewWorkflows extends State<APICall> {
                       children: [
                         SafeWebImage(
                           url:
-                              "${Globaldata.domainName}${CreateData.actionServiceList[Globaldata.firstService].icon}",
+                              "${Globaldata.domainName}${CreateData.serviceAction.icon}",
                           width: 30,
                           height: 30,
                         ),
                         Padding(padding: EdgeInsets.only(left: 10)),
                         SafeWebImage(
                           url:
-                              "${Globaldata.domainName}${CreateData.reactionServiceList[Globaldata.secondService].icon}",
+                              "${Globaldata.domainName}${CreateData.serviceReaction.icon}",
                           width: 30,
                           height: 30,
                         ),

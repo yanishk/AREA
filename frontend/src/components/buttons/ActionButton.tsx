@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 
-interface CancelButtonProps {
+interface ActionButtonProps {
     onClick: () => void;
     text: string;
     textColor: string;
@@ -9,7 +9,7 @@ interface CancelButtonProps {
     bgColor: string;
 }
 
-const CancelButton: React.FC<CancelButtonProps> = ({ onClick, text, textColor, borderColor, bgColor }) => {
+const ActionButton: React.FC<ActionButtonProps> = ({ onClick, text, textColor, borderColor, bgColor }) => {
     return (
         <button
             onClick={onClick}
@@ -25,4 +25,4 @@ const CancelButton: React.FC<CancelButtonProps> = ({ onClick, text, textColor, b
     );
 };
 
-export default CancelButton;
+export default ActionButton;

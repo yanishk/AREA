@@ -80,6 +80,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
           allActionOrReactionList[i].name,
           allActionOrReactionList[i].description,
           allActionOrReactionList[i].serviceid,
+          CreateData.actualServiceList[serviceIndex].icon,
           allActionOrReactionList[i].parameter,
         ));
         ActionOrReactionButtonsList.add(
@@ -112,6 +113,10 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
       Globaldata.myContext,
       MaterialPageRoute(builder: (context) => SelectParamActionOrReactionPage()),
     );
+    if (!CreateData.selectOrUpdateWorkflow) {
+      Navigator.pop(Globaldata.myContext);
+      return;
+    }
     actionOrReactionList[index] = CreateData.selectedActionOrReactionData;
     if (isAnAction) {
       CreateData.serviceAction = actionOrReactionList[index];

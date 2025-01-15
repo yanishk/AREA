@@ -35,23 +35,23 @@ func (self *ServiceHandler) setupRoutes(router *gin.Engine) {
 
 func (self *ServiceHandler) publicRoutes(router *gin.Engine) {
 	router.GET("/authentication", self.oauth2Service)
+	router.GET("/services", self.retrieveAllServices)
+	service := router.Group("/:service")
+	{
+		service.GET("/actions", self.retrieveActionsFromService)
+		service.GET("/reactions", self.retrieveReactionsFromService)
+	}
 }
 
 func (self *ServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	services := private.Group("/services")
 	{
-		services.GET("", self.retrieveAllServices)
 		services.GET("/actions", self.retrieveActionsServices)
 		services.GET("/reactions", self.retrieveReactionsServices)
 		services.GET("/:id", self.retrieveServiceById)
 		services.GET("/action/:actionid", self.retrieveServiceByActionId)
 		services.GET("/reaction/:reactionid", self.retrieveServiceByReactionId)
-	}
-	service := private.Group("/:service")
-	{
-		service.GET("/actions", self.retrieveActionsFromService)
-		service.GET("/reactions", self.retrieveReactionsFromService)
 	}
 	private.GET("discord/server/channels", self.getDiscordGuildChannels)
 }

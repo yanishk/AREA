@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar/Navbar";
 import getServiceDetails from "../utils/GetServiceDetails";
-import CancelButton from "../components/buttons/CancelButton";
+import ActionButton from "../components/buttons/ActionButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { getUserName } from "../utils/GetUserName";
 
@@ -70,7 +70,7 @@ const WorkflowDetail = () => {
             });
 
             if (result.data.success) {
-                navigate("/explore");
+                navigate("/my_workflows");
             }
 
         } catch (error) {
@@ -144,23 +144,6 @@ const WorkflowDetail = () => {
         fetchUserName();
     }, []);
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-            handleSaveName();
-        }
-    };
-
-    useEffect(() => {
-        if (isEditing) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isEditing]);
-
     if (loading) {
         return;
     }
@@ -175,7 +158,7 @@ const WorkflowDetail = () => {
                 />
                 <div className="flex items-center justify-between px-10 py-5">
                     <div>
-                        <CancelButton
+                        <ActionButton
                             text="Back"
                             textColor="text-white"
                             borderColor="border-white"
@@ -217,7 +200,6 @@ const WorkflowDetail = () => {
                                 >
                                     <button
                                         className="text-white font-bold text-[16px] underline cursor-pointer"
-                                        onClick={handleSaveName}
                                     >
                                         Save
                                     </button>

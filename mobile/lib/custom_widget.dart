@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
+import 'globalData.dart';
+
 class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
@@ -511,4 +513,90 @@ class HexColor extends Color {
   }
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
+
+class SquareServicesCard extends StatelessWidget {
+  const SquareServicesCard({
+    super.key,
+    required this.name,
+    required this.color,
+    this.imageUrl = "",
+    this.onTap,
+  });
+
+  final String name;
+  final Color color;
+  final String imageUrl;
+  final void Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Container(
+        width: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
+        height: (MediaQuery.sizeOf(Globaldata.myContext).width / 2) - 25,
+        decoration: BoxDecoration(
+          color: color,
+          border: Border.all(
+            color: color,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(6.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SafeWebImage(
+                url: "${Globaldata.domainName}$imageUrl",
+                width: 50,
+                height: 50,
+              ),
+              AutoSizeText(
+                name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white
+                ),
+                maxLines: 1,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EditWheel extends StatelessWidget {
+  const EditWheel({
+    super.key,
+    this.onPressed,
+    this.color = Colors.white,
+  });
+  final void Function()? onPressed;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(
+        Icons.settings,
+        size: 32,
+        color: color,
+      ),
+    );
+  }
 }

@@ -47,7 +47,7 @@ class ExplorePageMain extends State<ExplorePageStateful> {
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
             AutoSizeText(
-              "AREA",
+              "Explore",
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w900,

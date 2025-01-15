@@ -168,8 +168,8 @@ class EditAccount extends State<APICall> {
         child: Column(
           children: [
             Padding(padding: EdgeInsets.only(top: 30)),
-            AutoSizeText("Account",
-              style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.black,),
+            AutoSizeText("Account settings",
+              style: TextStyle(fontSize: 30,fontWeight: FontWeight.w900,color: Colors.black,),
               maxLines: 1,
             ),
             SizedBox(width: 16),

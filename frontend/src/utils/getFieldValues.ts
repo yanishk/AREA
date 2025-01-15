@@ -1,8 +1,7 @@
 import axios from "axios";
 import { Parameters } from "./ActionReactionParameters";
 import { getAsanaWorkspaces } from "./AsanaUtils";
-
-export const gitlabNameToIdMap: Record<string, number> = {};
+import { getDiscordServers } from "./DiscordUtils";
 
 interface GitlabParams {
     id: number;
@@ -51,13 +50,7 @@ const handleService = async (route: string, param: Parameters, serviceName: stri
         if (serviceName === "gitlab") {
             const result = await getGitlabFieldValues(route);
 
-            if (result.data?.projects) {
-                result.data.projects.forEach((item) => {
-                    gitlabNameToIdMap[item.name] = item.id;
-                });
-
-                return result.data.projects.map((item) => item.name);
-            }
+            return result.data.projects.map((item) => item.name);
         }
 
         if (serviceName === "github") {
@@ -74,6 +67,13 @@ const handleService = async (route: string, param: Parameters, serviceName: stri
             if (param.route === "/asana/user/workspaces") {
                 const workspaces = await getAsanaWorkspaces();
                 return workspaces.map((workspace) => workspace.name);
+            }
+        }
+
+        if (serviceName === "discord") {
+            if (param.route === "/discord/user/servers") {
+                const servers = await getDiscordServers();
+                return servers.map((server) => server.name);
             }
         }
 
@@ -105,6 +105,8 @@ const getFieldValues = async (param: Parameters): Promise<string[] | undefined> 
                 return handleService(param.route, param, "github");
             case "asana":
                 return handleService(param.route, param, "asana");
+            case "discord":
+                return handleService(param.route, param, "discord");
         }
     }
 
