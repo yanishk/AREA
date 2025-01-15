@@ -206,14 +206,13 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             <div className="w-full max-w-[520px] mx-auto">
                 {isWorkspaceLoaded ? (
                     selectedItem.parameters.map((param) => {
-                        console.log(param.name)
                         if (param.name === "workspace") {
                             return (
                                 <SelectField
                                     label="Workspace"
                                     value={itemFieldValues["workspace"] || ""}
                                     options={workspaces}
-                                    onChange={(value) => handleFieldChange("workspace", value, type)}
+                                    onChange={(value) => handleWorkspaceChange(value)}
                                 />
                             );
                         }
