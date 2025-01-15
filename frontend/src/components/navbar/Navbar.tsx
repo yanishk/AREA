@@ -256,48 +256,46 @@ const Navbar: React.FC<NavbarProps> = ({ bgColor, isWhiteMode }) => {
                                 </>
                             ) : (
                                 <>
-                                    <>
-                                        <TEDropdownItem>
-                                            <NavbarLink
-                                                href="/explore"
-                                                text="Explore"
-                                                textColor="text-[#222222]"
-                                                hoverColor="hover:text-[#444444]"
-                                            />
-                                        </TEDropdownItem>
-                                        <TEDropdownItem>
-                                            <NavbarLink
-                                                href="/my_workflows"
-                                                text="My workflows"
-                                                textColor="text-[#222222]"
-                                                hoverColor="hover:text-[#444444]"
-                                            />
-                                        </TEDropdownItem>
-                                        <TEDropdownItem>
-                                            <NavbarLink
-                                                href="/create"
-                                                text="Create"
-                                                textColor="text-[#222222]"
-                                                hoverColor="hover:text-[#444444]"
-                                            />
-                                        </TEDropdownItem>
-                                        <TEDropdownItem>
-                                            <button
-                                                onClick={handleLogout}
-                                                className="text-[#222222] font-bold text-[20px] ml-3"
-                                            >
-                                                Log out
-                                            </button>
-                                        </TEDropdownItem>
-                                        <TEDropdownItem>
-                                            <NavbarLink
-                                                href="/settings"
-                                                text="Account"
-                                                textColor="text-[#222222]"
-                                                hoverColor="hover:text-[#444444]"
-                                            />
-                                        </TEDropdownItem>
-                                    </>
+                                    <TEDropdownItem>
+                                        <NavbarLink
+                                            href="/explore"
+                                            text="Explore"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                    </TEDropdownItem>
+                                    <TEDropdownItem>
+                                        <NavbarLink
+                                            href="/my_workflows"
+                                            text="My workflows"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                    </TEDropdownItem>
+                                    <TEDropdownItem>
+                                        <NavbarLink
+                                            href="/create"
+                                            text="Create"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                    </TEDropdownItem>
+                                    <TEDropdownItem>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="text-[#222222] font-bold text-[20px] ml-3"
+                                        >
+                                            Log out
+                                        </button>
+                                    </TEDropdownItem>
+                                    <TEDropdownItem>
+                                        <NavbarLink
+                                            href="/settings"
+                                            text="Account"
+                                            textColor="text-[#222222]"
+                                            hoverColor="hover:text-[#444444]"
+                                        />
+                                    </TEDropdownItem>
                                 </>
                             )}
                         </TEDropdownMenu>
