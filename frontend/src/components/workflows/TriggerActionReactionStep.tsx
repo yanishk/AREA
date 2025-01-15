@@ -7,6 +7,7 @@ import DynamicFields from "../inputs/DynamicFields";
 import ActionButton from "../buttons/ActionButton";
 import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
 import SelectField from "../inputs/SelectField";
+import SelectFieldId from "../inputs/SelectFieldId";
 import getFieldValues from "../../utils/getFieldValues";
 import { getDiscordChannels, getDiscordServers, getServerIdByName, setSelectedServer } from "../../utils/DiscordUtils";
 
@@ -38,6 +39,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [discordField, setDiscordField] = useState(false);
     const [servers, setServers] = useState<string[]>([]);
     const [channels, setChannels] = useState<string[]>([]);
+    const [channelsId, setChannelsId] = useState<string[]>([]);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
@@ -182,14 +184,17 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             setSelectedServer(serverId, serverName);
 
             const channels = await getDiscordChannels(serverId);
+            const channelsId = await getDiscordChannels(serverId);
 
             setIsServerLoaded(true);
             setIsFieldLoading(false);
 
             if (channels.length === 0) {
                 setChannels(["No channels"]);
+                setChannelsId(["No channels"]);
             } else {
-                setChannels(channels.map((channel) => channel.id));
+                setChannels(channels.map((channel) => channel.name));
+                setChannelsId(channelsId.map((channel) => channel.id));
             }
         }
     };
@@ -252,12 +257,16 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     }
 
                     if (param.name === "channel") {
+                        const paramMap = channels.reduce<Record<string, string>>((acc, channel, index) => {
+                          acc[channel] = channelsId[index];
+                          return acc;
+                        }, {});
                         return (
-                            <SelectField
+                            <SelectFieldId
                                 key={param.name}
                                 label="Channel"
                                 value={itemFieldValues["channel"] || ""}
-                                options={channels}
+                                paramMap={paramMap}
                                 onChange={(value) => handleFieldChange("channel", value, type)}
                             />
                         );
