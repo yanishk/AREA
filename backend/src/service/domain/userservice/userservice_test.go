@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -397,5 +398,215 @@ func TestRetrieveUserServiceAuthenticationStatus(test *testing.T) {
 
 		require.NoError(test, err)
 		require.False(test, answer)
+	})
+}
+
+func TestRefreshToken(test *testing.T) {
+	mockService := entities.Service{
+		Id:   "1",
+		Name: "Google",
+	}
+
+	test.Run("Successful", func(test *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+				"access_token": "accessToken",
+				"refresh_token": "refreshToken",
+				"expires_in": 3600}`,
+			)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(mockService, nil)
+
+		mockUserServiceRepo.On("UpdateUserServiceByServiceIdAndUserId", "1", "accessToken", "refreshToken", mock.Anything, mockService.Id).
+			Return(nil)
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Unknown service", func(test *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		_, err := userService.refreshToken("refreshToken", "1", "false")
+
+		require.EqualError(test, err, "Unknown service")
+	})
+
+	test.Run("Request error", func(test *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, errors.New("request error"))
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.EqualError(test, err, "request error")
+	})
+
+	test.Run("Fail Execute", func(test *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+			"access_token": "accessToken",
+			"refresh_token": "refreshToken",
+			"expires_in": 3600}`,
+			)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, errors.New("Fail execute"))
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.EqualError(test, err, "Fail execute")
+	})
+
+	test.Run("Fail Decode", func(t *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`invalid json`)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, nil)
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.Error(test, err)
+	})
+
+	test.Run("Fail Find Service", func(t *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+			"access_token": "accessToken",
+			"refresh_token": "refreshToken",
+			"expires_in": 3600}`,
+			)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(mockService, errors.New("Fail find service"))
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail update", func(t *testing.T) {
+		mockServiceService := new(MockServiceServiceRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			ServiceService:        mockServiceService,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockRequest := &http.Request{}
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+			"access_token": "accessToken",
+			"refresh_token": "refreshToken",
+			"expires_in": 3600}`,
+			)),
+		}
+
+		mockServiceService.On("GetGoogleRefreshTokenRequest", "refreshToken").
+			Return(mockRequest, nil)
+
+		mockServiceService.On("ExecuteRequest", mockRequest).
+			Return(mockResponse, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(mockService, nil)
+
+		mockUserServiceRepo.On("UpdateUserServiceByServiceIdAndUserId", "1", "accessToken", "refreshToken", mock.Anything, mockService.Id).
+			Return(errors.New("Fail update service"))
+
+		_, err := userService.refreshToken("refreshToken", "1", "Google")
+
+		require.EqualError(test, err, "Fail update service")
 	})
 }
