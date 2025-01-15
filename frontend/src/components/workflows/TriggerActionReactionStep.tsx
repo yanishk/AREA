@@ -7,6 +7,7 @@ import DynamicFields from "../inputs/DynamicFields";
 import ActionButton from "../buttons/ActionButton";
 import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
 import SelectField from "../inputs/SelectField";
+import SelectFieldId from "../inputs/SelectFieldId";
 import getFieldValues from "../../utils/getFieldValues";
 import { getDiscordChannels, getDiscordServers, getServerIdByName, setSelectedServer } from "../../utils/DiscordUtils";
 
@@ -38,6 +39,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     const [discordField, setDiscordField] = useState(false);
     const [servers, setServers] = useState<string[]>([]);
     const [channels, setChannels] = useState<string[]>([]);
+    const [channelsId, setChannelsId] = useState<string[]>([]);
     const [workspaces, setWorkspaces] = useState<string[]>([]);
     const [projects, setProjects] = useState<string[]>([]);
     const [assignees, setAssignees] = useState<string[]>([]);
@@ -155,19 +157,19 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             if (projects.length === 0) {
                 setProjects(["No projects"]);
             } else {
-                setProjects(projects.map((project) => project.name));
+                setProjects(projects.map((project) => project.gid));
             }
 
             if (assignees.length === 0) {
                 setAssignees(["No assignees"]);
             } else {
-                setAssignees(assignees.map((assignee) => assignee.name));
+                setAssignees(assignees.map((assignee) => assignee.gid));
             }
 
             if (tags.length === 0) {
                 setTags(["No tags"]);
             } else {
-                setTags(tags.map((tag) => tag.name));
+                setTags(tags.map((tag) => tag.gid));
             }
         }
     };
@@ -182,55 +184,100 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
             setSelectedServer(serverId, serverName);
 
             const channels = await getDiscordChannels(serverId);
+            const channelsId = await getDiscordChannels(serverId);
 
             setIsServerLoaded(true);
             setIsFieldLoading(false);
 
             if (channels.length === 0) {
                 setChannels(["No channels"]);
+                setChannelsId(["No channels"]);
             } else {
-                setChannels(channels.map((channel) => channel.id));
+                setChannels(channels.map((channel) => channel.name));
+                setChannelsId(channelsId.map((channel) => channel.id));
             }
         }
     };
 
-    const renderAsanaFields = () => (
-        <div className="w-full max-w-[520px] mx-auto">
-            <SelectField
-                label="Workspace"
-                value={selectedWorkspaceName || ""}
-                options={workspaces}
-                onChange={(value) => handleWorkspaceChange(value)}
-            />
+    const renderAsanaFields = () => {
+        if (!selectedItem) return null;
 
-            {isWorkspaceLoaded ? (
-                <>
-                    <SelectField
-                        label="Project"
-                        value={itemFieldValues["project"] || ""}
-                        options={projects}
-                        onChange={(value) => handleFieldChange("project", value, type)}
-                    />
+        return (
+            <div className="w-full max-w-[520px] mx-auto">
+                {isWorkspaceLoaded ? (
+                    selectedItem.parameters.map((param) => {
+                        console.log(param.name)
+                        if (param.name === "workspace") {
+                            return (
+                                <SelectField
+                                    label="Workspace"
+                                    value={itemFieldValues["workspace"] || ""}
+                                    options={workspaces}
+                                    onChange={(value) => handleFieldChange("workspace", value, type)}
+                                />
+                            );
+                        }
 
-                    <SelectField
-                        label="Assignee"
-                        value={itemFieldValues["assignee"] || ""}
-                        options={assignees}
-                        onChange={(value) => handleFieldChange("assignee", value, type)}
-                    />
+                        if (param.name === "project") {
+                            return (
+                                <SelectField
+                                    label="Project"
+                                    value={itemFieldValues["project"] || ""}
+                                    options={projects}
+                                    onChange={(value) => handleFieldChange("project", value, type)}
+                                />
+                            );
+                        }
 
-                    <SelectField
-                        label="Tag"
-                        value={itemFieldValues["tag"] || ""}
-                        options={tags}
-                        onChange={(value) => handleFieldChange("tag", value, type)}
-                    />
-                </>
-            ) : (
-                <></>
-            )}
-        </div>
-    );
+                        if (param.name === "assignee") {
+                            return (
+                                <SelectField
+                                    label="Assignee"
+                                    value={itemFieldValues["assignee"] || ""}
+                                    options={assignees}
+                                    onChange={(value) => handleFieldChange("assignee", value, type)}
+                                />
+                            );
+                        }
+
+                        if (param.name === "tag") {
+                            return (
+                                <SelectField
+                                    label="Tag"
+                                    value={itemFieldValues["tag"] || ""}
+                                    options={tags}
+                                    onChange={(value) => handleFieldChange("tag", value, type)}
+                                />
+                            );
+                        }
+
+
+                        if (param.name === "due" || param.name === "notes" || param.name === "name") {
+                            return (
+                                <div className="pt-4 pb-2">
+                                    <h3 className="text-white font-[900] text-[1.6rem] pb-2">{param.name}</h3>
+                                    <input
+                                        key={param.name}
+                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
+                                        placeholder={param.name}
+                                        type="text"
+                                        value={itemFieldValues[param.name] || ""}
+                                        onChange={(event) =>
+                                            handleFieldChange(param.name, event.target.value, type)
+                                        }
+                                    />
+                                </div>
+                            );
+                        }
+
+                        return null;
+                    })
+                ) : (
+                    <></>
+                )}
+            </div>
+        );
+    };
 
     const renderDiscordFields = () => {
     if (!selectedItem) return null;
@@ -252,12 +299,16 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     }
 
                     if (param.name === "channel") {
+                        const paramMap = channels.reduce<Record<string, string>>((acc, channel, index) => {
+                          acc[channel] = channelsId[index];
+                          return acc;
+                        }, {});
                         return (
-                            <SelectField
+                            <SelectFieldId
                                 key={param.name}
                                 label="Channel"
                                 value={itemFieldValues["channel"] || ""}
-                                options={channels}
+                                paramMap={paramMap}
                                 onChange={(value) => handleFieldChange("channel", value, type)}
                             />
                         );
