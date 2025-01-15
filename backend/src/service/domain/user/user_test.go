@@ -331,3 +331,89 @@ func TestCreateToken(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestLoginAuthentication(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Password = "$2a$12$tlM/vFPpczFORp7v.jrJfuZ9sz0/hAuADl86YDdohIDujKwCSq08y"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		_, err := userService.LoginAuthentication("test@test.com", "test", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Connection type", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Password = "$2a$12$tlM/vFPpczFORp7v.jrJfuZ9sz0/hAuADl86YDdohIDujKwCSq08y"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		_, err := userService.LoginAuthentication("test@test.com", "test", "fail")
+
+		require.EqualError(test, err, "Wrong password")
+	})
+
+	test.Run("Fail Find User", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Password = "$2a$12$tlM/vFPpczFORp7v.jrJfuZ9sz0/hAuADl86YDdohIDujKwCSq08y"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, errors.New("Fail Find User"))
+
+		_, err := userService.LoginAuthentication("test@test.com", "test", "basic")
+
+		require.EqualError(test, err, "Could not find requested user")
+	})
+
+	test.Run("Invalid Password", func(test *testing.T) {
+		var user entities.User
+
+		mockUserRepo := new(MockUserRepository)
+
+		userService := &UserService{
+			UserRepository: mockUserRepo,
+		}
+
+		user.Email = "test@test.com"
+		user.Password = "$2a$12$tlM/vFPpczFORp7v.jrJfuZ9sz0/hAuADl86YDdohIDujKwCSq08y"
+		user.ConnectionType = "basic"
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		_, err := userService.LoginAuthentication("test@test.com", "fail", "basic")
+
+		require.EqualError(test, err, "Wrong password")
+	})
+}
