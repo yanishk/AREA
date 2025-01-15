@@ -1615,3 +1615,54 @@ func TestDecodeRequiredWorkspaceInfo(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestRetrieveAsanaWorkspaceAssignees(test *testing.T) {
+	var user entities.User
+	var service entities.Service
+	var serviceOfUser entities.UserService
+
+	user.Email = "test@test.com"
+	user.Id = "1"
+
+	service.Id = "1"
+
+	serviceOfUser.AccessToken = "accessToken"
+	serviceOfUser.RefreshToken = "refreshToken"
+	serviceOfUser.ExpiryDate = time.Now().Add(time.Hour).Format(formattingDate)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`
+				{"data":[{"gid":"1209091057287055","name":"Cross-functional project plan","resource_type":"project"}]}
+			`)),
+		}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Asana").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://app.asana.com/api/1.0/workspaces/1/users", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := userService.RetrieveAsanaWorkspaceAssignees("test@test.com", "basic", "1")
+
+		require.NoError(test, err)
+	})
+}
