@@ -2,6 +2,7 @@ package userservice_service
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -849,5 +850,132 @@ func TestCallApiAndRefresh(test *testing.T) {
 		_, err := userService.CallApiAndRefresh("test@test.com", "basic", "Google")
 
 		require.NoError(test, err)
+	})
+}
+
+func TestUpdateTokenForService(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var user entities.User
+		var service entities.Service
+		var token entities.ResultToken
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		user.Email = "test@test.com"
+		user.Id = "1"
+
+		service.Id = "2"
+		service.Name = "Google"
+
+		token.AccessToken = "accessToken"
+		token.RefreshToken = "refreshToken"
+		token.ExpiresIn = 3600
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockServiceService.On("GetResultTokenFromCode", "code", "Google", "service", "web").
+			Return(token, nil)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "2").
+			Return(entities.UserService{}, errors.New("user service not found"))
+
+		mockUserServiceRepo.On("CreateUserService", "1", "accessToken", "refreshToken", mock.Anything, "2").
+			Return(nil)
+
+		err := userService.UpdateTokenForService("code", "Google", "web", "test@test.com", "basic")
+		require.NoError(test, err)
+	})
+
+	test.Run("Service not found", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(entities.Service{}, fmt.Errorf("service not found"))
+
+		err := userService.UpdateTokenForService("code", "Google", "web", "test@test.com", "basic")
+		require.EqualError(test, err, "service not found")
+	})
+
+	test.Run("Fail Token from Code", func(test *testing.T) {
+		var service entities.Service
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockServiceService.On("GetResultTokenFromCode", "code", "Google", "service", "web").
+			Return(entities.ResultToken{}, errors.New("token retrieval failed"))
+
+		err := userService.UpdateTokenForService("code", "Google", "web", "test@test.com", "basic")
+
+		require.EqualError(test, err, "token retrieval failed")
+	})
+
+	test.Run("User not found", func(test *testing.T) {
+		var service entities.Service
+		var token entities.ResultToken
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "Google").
+			Return(service, nil)
+
+		mockServiceService.On("GetResultTokenFromCode", "code", "Google", "service", "web").
+			Return(token, nil)
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(entities.User{}, errors.New("user not found"))
+
+		err := userService.UpdateTokenForService("code", "Google", "web", "test@test.com", "basic")
+
+		require.EqualError(test, err, "Could not find requested user")
 	})
 }
