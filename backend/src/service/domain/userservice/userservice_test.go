@@ -1293,3 +1293,176 @@ func TestRetrieveDiscordUserServers(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestRetrieveAsanaUserWorkspaces(test *testing.T) {
+	var user entities.User
+	var service entities.Service
+	var serviceOfUser entities.UserService
+
+	user.Email = "test@test.com"
+	user.Id = "1"
+
+	service.Id = "1"
+
+	serviceOfUser.AccessToken = "accessToken"
+	serviceOfUser.RefreshToken = "refreshToken"
+	serviceOfUser.ExpiryDate = time.Now().Add(time.Hour).Format(formattingDate)
+
+	test.Run("Successful", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`
+				{
+					"data": [
+						{
+							"gid": "12345",
+							"resource_type": "workspace",
+							"name": "My Company Workspace"
+						}
+					],
+					"next_page": {
+						"offset": "eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9",
+						"path": "/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9",
+						"uri": "https://app.asana.com/api/1.0/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9"
+					}
+				}`,
+			)),
+		}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Asana").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://app.asana.com/api/1.0/workspaces/", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := userService.RetrieveAsanaUserWorkspaces("test@test.com", "basic")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Call API Refresh", func(test *testing.T) {
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Asana").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, errors.New("Fail Api Refresh"))
+
+		_, err := userService.RetrieveAsanaUserWorkspaces("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail Api Refresh")
+	})
+
+	test.Run("Fail Execute Request", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`
+				{
+					"data": [
+						{
+							"gid": "12345",
+							"resource_type": "workspace",
+							"name": "My Company Workspace"
+						}
+					],
+					"next_page": {
+						"offset": "eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9",
+						"path": "/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9",
+						"uri": "https://app.asana.com/api/1.0/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9"
+					}
+				}`,
+			)),
+		}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Asana").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://app.asana.com/api/1.0/workspaces/", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, errors.New("Fail Execute Request"))
+
+		_, err := userService.RetrieveAsanaUserWorkspaces("test@test.com", "basic")
+
+		require.EqualError(test, err, "Fail Execute Request")
+	})
+
+	test.Run("Fail Decode", func(test *testing.T) {
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`invalid json`)),
+		}
+
+		mockUserRepo := new(MockUserRepository)
+		mockServiceRepo := new(MockServiceRepository)
+		mockUserServiceRepo := new(MockUserServiceRepository)
+		mockServiceService := new(MockServiceServiceRepository)
+
+		userService := &UserServiceService{
+			UserRepository:        mockUserRepo,
+			ServiceRepository:     mockServiceRepo,
+			UserServiceRepository: mockUserServiceRepo,
+			ServiceService:        mockServiceService,
+		}
+
+		mockUserRepo.On("FindUserByEmail", "test@test.com", "basic").
+			Return(user, nil)
+
+		mockServiceRepo.On("FindServiceByName", "Asana").
+			Return(service, nil)
+
+		mockUserServiceRepo.On("FindUserServiceByServiceIdandUserId", "1", "1").
+			Return(serviceOfUser, nil)
+
+		mockServiceService.On("ExecuteApiRequest", "https://app.asana.com/api/1.0/workspaces/", "GET", "Bearer ", "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := userService.RetrieveAsanaUserWorkspaces("test@test.com", "basic")
+
+		require.Error(test, err)
+	})
+
+}
