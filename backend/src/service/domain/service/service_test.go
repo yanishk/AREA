@@ -510,3 +510,20 @@ func TestOauth2Github(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOauth2Reddit(test *testing.T) {
+	clientID := os.Getenv("REDDIT_LOGIN_CLIENT_ID")
+	callbackLink := os.Getenv("REDDIT_LOGIN_CALLBACK")
+
+	expectedRes := "https://www.reddit.com/api/v1/authorize?" +
+		clientIdParam + clientID +
+		codeResponseType +
+		stateParam + os.Getenv("REDDIT_STATE") +
+		redirectUriParam + callbackLink +
+		"&duration=permanent" +
+		"&scope=identity read submit vote mysubreddits history account edit privatemessages"
+
+	res := oauth2Reddit("login")
+
+	assert.Equal(test, res, expectedRes)
+}
