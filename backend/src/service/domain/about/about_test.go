@@ -153,3 +153,35 @@ func TestGetAboutActions(test *testing.T) {
 		require.EqualError(test, err, "Fail find actions")
 	})
 }
+
+func TestGetAboutReactions(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		about := &AboutService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		mockReactionRepo.On("FindReactionsByServiceId", "1").
+			Return([]entities.Reaction{}, nil)
+
+		_, err := about.getAboutReactions("1")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		about := &AboutService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		mockReactionRepo.On("FindReactionsByServiceId", "1").
+			Return([]entities.Reaction{}, errors.New("Fail find reactions"))
+
+		_, err := about.getAboutReactions("1")
+
+		require.EqualError(test, err, "Fail find reactions")
+	})
+}
