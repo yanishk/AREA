@@ -978,3 +978,11 @@ func TestGetRedditRefreshTokenRequest(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetGitlabRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetGitlabRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
