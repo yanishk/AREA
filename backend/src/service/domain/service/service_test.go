@@ -946,3 +946,11 @@ func TestGetAsanaRefreshTokenRequest(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetDropboxRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetDropboxRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
