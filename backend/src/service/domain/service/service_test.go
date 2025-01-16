@@ -1,7 +1,10 @@
 package service_service
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"backend/src/entities"
 )
@@ -91,4 +94,19 @@ func (m *MockReactionRepository) FindReactionByName(name string) (entities.React
 func (m *MockReactionRepository) FindReactionsByServiceId(serviceId string) ([]entities.Reaction, error) {
 	args := m.Called(serviceId)
 	return args.Get(0).([]entities.Reaction), args.Error(1)
+}
+
+func TestFindServiceByName(test *testing.T) {
+	mockServiceRepo := new(MockServiceRepository)
+
+	serviceservice := &ServiceService{
+		ServiceRepository: mockServiceRepo,
+	}
+
+	mockServiceRepo.On("FindServiceByName", "service").
+		Return(entities.Service{}, nil)
+
+	_, err := serviceservice.FindServiceByName("service")
+
+	require.NoError(test, err)
 }
