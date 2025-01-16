@@ -1,10 +1,12 @@
 package about_service
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"backend/src/entities"
 )
@@ -118,4 +120,36 @@ func TestGetAboutReaction(test *testing.T) {
 
 	assert.Equal(test, reaction.Name, result.Name)
 	assert.Equal(test, reaction.Description, result.Description)
+}
+
+func TestGetAboutActions(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		mockActionRepo := new(MockActionRepository)
+
+		about := &AboutService{
+			ActionRepository: mockActionRepo,
+		}
+
+		mockActionRepo.On("FindActionsByServiceId", "1").
+			Return([]entities.Action{}, nil)
+
+		_, err := about.getAboutActions("1")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		mockActionRepo := new(MockActionRepository)
+
+		about := &AboutService{
+			ActionRepository: mockActionRepo,
+		}
+
+		mockActionRepo.On("FindActionsByServiceId", "1").
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		_, err := about.getAboutActions("1")
+
+		require.EqualError(test, err, "Fail find actions")
+	})
 }
