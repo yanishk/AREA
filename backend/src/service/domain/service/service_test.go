@@ -930,3 +930,11 @@ func TestGenericJsonBodyRefreshToken(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestGetGoogleRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetGoogleRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
