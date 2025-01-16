@@ -1009,3 +1009,21 @@ func TestExecuteRequest(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestExecuteApiRequest(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.ExecuteApiRequest("https://tools.aimylogic.com/api/now?tz=Europe/Paris", "GET", "token", "accessToken", nil)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.ExecuteApiRequest(":", "GET", "token", "accessToken", nil)
+
+		require.Error(test, err)
+	})
+}
