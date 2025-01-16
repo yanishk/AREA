@@ -876,3 +876,23 @@ func TestGetDiscordOAuth2AccessTokenRequest(test *testing.T) {
 		require.EqualError(test, err, invalidCallbackTypeMessage)
 	})
 }
+
+func TestGetRedditOAuth2AccessTokenRequest(test *testing.T) {
+	test.Run("Success Service", func(test *testing.T) {
+		_, err := getRedditOAuth2AccessTokenRequest("code", "service")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Success Login", func(test *testing.T) {
+		_, err := getRedditOAuth2AccessTokenRequest("code", "login")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Invalid Callback Type", func(test *testing.T) {
+		_, err := getRedditOAuth2AccessTokenRequest("code", "invalid")
+
+		require.EqualError(test, err, invalidCallbackTypeMessage)
+	})
+}
