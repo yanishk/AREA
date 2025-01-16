@@ -68,7 +68,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
         >
             <div
                 style={{ backgroundColor: selectedActionService?.color }}
-                className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
+                className="flex items-center justify-between lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
                     <ActionButton
@@ -81,7 +81,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
                 </div>
 
                 <h1
-                    className="text-white text-[3.2rem] font-extrabold text-center flex-1"
+                    className="text-white text-[2.2rem] sm:text-[3.2rem] font-extrabold text-center flex-1"
                 >
                     Review and finish
                 </h1>
@@ -91,7 +91,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
 
             <div
                 style={{ backgroundColor: selectedActionService?.color }}
-                className="flex flex-col items-center justify-center"
+                className="flex flex-col items-center justify-center lg:px-0 px-3"
             >
                 <MaxWidthWrapper
                     maxWidth="680px"
@@ -132,7 +132,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
             </div>
 
             <div
-                className="mt-5 flex flex-col !items-center "
+                className="mt-5 flex flex-col !items-center lg:px-0 px-3"
             >
                 <div className="w-full max-w-[300px]">
                     <TriggerButton

@@ -28,10 +28,10 @@ const SocialButton: React.FC<SocialButtonProps> = ({
         >
             <FontAwesomeIcon
                 icon={icon}
-                className={`absolute ${iconPosition} ${iconSize}`}
+                className={`ml-5 ${iconPosition} ${iconSize}`}
             />
             <span
-                className="flex justify-center items-center w-full ml-4">
+                className="flex justify-center items-center w-full pl-2 pr-2">
                 {text}
             </span>
         </button>

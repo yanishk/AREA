@@ -79,8 +79,8 @@ const MyWorkflow = () => {
 
                     </div>
                 </div>
-                <div className="mt-16 ml-[35px]">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                <div className="mt-16">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-3">
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
@@ -88,7 +88,7 @@ const MyWorkflow = () => {
                                     backgroundColor: workflow.actioncolor,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative ${
+                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-3 mb-5 hover:opacity-90 relative ${
                                     workflow.isactivated ? "opacity-100" : "opacity-50 hover:opacity-30"
                                 }`}
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
@@ -112,9 +112,9 @@ const MyWorkflow = () => {
                                         {workflow.name}
                                     </h2>
 
-                                    <div className="absolute bottom-[20px]">
+                                    <div className="bottom-[10px]">
                                         <p
-                                            className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
+                                            className="text-white text-[15.7px] mt-[10px] max-w-[100%]"
                                         >
                                             by{' '}
                                             <span className="font-bold">
@@ -124,7 +124,7 @@ const MyWorkflow = () => {
 
                                         <div
                                             style={{backgroundColor: "white"}}
-                                            className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
+                                            className="h-[38px] w-[160px] mt-[10px] rounded-full relative flex items-center justify-between px-1"
                                         >
                                             {workflow.isactivated ? (
                                                 <p
@@ -151,7 +151,7 @@ const MyWorkflow = () => {
                                             </div>
                                         </div>
                                         {workflow.isactivated ? (
-                                            <div className="flex flex-row mt-[30px]">
+                                            <div className="flex flex-row mt-[10px]">
                                                 <img
                                                     className="w-[14px] h-[18px]"
                                                     src="/user-icon.png"

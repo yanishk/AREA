@@ -13,12 +13,12 @@ const ButtonIfCustom: React.FC<ButtonIfCustomProps> = ({ text, color, iconPath, 
     const buttonColor = color || "#222222";
 
     return (
-        <div className="relative inline-block">
+        <div className="relative ">
             <button
                 style={{ backgroundColor: buttonColor }}
-                className="w-[730px] h-[125px] flex justify-start items-center text-white rounded-lg font-[900]"
+                className="w-full h-[125px] flex justify-start items-center text-white rounded-lg font-[900]"
             >
-                <p className="ml-[35px] pr-10 text-[5.8rem] text-left">If</p>
+                <p className="ml-[35px] pr-5 text-[2.8rem] sm:text-[5.8rem] text-left">If</p>
                 <img alt="icon" src={iconPath} className="size-11" />
                 <p className="text-[1.4rem] font-bold ml-4">{text}</p>
             </button>

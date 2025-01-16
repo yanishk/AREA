@@ -106,7 +106,7 @@ const ServiceDetailsPage = () => {
                 />
 
                 <div
-                    className="flex items-center justify-between px-10 py-5"
+                    className="flex items-center justify-between px-8 lg:py-5 pb-5"
                 >
                     <div>
                         <ActionButton
@@ -142,7 +142,7 @@ const ServiceDetailsPage = () => {
                                     </span>
                                 </h1>
 
-                                <p className="text-white text-[1.1rem] tracking-wider mt-[10px] mb-[35px]">
+                                <p className="text-white text-[1.1rem] tracking-wider mt-[10px] mb-[35px] lg:px-0 px-5">
                                     {service?.description}
                                 </p>
 
@@ -190,11 +190,11 @@ const ServiceDetailsPage = () => {
                         className="mt-[60px]"
                     >
                         <h3
-                            className="text-[#222222] text-[1.5rem] font-[800] mb-[25px]"
+                            className="text-[#222222] text-[1.5rem] font-[800] mb-[25px] px-3 lg:px-2"
                         >
                             Actions
                         </h3>
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 ml-2 mb-[20px]">
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 ml-2 mr-2 mb-[20px]">
                                 {serviceActions.map((action) => (
                                     <div
                                         key={action.id}
@@ -220,11 +220,11 @@ const ServiceDetailsPage = () => {
                         className="mt-[60px]"
                     >
                         <h3
-                            className="text-[#222222] text-[1.5rem] font-[800] mb-[25px]"
+                            className="text-[#222222] text-[1.5rem] font-[800] mb-[25px] px-3 lg:px-2"
                         >
                             Reactions
                         </h3>
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 ml-2 mb-[20px]">
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 ml-2 mr-2 mb-[20px]">
                                 {serviceReactions.map((reaction) => (
                                     <div
                                         key={reaction.id}
