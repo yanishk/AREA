@@ -1,8 +1,11 @@
 package service_service
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -1048,4 +1051,21 @@ func TestGetOAuth2UserEmailRequest(test *testing.T) {
 
 		require.Error(test, err)
 	})
+}
+
+func TestDecodeUserInfoWithMultipleResults(test *testing.T) {
+	userInfos := []entities.UserInfo{
+		{Email: "test@test.com"},
+	}
+
+	responseBody, _ := json.Marshal(userInfos)
+
+	res := &http.Response{
+		Body:       io.NopCloser(bytes.NewReader(responseBody)),
+		StatusCode: http.StatusOK,
+	}
+
+	_, err := decodeUserInfoWithMultipleResults(res)
+
+	require.NoError(test, err)
 }
