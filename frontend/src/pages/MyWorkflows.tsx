@@ -79,8 +79,8 @@ const MyWorkflow = () => {
 
                     </div>
                 </div>
-                <div className="mt-16 ml-[35px]">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                <div className="mt-16">
+                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-3">
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
@@ -88,7 +88,7 @@ const MyWorkflow = () => {
                                     backgroundColor: workflow.actioncolor,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative ${
+                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-3 mb-5 hover:opacity-90 relative ${
                                     workflow.isactivated ? "opacity-100" : "opacity-50 hover:opacity-30"
                                 }`}
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
