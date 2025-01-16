@@ -571,3 +571,18 @@ func TestOauth2Dropbox(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOauth2Gitlab(test *testing.T) {
+	callbackLink := os.Getenv("GITLAB_LOGIN_CALLBACK")
+
+	expectedRes := "https://gitlab.com/oauth/authorize?" +
+		clientIdParam + os.Getenv("GITLAB_CLIENT_ID") +
+		codeResponseType +
+		redirectUriParam + callbackLink +
+		stateParam + os.Getenv("GITLAB_STATE") +
+		"&scope=api read_api read_user read_repository write_repository"
+
+	res := oauth2Gitlab("login")
+
+	assert.Equal(test, res, expectedRes)
+}
