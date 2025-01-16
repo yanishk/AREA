@@ -64,7 +64,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
     return (
         <div>
         <div
-            className="flex items-center justify-between px-10 py-5"
+            className="flex items-center justify-between lg:px-10 px-2 py-5"
         >
             <div>
                 <ActionButton
