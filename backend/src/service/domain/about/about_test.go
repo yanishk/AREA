@@ -107,3 +107,15 @@ func TestGetAboutAction(test *testing.T) {
 	assert.Equal(test, action.Name, result.Name)
 	assert.Equal(test, action.Description, result.Description)
 }
+
+func TestGetAboutReaction(test *testing.T) {
+	var reaction entities.Reaction
+
+	reaction.Name = "test"
+	reaction.Description = "description"
+
+	result := getAboutReaction(reaction)
+
+	assert.Equal(test, reaction.Name, result.Name)
+	assert.Equal(test, reaction.Description, result.Description)
+}
