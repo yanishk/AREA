@@ -2,8 +2,10 @@ package service_service
 
 import (
 	"errors"
+	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -386,4 +388,32 @@ func TestRetrieveReactionsServices(test *testing.T) {
 	_, err := serviceservice.RetrieveReactionsServices()
 
 	require.NoError(test, err)
+}
+
+func TestGetCallbackAndClientId(test *testing.T) {
+	test.Run("Login", func(test *testing.T) {
+
+		serviceName := "SPOTIFY"
+
+		callback, clientId := getCallbackAndClientId("login", "SPOTIFY", true)
+
+		resCallback := serviceName + "_LOGIN_CALLBACK"
+		resClientId := serviceName + "_LOGIN_CLIENT_ID"
+
+		assert.Equal(test, os.Getenv(resCallback), callback)
+		assert.Equal(test, os.Getenv(resClientId), clientId)
+	})
+
+	test.Run("Service", func(test *testing.T) {
+
+		serviceName := "SPOTIFY"
+
+		callback, clientId := getCallbackAndClientId("service", "SPOTIFY", true)
+
+		resCallback := serviceName + "_SERVICE_CALLBACK"
+		resClientId := serviceName + "_SERVICE_CLIENT_ID"
+
+		assert.Equal(test, os.Getenv(resCallback), callback)
+		assert.Equal(test, os.Getenv(resClientId), clientId)
+	})
 }
