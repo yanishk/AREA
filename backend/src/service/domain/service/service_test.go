@@ -2,6 +2,7 @@ package service_service
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"testing"
@@ -681,4 +682,18 @@ func TestGenericAccessTokenRequest(test *testing.T) {
 
 		require.Error(test, err)
 	})
+}
+
+func TestGetGoogleOAuth2AccessTokenWebRequestBody(test *testing.T) {
+	expectedRes := fmt.Sprintf(
+		"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=%s",
+		"code",
+		os.Getenv("GOOGLE_WEB_CLIENT_ID"),
+		os.Getenv("GOOGLE_CLIENT_SECRET"),
+		"callback",
+		grantTypeAuthorization,
+	)
+	res := getGoogleOAuth2AccessTokenWebRequestBody("code", "callback")
+
+	assert.Equal(test, res, expectedRes)
 }
