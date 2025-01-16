@@ -2,10 +2,13 @@ package workflow_service
 
 import (
 	"backend/src/entities"
+	"errors"
 	"io"
 	"net/http"
+	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 type MockServiceServiceRepository struct {
@@ -153,4 +156,48 @@ func (m *MockActionRepository) FindActionsByServiceId(serviceId string) ([]entit
 func (m *MockActionRepository) FindActionByNameAndServiceId(name, serviceId string) (entities.Action, error) {
 	args := m.Called(name, serviceId)
 	return args.Get(0).(entities.Action), args.Error(1)
+}
+
+func TestCheckWorkflowsWithWeatherActions(test *testing.T) {
+	action := entities.Action{
+		Id:          "1",
+		Name:        "action",
+		Description: "description",
+		ServiceId:   "2",
+		NbParam:     0,
+	}
+
+	workflowEntities := []entities.Workflow{
+		{Name: "test 1", IsActivated: true, ActionId: "1"},
+		{Name: "test 2", IsActivated: true, ActionId: "2"},
+	}
+	test.Run("Success", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		workflow := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return(workflowEntities, nil)
+
+		err := workflow.checkWorkflowsWithWeatherActions(action)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail find workflow", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		workflow := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return(workflowEntities, errors.New("Fail find workflows"))
+
+		err := workflow.checkWorkflowsWithWeatherActions(action)
+
+		require.EqualError(test, err, "Fail find workflows")
+	})
 }
