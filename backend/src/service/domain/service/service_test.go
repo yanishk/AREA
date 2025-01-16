@@ -417,3 +417,37 @@ func TestGetCallbackAndClientId(test *testing.T) {
 		assert.Equal(test, os.Getenv(resClientId), clientId)
 	})
 }
+
+func TestOauth2Google(test *testing.T) {
+	test.Run("Login web", func(test *testing.T) {
+		callbackLink := os.Getenv("GOOGLE_LOGIN_CALLBACK")
+		appTypeLink := os.Getenv("GOOGLE_WEB_CLIENT_ID")
+
+		res := oauth2Google("login", "web")
+
+		expectedRes := "https://accounts.google.com/o/oauth2/auth?" +
+			clientIdParam + appTypeLink +
+			codeResponseType +
+			"&access_type=offline" +
+			redirectUriParam + callbackLink +
+			"&scope=email"
+
+		assert.Equal(test, res, expectedRes)
+	})
+
+	test.Run("Service mobile", func(test *testing.T) {
+		callbackLink := os.Getenv("GOOGLE_WEB_CLIENT_ID")
+		appTypeLink := os.Getenv("GOOGLE_MOBILE_CLIENT_ID")
+
+		res := oauth2Google("service", "mobile")
+
+		expectedRes := "https://accounts.google.com/o/oauth2/auth?" +
+			clientIdParam + appTypeLink +
+			codeResponseType +
+			"&access_type=offline" +
+			redirectUriParam + callbackLink +
+			"&scope=email"
+
+		assert.Equal(test, res, expectedRes)
+	})
+}
