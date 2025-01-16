@@ -1,6 +1,7 @@
 package service_service
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -124,4 +125,47 @@ func TestFindServiceById(test *testing.T) {
 	_, err := serviceservice.FindServiceById("id")
 
 	require.NoError(test, err)
+}
+
+func TestFindServiceByActionId(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var action entities.Action
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository: mockServiceRepo,
+			ActionRepository:  mockActionRepo,
+		}
+
+		action.ServiceId = "id"
+
+		mockActionRepo.On("FindActionById", "id").
+			Return(action, nil)
+
+		mockServiceRepo.On("FindServiceById", "id").
+			Return(entities.Service{}, nil)
+
+		_, err := serviceservice.FindServiceByActionId("id")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Find action failure", func(test *testing.T) {
+		mockServiceRepo := new(MockServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository: mockServiceRepo,
+			ActionRepository:  mockActionRepo,
+		}
+
+		mockActionRepo.On("FindActionById", "id").
+			Return(entities.Action{}, errors.New("Fail find action"))
+
+		_, err := serviceservice.FindServiceByActionId("id")
+
+		require.EqualError(test, err, "Fail find action")
+	})
 }
