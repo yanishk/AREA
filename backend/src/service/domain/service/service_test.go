@@ -372,3 +372,18 @@ func TestRetrieveActionsServices(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestRetrieveReactionsServices(test *testing.T) {
+	mockServiceRepo := new(MockServiceRepository)
+
+	serviceservice := &ServiceService{
+		ServiceRepository: mockServiceRepo,
+	}
+
+	mockServiceRepo.On("FindReactionsServices").
+		Return([]entities.Service{}, nil)
+
+	_, err := serviceservice.RetrieveReactionsServices()
+
+	require.NoError(test, err)
+}
