@@ -112,9 +112,9 @@ const MyWorkflow = () => {
                                         {workflow.name}
                                     </h2>
 
-                                    <div className="absolute bottom-[20px]">
+                                    <div className="bottom-[10px]">
                                         <p
-                                            className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
+                                            className="text-white text-[15.7px] mt-[10px] max-w-[100%]"
                                         >
                                             by{' '}
                                             <span className="font-bold">
@@ -124,7 +124,7 @@ const MyWorkflow = () => {
 
                                         <div
                                             style={{backgroundColor: "white"}}
-                                            className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
+                                            className="h-[38px] w-[160px] mt-[10px] rounded-full relative flex items-center justify-between px-1"
                                         >
                                             {workflow.isactivated ? (
                                                 <p
@@ -151,7 +151,7 @@ const MyWorkflow = () => {
                                             </div>
                                         </div>
                                         {workflow.isactivated ? (
-                                            <div className="flex flex-row mt-[30px]">
+                                            <div className="flex flex-row mt-[10px]">
                                                 <img
                                                     className="w-[14px] h-[18px]"
                                                     src="/user-icon.png"
