@@ -970,3 +970,11 @@ func TestGetDiscordRefreshTokenRequest(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetRedditRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetRedditRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
