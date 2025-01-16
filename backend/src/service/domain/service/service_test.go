@@ -495,3 +495,18 @@ func TestOauth2Discord(test *testing.T) {
 		assert.Equal(test, res, expectedRes)
 	})
 }
+
+func TestOauth2Github(test *testing.T) {
+	clientID := os.Getenv("GITHUB_LOGIN_CLIENT_ID")
+	callbackLink := os.Getenv("GITHUB_LOGIN_CALLBACK")
+
+	expectedRes := "https://github.com/login/oauth/authorize?" +
+		clientIdParam + clientID +
+		redirectUriParam + callbackLink +
+		"&scope=repo admin:org user" +
+		stateParam + os.Getenv("GITHUB_STATE")
+
+	res := oauth2Github("login")
+
+	assert.Equal(test, res, expectedRes)
+}
