@@ -24,7 +24,7 @@ const SocialButton: React.FC<SocialButtonProps> = ({
     return (
         <button
             onClick={onClick}
-            className={`w-full h-[75px] ${bgColor} text-white text-[1.6rem] rounded-full ${hoverColor} mt-4 font-[900] flex items-center justify-center relative`}
+            className={`w-full h-[75px] ${bgColor} text-white text-[1.4rem] sm:text-[1.6rem] rounded-full ${hoverColor} mt-4 font-[900] flex items-center justify-center relative`}
         >
             <FontAwesomeIcon
                 icon={icon}
