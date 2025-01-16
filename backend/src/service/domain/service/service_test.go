@@ -527,3 +527,18 @@ func TestOauth2Reddit(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOauth2Asana(test *testing.T) {
+	callbackLink := os.Getenv("ASANA_LOGIN_CALLBACK")
+
+	expectedRes := "https://app.asana.com/-/oauth_authorize?" +
+		clientIdParam + os.Getenv("ASANA_CLIENT_ID") +
+		redirectUriParam + callbackLink +
+		codeResponseType +
+		stateParam + os.Getenv("ASANA_STATE") +
+		"&scope=default email profile"
+
+	res := oauth2Asana("login")
+
+	assert.Equal(test, res, expectedRes)
+}
