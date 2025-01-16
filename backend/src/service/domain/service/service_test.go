@@ -451,3 +451,15 @@ func TestOauth2Google(test *testing.T) {
 		assert.Equal(test, res, expectedRes)
 	})
 }
+
+func TestOauth2Spotify(test *testing.T) {
+	expectedRes := "https://accounts.spotify.com/authorize?" +
+		clientIdParam + os.Getenv("SPOTIFY_CLIENT_ID") +
+		codeResponseType +
+		redirectUriParam + os.Getenv("SPOTIFY_LOGIN_CALLBACK") +
+		"&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-state user-library-modify playlist-modify-public"
+
+	res := oauth2Spotify("login")
+
+	assert.Equal(test, res, expectedRes)
+}
