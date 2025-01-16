@@ -201,3 +201,118 @@ func TestCheckWorkflowsWithWeatherActions(test *testing.T) {
 		require.EqualError(test, err, "Fail find workflows")
 	})
 }
+
+func TestCheckWeatherActions(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		serviceFound := entities.Service{
+			Id: "1",
+		}
+
+		actionFound := []entities.Action{
+			{Name: "Action 1", Id: "1"},
+		}
+
+		workflowFound := []entities.Workflow{
+			{Name: "test 1", IsActivated: true, ActionId: "1"},
+		}
+
+		mockServiceServiecRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		workflow := &WorkflowService{
+			ServiceService:     mockServiceServiecRepo,
+			ActionRepository:   mockActionRepo,
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		mockServiceServiecRepo.On("FindServiceByName", "FreeWeather").
+			Return(serviceFound, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", serviceFound.Id).
+			Return(actionFound, nil)
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", actionFound[0].Id).
+			Return(workflowFound, nil)
+
+		err := workflow.CheckWeatherActions()
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceServiecRepo := new(MockServiceServiceRepository)
+
+		workflow := &WorkflowService{
+			ServiceService: mockServiceServiecRepo,
+		}
+
+		mockServiceServiecRepo.On("FindServiceByName", "FreeWeather").
+			Return(entities.Service{}, errors.New("Fail find service"))
+
+		err := workflow.CheckWeatherActions()
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		serviceFound := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiecRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		workflow := &WorkflowService{
+			ServiceService:   mockServiceServiecRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		mockServiceServiecRepo.On("FindServiceByName", "FreeWeather").
+			Return(serviceFound, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", serviceFound.Id).
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		err := workflow.CheckWeatherActions()
+
+		require.EqualError(test, err, "Fail find actions")
+	})
+
+	test.Run("Fail Check Workflows", func(test *testing.T) {
+		serviceFound := entities.Service{
+			Id: "1",
+		}
+
+		actionFound := []entities.Action{
+			{Name: "Action 1", Id: "1"},
+		}
+
+		workflowFound := []entities.Workflow{
+			{Name: "test 1", IsActivated: true, ActionId: "1"},
+		}
+
+		mockServiceServiecRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		workflow := &WorkflowService{
+			ServiceService:     mockServiceServiecRepo,
+			ActionRepository:   mockActionRepo,
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		mockServiceServiecRepo.On("FindServiceByName", "FreeWeather").
+			Return(serviceFound, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", serviceFound.Id).
+			Return(actionFound, nil)
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", actionFound[0].Id).
+			Return(workflowFound, errors.New("Fail check workflows"))
+
+		err := workflow.CheckWeatherActions()
+
+		require.EqualError(test, err, "Fail check workflows")
+	})
+}
