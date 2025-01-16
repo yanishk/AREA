@@ -697,3 +697,16 @@ func TestGetGoogleOAuth2AccessTokenWebRequestBody(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestGetGoogleOAuth2AccessTokenMobileRequestBody(test *testing.T) {
+	expectedRes := fmt.Sprintf(
+		"code=%s&client_id=%s&redirect_uri=%s&grant_type=%s",
+		"code",
+		os.Getenv("GOOGLE_MOBILE_CLIENT_ID"),
+		"callback",
+		grantTypeAuthorization,
+	)
+	res := getGoogleOAuth2AccessTokenMobileRequestBody("code", "callback")
+
+	assert.Equal(test, res, expectedRes)
+}
