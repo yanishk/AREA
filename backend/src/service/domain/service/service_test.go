@@ -938,3 +938,11 @@ func TestGetGoogleRefreshTokenRequest(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetAsanaRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetAsanaRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
