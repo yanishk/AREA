@@ -1,6 +1,9 @@
 package about_service
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"backend/src/entities"
@@ -91,4 +94,16 @@ func (m *MockServiceRepository) FindActionsServices() ([]entities.Service, error
 func (m *MockServiceRepository) FindReactionsServices() ([]entities.Service, error) {
 	args := m.Called()
 	return args.Get(0).([]entities.Service), args.Error(1)
+}
+
+func TestGetAboutAction(test *testing.T) {
+	var action entities.Action
+
+	action.Name = "test"
+	action.Description = "description"
+
+	result := getAboutAction(action)
+
+	assert.Equal(test, action.Name, result.Name)
+	assert.Equal(test, action.Description, result.Description)
 }
