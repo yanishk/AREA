@@ -338,7 +338,7 @@ const WorkflowDetail = () => {
                             Delete workflow
                         </button>
                     </div>
-                <div/>
+                </div>
 
             </MaxWidthWrapper>
         </>
