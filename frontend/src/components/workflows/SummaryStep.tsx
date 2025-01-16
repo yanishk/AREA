@@ -36,7 +36,7 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
 
     let defaultWorkflowTitle
 
-    if (selectedReactionService?.name === "Asana") {
+    if (selectedReactionService?.name === "Asana" || selectedReactionService?.name === "Discord") {
         defaultWorkflowTitle = `If ${actionDescription}, then ${selectedReaction?.name}`;
     } else {
         defaultWorkflowTitle = `If ${actionDescription}, then ${reactionDescription}`;
