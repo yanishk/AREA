@@ -1035,3 +1035,17 @@ func TestGetResultTokenFromCode(test *testing.T) {
 
 	require.EqualError(test, err, unknownServiceMessage)
 }
+
+func TestGetOAuth2UserEmailRequest(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		_, err := getOAuth2UserEmailRequest("https://tools.aimylogic.com/api/now?tz=Europe/Paris", "accessToken")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		_, err := getOAuth2UserEmailRequest(":", "accessToken")
+
+		require.Error(test, err)
+	})
+}
