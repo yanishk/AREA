@@ -13,13 +13,13 @@ const ButtonThenCustom: React.FC<ButtonThenCustomProps> = ({ text, color, iconPa
     const buttonColor = color || "#222222";
 
     return (
-        <div className="relative inline-block">
+        <div className="relative">
             <button
                 style={{ backgroundColor: buttonColor }}
-                className="w-[730px] h-[125px] flex justify-start items-center text-white rounded-lg font-[900]"
+                className="w-full h-[125px] flex justify-start items-center text-white rounded-lg font-[900]"
             >
                 <p
-                    className="ml-[35px] pr-10 text-[5.8rem]"
+                    className="ml-[35px] pr-5 text-[2.8rem] sm:text-[5.8rem]"
                 >
                     Then
                 </p>

@@ -10,9 +10,9 @@ const ButtonIfDefault: React.FC<ButtonIfDefaultProps> = ({ text, onClick }) => {
     return (
         <button
             onClick={onClick}
-            className="w-[730px] h-[125px] bg-[#222222] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 cursor-pointer relative"
+            className="w-full h-[125px] bg-[#222222] flex items-center text-white text-[2.8rem] sm:text-[5.8rem] rounded-lg font-[900] pr-6 cursor-pointer relative"
         >
-            <span className="absolute left-1/2 transform -translate-x-1/2">
+            <span className="absolute sm:left-1/2 left transform sm:-translate-x-1/2 sm:pl-0 pl-5">
                 {text}
             </span>
             <button

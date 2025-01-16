@@ -29,7 +29,7 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
             <>
                 <div
                     style={{ backgroundColor: selectedService.color }}
-                    className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]"
+                    className="flex items-center justify-between lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
                 >
                     <div>
                         <ActionButton
@@ -41,7 +41,7 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
                         />
                     </div>
 
-                    <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
+                    <h1 className="text-white text-[2.2rem] sm:text-[3.2rem] font-extrabold text-center flex-1">
                         {type === "action" ? "Choose an action" : "Choose a reaction"}
                     </h1>
 

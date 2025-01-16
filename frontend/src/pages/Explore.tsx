@@ -96,7 +96,7 @@ const ExplorePage = () => {
             </div>
 
             <MaxWidthWrapper maxWidth="1140px">
-                <div className="mt-16 ml-[35px]">
+                <div className="mt-16 ml-6">
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
                         {services?.filter(service => service.name !== "Google").map((service) => (
                             <button

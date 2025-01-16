@@ -11,13 +11,13 @@ const ButtonThenDefault: React.FC<ButtonThenDefaultProps> = ({ text, onClick, is
     return (
         <button
         onClick={isDisabled ? undefined : onClick}
-        className={`w-[730px] h-[125px] flex items-center text-white text-[5.8rem] rounded-lg font-[900] pr-6 ${
+        className={`w-full h-[125px] flex items-center text-white text-[2.8rem] lg:text-[5.8rem] md:text-[4.8rem] rounded-lg font-[900] pr-6 ${
                 isDisabled
                     ? "cursor-not-allowed bg-[#999999] justify-center"
                     : "cursor-pointer bg-[#222222]"
             }`}
         >
-            <span className="ml-14">
+            <span className="pl-5">
                 {text}
             </span>
             {!isDisabled &&
