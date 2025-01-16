@@ -2,6 +2,7 @@ package service_service
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"testing"
 
@@ -539,6 +540,21 @@ func TestOauth2Asana(test *testing.T) {
 		"&scope=default email profile"
 
 	res := oauth2Asana("login")
+
+	assert.Equal(test, res, expectedRes)
+}
+
+func TestOauth2Linkedin(test *testing.T) {
+	callbackLink := os.Getenv("LINKEDIN_LOGIN_CALLBACK")
+
+	expectedRes := "https://www.linkedin.com/oauth/v2/authorization?" +
+		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType +
+		"&scope=openid email profile w_member_social" +
+		stateParam + os.Getenv("LINKEDIN_STATE")
+
+	res := oauth2Linkedin("login")
 
 	assert.Equal(test, res, expectedRes)
 }
