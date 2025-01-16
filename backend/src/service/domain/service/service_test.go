@@ -1069,3 +1069,13 @@ func TestDecodeUserInfoWithMultipleResults(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetUserInfoFromService(test *testing.T) {
+	test.Run("Unknown", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.GetUserInfoFromService("accessToken", "invalid")
+
+		require.EqualError(test, err, unknownServiceMessage)
+	})
+}
