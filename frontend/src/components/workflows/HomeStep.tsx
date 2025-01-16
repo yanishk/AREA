@@ -88,7 +88,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
         <div
             className="flex items-center justify-center flex-col px-10 pt-[100px] py-5"
         >
-            <div className="pt-10">
+            <div className="pt-10 max-w-[730px] w-full">
                 {selectedAction ? (
                     <ButtonIfCustom
                         text={selectedAction.name}
@@ -110,7 +110,7 @@ const HomeStep: React.FC<HomeStepProps> = ({
 
             <div className="h-[70px] w-[5px] bg-[#EEEEEE]" />
 
-            <div className="mb-[50px]">
+            <div className="mb-[50px] max-w-[730px] w-full">
                 {selectedReaction ? (
                     <ButtonThenCustom
                         text={selectedReaction.name}
