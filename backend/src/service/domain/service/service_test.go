@@ -3,6 +3,7 @@ package service_service
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"testing"
@@ -985,4 +986,26 @@ func TestGetGitlabRefreshTokenRequest(test *testing.T) {
 	_, err := serviceservice.GetGitlabRefreshTokenRequest("refreshToken")
 
 	require.NoError(test, err)
+}
+
+func TestExecuteRequest(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		req, _ := http.NewRequest("GET", "https://tools.aimylogic.com/api/now?tz=Europe/Paris", nil)
+
+		_, err := serviceservice.ExecuteRequest(req)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		req, _ := http.NewRequest("GET", "https://tools.aimylogic.", nil)
+
+		_, err := serviceservice.ExecuteRequest(req)
+
+		require.Error(test, err)
+	})
 }
