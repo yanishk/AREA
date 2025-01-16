@@ -16,6 +16,7 @@ interface Workflow {
     actioncolor: string;
     actionlogo: string;
     reactionlogo: string;
+    createdat: string;
 }
 
 const WorkflowDetail = () => {
@@ -29,6 +30,18 @@ const WorkflowDetail = () => {
     const [workflowName, setWorkflowName] = useState("");
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const navigate = useNavigate();
+
+    const extractDate = (createdAt: string) => {
+        const [datePart, timePart] = createdAt.split("T");
+        const [year, month, day] = datePart.split("-");
+        const [hour, minute] = timePart.split(":");
+        const time = `${hour}:${minute}`;
+        return { year, month, day, time };
+    };
+
+    const { year, month, day, time } = workflow?.createdat
+        ? extractDate(workflow.createdat)
+        : { year: "", month: "", day: "", time: "" };
 
     const getWorkflowDetails = async () => {
         try {
@@ -285,17 +298,45 @@ const WorkflowDetail = () => {
                         className="h-[90px] w-[90px] rounded-full mr-[6px] transition-transform duration-300 ease-in-out">
                     </div>
                 </button>
-            </MaxWidthWrapper>
 
-            <div className="flex justify-center mt-[55px] mb-[45px]">
-                <button
-                    className="font-[700] text-[20px] text-[#BC5555] hover:opacity-85 hover:cursor-pointer"
-                    onClick={handleDelete}
+                <div
+                    className="mt-[40px]"
                 >
-                    Delete workflow
-                </button>
-            </div>
+                    <p
+                        className="text-[#999999] font-[800]"
+                    >
+                        More details
+                    </p>
 
+                    <div
+                        className="w-full h-[0.5px] bg-[#e7e6e6] mt-[10px]">
+                    </div>
+
+                    <p className="text-black font-[800] mt-[15px]">
+                        Created on {day} {month} {year}
+                    </p>
+
+                    <p className="text-black font-[800] mt-[5px]">
+                        At {time}
+                    </p>
+
+                    <div
+                        className="w-full h-[0.5px] bg-[#e7e6e6] mt-[20px]">
+                    </div>
+                </div>
+
+                <div
+                    className="flex justify-center mt-[55px] mb-[45px]"
+                >
+                    <button
+                        className="font-[700] text-[20px] text-[#BC5555] hover:opacity-85 hover:cursor-pointer"
+                        onClick={handleDelete}
+                    >
+                        Delete workflow
+                    </button>
+                </div>
+
+                </MaxWidthWrapper>
         </>
     );
 };
