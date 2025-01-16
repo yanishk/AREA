@@ -914,3 +914,19 @@ func TestGenericRefreshTokenRequest(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestGenericJsonBodyRefreshToken(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	expectedRes := fmt.Sprintf(
+		"client_id=%s&client_secret=%s&grant_type=%s&refresh_token=%s",
+		"clientId",
+		"secretId",
+		grantTypeRefreshToken,
+		"refreshToken",
+	)
+
+	res := serviceservice.genericJsonBodyRefreshToken("clientId", "secretId", "refreshToken")
+
+	assert.Equal(test, res, expectedRes)
+}
