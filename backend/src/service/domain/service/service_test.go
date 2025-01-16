@@ -212,3 +212,18 @@ func TestFindServiceByReactionId(test *testing.T) {
 		require.EqualError(test, err, "Fail find reaction")
 	})
 }
+
+func TestFindAllServices(test *testing.T) {
+	mockServiceRepo := new(MockServiceRepository)
+
+	serviceservice := &ServiceService{
+		ServiceRepository: mockServiceRepo,
+	}
+
+	mockServiceRepo.On("FindAllServices").
+		Return([]entities.Service{}, nil)
+
+	_, err := serviceservice.FindAllServices()
+
+	require.NoError(test, err)
+}
