@@ -558,3 +558,16 @@ func TestOauth2Linkedin(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOauth2Dropbox(test *testing.T) {
+	callbackLink := os.Getenv("DROPBOX_LOGIN_CALLBACK")
+
+	expectedRes := "https://www.dropbox.com/oauth2/authorize?" +
+		clientIdParam + url.QueryEscape(os.Getenv("DROPBOX_CLIENT_ID")) +
+		redirectUriParam + callbackLink +
+		codeResponseType + "&token_access_type=offline"
+
+	res := oauth2Dropbox("login")
+
+	assert.Equal(test, res, expectedRes)
+}
