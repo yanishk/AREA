@@ -150,6 +150,9 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
     if (!(response[listName] is List<dynamic>)) {
       developer.log("new response : ${ActionsOrReactionsFunctions.getMapKeyName(response)}");
       dynamic newResponse = ActionsOrReactionsFunctions.getMapKeyName(response);
+      if (newResponse == null) {
+        return;
+      }
       listName = newResponse.toString().split(":").first.split("{").last;
       createDropdownFromRoute(index, newResponse, listName);
       return;
@@ -257,6 +260,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       CreateData.selectOrUpdateWorkflow = true;
       Navigator.pop(Globaldata.myContext);
     }
+    fillParameterFiledList();
   }
 
   Widget connectButton() {
