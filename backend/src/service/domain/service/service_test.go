@@ -227,3 +227,68 @@ func TestFindAllServices(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestRetrieveActionsFromService(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var service entities.Service
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository: mockServiceRepo,
+			ActionRepository:  mockActionRepo,
+		}
+
+		service.Id = "id"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, nil)
+
+		_, err := serviceservice.RetrieveActionsFromService("service")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceRepo := new(MockServiceRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(entities.Service{}, errors.New("Fail find service"))
+
+		_, err := serviceservice.RetrieveActionsFromService("service")
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		var service entities.Service
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository: mockServiceRepo,
+			ActionRepository:  mockActionRepo,
+		}
+
+		service.Id = "id"
+
+		mockServiceRepo.On("FindServiceByName", "service").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		_, err := serviceservice.RetrieveActionsFromService("service")
+
+		require.EqualError(test, err, "Fail find actions")
+	})
+}
