@@ -1027,3 +1027,11 @@ func TestExecuteApiRequest(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestGetResultTokenFromCode(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetResultTokenFromCode("code", "Unknown", "service", "web")
+
+	require.EqualError(test, err, unknownServiceMessage)
+}
