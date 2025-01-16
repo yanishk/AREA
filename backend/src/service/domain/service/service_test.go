@@ -710,3 +710,29 @@ func TestGetGoogleOAuth2AccessTokenMobileRequestBody(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestGetGoogleOAuth2AccessTokenRequest(test *testing.T) {
+	test.Run("Success Service Web", func(test *testing.T) {
+		_, err := getGoogleOAuth2AccessTokenRequest("code", "service", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Success Login Mobile", func(test *testing.T) {
+		_, err := getGoogleOAuth2AccessTokenRequest("code", "login", "mobile")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Invalid Callback Type", func(test *testing.T) {
+		_, err := getGoogleOAuth2AccessTokenRequest("code", "invalid", "mobile")
+
+		require.EqualError(test, err, invalidCallbackTypeMessage)
+	})
+
+	test.Run("Invalid App Type", func(test *testing.T) {
+		_, err := getGoogleOAuth2AccessTokenRequest("code", "service", "invalid")
+
+		require.EqualError(test, err, "Invalid app type")
+	})
+}
