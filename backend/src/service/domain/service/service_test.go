@@ -586,3 +586,85 @@ func TestOauth2Gitlab(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOAuth2Service(test *testing.T) {
+	test.Run("Google", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Google", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Spotify", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Spotify", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Discord", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Discord", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Github", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Github", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Reddit", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Reddit", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Asana", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Asana", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Linkedin", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Linkedin", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Dropbox", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Dropbox", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Gitlab", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Gitlab", "login", "web")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Unknown", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.OAuth2Service("Unknown", "login", "web")
+
+		require.EqualError(test, err, unknownServiceMessage)
+	})
+}
