@@ -463,3 +463,35 @@ func TestOauth2Spotify(test *testing.T) {
 
 	assert.Equal(test, res, expectedRes)
 }
+
+func TestOauth2Discord(test *testing.T) {
+	test.Run("Login", func(test *testing.T) {
+		scope := "identify+email"
+
+		expectedRes := "https://discord.com/oauth2/authorize?" +
+			clientIdParam + os.Getenv("DISCORD_CLIENT_ID") +
+			"&permissions=141376" +
+			codeResponseType +
+			redirectUriParam + os.Getenv("DISCORD_LOGIN_CALLBACK") +
+			"&scope=" + scope
+
+		res := oauth2Discord("login")
+
+		assert.Equal(test, res, expectedRes)
+	})
+
+	test.Run("Service", func(test *testing.T) {
+		scope := "identify+email+guilds+bot"
+
+		expectedRes := "https://discord.com/oauth2/authorize?" +
+			clientIdParam + os.Getenv("DISCORD_CLIENT_ID") +
+			"&permissions=141376" +
+			codeResponseType +
+			redirectUriParam + os.Getenv("DISCORD_LOGIN_CALLBACK") +
+			"&scope=" + scope
+
+		res := oauth2Discord("service")
+
+		assert.Equal(test, res, expectedRes)
+	})
+}
