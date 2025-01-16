@@ -21,9 +21,6 @@ type UserService struct {
 	ServiceService        service.ServiceService
 }
 
-const contentType = "Content-Type"
-const contentTypeUrlEncoded = "application/x-www-form-urlencoded"
-const formattingDate = "2006-01-02 15:04:05-07:00"
 const basicConnectionType = "basic"
 
 func NewUserService(UserRepository storage.UserRepository, ServiceRepository storage.ServiceRepository,

@@ -68,7 +68,7 @@ func requestForProtected(method, url, token string, body io.Reader) *http.Reques
 func createToken(test *testing.T) string {
 	secretKey := os.Getenv("SECRET_KEY")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":          "eva.legrand@epitech.eu",
+		"email":          "test@test.com",
 		"connectionType": "basic",
 		"exp":            time.Now().Add(time.Hour).Unix(),
 	})
@@ -96,11 +96,11 @@ func TestCreateUser(test *testing.T) {
 	router.POST("/register", handler.createUser)
 
 	test.Run("Successful", func(test *testing.T) {
-		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("CreateUser", "test@test.com", "password", "basic").
 			Return(nil)
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -114,7 +114,7 @@ func TestCreateUser(test *testing.T) {
 	})
 
 	test.Run("Fail JSON Bind", func(test *testing.T) {
-		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("CreateUser", "test@test.com", "password", "basic").
 			Return(nil)
 
 		req, _ := http.NewRequest("POST", "/register", nil)
@@ -130,11 +130,11 @@ func TestCreateUser(test *testing.T) {
 		handler, router, mockUserService := createMockAndRoute(false)
 		router.POST("/register", handler.createUser)
 
-		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("CreateUser", "test@test.com", "password", "basic").
 			Return(errors.New("Connection type doesn't exist"))
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -151,11 +151,11 @@ func TestCreateUser(test *testing.T) {
 		handler, router, mockUserService := createMockAndRoute(false)
 		router.POST("/register", handler.createUser)
 
-		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("CreateUser", "test@test.com", "password", "basic").
 			Return(errors.New("Email address already used"))
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -172,11 +172,11 @@ func TestCreateUser(test *testing.T) {
 		handler, router, mockUserService := createMockAndRoute(false)
 		router.POST("/register", handler.createUser)
 
-		mockUserService.On("CreateUser", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("CreateUser", "test@test.com", "password", "basic").
 			Return(errors.New("other error"))
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -195,11 +195,11 @@ func TestLoginAuthentication(test *testing.T) {
 	router.POST("/login", handler.loginAuthentication)
 
 	test.Run("Successful", func(test *testing.T) {
-		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("LoginAuthentication", "test@test.com", "password", "basic").
 			Return("token", nil).Once()
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -213,11 +213,11 @@ func TestLoginAuthentication(test *testing.T) {
 	})
 
 	test.Run("User not found", func(test *testing.T) {
-		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("LoginAuthentication", "test@test.com", "password", "basic").
 			Return("", fmt.Errorf("Could not find requested user")).Once()
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -232,11 +232,11 @@ func TestLoginAuthentication(test *testing.T) {
 	})
 
 	test.Run("Other error", func(test *testing.T) {
-		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("LoginAuthentication", "test@test.com", "password", "basic").
 			Return("token", errors.New("Other errors")).Once()
 
 		body := `{
-			"email": "eva.legrand@epitech.eu",
+			"email": "test@test.com",
 			"password": "password"
 		}`
 
@@ -250,7 +250,7 @@ func TestLoginAuthentication(test *testing.T) {
 	})
 
 	test.Run("Fail JSON Bind", func(test *testing.T) {
-		mockUserService.On("LoginAuthentication", "eva.legrand@epitech.eu", "password", "basic").
+		mockUserService.On("LoginAuthentication", "test@test.com", "password", "basic").
 			Return("token", nil).Once()
 
 		req, _ := http.NewRequest("POST", "/login", nil)

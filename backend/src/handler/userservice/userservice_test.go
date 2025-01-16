@@ -82,7 +82,7 @@ func requestForProtected(method, url, token string, body io.Reader) *http.Reques
 func createToken(test *testing.T) string {
 	secretKey := os.Getenv("SECRET_KEY")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":          "eva.legrand@epitech.eu",
+		"email":          "test@test.com",
 		"connectionType": "basic",
 		"exp":            time.Now().Add(time.Hour).Unix(),
 	})
