@@ -59,10 +59,10 @@ class AuthLoadingScreen extends State<APICall> {
   }
 
   Future<void> saveJWToken(Response response) async {
-    String? cookiesBrute = response.headers["set-cookie"];
+    String? cookie = response.headers["set-cookie"];
     String JWToken = "";
-    if (cookiesBrute != null) {
-      JWToken = cookiesBrute.split(';').first;
+    if (cookie != null) {
+      JWToken = cookie.split(';').first;
       setState(() {
         developer.log("JWToken : {${JWToken}}");
         Globaldata.JWToken = JWToken;
