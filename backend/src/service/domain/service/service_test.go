@@ -169,3 +169,46 @@ func TestFindServiceByActionId(test *testing.T) {
 		require.EqualError(test, err, "Fail find action")
 	})
 }
+
+func TestFindServiceByReactionId(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		var reaction entities.Reaction
+
+		mockServiceRepo := new(MockServiceRepository)
+		mockReactionRepo := new(MockReactionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository:  mockServiceRepo,
+			ReactionRepository: mockReactionRepo,
+		}
+
+		reaction.ServiceId = "id"
+
+		mockReactionRepo.On("FindReactionById", "id").
+			Return(reaction, nil)
+
+		mockServiceRepo.On("FindServiceById", "id").
+			Return(entities.Service{}, nil)
+
+		_, err := serviceservice.FindServiceByReactionId("id")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Find action failure", func(test *testing.T) {
+		mockServiceRepo := new(MockServiceRepository)
+		mockReactionRepo := new(MockReactionRepository)
+
+		serviceservice := &ServiceService{
+			ServiceRepository:  mockServiceRepo,
+			ReactionRepository: mockReactionRepo,
+		}
+
+		mockReactionRepo.On("FindReactionById", "id").
+			Return(entities.Reaction{}, errors.New("Fail find reaction"))
+
+		_, err := serviceservice.FindServiceByReactionId("id")
+
+		require.EqualError(test, err, "Fail find reaction")
+	})
+}
