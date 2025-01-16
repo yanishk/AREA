@@ -1,12 +1,13 @@
 package workflow_service
 
 import (
-	"backend/src/entities"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
 )
 
 type MockWorkflowRepository struct {
