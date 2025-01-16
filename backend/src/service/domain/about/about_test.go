@@ -328,3 +328,53 @@ func TestGetAboutServices(test *testing.T) {
 		require.EqualError(test, err, "Fail get about services")
 	})
 }
+
+func TestGetAboutServer(test *testing.T) {
+	test.Run("Successful", func(test *testing.T) {
+		service := []entities.Service{
+			{Id: "1"},
+		}
+
+		mockActionRepo := new(MockActionRepository)
+		mockReactionRepo := new(MockReactionRepository)
+		mockServiceRepo := new(MockServiceRepository)
+
+		about := &AboutService{
+			ActionRepository:   mockActionRepo,
+			ReactionRepository: mockReactionRepo,
+			ServiceRepository:  mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindAllServices").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", "1").
+			Return([]entities.Action{}, nil)
+
+		mockReactionRepo.On("FindReactionsByServiceId", "1").
+			Return([]entities.Reaction{}, nil)
+
+		_, err := about.GetAboutServer(entities.About{})
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		service := []entities.Service{
+			{Id: "1"},
+		}
+
+		mockServiceRepo := new(MockServiceRepository)
+
+		about := &AboutService{
+			ServiceRepository: mockServiceRepo,
+		}
+
+		mockServiceRepo.On("FindAllServices").
+			Return(service, errors.New("Fail find service"))
+
+		_, err := about.GetAboutServer(entities.About{})
+
+		require.EqualError(test, err, "Fail find service")
+	})
+}
