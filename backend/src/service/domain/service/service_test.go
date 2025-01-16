@@ -896,3 +896,21 @@ func TestGetRedditOAuth2AccessTokenRequest(test *testing.T) {
 		require.EqualError(test, err, invalidCallbackTypeMessage)
 	})
 }
+
+func TestGenericRefreshTokenRequest(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.genericRefreshTokenRequest("tokenurl", "refreshToken")
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		serviceservice := &ServiceService{}
+
+		_, err := serviceservice.genericRefreshTokenRequest(":", "refreshToken")
+
+		require.Error(test, err)
+	})
+}
