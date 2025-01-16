@@ -668,3 +668,17 @@ func TestOAuth2Service(test *testing.T) {
 		require.EqualError(test, err, unknownServiceMessage)
 	})
 }
+
+func TestGenericAccessTokenRequest(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		_, err := genericAccessTokenRequest("url", "code", "callback")
+
+		assert.NoError(test, err, "Error should be nil")
+	})
+
+	test.Run("Failure", func(test *testing.T) {
+		_, err := genericAccessTokenRequest(":", "code", "callback")
+
+		require.Error(test, err)
+	})
+}
