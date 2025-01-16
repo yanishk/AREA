@@ -357,3 +357,18 @@ func TestRetrieveReactionsFromService(test *testing.T) {
 		require.EqualError(test, err, "Fail find reactions")
 	})
 }
+
+func TestRetrieveActionsServices(test *testing.T) {
+	mockServiceRepo := new(MockServiceRepository)
+
+	serviceservice := &ServiceService{
+		ServiceRepository: mockServiceRepo,
+	}
+
+	mockServiceRepo.On("FindActionsServices").
+		Return([]entities.Service{}, nil)
+
+	_, err := serviceservice.RetrieveActionsServices()
+
+	require.NoError(test, err)
+}
