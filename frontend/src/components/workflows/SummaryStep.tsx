@@ -34,7 +34,13 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
         ? `${selectedReaction.name} ${Object.values(reactionFields).join(" ")}`
         : "";
 
-    const defaultWorkflowTitle = `If ${actionDescription}, then ${reactionDescription}`;
+    let defaultWorkflowTitle
+
+    if (selectedReactionService?.name === "Asana") {
+        defaultWorkflowTitle = `If ${actionDescription}, then ${selectedReaction?.name}`;
+    } else {
+        defaultWorkflowTitle = `If ${actionDescription}, then ${reactionDescription}`;
+    }
 
     const [workflowTitle, setWorkflowTitle] = useState<string>(defaultWorkflowTitle);
 
