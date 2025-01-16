@@ -954,3 +954,11 @@ func TestGetDropboxRefreshTokenRequest(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestGetSpotifyRefreshTokenRequest(test *testing.T) {
+	serviceservice := &ServiceService{}
+
+	_, err := serviceservice.GetSpotifyRefreshTokenRequest("refreshToken")
+
+	require.NoError(test, err)
+}
