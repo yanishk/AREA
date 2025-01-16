@@ -110,3 +110,18 @@ func TestFindServiceByName(test *testing.T) {
 
 	require.NoError(test, err)
 }
+
+func TestFindServiceById(test *testing.T) {
+	mockServiceRepo := new(MockServiceRepository)
+
+	serviceservice := &ServiceService{
+		ServiceRepository: mockServiceRepo,
+	}
+
+	mockServiceRepo.On("FindServiceById", "id").
+		Return(entities.Service{}, nil)
+
+	_, err := serviceservice.FindServiceById("id")
+
+	require.NoError(test, err)
+}
