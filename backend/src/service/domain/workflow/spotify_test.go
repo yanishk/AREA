@@ -56,7 +56,7 @@ func TestGetSpotifyUrl(test *testing.T) {
 	test.Run("Failure", func(test *testing.T) {
 		_, err := getSpotifyUrl(workflow, baseUrl, "fail", endUrl)
 
-		require.Error(test, err)
+		require.EqualError(test, err, "Incorrect parameter")
 	})
 }
 
@@ -93,11 +93,11 @@ func TestCheckSpotifyReactions(test *testing.T) {
 		}
 
 		mockReactionRepo.On("FindReactionById", workflow.ReactionId).
-			Return(entities.Reaction{}, errors.New("Fail retrieve reaction"))
+			Return(entities.Reaction{}, errors.New(errorRetrievingReaction))
 
 		err := spotify.checkSpotifyReactions(workflow)
 
-		require.EqualError(test, err, "Error finding reaction")
+		require.EqualError(test, err, errorRetrievingReaction)
 	})
 
 	test.Run("Unknown Reaction", func(test *testing.T) {
