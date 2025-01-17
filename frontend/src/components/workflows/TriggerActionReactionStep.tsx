@@ -394,7 +394,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
-                className="flex items-center justify-between lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
+                className="flex items-center w-[110%] lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
                     <ActionButton
@@ -406,7 +406,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     />
                 </div>
 
-                <h1 className="text-white text-[2.2rem] sm:text-[3.2rem] font-extrabold text-center flex-1">
+                <h1 className="text-white text-[1.3rem] sm:text-[3.2rem] font-extrabold text-center w-full">
                     {type === "action" ? "Complete action fields" : "Complete reaction fields"}
                 </h1>
 

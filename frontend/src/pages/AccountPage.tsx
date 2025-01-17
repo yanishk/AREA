@@ -105,7 +105,7 @@ const AccountPage = () => {
                         className="flex flex-col items-center text-center w-full"
                     >
                         <h1
-                            className="text-5xl text-[#222222] font-[900]"
+                            className="text-4xl sm:text-5xl text-[#222222] font-[900]"
                         >
                             Account settings
                         </h1>

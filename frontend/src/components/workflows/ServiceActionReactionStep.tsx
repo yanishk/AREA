@@ -13,7 +13,7 @@ const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
 }) => {
     return (
         <div className="min-h-screen bg-gray-100">
-            <div className="flex items-center justify-between lg:px-10 px-2 py-5">
+            <div className="flex w-[110%] items-center justify-between lg:px-10 px-2 py-5">
                 <div>
                     <ActionButton
                         text="Cancel"
@@ -24,7 +24,7 @@ const SelectServiceStep: React.FC<SelectServiceStepProps> = ({
                     />
                 </div>
 
-                <h1 className="text-[2.2rem] sm:text-[3.2rem] font-extrabold text-center flex-1">
+                <h1 className="text-[1.9rem] sm:text-[3.2rem] font-extrabold text-center w-full">
                     Choose a service
                 </h1>
 
