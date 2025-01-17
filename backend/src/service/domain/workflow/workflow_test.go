@@ -394,15 +394,14 @@ func TestGetAccessToken(test *testing.T) {
 	})
 }
 
-func TestConcatanateSlashToPath(t *testing.T) {
+func TestConcatanateSlashToPath(test *testing.T) {
 	name := "test.go"
 	filepath := "path"
 	expected := "/" + filepath + "/" + name
 
 	res := concatanateSlashToPath(filepath, name)
-	if res != expected {
-		t.Fatalf(`Got : %s but Expected -> %s`, res, expected)
-	}
+
+	require.Equal(test, expected, res)
 }
 
 func TestGetWorkflowStringActionParam(test *testing.T) {
