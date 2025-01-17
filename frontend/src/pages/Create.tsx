@@ -614,8 +614,6 @@ const WorkflowBuilder = () => {
             });
         }
 
-        // return;
-
         navigate("/explore");
 
         await axios.post(
