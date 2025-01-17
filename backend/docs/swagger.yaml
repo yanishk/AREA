@@ -409,8 +409,8 @@ definitions:
     type: object
   docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse:
     properties:
-      success:
-        example: User authenticated to ${service}-User not authenticated to ${service}
+      authenticated:
+        example: true-false
         type: string
     type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:

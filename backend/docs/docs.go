@@ -1767,9 +1767,9 @@ const docTemplate = `{
         "docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse": {
             "type": "object",
             "properties": {
-                "success": {
+                "authenticated": {
                     "type": "string",
-                    "example": "User authenticated to ${service}-User not authenticated to ${service}"
+                    "example": "true-false"
                 }
             }
         },

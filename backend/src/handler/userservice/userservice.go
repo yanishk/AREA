@@ -1,7 +1,6 @@
 package userservice_handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -114,14 +113,8 @@ func (self *UserServiceHandler) getUserServiceAuthenticationStatus(context *gin.
 		})
 		return
 	}
-	if isUserAuthenticated {
-		context.IndentedJSON(http.StatusOK, gin.H{
-			"success": fmt.Sprintf("User authenticated to %s", serviceName),
-		})
-		return
-	}
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"success": fmt.Sprintf("User not authenticated to %s", serviceName),
+		"authenticated": isUserAuthenticated,
 	})
 }
 
