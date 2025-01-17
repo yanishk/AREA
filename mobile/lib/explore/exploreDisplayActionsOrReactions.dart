@@ -95,13 +95,18 @@ class DisplayActionOrReaction extends State<DisplayActionOrReactionAPICall> {
   Widget actionOrReactionButtons(int index, List<ActionOrReactionList> actionOrReactionList) {
     return Column(children: [
       Padding(padding: EdgeInsets.only(top: 15)),
-      CustomButton(
-        backgroundColor: HexColor(Globaldata.serviceList[serviceIndex].color),
-        text: ButtonText(text: actionOrReactionList[index].name,),
-        onPressed: () {},
-        size: Size(MediaQuery.sizeOf(Globaldata.myContext).width, 20),
+      Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.0),
-        borderCircularRadius: buttonRadius,
+        child: TextWithBackground(
+          text: actionOrReactionList[index].name,
+          backgroundColor: HexColor(Globaldata.serviceList[serviceIndex].color),
+          textColor: Colors.white,
+          fontSize: 20,
+          borderRadius: buttonRadius,
+          height: 45,
+          width: MediaQuery.sizeOf(Globaldata.myContext).width,
+          alignment: Alignment.centerLeft,
+        ),
       )
     ]);
   }
