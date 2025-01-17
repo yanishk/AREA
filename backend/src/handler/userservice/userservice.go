@@ -29,7 +29,7 @@ func (self *UserServiceHandler) setupRoutes(router *gin.Engine) {
 func (self *UserServiceHandler) privateRoutes(router *gin.Engine) {
 	private := router.Group("", middleware.VerifyJWTCookie, middleware.VerifyEmailFromContext, middleware.VerifyConnectionTypeFromContext)
 	private.POST("/service-callback", self.serviceCallback)
-	private.GET("/authentication-status", self.getUserServiceAuthenticationStatus)
+	private.GET("/service-authentication-status", self.getUserServiceAuthenticationStatus)
 	private.GET("/github/user/repositories", self.getGithubUserRepositories)
 	private.GET("/gitlab/user/projects", self.getGitlabUserProjects)
 	private.GET("/discord/user/servers", self.getDiscordUserServers)
@@ -100,7 +100,7 @@ func (self *UserServiceHandler) serviceCallback(context *gin.Context) {
 // @Param        service     query     string  true  "Service name (Github, Spotify, Discord..)"
 // @Failure		200		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse
 // @Failure		400		{object}	docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse
-// @Router       /authentication-status [get]
+// @Router       /service-authentication-status [get]
 func (self *UserServiceHandler) getUserServiceAuthenticationStatus(context *gin.Context) {
 	serviceName := context.Query("service")
 	email := context.GetString("email")
