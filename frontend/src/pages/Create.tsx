@@ -608,19 +608,14 @@ const WorkflowBuilder = () => {
                 }
 
                 if (param.name === "hour") {
-                    const hourParams = actionParams?.[param.name];
-                    const [hour, period] = hourParams.split(" ");
-                    let hourInt = parseInt(hour, 10);
+                    const selectedHour = actionParams?.[param.name];
+                    const hourArray = param.values;
+                    const index = hourArray.indexOf(selectedHour) + 1;
 
-                    if (period === "PM" && hourInt !== 12) {
-                        hourInt += 12;
-                    }
-                    if (period === "AM" && hourInt === 12) {
-                        hourInt = 0;
-                    }
-                    actionParams[param.name] = hourInt;
+                    actionParams[param.name] = index;
                     return actionParams[param.name];
                 }
+
                 actionParams[param.name] = parseInt(actionParams[param.name], 10);
             });
         }
