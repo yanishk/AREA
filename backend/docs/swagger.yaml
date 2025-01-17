@@ -409,9 +409,8 @@ definitions:
     type: object
   docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse:
     properties:
-      success:
-        example: User authenticated to ${service}-User not authenticated to ${service}
-        type: string
+      authenticated:
+        type: boolean
     type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:
@@ -921,29 +920,6 @@ paths:
       summary: Service OAuth2
       tags:
       - Authentication
-  /authentication-status:
-    get:
-      description: Checks if connected user is authenticated to the specified service
-      parameters:
-      - description: Service name (Github, Spotify, Discord..)
-        in: query
-        name: service
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse'
-      summary: User Service Authentication Status
-      tags:
-      - Authentication
   /discord/server/channels:
     get:
       description: Retrieve the channels from the selected server
@@ -1136,6 +1112,29 @@ paths:
       summary: Register
       tags:
       - Users
+  /service-authentication-status:
+    get:
+      description: Checks if connected user is authenticated to the specified service
+      parameters:
+      - description: Service name (Github, Spotify, Discord..)
+        in: query
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse'
+      summary: User Service Authentication Status
+      tags:
+      - Authentication
   /service-callback:
     post:
       description: Callback for services
