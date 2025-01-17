@@ -338,9 +338,7 @@ const WorkflowBuilder = () => {
     const handleSelectReaction = async (name: string, id: string, nbparam: number, parameters: Parameters[]) => {
         setSelectedReaction({ name, id, nbparam, parameters});
 
-        const result = await isRequiredConnection("reaction");
-
-        if (selectedReactionService?.name && result) {
+        if (selectedReactionService?.name && await isRequiredConnection("reaction")) {
             goToStep(Steps.CONNECT_REACTION_SERVICE);
             return;
         }
