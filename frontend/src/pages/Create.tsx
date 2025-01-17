@@ -297,8 +297,6 @@ const WorkflowBuilder = () => {
                 ...prev,
                 [id]: value,
             }));
-        } else {
-            console.error(`Invalid type parameter: ${type}`);
         }
     };
 
@@ -581,6 +579,7 @@ const WorkflowBuilder = () => {
 
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
+                console.log("param ici ", param);
                 if (param.type != "int" || actionParams === null) {
                     return null;
                 }
