@@ -237,7 +237,7 @@ func TestGetUserServiceAuthenticationStatus(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusOK, w.Code)
-		require.JSONEq(test, `{"success": "User authenticated to Github"}`, w.Body.String())
+		require.JSONEq(test, `{"authenticated": true}`, w.Body.String())
 	})
 
 	test.Run("User is not Authenticated", func(test *testing.T) {
@@ -250,7 +250,7 @@ func TestGetUserServiceAuthenticationStatus(test *testing.T) {
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusOK, w.Code)
-		require.JSONEq(test, `{"success": "User not authenticated to Github"}`, w.Body.String())
+		require.JSONEq(test, `{"authenticated": false}`, w.Body.String())
 	})
 
 	test.Run("Fail retrieving user's services", func(test *testing.T) {
