@@ -45,7 +45,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         apiRoute = "reactions";
       });
     }
-    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.hasToLogin) {
       if (isAnAction) {
         setState(() {
           CreateData.actionParamListName = [];
@@ -254,7 +254,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       return;
     }
     setState(() {
-      CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded = false;
+      CreateData.hasToLogin = false;
     });
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
       CreateData.selectOrUpdateWorkflow = true;
@@ -287,7 +287,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
 
   @override
   Widget build(BuildContext context) {
-    if (CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+    if (CreateData.hasToLogin) {
       return Scaffold(
         body: SingleChildScrollView(
           child: Column(

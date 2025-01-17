@@ -6,6 +6,7 @@ import "../../globalData.dart";
 import '../createWidget.dart';
 import '../createWorkflowsData.dart';
 import "selectActionOrReactionParam.dart";
+import 'actionOrReactionsFunctions.dart';
 
 class SelectActionOrReactionPage extends StatelessWidget {
   const SelectActionOrReactionPage({
@@ -58,8 +59,22 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
         CreateData.selectedServiceId = serviceIndex;
       });
     }
+    CreateData.hasToLogin = false;
     actionDescription = CreateData.actualServiceList[serviceIndex].description;
     getActionsOrReactions();
+    isAlreadyLogged();
+  }
+
+  Future<void> isAlreadyLogged() async {
+    setState(() {
+      CreateData.hasToLogin = CreateData.actualServiceList[serviceIndex].isAuthNeeded;
+    });
+    if (CreateData.actualServiceList[serviceIndex].isAuthNeeded) {
+      final bool isLoged = await ActionsOrReactionsFunctions.isAlreadyLogged(CreateData.actualServiceList[serviceIndex]);
+      setState(() {
+        CreateData.hasToLogin = !isLoged;
+      });
+    }
   }
 
   Future<void> getActionsOrReactions() async {
