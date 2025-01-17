@@ -585,10 +585,9 @@ const WorkflowBuilder = () => {
                     return null;
                 }
 
-                if (param.name === "month") {
-                    const selectedMonth = actionParams?.[param.name];
-                    const monthArray = param.values;
-                    const index = monthArray.indexOf(selectedMonth) + 1;
+                if (param.name === "month" || param.name === "hour") {
+                    const selectedParam = actionParams?.[param.name];
+                    const index = param.values.indexOf(selectedParam) + 1;
 
                     actionParams[param.name] = index;
                     return actionParams[param.name];
@@ -604,15 +603,6 @@ const WorkflowBuilder = () => {
                     } else {
                         actionParams[param.name] = parseInt(actionParams[param.name], 10);
                     }
-                    return actionParams[param.name];
-                }
-
-                if (param.name === "hour") {
-                    const selectedHour = actionParams?.[param.name];
-                    const hourArray = param.values;
-                    const index = hourArray.indexOf(selectedHour) + 1;
-
-                    actionParams[param.name] = index;
                     return actionParams[param.name];
                 }
 
