@@ -579,30 +579,25 @@ const WorkflowBuilder = () => {
 
         if (selectedAction?.parameters) {
             selectedAction.parameters.forEach((param) => {
-                console.log("param ici ", param);
                 if (param.type != "int" || actionParams === null) {
                     return null;
                 }
 
-                if (param.name === "month" || param.name === "hour") {
+                if (selectedActionService?.name === "Time & Date") {
                     const selectedParam = actionParams?.[param.name];
-                    const index = param.values.indexOf(selectedParam) + 1;
+                    let index = param.values.indexOf(selectedParam);
 
-                    actionParams[param.name] = index;
-                    return actionParams[param.name];
-                }
-
-                if (param.name === "day") {
-                    const selectedDay = actionParams?.[param.name];
-                    const dayArray = param.values;
-                    const index = dayArray.indexOf(selectedDay);
-
-                    if (index != -1) {
+                    if (param.values[0] === "0") {
+                        actionParams[param.name] = index;
+                    }
+                    if (index === -1) {
                         actionParams[param.name] = index + 1;
-                    } else {
+                    }
+                    else {
                         actionParams[param.name] = parseInt(actionParams[param.name], 10);
                     }
-                    return actionParams[param.name];
+
+                    return actionParams[param.name]
                 }
 
                 actionParams[param.name] = parseInt(actionParams[param.name], 10);
@@ -618,6 +613,8 @@ const WorkflowBuilder = () => {
                 }
             });
         }
+
+        // return;
 
         navigate("/explore");
 
