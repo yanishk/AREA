@@ -71,9 +71,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
     });
     if (CreateData.actualServiceList[serviceIndex].isAuthNeeded) {
       final bool isLoged = await ActionsOrReactionsFunctions.isAlreadyLogged(CreateData.actualServiceList[serviceIndex]);
-      setState(() {
-        CreateData.hasToLogin = !isLoged;
-      });
+      CreateData.hasToLogin = !isLoged;
     }
   }
 
