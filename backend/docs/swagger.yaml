@@ -410,8 +410,7 @@ definitions:
   docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse:
     properties:
       authenticated:
-        example: true-false
-        type: string
+        type: boolean
     type: object
   docs_userservice.UserServiceServiceCallbackBadRequestResponse:
     properties:

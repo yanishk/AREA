@@ -27,7 +27,7 @@ type UserServiceServiceCallbackInternalServerErrorResponse struct {
 
 // User Service Authentication Status Responses
 type UserServiceGetUserServiceAuthenticationStatusSuccessResponse struct {
-	Msg string `json:"authenticated"example:"true-false"`
+	Msg bool `json:"authenticated"`
 }
 
 type UserServiceGetUserServiceAuthenticationStatusBadRequestResponse struct {

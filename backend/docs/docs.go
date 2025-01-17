@@ -1768,8 +1768,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "authenticated": {
-                    "type": "string",
-                    "example": "true-false"
+                    "type": "boolean"
                 }
             }
         },
