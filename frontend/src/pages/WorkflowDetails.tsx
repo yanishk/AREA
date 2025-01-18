@@ -6,6 +6,7 @@ import getServiceDetails from "../utils/GetServiceDetails";
 import ActionButton from "../components/buttons/ActionButton";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
 import { getUserName } from "../utils/GetUserName";
+import Modal from "../components/modals/Modal";
 
 interface Workflow {
     id: string;
@@ -28,6 +29,7 @@ const WorkflowDetail = () => {
     const [buttonText, setButtonText] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [workflowName, setWorkflowName] = useState("");
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const navigate = useNavigate();
 
@@ -75,6 +77,14 @@ const WorkflowDetail = () => {
     const goBack = () => {
         navigate(-1);
     }
+
+    const handleShowModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+    };
 
     const handleDelete = async () => {
         try {
@@ -163,6 +173,14 @@ const WorkflowDetail = () => {
 
     return (
         <>
+            {isModalVisible && (
+                <Modal
+                    message={"Are you sure you want to delete this workflow ?"}
+                    onClickYes={handleDelete}
+                    onClickNo={handleCloseModal}
+                />
+            )}
+
             <div
                 style={{backgroundColor: workflow?.actioncolor}}
             >
@@ -333,7 +351,7 @@ const WorkflowDetail = () => {
                     >
                         <button
                             className="font-[700] text-[20px] text-[#BC5555] hover:opacity-85 hover:cursor-pointer"
-                            onClick={handleDelete}
+                            onClick={handleShowModal}
                         >
                             Delete workflow
                         </button>
