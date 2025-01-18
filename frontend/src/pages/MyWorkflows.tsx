@@ -58,6 +58,13 @@ const MyWorkflow = () => {
         fetchUserName();
     }, []);
 
+    const sliceText = (text: string, maxLen: number) => {
+        if (text.length > maxLen) {
+            return text.slice(0, maxLen) + "...";
+        }
+        return text;
+    }
+
     return (
         <>
             <Navbar />
@@ -109,7 +116,7 @@ const MyWorkflow = () => {
                                     <h2
                                         className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0 break-words whitespace-normal"
                                     >
-                                        {workflow.name}
+                                        {sliceText(workflow.name, 70)}
                                     </h2>
 
                                     <div className="absolute bottom-[20px]">
