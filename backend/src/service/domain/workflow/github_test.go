@@ -128,3 +128,45 @@ func TestCheckGithubNewIssueAction(test *testing.T) {
 		require.Error(test, err)
 	})
 }
+
+func TestCheckWorkflowsWithGithubActions(test *testing.T) {
+	test.Run("Fail Find Workflows", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		github := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, errors.New("Fail find worklfows"))
+
+		err := github.checkWorkflowsWithGithubActions(action)
+
+		require.EqualError(test, err, "Fail find worklfows")
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		github := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, nil)
+
+		err := github.checkWorkflowsWithGithubActions(action)
+
+		require.NoError(test, err)
+	})
+}
