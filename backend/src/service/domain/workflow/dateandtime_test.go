@@ -65,3 +65,27 @@ func TestCheckEveryMonthOnTheParamValidity(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCheckEveryYearParamValidity(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		month, day, hour, minute, err := checkEveryYearParamValidity(1.0, 1.0, 1.0, 1.0)
+
+		require.NoError(test, err)
+		require.Equal(test, 1.0, month)
+		require.Equal(test, 1.0, day)
+		require.Equal(test, 1.0, hour)
+		require.Equal(test, 1.0, minute)
+	})
+
+	test.Run("Month Failure", func(test *testing.T) {
+		_, _, _, _, err := checkEveryYearParamValidity(1, 1.0, 1.0, 1.0)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+
+	test.Run("Failure Day/Hour/Minute", func(test *testing.T) {
+		_, _, _, _, err := checkEveryYearParamValidity(1.0, 1, 1, 1)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
