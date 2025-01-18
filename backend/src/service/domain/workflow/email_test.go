@@ -54,3 +54,47 @@ func TestSendMeEmail(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCheckSendEmailReactions(test *testing.T) {
+	test.Run("Fail Find Reaction", func(test *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		email := &WorkflowService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		workflow := entities.Workflow{
+			ReactionId: "1",
+		}
+
+		mockReactionRepo.On("FindReactionById", workflow.ReactionId).
+			Return(entities.Reaction{}, errors.New(errorRetrievingReaction))
+
+		err := email.checkSendEmailReactions(workflow)
+
+		require.EqualError(test, err, errorRetrievingReaction)
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		email := &WorkflowService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		workflow := entities.Workflow{
+			ReactionId: "1",
+		}
+
+		reaction := entities.Reaction{
+			Name: "test",
+		}
+
+		mockReactionRepo.On("FindReactionById", workflow.ReactionId).
+			Return(reaction, nil)
+
+		err := email.checkSendEmailReactions(workflow)
+
+		require.NoError(test, err)
+	})
+}
