@@ -109,8 +109,8 @@ func (m *MockServiceServiceRepository) GetUserInfoFromService(accessToken, servi
 }
 
 func (m *MockServiceServiceRepository) RequestToTimeApi() (entities.TimeResponse, error) {
-	var test entities.TimeResponse
-	return test, nil
+	args := m.Called()
+	return args.Get(0).(entities.TimeResponse), args.Error(1)
 }
 
 func (m *MockServiceServiceRepository) RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error) {
