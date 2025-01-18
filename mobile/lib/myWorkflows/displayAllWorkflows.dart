@@ -33,7 +33,7 @@ class DisplayWorkflowsMain extends State<DisplayWorkflowsStateful> {
   String apiRoute = "workflows";
   String workflowsResponseName = "workflows";
   List<Widget> workflowsCardList = [];
-  String email = Globaldata.userInfos.email;
+  String email = Globaldata.userInfos.username;
 
   Future<void> redirectWorkflowInfos(int index) async {
     MyWorkflowsData.selectedWorkflowsIndex = index;

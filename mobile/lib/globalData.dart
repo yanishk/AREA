@@ -92,11 +92,13 @@ class UserInfos {
   String createdat = "";
   String timezone = "";
   String connectiontype = "";
+  String username = "";
 
   UserInfos.optional([
     this.email = "",
     this.createdat = "",
     this.timezone = "",
     this.connectiontype = "",
+    this.username = "",
   ]);
 }
