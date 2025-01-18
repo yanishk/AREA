@@ -64,3 +64,20 @@ func TestCheckActionDataLen(test *testing.T) {
 		require.EqualError(test, err, "Fail update worklfow")
 	})
 }
+
+func TestCheckGithubNewRepositoryAction(test *testing.T) {
+	test.Run("Fail Request Repositories", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockServiceServiceRepo.On("RequestGithubUserRepositories", "accessToken").
+			Return([]entities.GithubRepository{}, errors.New("Fail request repositories"))
+
+		err := github.checkGithubNewRepositoryAction(entities.Workflow{}, "accessToken")
+
+		require.EqualError(test, err, "Fail request repositories")
+	})
+}
