@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
 import { useNavigate } from "react-router-dom";
 import getServiceDetails from "../utils/GetServiceDetails";
+import ButtonValidation from "../components/buttons/ButtonValidation";
 
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
     const [userName, setUserName] = useState("You");
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     const getUserWorkflows = async () => {
@@ -25,6 +27,12 @@ const MyWorkflow = () => {
 
             const workflows = result.data.workflows;
 
+            if (!result.data.workflows) {
+                setUserWorkflows([]);
+                setIsLoading(false);
+                return;
+            }
+
             const workflowsDetails = await Promise.all(
                 workflows.map(async (workflow: any) => {
                     const actionDetails = await getServiceDetails(workflow.actionid, "action");
@@ -39,6 +47,7 @@ const MyWorkflow = () => {
                 })
             );
 
+            setIsLoading(false);
             setUserWorkflows(workflowsDetails);
         } catch (err) {
             console.error("Error fetching workflows:", err);
@@ -58,13 +67,47 @@ const MyWorkflow = () => {
         fetchUserName();
     }, []);
 
-    return (
-        <>
-            <Navbar />
+    const sliceText = (text: string, maxLen: number) => {
+        if (text.length > maxLen) {
+            return text.slice(0, maxLen) + "...";
+        }
+        return text;
+    }
 
-            <MaxWidthWrapper
-                maxWidth="1120px"
-            >
+    const renderContent = () => {
+        if (isLoading) {
+            return null;
+        }
+
+        if (userWorkflows.length === 0) {
+            return (
+                <div
+                    className="flex flex-col items-center justify-center min-h-[75vh] text-center"
+                >
+                    <h1
+                        className="text-[#222222] text-[2.96666667rem] font-[900]"
+                    >
+                        Start connecting your world
+                    </h1>
+                    <p
+                        className="text-[#222222] mt-[30px] text-[20px] mb-[50px] font-[500]"
+                    >
+                        Save time and money by making the internet work for you!
+                    </p>
+                    <MaxWidthWrapper
+                        maxWidth="420px"
+                    >
+                        <ButtonValidation
+                            text="Create your workflow"
+                            onClick={() => navigate("/create")}
+                        />
+                    </MaxWidthWrapper>
+                </div>
+            )
+        }
+
+        return (
+            <>
                 <div
                     className="flex items-center justify-center mt-10"
                 >
@@ -79,8 +122,8 @@ const MyWorkflow = () => {
 
                     </div>
                 </div>
-                <div className="mt-16 ml-[35px]">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
+                <div className="mt-16">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-3">
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
@@ -88,7 +131,7 @@ const MyWorkflow = () => {
                                     backgroundColor: workflow.actioncolor,
                                     boxShadow: '0 1.5px 6px 0 rgba(0,0,0,.24)'
                                 }}
-                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-6 mb-5 hover:opacity-90 relative ${
+                                className={`h-[420px] flex flex-col items-start pt-2 cursor-pointer rounded-[10px] mr-3 mb-5 hover:opacity-90 relative ${
                                     workflow.isactivated ? "opacity-100" : "opacity-50 hover:opacity-30"
                                 }`}
                                 onClick={() => navigate(`/workflows/${workflow.id}`)}
@@ -109,7 +152,7 @@ const MyWorkflow = () => {
                                     <h2
                                         className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0 break-words whitespace-normal"
                                     >
-                                        {workflow.name}
+                                        {sliceText(workflow.name, 70)}
                                     </h2>
 
                                     <div className="absolute bottom-[20px]">
@@ -144,14 +187,14 @@ const MyWorkflow = () => {
                                                 style={{
                                                     backgroundColor: workflow.actioncolor,
                                                     transform: workflow.isactivated
-                                                    ? "translateX(0)"
-                                                    : "translateX(-120px)",
+                                                        ? "translateX(0)"
+                                                        : "translateX(-120px)",
                                                 }}
                                                 className="h-[33px] w-[33px] rounded-full">
                                             </div>
                                         </div>
                                         {workflow.isactivated ? (
-                                            <div className="flex flex-row mt-[30px]">
+                                            <div className="flex flex-row mt-[22px]">
                                                 <img
                                                     className="w-[14px] h-[18px]"
                                                     src="/user-icon.png"
@@ -169,14 +212,28 @@ const MyWorkflow = () => {
                                     </div>
                                 </div>
 
-                            </button>
+                                    </button>
 
-                        ))}
-                    </div>
-                </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+        )
+    }
+
+    return (
+        <>
+            <Navbar />
+
+            <MaxWidthWrapper
+                maxWidth="1120px"
+            >
+                {
+                    renderContent()
+                }
             </MaxWidthWrapper>
         </>
-    )
+    );
 }
 
 export default MyWorkflow

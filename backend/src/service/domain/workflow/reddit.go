@@ -13,6 +13,8 @@ import (
 	"backend/src/entities"
 )
 
+const redditUserRoute = "https://oauth.reddit.com/user/"
+
 func redditReactions() []string {
 	return []string{
 		"Submit a comment on a post ",
@@ -22,8 +24,6 @@ func redditReactions() []string {
 		"Submit a post with a link",
 	}
 }
-
-const redditUserRoute = "https://oauth.reddit.com/user/"
 
 func (self *WorkflowService) postRedditComment(accessToken string, workflow entities.Workflow) error {
 	comment, commentExists := workflow.ReactionParam["comment"]

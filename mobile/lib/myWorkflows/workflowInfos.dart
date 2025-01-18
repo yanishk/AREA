@@ -29,13 +29,13 @@ class WorkflowInfosAPICall extends StatefulWidget {
 
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
-  String email = Globaldata.userInfos.email;
+  String email = Globaldata.userInfos.username;
   Color backgroundColor = HexColor(
     Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)].color
   );
 
   bool editNameMode = false;
-  String editNameButtonText = "Edit name";
+  String editNameButtonText = "Edit title";
   String modifDate = "";
   String workflowID = MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].id;
 
@@ -260,7 +260,7 @@ class WorkflowInfosTitle extends StatelessWidget {
             ),
             LeftWidget(
               child: AutoSizeText(
-                "By $email",
+                "by $email",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

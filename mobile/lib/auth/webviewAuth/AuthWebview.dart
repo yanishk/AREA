@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:namer_app/apiCall/apiRequest.dart';
 import 'dart:developer' as developer;
-import 'dart:convert';
-import "package:http/src/response.dart";
 import "package:namer_app/auth/authFunctions.dart";
 
-import "../../apiCall/apiErrorHandling.dart";
 import "../../globalData.dart";
-import "../../login/loginNavigator.dart";
-import "../../login/loadData/loadServicesData.dart";
 import "../../apiCall/apiData.dart";
 import "../authData.dart";
+import 'AuthLoadingScreen.dart';
 
 String authConnectionType = "";
 String authServiceName = "";
@@ -46,6 +41,7 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
   late InAppWebViewController webViewController;
   String newUrl = "";
   String apiRoute = "service-callback";
+  String callBackRedirect = "create";
 
   @override
   void initState() {
@@ -54,31 +50,9 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
       developer.log("authConnectionType : $authConnectionType");
       setState(() {
         apiRoute = "login-callback";
+        callBackRedirect = "explore";
       });
     }
-  }
-
-  Future<void> saveJWToken(Response response) async {
-    String? cookiesBrute = response.headers["set-cookie"];
-    String JWToken = "";
-    if (cookiesBrute != null) {
-      JWToken = cookiesBrute.split(';').first;
-      setState(() {
-        developer.log("JWToken : {${JWToken}}");
-        Globaldata.JWToken = JWToken;
-        LoginNavigator.redirectAndHandleGoBackRedirection(LoadServicePage(), LoadServicePage());
-      });
-      return;
-    }
-  }
-
-  String removeUrlState(String url) {
-    final splitState = url.split("?state=");
-    if (splitState.length == 1) {
-      return url.split("&state=").first;
-    }
-    final splitCode = splitState.last.split("&code=");
-    return "${splitState.first}?code=${splitCode.last}";
   }
 
   @override
@@ -92,36 +66,23 @@ class WebviewAuth extends State<WebviewAuthAPICall> {
           javaScriptEnabled: true,
           domStorageEnabled: true,
         ),
-        onLoadStart: (controller, url) {
+        onLoadStart: (controller, url) async {
           AuthFunctions.setCookiesAndNavigate(ApiData.apiUrl);
-        },
-        onLoadStop: (controller, url) async {
-          developer.log("onLoadStop url : ${url.toString()}");
-          if (url != null &&
-              url.toString().contains(ApiData.apiUrl + "$apiRoute/$authServiceName")) {
-            final urlSplit = url.toString().split(ApiData.apiUrl);
-            String callBackUrl = removeUrlState(urlSplit.last);
-            final Response response = await ApiRequest.post(
-              AuthFunctions.removeServiceFromUrl(callBackUrl, authServiceName),
-              jsonEncode(<String, dynamic>{
-                "apptype" : Globaldata.appType,
-                "service" : authServiceName,
-              }),
+          developer.log("onLoadStart url : $url");
+          if (url != null && url.toString().contains("/$callBackRedirect?") ||
+              url != null && url.toString().contains("/$authServiceName?")) {
+            final authSucced = await Navigator.push(
+              Globaldata.myContext,
+              MaterialPageRoute(builder: (context) => AuthLoadingScreenPage(
+                callBack: callBackRedirect,
+                authService: authServiceName,
+                route: apiRoute,
+                uri: url,
+              )),
             );
-
-            if (response.statusCode == 200) {
-              developer.log("User connected");
-              if (Globaldata.JWToken.isEmpty) {
-                saveJWToken(response);
-              }
-              Navigator.pop(context);
-              Navigator.pop(Globaldata.myContext, true);
-            } else {
-              final responseData = await errorHandler.basicResponseErrorHandler(response, "Error auth failed : ");
-              if (responseData == null) {
-                return;
-              }
-            }
+            Navigator.pop(context);
+            Navigator.pop(Globaldata.myContext, authSucced);
+            return;
           }
         },
       ),

@@ -82,7 +82,7 @@ const AccountPage = () => {
             <Navbar />
 
             <div
-                className="flex items-center justify-between px-10 py-5"
+                className="flex items-center justify-between px-6 lg:py-5 pb-14"
             >
                 <div>
                     <ActionButton
@@ -105,7 +105,7 @@ const AccountPage = () => {
                         className="flex flex-col items-center text-center w-full"
                     >
                         <h1
-                            className="text-5xl text-[#222222] font-[900]"
+                            className="text-4xl sm:text-5xl text-[#222222] font-[900]"
                         >
                             Account settings
                         </h1>
@@ -122,7 +122,7 @@ const AccountPage = () => {
                 </div>
 
                 <div
-                    className="flex flex-col justify-center items-center"
+                    className="flex flex-col justify-center items-center lg:px-0 px-10"
                 >
                     <div
                         className="w-full mt-10"

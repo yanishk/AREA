@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
-import isAuthenticated from "../utils/checkAuthStatus";
+import isAuthenticated from "../utils/CheckAuthStatus";
 
 type AuthContextType = {
     isUserConnected: boolean;

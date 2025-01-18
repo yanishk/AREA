@@ -11,8 +11,9 @@ import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
-import getFieldValues, { gitlabNameToIdMap } from "../utils/getFieldValues";
+import getFieldValues from "../utils/GetFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
+import { getDiscordChannels, getServerIdByName, setSelectedServer } from "../utils/DiscordUtils";
 
 type availableActionsType = {
     name: string;
@@ -78,7 +79,7 @@ const WorkflowBuilder = () => {
             handleDeleteAction();
             handleDeleteReaction();
             sessionStorage.removeItem("state-data");
-            navigate("/explore")
+            navigate(-1);
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -264,7 +265,7 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const handleFieldChange = (id: string, value: string, type: "action" | "reaction") => {
+    const handleFieldChange = async (id: string, value: string, type: "action" | "reaction") => {
         if (type === "action") {
             setActionFieldValues((prev) => ({
                 ...prev,
@@ -272,18 +273,32 @@ const WorkflowBuilder = () => {
             }));
         }
         if (type === "reaction") {
+            if (id === "server") {
+                setSelectedServer(value, id);
+
+                const serverId = await getServerIdByName(value);
+                if (serverId) {
+                    const channels = await getDiscordChannels(serverId);
+
+                    if (channels.length > 0) {
+                        setReactionFieldValues((prev) => ({
+                            ...prev,
+                            channel: channels[0].name,
+                        }));
+                    }
+                }
+            }
+
             if (id === "workflow") {
                 setSelectedWorkspace(value, id);
             }
-              setReactionFieldValues((prev) => ({
+
+            setReactionFieldValues((prev) => ({
                 ...prev,
                 [id]: value,
             }));
         }
-        else {
-            console.error(`Invalid type parameter: ${type}`);
-        }
-    }
+    };
 
     const handleSelectReactionService = (name: string, color: string, iconPath: string, isauthneeded: boolean) => {
         setSelectedReactionService({ name, color, iconPath, isauthneeded });
@@ -404,7 +419,7 @@ const WorkflowBuilder = () => {
             const state = sessionStorage.getItem("state-data");
 
             if (!state) {
-                console.error("Undetected state into session storage");
+                console.warn("Undetected state into session storage");
                 return;
             }
 
@@ -471,58 +486,79 @@ const WorkflowBuilder = () => {
 
     }, [selectedAction, selectedReaction]);
 
-    const getIndexFromValues = (value: string, valuesArray: string[]): number | null => {
-        const index = valuesArray.indexOf(value);
-
-        if (index === -1) {
-            return null;
-        }
-
-        if (valuesArray[0] === "0") {
-            return index;
-        }
-
-        return index + 1;
-    };
-
     const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
         parameters: Parameters[]
     ): Promise<Record<string, any>> => {
         const params: Record<string, any> = {};
 
-        const handleIntParam = async (key: string, param: Parameters) => {
-            const valuesArray = await getFieldValues(param);
-
-            if (!valuesArray) {
-                return;
-            }
-
-            const index = getIndexFromValues(valuesSelectedByUser[key], valuesArray);
-
-            if (index !== null) {
-                params[key] = index;
-            }
+        if (!parameters) {
+            return params;
         }
 
-        const processKeys = async (key: string) => {
-            const param = parameters.find((param) => param.name === key);
-
-            if (!param) {
-                return;
-            }
-
-            if (param.type === "int") {
-                await handleIntParam(key, param);
-            } else {
-                params[key] = valuesSelectedByUser[key];
-            }
+        for (const param of parameters) {
+            params[param.name] = valuesSelectedByUser[param.name];
         }
-
-        await Promise.all(Object.keys(valuesSelectedByUser).map(processKeys));
 
         return params;
     };
+
+    const getGitlabProjectId = async (actionParams: any) => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}gitlab/user/projects`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                const gitlabProjects = result.data.projects;
+
+                Object.keys(actionParams).forEach((key) => {
+                    const projectName = actionParams[key];
+
+                    const project = gitlabProjects.find((item: { name: string }) => item.name === projectName);
+
+                    if (!project) {
+                        console.error("No gitlab projects found");
+                        return;
+                    }
+                    actionParams[key] = project.id.toString();
+                }
+            );
+        } catch (error) {
+            console.error("Error with fetch gitlab projects", error);
+        }
+    }
+
+    const handleDiscordParameters = async (reactionParams: any) => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}discord/user/servers`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                const discordServers = result.data.servers;
+
+                Object.keys(reactionParams).forEach((key) => {
+                    const projectName = reactionParams[key];
+
+                    const server = discordServers.find((item: { name: string }) => item.name === projectName);
+
+                    if (!server) {
+                        console.error("No discord servers found");
+                        return;
+                    }
+
+                    reactionParams[key] = server.id;
+                }
+            );
+        } catch (error) {
+            console.error("Error with fetch discord servers", error);
+        }
+    }
 
     const handleCreateWorkflow = async (workflowTitle: string) => {
         const actionParams = selectedAction
@@ -533,12 +569,47 @@ const WorkflowBuilder = () => {
             ? await getActionReactionParams(reactionFieldValues, selectedReaction.parameters)
             : null;
 
-            if (selectedActionService?.name === "Gitlab" && actionParams) {
-                Object.keys(actionParams).forEach((key) => {
-                    const value = actionParams[key];
-                    actionParams[key] = gitlabNameToIdMap[value];
-                });
-            }
+        if (selectedActionService?.name === "Gitlab" && actionParams) {
+            await getGitlabProjectId(actionParams);
+        }
+
+        if (selectedReactionService?.name === "Discord" && reactionParams) {
+            await handleDiscordParameters(reactionParams);
+        }
+
+        if (selectedAction?.parameters) {
+            selectedAction.parameters.forEach((param) => {
+                if (param.type != "int" || actionParams === null) {
+                    return null;
+                }
+
+                const selectedParam = actionParams?.[param.name];
+                let index = param.values.indexOf(selectedParam);
+
+                if (param.values[0] === "0") {
+                    actionParams[param.name] = index;
+                }
+                if (index != -1) {
+                    actionParams[param.name] = index + 1;
+                } else {
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                }
+
+                return actionParams[param.name]
+            });
+        }
+
+        if (selectedReaction?.parameters) {
+            selectedReaction.parameters.forEach((param) => {
+                if (param.type != "int" || reactionParams === null)
+                    return null;
+                if (param?.name != "server" && param?.name != "channel") {
+                    reactionParams[param.name] = parseInt(reactionParams[param.name], 10);
+                }
+            });
+        }
+
+        navigate("/my_workflows");
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
@@ -554,10 +625,10 @@ const WorkflowBuilder = () => {
             }
         );
 
+        sessionStorage.removeItem("state-data");
         setSelectedActionService(null);
         setSelectedAction(null);
         setSelectedReaction(null);
-        navigate("/explore");
     };
 
     const renderStep = () => {

@@ -17,7 +17,7 @@ const ConnectServiceStep: React.FC<ConnectServiceProps> = ({
             style={{ backgroundColor: selectedService?.color }}
             className="min-h-screen bg-gray-100"
         >
-            <div className="flex items-center justify-between px-10 py-5 border-b-[1px] border-[#dadada]">
+            <div className="flex items-center w-[110%] lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]">
                 <div>
                     <ActionButton
                         text="Back"
@@ -28,7 +28,7 @@ const ConnectServiceStep: React.FC<ConnectServiceProps> = ({
                     />
                 </div>
 
-                <h1 className="text-white text-[3.2rem] font-extrabold text-center flex-1">
+                <h1 className="text-white text-[1.3rem] sm:text-[3.2rem] font-extrabold w-full text-center">
                     Connect Service
                 </h1>
 
@@ -45,7 +45,7 @@ const ConnectServiceStep: React.FC<ConnectServiceProps> = ({
                 </h2>
             </div>
 
-            <div className="cursor-pointer flex justify-center items-center">
+            <div className="cursor-pointer flex justify-center items-center px-3 sm:px-0">
                 <TriggerButton
                     text={"Connect"}
                     textColor="text-black"

@@ -221,41 +221,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/authentication-status": {
-            "get": {
-                "description": "Checks if connected user is authenticated to the specified service",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "User Service Authentication Status",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Service name (Github, Spotify, Discord..)",
-                        "name": "service",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/discord/server/channels": {
             "get": {
                 "description": "Retrieve the channels from the selected server",
@@ -544,6 +509,41 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/docs_user.UserInternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-authentication-status": {
+            "get": {
+                "description": "Checks if connected user is authenticated to the specified service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Service Authentication Status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service name (Github, Spotify, Discord..)",
+                        "name": "service",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/docs_userservice.UserServiceGetUserServiceAuthenticationStatusBadRequestResponse"
                         }
                     }
                 }
@@ -1767,9 +1767,8 @@ const docTemplate = `{
         "docs_userservice.UserServiceGetUserServiceAuthenticationStatusSuccessResponse": {
             "type": "object",
             "properties": {
-                "success": {
-                    "type": "string",
-                    "example": "User authenticated to ${service}-User not authenticated to ${service}"
+                "authenticated": {
+                    "type": "boolean"
                 }
             }
         },

@@ -130,7 +130,7 @@ class WorkflowsTiles extends StatelessWidget {
             padding: const EdgeInsets.only(left: 0),
             mainAxisAlignment: MainAxisAlignment.start,
             firstChild: Text(
-              "By ",
+              "by ",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -154,14 +154,17 @@ class WorkflowsTiles extends StatelessWidget {
               showOnOff: true,
               inactiveText: "Connect",
               activeText: "Connected",
-              activeTextFontWeight: FontWeight.normal,
+              toggleColor: HexColor(
+                Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[index].actionID)].color
+              ),
+              activeTextFontWeight: FontWeight.bold,
               inactiveTextFontWeight: FontWeight.normal,
               inactiveTextColor: Colors.white,
-              activeTextColor: Colors.white,
+              activeTextColor: const Color.fromARGB(255, 0, 0, 0),
               inactiveColor: const Color.fromARGB(255, 102, 102, 102),
               value: MyWorkflowsData.allWorkflowsData[index].isActivated,
               width: MediaQuery.sizeOf(Globaldata.myContext).width / 3,
-              activeColor: const Color.fromARGB(255, 0, 132, 255),
+              activeColor: const Color.fromARGB(255, 255, 255, 255),
               onToggle: (bool) {},
             ),
           ),

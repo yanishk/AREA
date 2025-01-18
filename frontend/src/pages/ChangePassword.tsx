@@ -125,7 +125,7 @@ const ChangePasswordPage = () => {
                 </div>
 
                 <div
-                    className="flex flex-col justify-center items-center"
+                    className="flex flex-col justify-center items-center lg:px-0 px-10"
                 >
                     <div
                         className="w-full mt-10"

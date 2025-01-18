@@ -24,14 +24,14 @@ const SocialButton: React.FC<SocialButtonProps> = ({
     return (
         <button
             onClick={onClick}
-            className={`w-full h-[75px] ${bgColor} text-white text-[1.6rem] rounded-full ${hoverColor} mt-4 font-[900] flex items-center justify-center relative`}
+            className={`w-full h-[75px] ${bgColor} text-white text-[1.4rem] sm:text-[1.6rem] rounded-full ${hoverColor} mt-4 font-[900] flex items-center justify-center relative`}
         >
             <FontAwesomeIcon
                 icon={icon}
-                className={`absolute ${iconPosition} ${iconSize}`}
+                className={`ml-5 ${iconPosition} ${iconSize}`}
             />
             <span
-                className="flex justify-center items-center w-full ml-4">
+                className="flex justify-center items-center w-full pl-2 pr-2">
                 {text}
             </span>
         </button>
