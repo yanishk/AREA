@@ -226,7 +226,7 @@ const MyWorkflow = () => {
                                                 </span>
                                             </div>
                                         ) : (
-                                            <div className="mb-[60px]"></div>
+                                            <div className="mb-[51px]"></div>
                                         )}
                                     </div>
                                 </div>
