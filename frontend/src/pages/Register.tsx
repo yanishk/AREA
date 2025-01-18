@@ -1,7 +1,6 @@
 import { faSpotify, faDiscord, faGithub, faGitlab} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import axios from "axios";
-import ErrorMessage from "../components/errors/ErrorMessage";
 import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import SocialButton from "../components/buttons/SocialButton";
@@ -10,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { handleOAuthLogin } from '../OAuth';
+import MessageBox from '../components/notification/MessageBox';
 
 const RegisterForm = () => {
 
@@ -64,7 +64,7 @@ const RegisterForm = () => {
 
     return (
         <>
-            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
+            <MessageBox message={error} trigger={errorTrigger} onClose={handleErrorClose} type="error" timeout={3000}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">

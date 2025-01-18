@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import ErrorMessage from "../components/errors/ErrorMessage"
 import Navbar from "../components/navbar/Navbar"
 import {useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
+import MessageBox from "../components/notification/MessageBox";
 
 const ExplorePage = () => {
     const location = useLocation();
@@ -79,7 +79,8 @@ const ExplorePage = () => {
     return (
         <>
             <Navbar bgColor="bg-white"/>
-            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose} />
+
+            <MessageBox message={error} trigger={errorTrigger} onClose={handleErrorClose} type="error" timeout={3000} />
 
             <div
                     className="flex items-center justify-center mt-10"
