@@ -23,3 +23,19 @@ func TestMoveFileOrFolder(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCreateTextFile(test *testing.T) {
+	test.Run("Missing Field", func(test *testing.T) {
+		dropbox := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ReactionParam: map[string]interface{}{
+				"key": "value",
+			},
+		}
+
+		err := dropbox.createTextFile("accessToken", workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
