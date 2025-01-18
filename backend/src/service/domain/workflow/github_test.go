@@ -170,3 +170,68 @@ func TestCheckWorkflowsWithGithubActions(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestCheckGithubActions(test *testing.T) {
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockServiceServiceRepo.On("FindServiceByName", "Github").
+			Return(entities.Service{}, errors.New("Fail find service"))
+
+		err := github.CheckGithubActions()
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		github := &WorkflowService{
+			ServiceService:   mockServiceServiceRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		service := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		err := github.CheckGithubActions()
+
+		require.EqualError(test, err, "Fail find actions")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		github := &WorkflowService{
+			ServiceService:   mockServiceServiceRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		service := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiceRepo.On("FindServiceByName", "Github").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, nil)
+
+		err := github.CheckGithubActions()
+
+		require.NoError(test, err)
+	})
+}
