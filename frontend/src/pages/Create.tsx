@@ -590,16 +590,14 @@ const WorkflowBuilder = () => {
                     if (param.values[0] === "0") {
                         actionParams[param.name] = index;
                     }
-                    if (index === -1) {
+                    if (index != -1) {
                         actionParams[param.name] = index + 1;
-                    }
-                    else {
+                    } else {
                         actionParams[param.name] = parseInt(actionParams[param.name], 10);
                     }
 
                     return actionParams[param.name]
                 }
-
                 actionParams[param.name] = parseInt(actionParams[param.name], 10);
             });
         }
