@@ -98,7 +98,7 @@ const WorkflowDetail = () => {
             if (result.data.success) {
                 navigate("/my_workflows", {
                     state: {
-                        notification: "Workflow was deleted successfully !",
+                        notification: "Workflow deleted",
                         notificationTrigger: Date.now()
                     }
                 });
