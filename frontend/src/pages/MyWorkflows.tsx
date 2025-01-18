@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
 import { useNavigate } from "react-router-dom";
 import getServiceDetails from "../utils/GetServiceDetails";
+import ButtonValidation from "../components/buttons/ButtonValidation";
 
 const MyWorkflow = () => {
 
@@ -23,7 +24,11 @@ const MyWorkflow = () => {
                 return;
             }
 
+            console.log("result ici : ", result);
+
             const workflows = result.data.workflows;
+
+            console.log("workflow ici : ", workflows);
 
             const workflowsDetails = await Promise.all(
                 workflows.map(async (workflow: any) => {
@@ -38,6 +43,11 @@ const MyWorkflow = () => {
                     };
                 })
             );
+
+            if (!result.data.workflows) {
+                setUserWorkflows([]);
+                return;
+            }
 
             setUserWorkflows(workflowsDetails);
         } catch (err) {
@@ -65,6 +75,33 @@ const MyWorkflow = () => {
             <MaxWidthWrapper
                 maxWidth="1120px"
             >
+                {userWorkflows.length === 0 ? (
+                    <>
+                        <div
+                            className="flex flex-col items-center justify-center min-h-screen text-center"
+                        >
+                            <h1
+                                className="text-[#222222] text-[2.96666667rem] font-[900]"
+                            >
+                                Start connecting your world
+                            </h1>
+                            <p
+                                className="text-[#222222] mt-[30px] text-[20px] mb-[50px] font-[500]"
+                            >
+                                Save time and money by making the internet work for you!
+                            </p>
+                            <MaxWidthWrapper
+                                maxWidth="420px"
+                            >
+                                <ButtonValidation
+                                    text="Create your workflow"
+                                    onClick={() => navigate("/create")}
+                                />
+                            </MaxWidthWrapper>
+                        </div>
+                    </>
+                ) : (
+                <>
                 <div
                     className="flex items-center justify-center mt-10"
                 >
@@ -174,6 +211,8 @@ const MyWorkflow = () => {
                         ))}
                     </div>
                 </div>
+                </>
+                )}
             </MaxWidthWrapper>
         </>
     )
