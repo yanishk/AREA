@@ -47,8 +47,7 @@ class ActionsOrReactionsFunctions {
     }
     final responseData = jsonDecode(response.body);
     if (response.statusCode != 200) {
-      developer.log(
-          "isAlreadyLogged, service : ${actualService.name}, FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
+      developer.log("isAlreadyLogged, service : ${actualService.name}, FAIL ERROR : \nError Message : $responseData\nError Code : ${response.statusCode}");
       return false;
     }
     return responseData["authenticated"];
