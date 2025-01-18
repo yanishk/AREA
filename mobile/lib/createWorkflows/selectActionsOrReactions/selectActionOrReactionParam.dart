@@ -10,9 +10,12 @@ import '../createWorkflowsData.dart';
 import "../../auth/webviewAuth/connectServiceAuth.dart";
 import 'actionOrReactionsFunctions.dart';
 
+bool hasToLogin = true;
+
 class SelectParamActionOrReactionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    hasToLogin = CreateData.hasToLogin;
     return MaterialApp(
       theme: ThemeData(
           scaffoldBackgroundColor: HexColor(CreateData.actualServiceList[CreateData.selectedServiceId].color)),
@@ -45,7 +48,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
         apiRoute = "reactions";
       });
     }
-    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+    if (CreateData.selectedActionOrReactionData.parameter.isEmpty && !hasToLogin) {
       if (isAnAction) {
         setState(() {
           CreateData.actionParamListName = [];
@@ -254,7 +257,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
       return;
     }
     setState(() {
-      CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded = false;
+      hasToLogin = false;
     });
     if (CreateData.selectedActionOrReactionData.parameter.isEmpty) {
       CreateData.selectOrUpdateWorkflow = true;
@@ -287,7 +290,7 @@ class SelectParamActionOrReaction extends State<SelectParamActionOrReactionAPICa
 
   @override
   Widget build(BuildContext context) {
-    if (CreateData.actualServiceList[CreateData.selectedServiceId].isAuthNeeded) {
+    if (hasToLogin) {
       return Scaffold(
         body: SingleChildScrollView(
           child: Column(

@@ -13,6 +13,8 @@ class CreateData {
   static int selectedServiceId = 0;
   static bool selectOrUpdateWorkflow = false;
 
+  static bool hasToLogin = false;
+
   static List<String> actionParamListName = [];
   static List<String> reactionParamListName = [];
 }
