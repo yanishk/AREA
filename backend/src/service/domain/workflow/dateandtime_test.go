@@ -128,7 +128,7 @@ func TestCheckTimeAndDateEveryHourAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 
-	test.Run("Invalid Minute", func(test *testing.T) {
+	test.Run("Invalid Param", func(test *testing.T) {
 		timeDate := &WorkflowService{}
 
 		time := entities.TimeResponse{
@@ -186,7 +186,7 @@ func TestCheckTimeAndDateEveryDayAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 
-	test.Run("Invalid Hour/Minute", func(test *testing.T) {
+	test.Run("Invalid Param", func(test *testing.T) {
 		timeDate := &WorkflowService{}
 
 		workflow := entities.Workflow{
@@ -269,7 +269,7 @@ func TestCheckTimeAndDateEveryWeekAtAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 
-	test.Run("Invalid Hour/Minute", func(test *testing.T) {
+	test.Run("Invalid Param", func(test *testing.T) {
 		timeDate := &WorkflowService{}
 
 		workflow := entities.Workflow{
@@ -332,7 +332,7 @@ func TestCheckTimeAndDateEveryMonthOnTheAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 
-	test.Run("Invalid Hour/Minute", func(test *testing.T) {
+	test.Run("Invalid Param", func(test *testing.T) {
 		timeDate := &WorkflowService{}
 
 		workflow := entities.Workflow{
@@ -350,6 +350,75 @@ func TestCheckTimeAndDateEveryMonthOnTheAction(test *testing.T) {
 		}
 
 		err := timeDate.checkTimeAndDateEveryMonthOnTheAction(time, workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
+
+func TestCheckTimeAndDateEveryYearOnAction(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"month":  1.0,
+				"day":    1.0,
+				"hour":   1.0,
+				"minute": 1.0,
+			},
+		}
+
+		time := entities.TimeResponse{
+			Month:  2,
+			Day:    2,
+			Hour:   2,
+			Minute: 2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryYearOnAction(time, workflow)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Missing Field", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{},
+		}
+
+		time := entities.TimeResponse{
+			Month:  2,
+			Day:    2,
+			Hour:   2,
+			Minute: 2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryYearOnAction(time, workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+
+	test.Run("Invalid Param", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"month":  "1.0",
+				"day":    "1.0",
+				"hour":   "1.0",
+				"minute": "1.0",
+			},
+		}
+
+		time := entities.TimeResponse{
+			Month:  2,
+			Day:    2,
+			Hour:   2,
+			Minute: 2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryYearOnAction(time, workflow)
 
 		require.EqualError(test, err, errorMissingField)
 	})
