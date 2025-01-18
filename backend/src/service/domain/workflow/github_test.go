@@ -2,6 +2,9 @@ package workflow_service
 
 import (
 	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -79,5 +82,49 @@ func TestCheckGithubNewRepositoryAction(test *testing.T) {
 		err := github.checkGithubNewRepositoryAction(entities.Workflow{}, "accessToken")
 
 		require.EqualError(test, err, "Fail request repositories")
+	})
+}
+
+func TestCheckGithubNewIssueAction(test *testing.T) {
+	test.Run("Fail Request Repositories", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+				"title": "test"}`,
+			)),
+		}
+
+		mockServiceServiceRepo.On("ExecuteApiRequest", githubBaseUrl+"issues", "GET", bearerType, "accessToken", nil).
+			Return(mockResponse, errors.New("Fail request"))
+
+		err := github.checkGithubNewIssueAction(entities.Workflow{}, "accessToken")
+
+		require.EqualError(test, err, "Fail request")
+	})
+
+	test.Run("Fail Unmarshal", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{
+				"title": "test"}`,
+			)),
+		}
+
+		mockServiceServiceRepo.On("ExecuteApiRequest", githubBaseUrl+"issues", "GET", bearerType, "accessToken", nil).
+			Return(mockResponse, nil)
+
+		err := github.checkGithubNewIssueAction(entities.Workflow{}, "accessToken")
+
+		require.Error(test, err)
 	})
 }
