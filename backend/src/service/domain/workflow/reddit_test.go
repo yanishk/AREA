@@ -150,3 +150,46 @@ func TestIsANewPost(test *testing.T) {
 		require.EqualError(t, err, errorUpdatingWorkflow)
 	})
 }
+
+func TestIsANewComment(test *testing.T) {
+	test.Run("Fail Update Workflow", func(t *testing.T) {
+		var result entities.RedditCommentResponse
+
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		reddit := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		workflow := entities.Workflow{
+			Id:         "1",
+			ActionData: map[string]interface{}{},
+		}
+
+		redditResponse := `{
+			"data": {
+				"children": [
+					{
+						"data": {
+							"id": "id",
+							"author": "author",
+							"body": "body"
+						}
+					}
+				]
+			}
+		}`
+
+		json.Unmarshal([]byte(redditResponse), &result)
+
+		expectedWorkflow := workflow
+		expectedWorkflow.ActionData = map[string]interface{}{"id": "id"}
+
+		mockWorkflowRepo.On("UpdateWorkflow", expectedWorkflow.Id, expectedWorkflow).
+			Return(fmt.Errorf("update error"))
+
+		err := reddit.isANewComment(workflow, result)
+
+		require.EqualError(t, err, errorUpdatingWorkflow)
+	})
+}
