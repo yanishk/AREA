@@ -248,3 +248,45 @@ func TestCheckRedditNewPostInSubredditAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCheckWorkflowsWithRedditActions(test *testing.T) {
+	test.Run("Fail Find Workflow", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		reddit := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, errors.New("Fail find workflows"))
+
+		err := reddit.checkWorkflowsWithRedditActions(action)
+
+		require.EqualError(test, err, "Fail find workflows")
+	})
+
+	test.Run("Fail Find Workflow", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		reddit := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, nil)
+
+		err := reddit.checkWorkflowsWithRedditActions(action)
+
+		require.NoError(test, err)
+	})
+}
