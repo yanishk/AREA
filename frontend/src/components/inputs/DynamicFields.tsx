@@ -1,5 +1,5 @@
 import React from "react";
-import { fieldType } from "../../utils/fieldType";
+import { fieldType } from "../../utils/FieldType";
 
 interface Field {
     id: string;

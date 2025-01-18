@@ -17,6 +17,8 @@ interface Workflow {
     actionlogo: string;
     reactionlogo: string;
     createdat: string;
+    actionname?: string;
+    reactionname?: string;
 }
 
 const WorkflowDetail = () => {
@@ -59,6 +61,7 @@ const WorkflowDetail = () => {
                 actioncolor: actionDetails?.color,
                 actionlogo: actionDetails?.logo,
                 actionname: actionDetails?.name,
+                reactionname: reactionDetails?.name,
                 reactionlogo: reactionDetails?.logo,
             };
 
@@ -188,16 +191,26 @@ const WorkflowDetail = () => {
                             className="flex flex-col text-left justify-center"
                         >
                             <div className="flex flex-row pt-[15px]">
-                                <img
-                                    alt="icon"
-                                    src={`${import.meta.env.VITE_HOST_URL}${workflow?.actionlogo}`}
-                                    className="size-[60px]"
-                                />
-                                <img
-                                    alt="icon"
-                                    src={`${import.meta.env.VITE_HOST_URL}${workflow?.reactionlogo}`}
-                                    className="size-[60px] ml-[10px]"
-                                />
+                                <button
+                                    className="hover:opacity-85"
+                                    onClick={() => navigate(`/${workflow?.actionname?.toLowerCase()}`)}
+                                >
+                                    <img
+                                        alt="icon"
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow?.actionlogo}`}
+                                        className="size-[60px]"
+                                    />
+                                </button>
+                                <button
+                                    className="hover:opacity-85"
+                                    onClick={() => navigate(`/${workflow?.reactionname?.toLowerCase()}`)}
+                                >
+                                    <img
+                                        alt="icon"
+                                        src={`${import.meta.env.VITE_HOST_URL}${workflow?.reactionlogo}`}
+                                        className="size-[60px] ml-[10px]"
+                                    />
+                                </button>
                             </div>
                             {isEditing ? (
                                 <>

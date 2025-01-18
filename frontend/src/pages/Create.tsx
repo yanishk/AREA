@@ -11,10 +11,8 @@ import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
-import getFieldValues from "../utils/getFieldValues";
+import getFieldValues from "../utils/GetFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
-import { monthType } from "../utils/monthType";
-import { dayType } from "../utils/dayType";
 import { getDiscordChannels, getServerIdByName, setSelectedServer } from "../utils/DiscordUtils";
 
 type availableActionsType = {
@@ -81,7 +79,7 @@ const WorkflowBuilder = () => {
             handleDeleteAction();
             handleDeleteReaction();
             sessionStorage.removeItem("state-data");
-            navigate("/explore")
+            navigate(-1);
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -299,8 +297,6 @@ const WorkflowBuilder = () => {
                 ...prev,
                 [id]: value,
             }));
-        } else {
-            console.error(`Invalid type parameter: ${type}`);
         }
     };
 
@@ -586,34 +582,20 @@ const WorkflowBuilder = () => {
                 if (param.type != "int" || actionParams === null) {
                     return null;
                 }
-                if (param.name === "month") {
-                    const monthName = actionParams?.[param.name];
-                    actionParams[param.name] = monthType[monthName];
-                    return actionParams[param.name];
-                }
-                if (param.name === "day") {
-                    const dayName = actionParams?.[param.name];
-                    if (dayType[dayName] != null)
-                        actionParams[param.name] = dayType[dayName];
-                    else
-                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
-                    return actionParams[param.name];
-                }
-                if (param.name === "hour") {
-                    const hourParams = actionParams?.[param.name];
-                    const [hour, period] = hourParams.split(" ");
-                    let hourInt = parseInt(hour, 10);
 
-                    if (period === "PM" && hourInt !== 12) {
-                        hourInt += 12;
-                    }
-                    if (period === "AM" && hourInt === 12) {
-                        hourInt = 0;
-                    }
-                    actionParams[param.name] = hourInt;
-                    return actionParams[param.name];
+                const selectedParam = actionParams?.[param.name];
+                let index = param.values.indexOf(selectedParam);
+
+                if (param.values[0] === "0") {
+                    actionParams[param.name] = index;
                 }
-                actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                if (index != -1) {
+                    actionParams[param.name] = index + 1;
+                } else {
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                }
+
+                return actionParams[param.name]
             });
         }
 
@@ -627,7 +609,7 @@ const WorkflowBuilder = () => {
             });
         }
 
-        navigate("/explore");
+        navigate("/my_workflows");
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,

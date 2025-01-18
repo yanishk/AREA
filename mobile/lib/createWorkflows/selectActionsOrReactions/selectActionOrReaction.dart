@@ -143,6 +143,7 @@ class SelectActionOrReaction extends State<SelectActionOrReactionAPICall> {
             Column(
               children: ActionOrReactionButtonsList,
             ),
+            Padding(padding: EdgeInsets.only(top: 15)),
           ],
         ),
       ),

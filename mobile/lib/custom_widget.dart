@@ -15,6 +15,7 @@ class CustomButton extends StatelessWidget {
     this.image,
     this.borderCircularRadius = 32.0,
     this.shadowSize = 3,
+    this.isActivated = true,
   });
 
   final Color backgroundColor;
@@ -26,6 +27,7 @@ class CustomButton extends StatelessWidget {
   final Image? image;
   final double borderCircularRadius;
   final double shadowSize;
+  final bool isActivated;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class CustomButton extends StatelessWidget {
           backgroundColor: backgroundColor,
           elevation: shadowSize,
           minimumSize: size,
+          enableFeedback: isActivated,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderCircularRadius),
           ),
@@ -409,6 +412,9 @@ class TextWithBackground extends StatelessWidget {
     this.fontSize = 30,
     this.textColor = Colors.black,
     this.maxLines = 1,
+    this.width,
+    this.height,
+    this.alignment,
   });
 
   final Color backgroundColor;
@@ -419,11 +425,17 @@ class TextWithBackground extends StatelessWidget {
   final double fontSize;
   final Color textColor;
   final int maxLines;
+  final double ?width;
+  final double ?height;
+  final Alignment ?alignment;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
+      width: width,
+      height: height,
+      alignment: alignment,
       decoration: BoxDecoration(
         color: backgroundColor,
         border: Border.all(

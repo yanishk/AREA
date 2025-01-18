@@ -225,39 +225,39 @@ func TestGetUserServiceAuthenticationStatus(test *testing.T) {
 		c.Set("email", "email")
 		c.Set("connectionType", "basic")
 	})
-	router.GET("/authentication-status", handler.getUserServiceAuthenticationStatus)
+	router.GET("/service-authentication-status", handler.getUserServiceAuthenticationStatus)
 
 	test.Run("User is Authenticated", func(test *testing.T) {
 		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
 			Return(true, nil).Once()
 
-		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		req := requestForProtected("GET", "/service-authentication-status?service=Github", token, nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusOK, w.Code)
-		require.JSONEq(test, `{"success": "User authenticated to Github"}`, w.Body.String())
+		require.JSONEq(test, `{"authenticated": true}`, w.Body.String())
 	})
 
 	test.Run("User is not Authenticated", func(test *testing.T) {
 		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
 			Return(false, nil).Once()
 
-		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		req := requestForProtected("GET", "/service-authentication-status?service=Github", token, nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)
 
 		require.Equal(test, http.StatusOK, w.Code)
-		require.JSONEq(test, `{"success": "User not authenticated to Github"}`, w.Body.String())
+		require.JSONEq(test, `{"authenticated": false}`, w.Body.String())
 	})
 
 	test.Run("Fail retrieving user's services", func(test *testing.T) {
 		mockUserServiceService.On("RetrieveUserServiceAuthenticationStatus", "email", "basic", "Github").
 			Return(false, errors.New("Could not retrieve user's services")).Once()
 
-		req := requestForProtected("GET", "/authentication-status?service=Github", token, nil)
+		req := requestForProtected("GET", "/service-authentication-status?service=Github", token, nil)
 		w := httptest.NewRecorder()
 
 		router.ServeHTTP(w, req)

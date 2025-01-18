@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateStepsType";
-import { fieldType } from "../../utils/fieldType";
+import { fieldType } from "../../utils/FieldType";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 import ActionButton from "../buttons/ActionButton";
 import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
 import SelectField from "../inputs/SelectField";
 import SelectFieldId from "../inputs/SelectFieldId";
-import getFieldValues from "../../utils/getFieldValues";
+import getFieldValues from "../../utils/GetFieldValues";
 import { getDiscordChannels, getDiscordServers, getServerIdByName, setSelectedServer } from "../../utils/DiscordUtils";
 
 interface TriggerActionReactionProps {
@@ -292,8 +292,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                     <h3 className="text-white font-[900] text-[1.6rem] pb-2" key={param.name}>{param.name}</h3>
                                     <input
                                         key={param.name}
-                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                                        placeholder={param.name}
+                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] font-[900] text-[1.6rem] leading-7"
                                         type="text"
                                         value={itemFieldValues[param.name] || ""}
                                         onChange={(event) =>
@@ -352,8 +351,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         return (
                             <input
                                 key={param.name}
-                                className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                                placeholder={param.name}
+                                className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] font-[900] text-[1.6rem] leading-7"
                                 type="text"
                                 value={itemFieldValues[param.name] || ""}
                                 onChange={(event) =>
@@ -394,7 +392,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     return (
         <div style={{ backgroundColor: selectedService?.color }} className="min-h-screen">
             <div
-                className="flex items-center justify-between lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
+                className="flex items-center w-[110%] lg:px-10 px-2 py-5 border-b-[1px] border-[#dadada]"
             >
                 <div>
                     <ActionButton
@@ -406,7 +404,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                     />
                 </div>
 
-                <h1 className="text-white text-[2.2rem] sm:text-[3.2rem] font-extrabold text-center flex-1">
+                <h1 className="text-white text-[1.3rem] sm:text-[3.2rem] font-extrabold text-center w-full">
                     {type === "action" ? "Complete action fields" : "Complete reaction fields"}
                 </h1>
 
