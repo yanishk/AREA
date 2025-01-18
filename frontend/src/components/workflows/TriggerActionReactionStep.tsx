@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Parameters } from "../../utils/ActionReactionParameters";
 import Steps from "../../utils/CreateStepsType";
-import { fieldType } from "../../utils/fieldType";
+import { fieldType } from "../../utils/FieldType";
 import TriggerButton from "../buttons/TriggerButton";
 import DynamicFields from "../inputs/DynamicFields";
 import ActionButton from "../buttons/ActionButton";
 import { getAsanaAssignees, getAsanaProjects, getAsanaTags, getAsanaWorkspaces, getWorkspaceIdByName, setSelectedWorkspace } from "../../utils/AsanaUtils";
 import SelectField from "../inputs/SelectField";
 import SelectFieldId from "../inputs/SelectFieldId";
-import getFieldValues from "../../utils/getFieldValues";
+import getFieldValues from "../../utils/GetFieldValues";
 import { getDiscordChannels, getDiscordServers, getServerIdByName, setSelectedServer } from "../../utils/DiscordUtils";
 
 interface TriggerActionReactionProps {
