@@ -1,11 +1,12 @@
 package workflow_service
 
 import (
-	"backend/src/entities"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
 )
 
 func TestCheckGitlabWebhooksWorkflow(test *testing.T) {
