@@ -93,7 +93,6 @@ const WorkflowDetail = () => {
             });
 
             if (result.data.success) {
-                console.log("ici:");
                 navigate("/my_workflows", {
                     state: {
                         notification: "Workflow was deleted successfully !",
