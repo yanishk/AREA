@@ -25,11 +25,7 @@ const MyWorkflow = () => {
                 return;
             }
 
-            console.log("result ici : ", result);
-
             const workflows = result.data.workflows;
-
-            console.log("workflow ici : ", workflows);
 
             if (!result.data.workflows) {
                 setUserWorkflows([]);
