@@ -235,3 +235,13 @@ func TestCheckGithubActions(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestCheckGithubWebhooksWorkflow(test *testing.T) {
+	test.Run("Fail Get Action Param", func(test *testing.T) {
+		github := &WorkflowService{}
+
+		err := github.checkGithubWebhooksWorkflow(entities.Workflow{}, "webhookRepo")
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
