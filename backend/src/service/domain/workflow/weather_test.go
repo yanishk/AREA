@@ -172,7 +172,7 @@ func TestCheckWorkflowsWithWeatherActions(test *testing.T) {
 
 	workflowEntities := []entities.Workflow{
 		{Name: "test 1", IsActivated: true, ActionId: "1"},
-		{Name: "test 2", IsActivated: true, ActionId: "2"},
+		{Name: "test 2", IsActivated: false, ActionId: "2"},
 	}
 	test.Run("Success", func(test *testing.T) {
 		mockWorkflowRepo := new(MockWorkflowRepository)
