@@ -292,8 +292,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                                     <h3 className="text-white font-[900] text-[1.6rem] pb-2" key={param.name}>{param.name}</h3>
                                     <input
                                         key={param.name}
-                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                                        placeholder={param.name}
+                                        className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] font-[900] text-[1.6rem] leading-7"
                                         type="text"
                                         value={itemFieldValues[param.name] || ""}
                                         onChange={(event) =>
@@ -352,8 +351,7 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                         return (
                             <input
                                 key={param.name}
-                                className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] placeholder-[#C8C8C8] font-[900] text-[1.6rem] leading-7"
-                                placeholder={param.name}
+                                className="w-full text-black h-[4.8rem] px-4 border-[3px] rounded-[10px] border-[#EEEEEE] font-[900] text-[1.6rem] leading-7"
                                 type="text"
                                 value={itemFieldValues[param.name] || ""}
                                 onChange={(event) =>
