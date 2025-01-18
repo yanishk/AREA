@@ -1,0 +1,23 @@
+package workflow_service
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"backend/src/entities"
+)
+
+func TestPostRedditComment(test *testing.T) {
+	test.Run("Missing Field", func(t *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		reddit := &WorkflowService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		err := reddit.postRedditComment("accessToken", entities.Workflow{})
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
