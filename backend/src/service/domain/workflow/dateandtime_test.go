@@ -498,3 +498,92 @@ func TestCheckWorkflowsWithTimeAndDateActions(test *testing.T) {
 		require.EqualError(test, err, "Fail find workflows")
 	})
 }
+
+func TestCheckTimeAndDateActions(test *testing.T) {
+	test.Run("Fail Request Time API", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		timeDate := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockServiceServiceRepo.On("RequestToTimeApi").
+			Return(entities.TimeResponse{}, errors.New("Fail time request"))
+
+		err := timeDate.CheckTimeAndDateActions()
+
+		require.EqualError(test, err, "Fail time request")
+	})
+
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		timeDate := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockServiceServiceRepo.On("RequestToTimeApi").
+			Return(entities.TimeResponse{}, nil)
+
+		mockServiceServiceRepo.On("FindServiceByName", "Time & Date").
+			Return(entities.Service{}, errors.New("Fail find service"))
+
+		err := timeDate.CheckTimeAndDateActions()
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		timeDate := &WorkflowService{
+			ServiceService:   mockServiceServiceRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		service := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiceRepo.On("RequestToTimeApi").
+			Return(entities.TimeResponse{}, nil)
+
+		mockServiceServiceRepo.On("FindServiceByName", "Time & Date").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		err := timeDate.CheckTimeAndDateActions()
+
+		require.EqualError(test, err, "Fail find actions")
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		timeDate := &WorkflowService{
+			ServiceService:   mockServiceServiceRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		service := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiceRepo.On("RequestToTimeApi").
+			Return(entities.TimeResponse{}, nil)
+
+		mockServiceServiceRepo.On("FindServiceByName", "Time & Date").
+			Return(service, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", service.Id).
+			Return([]entities.Action{}, nil)
+
+		err := timeDate.CheckTimeAndDateActions()
+
+		require.NoError(test, err)
+	})
+}
