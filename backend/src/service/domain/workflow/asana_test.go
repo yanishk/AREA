@@ -21,3 +21,17 @@ func TestCreateTaskAsana(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCreateProjectAsana(test *testing.T) {
+	test.Run("Missing Field", func(test *testing.T) {
+		asana := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ReactionParam: map[string]interface{}{},
+		}
+
+		err := asana.createProjectAsana("accessToken", workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
