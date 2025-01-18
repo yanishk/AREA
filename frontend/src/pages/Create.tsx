@@ -627,7 +627,7 @@ const WorkflowBuilder = () => {
             });
         }
 
-        navigate("/explore");
+        navigate("/my_workflows");
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
