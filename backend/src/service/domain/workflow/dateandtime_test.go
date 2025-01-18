@@ -2,6 +2,7 @@ package workflow_service
 
 import (
 	"backend/src/entities"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -421,5 +422,79 @@ func TestCheckTimeAndDateEveryYearOnAction(test *testing.T) {
 		err := timeDate.checkTimeAndDateEveryYearOnAction(time, workflow)
 
 		require.EqualError(test, err, errorMissingField)
+	})
+}
+
+func TestCheckWorkflowsWithTimeAndDateActions(test *testing.T) {
+	test.Run("Success Deactivated", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		timeDate := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		workflows := []entities.Workflow{
+			{Id: "1", IsActivated: false},
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return(workflows, nil)
+
+		err := timeDate.checkWorkflowsWithTimeAndDateActions(entities.TimeResponse{}, action)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Success Activated", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		timeDate := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		workflows := []entities.Workflow{
+			{Id: "1", IsActivated: true},
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return(workflows, nil)
+
+		err := timeDate.checkWorkflowsWithTimeAndDateActions(entities.TimeResponse{}, action)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Fail Find Workflows", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		timeDate := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id:   "1",
+			Name: "test",
+		}
+
+		workflows := []entities.Workflow{
+			{Id: "1", IsActivated: false},
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return(workflows, errors.New("Fail find workflows"))
+
+		err := timeDate.checkWorkflowsWithTimeAndDateActions(entities.TimeResponse{}, action)
+
+		require.EqualError(test, err, "Fail find workflows")
 	})
 }
