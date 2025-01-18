@@ -32,3 +32,15 @@ func TestCheckGitlabWebhooksWorkflow(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestCheckNewWorkflowGitlabWebhook(test *testing.T) {
+	test.Run("Fail Get Action Param", func(test *testing.T) {
+		gitlab := &WorkflowService{}
+
+		workflow := entities.Workflow{}
+
+		err := gitlab.checkNewWorkflowGitlabWebhook(workflow, "accessToken")
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
