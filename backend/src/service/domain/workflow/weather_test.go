@@ -113,7 +113,8 @@ func (m *MockServiceServiceRepository) RequestToTimeApi() (entities.TimeResponse
 }
 
 func (m *MockServiceServiceRepository) RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error) {
-	return nil, nil
+	args := m.Called(accessToken)
+	return args.Get(0).([]entities.GithubRepository), args.Error(1)
 }
 
 func (m *MockServiceServiceRepository) RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error) {
