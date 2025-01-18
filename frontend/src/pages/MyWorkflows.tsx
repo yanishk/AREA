@@ -3,14 +3,18 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import getServiceDetails from "../utils/GetServiceDetails";
+import MessageBox from "../components/notification/MessageBox";
 
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
     const [userName, setUserName] = useState("You");
+    const [notification, setNotification] = useState("");
+    const [notificationTrigger, setNotificationTrigger] = useState(0);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const getUserWorkflows = async () => {
         try {
@@ -46,6 +50,15 @@ const MyWorkflow = () => {
     };
 
     useEffect(() => {
+        if (location.state?.notification) {
+            setNotification(location.state.notification);
+        }
+        if (location.state?.notificationTrigger) {
+            setNotificationTrigger(location.state.notificationTrigger);
+        }
+    }, [location.state]);
+
+    useEffect(() => {
         const fetchUserName = async () => {
             try {
                 const username = await getUserName();
@@ -58,9 +71,25 @@ const MyWorkflow = () => {
         fetchUserName();
     }, []);
 
+    const handleNotificationClose = () => {
+        setNotification("");
+        setNotificationTrigger(0);
+        navigate(location.pathname, { replace: true, state: {} });
+    };
+
     return (
         <>
             <Navbar />
+
+            {notification && (
+                <MessageBox
+                    message={notification}
+                    trigger={notificationTrigger}
+                    onClose={handleNotificationClose}
+                    type="notification"
+                    timeout={3000}
+                />
+            )}
 
             <MaxWidthWrapper
                 maxWidth="1120px"
