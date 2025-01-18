@@ -290,3 +290,44 @@ func TestCheckWorkflowsWithRedditActions(test *testing.T) {
 		require.NoError(test, err)
 	})
 }
+
+func TestCheckRedditActions(test *testing.T) {
+	test.Run("Fail Find Service", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		reddit := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		mockServiceServiceRepo.On("FindServiceByName", "Reddit").
+			Return(entities.Service{}, errors.New("Fail find service"))
+
+		err := reddit.CheckRedditActions()
+
+		require.EqualError(test, err, "Fail find service")
+	})
+
+	test.Run("Fail Find Actions", func(test *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+		mockActionRepo := new(MockActionRepository)
+
+		reddit := &WorkflowService{
+			ServiceService:   mockServiceServiceRepo,
+			ActionRepository: mockActionRepo,
+		}
+
+		serviceFound := entities.Service{
+			Id: "1",
+		}
+
+		mockServiceServiceRepo.On("FindServiceByName", "Reddit").
+			Return(serviceFound, nil)
+
+		mockActionRepo.On("FindActionsByServiceId", serviceFound.Id).
+			Return([]entities.Action{}, errors.New("Fail find actions"))
+
+		err := reddit.CheckRedditActions()
+
+		require.EqualError(test, err, "Fail find actions")
+	})
+}
