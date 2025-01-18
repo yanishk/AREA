@@ -8,7 +8,7 @@ import MessageBox from "../components/notification/MessageBox";
 
 const ExplorePage = () => {
     const location = useLocation();
-    const [error, setError] = useState("");
+    const [notification, setError] = useState("");
     const [errorTrigger, setErrorTrigger] = useState(0);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -16,7 +16,7 @@ const ExplorePage = () => {
     const { login } = useAuth();
 
     useEffect(() => {
-        if (location.state?.error) {
+        if (location.state?.notification) {
             setError(location.state.error);
         }
         if (location.state?.errorTrigger) {
