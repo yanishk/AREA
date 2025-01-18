@@ -34,7 +34,7 @@ class SaveNewWorkflows extends State<APICall> {
       text:
           "If ${CreateData.serviceAction.name}, Then ${CreateData.reactionServiceList[Globaldata.reactionServiceIndex].name} : ${CreateData.serviceReaction.name}");
   final String apiRoute = "workflows";
-  String email = Globaldata.userInfos.email;
+  String email = Globaldata.userInfos.username;
   String defaultWorkflowName = "";
 
   @override
@@ -152,7 +152,7 @@ class SaveNewWorkflows extends State<APICall> {
                     ),
                     LeftWidget(
                       child: AutoSizeText(
-                        "By $email",
+                        "by $email",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

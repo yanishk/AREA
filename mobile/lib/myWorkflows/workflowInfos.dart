@@ -29,7 +29,7 @@ class WorkflowInfosAPICall extends StatefulWidget {
 
 class WorkflowInfos extends State<WorkflowInfosAPICall> {
   TextEditingController workflowTitleController = new TextEditingController(text: MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].name);
-  String email = Globaldata.userInfos.email;
+  String email = Globaldata.userInfos.username;
   Color backgroundColor = HexColor(
     Globaldata.serviceList[MyWorkflowsfunctions.getServiceLocalId(MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].actionID)].color
   );
@@ -260,7 +260,7 @@ class WorkflowInfosTitle extends StatelessWidget {
             ),
             LeftWidget(
               child: AutoSizeText(
-                "By $email",
+                "by $email",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
