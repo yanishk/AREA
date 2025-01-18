@@ -36,7 +36,7 @@ const MessageBox: React.FC<ErrorMessageProps> = ({ message, trigger, onClose, ti
             </div>
         ) : (
             <div
-                className={`fixed top-0 left-0 w-full p-5 bg-[#1ea54b] text-white text-center font-bold text-[30px] z-50 transition-transform duration-500 ${
+                className={`fixed top-0 left-0 w-full p-5 bg-[#2CBE60] text-white text-center font-bold text-[30px] z-50 transition-transform duration-500 ${
                     isVisible ? "translate-y-0" : "-translate-y-full"
                 }`}
             >
