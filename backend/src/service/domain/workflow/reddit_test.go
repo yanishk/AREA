@@ -234,3 +234,17 @@ func TestIsANewVote(test *testing.T) {
 		require.EqualError(t, err, errorUpdatingWorkflow)
 	})
 }
+
+func TestCheckRedditNewPostInSubredditAction(test *testing.T) {
+	test.Run("Missing Field", func(t *testing.T) {
+		reddit := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{"key": "value"},
+		}
+
+		err := reddit.checkRedditNewPostInSubredditAction("accessToken", workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
