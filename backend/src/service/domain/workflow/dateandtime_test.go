@@ -1,6 +1,7 @@
 package workflow_service
 
 import (
+	"backend/src/entities"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -85,6 +86,63 @@ func TestCheckEveryYearParamValidity(test *testing.T) {
 
 	test.Run("Failure Day/Hour/Minute", func(test *testing.T) {
 		_, _, _, _, err := checkEveryYearParamValidity(1.0, 1, 1, 1)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
+
+func TestCheckTimeAndDateEveryHourAction(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		time := entities.TimeResponse{
+			Minute: 1,
+		}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"minute": 1.0,
+			},
+			IsActivated: false,
+		}
+
+		err := timeDate.checkTimeAndDateEveryHourAction(time, workflow)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Missing Field", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		time := entities.TimeResponse{
+			Minute: 1.0,
+		}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{},
+			IsActivated: false,
+		}
+
+		err := timeDate.checkTimeAndDateEveryHourAction(time, workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+
+	test.Run("Invalid Minute", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		time := entities.TimeResponse{
+			Minute: 1,
+		}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"minute": "value",
+			},
+			IsActivated: false,
+		}
+
+		err := timeDate.checkTimeAndDateEveryHourAction(time, workflow)
 
 		require.EqualError(test, err, errorMissingField)
 	})
