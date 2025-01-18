@@ -583,22 +583,19 @@ const WorkflowBuilder = () => {
                     return null;
                 }
 
-                if (selectedActionService?.name === "Time & Date") {
-                    const selectedParam = actionParams?.[param.name];
-                    let index = param.values.indexOf(selectedParam);
+                const selectedParam = actionParams?.[param.name];
+                let index = param.values.indexOf(selectedParam);
 
-                    if (param.values[0] === "0") {
-                        actionParams[param.name] = index;
-                    }
-                    if (index != -1) {
-                        actionParams[param.name] = index + 1;
-                    } else {
-                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
-                    }
-
-                    return actionParams[param.name]
+                if (param.values[0] === "0") {
+                    actionParams[param.name] = index;
                 }
-                actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                if (index != -1) {
+                    actionParams[param.name] = index + 1;
+                } else {
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                }
+
+                return actionParams[param.name]
             });
         }
 
