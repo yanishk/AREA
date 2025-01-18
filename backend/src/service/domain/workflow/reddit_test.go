@@ -21,3 +21,17 @@ func TestPostRedditComment(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestUpvoteRedditPost(test *testing.T) {
+	test.Run("Missing Field", func(t *testing.T) {
+		mockReactionRepo := new(MockReactionRepository)
+
+		reddit := &WorkflowService{
+			ReactionRepository: mockReactionRepo,
+		}
+
+		err := reddit.upvoteRedditPost("accessToken", entities.Workflow{})
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
