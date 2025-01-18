@@ -94,7 +94,8 @@ func (m *MockServiceServiceRepository) ExecuteRequest(request *http.Request) (*h
 }
 
 func (m *MockServiceServiceRepository) ExecuteApiRequest(url, method, typeToken, accessToken string, body io.Reader) (*http.Response, error) {
-	return nil, nil
+	args := m.Called(url, method, typeToken, accessToken, body)
+	return args.Get(0).(*http.Response), args.Error(1)
 }
 
 func (m *MockServiceServiceRepository) GetResultTokenFromCode(code, serviceName, callbackType, appType string) (entities.ResultToken, error) {
@@ -113,7 +114,8 @@ func (m *MockServiceServiceRepository) RequestToTimeApi() (entities.TimeResponse
 }
 
 func (m *MockServiceServiceRepository) RequestGithubUserRepositories(accessToken string) ([]entities.GithubRepository, error) {
-	return nil, nil
+	args := m.Called(accessToken)
+	return args.Get(0).([]entities.GithubRepository), args.Error(1)
 }
 
 func (m *MockServiceServiceRepository) RequestGitlabUserProjects(accessToken string) ([]entities.GitlabProject, error) {
