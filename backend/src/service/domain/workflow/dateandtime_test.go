@@ -206,3 +206,87 @@ func TestCheckTimeAndDateEveryDayAction(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCheckTimeAndDateEveryWeekAtAction(test *testing.T) {
+	test.Run("Success", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"day":    []interface{}{float64(1)},
+				"hour":   1.0,
+				"minute": 1.0,
+			},
+		}
+
+		time := entities.TimeResponse{
+			WeekDay: 2,
+			Hour:    2,
+			Minute:  2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryWeekAtAction(time, workflow)
+
+		require.NoError(test, err)
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"day":    1,
+				"hour":   1.0,
+				"minute": 1.0,
+			},
+		}
+
+		time := entities.TimeResponse{
+			WeekDay: 2,
+			Hour:    2,
+			Minute:  2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryWeekAtAction(time, workflow)
+
+		require.EqualError(test, err, "Error parsing the day array")
+	})
+
+	test.Run("Missing Field", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{},
+		}
+
+		time := entities.TimeResponse{
+			Hour:   2,
+			Minute: 2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryWeekAtAction(time, workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+
+	test.Run("Invalid Hour/Minute", func(test *testing.T) {
+		timeDate := &WorkflowService{}
+
+		workflow := entities.Workflow{
+			ActionParam: map[string]interface{}{
+				"day":    []interface{}{float64(1)},
+				"hour":   "1.0",
+				"minute": "1.0",
+			},
+		}
+
+		time := entities.TimeResponse{
+			Hour:   2,
+			Minute: 2,
+		}
+
+		err := timeDate.checkTimeAndDateEveryWeekAtAction(time, workflow)
+
+		require.EqualError(test, err, errorMissingField)
+	})
+}
