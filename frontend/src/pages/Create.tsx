@@ -397,6 +397,7 @@ const WorkflowBuilder = () => {
             );
 
             if (result.data?.success) {
+                console.log("ici result data success : ", result.data.success);
                 setIsServiceConnected(true);
             }
 
@@ -410,6 +411,24 @@ const WorkflowBuilder = () => {
         url.search = "";
         window.history.replaceState({}, document.title, url.toString());
     };
+
+    const isServiceConnectedStatus = async (Servicename: string): Promise<boolean> => {
+        try {
+            console.log("service name ici : ", Servicename);
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}service-authentication-status?service=${Servicename}`,
+                {
+                    withCredentials: true,
+                }
+            );
+    
+            return result.data.authenticated;
+        } catch (error) {
+            console.error("Error with service authentication status ici:", error);
+            return false;
+        }
+    };
+    
 
     useEffect(() => {
         const getSavedData = async () => {
@@ -425,12 +444,20 @@ const WorkflowBuilder = () => {
 
             const jsonState = JSON.parse(state);
 
-            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
-                goToStep(Steps.TRIGGER_ACTION);
-            }
-            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
-                goToStep(Steps.TRIGGER_REACTION);
-            }
+            // if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+            //     const isconnected = await isServiceConnectedStatus(jsonState.selectedActionService?.name)
+
+            //     if (isconnected) {
+            //         goToStep(Steps.TRIGGER_ACTION);
+            //     }
+            //     console.log("is connected ici : ", isconnected);
+            //     return;
+            //     console.log("LALALALALAL");
+            //     return;
+            // }
+            // if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+            //     goToStep(Steps.TRIGGER_REACTION);
+            // }
 
             const serviceAuth = jsonState.selectedService;
 
@@ -441,6 +468,29 @@ const WorkflowBuilder = () => {
             }
 
             await handleServiceCallback(codeAuth, serviceAuth.name);
+
+            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedActionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_ACTION);
+                }
+                console.log("is connected ici : ", isconnected);
+                return;
+                console.log("LALALALALAL");
+                return;
+            }
+            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedActionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_REACTION);
+                }
+                console.log("is connected ici : ", isconnected);
+                return;
+                console.log("LALALALALAL");
+                return;
+            }
 
             sessionStorage.removeItem("state-data");
 
@@ -465,11 +515,16 @@ const WorkflowBuilder = () => {
     };
 
     useEffect(() => {
+        console.log("current step ici : ", currentStep);
         const fetchFieldValues = async () => {
             if (selectedAction?.parameters) {
+                // console.log("isServiceonnected ici : ", isServiceConnected);
+                // return;
                 if (isRequiredConnection("action") && !isServiceConnected) {
                     return;
                 }
+                // console.log("ça appelle get field value mtn ");
+                // return;
                 await updateFieldValues(selectedAction.parameters, setActionFieldValues);
                 setIsServiceConnected(false);
             }
@@ -482,9 +537,16 @@ const WorkflowBuilder = () => {
             }
         };
 
-        fetchFieldValues();
+        const test = async () => {
+            if (isServiceConnected) {
+                console.log("ICICICICICICI : ", isServiceConnected);
+                fetchFieldValues();
+            }
+        }
 
-    }, [selectedAction, selectedReaction]);
+        test();
+
+    }, [selectedAction, selectedReaction, isServiceConnected]);
 
     const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,

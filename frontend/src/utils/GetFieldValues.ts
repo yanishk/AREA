@@ -29,8 +29,29 @@ const getGitlabFieldValues = async (route: string): Promise<{ data: { projects: 
     }
 }
 
+const isServiceConnected = async (Servicename: string): Promise<boolean> => {
+    try {
+        const result = await axios.get(
+            `${import.meta.env.VITE_API_URL}service-authentication-status?service=${Servicename}`,
+            {
+                withCredentials: true,
+            }
+        );
+
+        return result.data.authenticated;
+    } catch (error) {
+        console.error("Error with service authentication status:", error);
+        return false;
+    }
+};
+
 const getGithubFieldValues = async (route: string): Promise<{ data: { repositories: GithubParams[] } }> => {
     try {
+        const result = await isServiceConnected("Github")
+        if (!result) {
+            console.log("service n'est pas connecté ici status ici : ", result);
+            return { data: { repositories: [] } };
+        }
         const slicedRoute = route.slice(1);
         const userRepo = await axios.get(
             `${import.meta.env.VITE_API_URL}${slicedRoute}`,
