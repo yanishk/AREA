@@ -24,7 +24,9 @@ const MessageBox: React.FC<ErrorMessageProps> = ({ message, trigger, onClose, ti
         }
     }, [message, trigger]);
 
-    if (!message) return null;
+    if (!message) {
+        return null;
+    }
 
     return type === "error" ? (
             <div
