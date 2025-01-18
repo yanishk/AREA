@@ -81,7 +81,7 @@ const WorkflowBuilder = () => {
             handleDeleteAction();
             handleDeleteReaction();
             sessionStorage.removeItem("state-data");
-            navigate("/explore")
+            navigate(-1);
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
