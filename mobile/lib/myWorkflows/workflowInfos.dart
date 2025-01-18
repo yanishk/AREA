@@ -35,7 +35,7 @@ class WorkflowInfos extends State<WorkflowInfosAPICall> {
   );
 
   bool editNameMode = false;
-  String editNameButtonText = "Edit name";
+  String editNameButtonText = "Edit title";
   String modifDate = "";
   String workflowID = MyWorkflowsData.allWorkflowsData[MyWorkflowsData.selectedWorkflowsIndex].id;
 
