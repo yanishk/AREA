@@ -20,11 +20,11 @@ RUN npm install vite
 
 COPY --from=builder /app/dist /app/dist
 
-COPY launchFrontend.sh /app/dist/
-RUN chmod +x /app/dist/launchFrontend.sh
+COPY apkEntrypoint.sh /app/dist/
+RUN chmod +x /app/dist/apkEntrypoint.sh
 
 EXPOSE 8081
 
-ENTRYPOINT ["/app/dist/launchFrontend.sh"]
+ENTRYPOINT ["/app/dist/apkEntrypoint.sh"]
 
 CMD ["npx", "vite", "preview", "--port", "8081", "--host"]
