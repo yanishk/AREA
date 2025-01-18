@@ -295,3 +295,43 @@ func TestCheckNewWorkflowGithubWebhook(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestCheckNewWorkflowsGithubWebhook(test *testing.T) {
+	test.Run("Fail Find Workflows", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		github := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id: "1",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, errors.New("Fail find workflows"))
+
+		err := github.checkNewWorkflowsGithubWebhook(action)
+
+		require.EqualError(test, err, "Fail find workflows")
+	})
+
+	test.Run("Success", func(test *testing.T) {
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		github := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		action := entities.Action{
+			Id: "1",
+		}
+
+		mockWorkflowRepo.On("FindWorkflowsByActionId", action.Id).
+			Return([]entities.Workflow{}, nil)
+
+		err := github.checkNewWorkflowsGithubWebhook(action)
+
+		require.NoError(test, err)
+	})
+}
