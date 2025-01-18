@@ -67,6 +67,13 @@ const MyWorkflow = () => {
         fetchUserName();
     }, []);
 
+    const sliceText = (text: string, maxLen: number) => {
+        if (text.length > maxLen) {
+            return text.slice(0, maxLen) + "...";
+        }
+        return text;
+    }
+
     const renderContent = () => {
         if (isLoading) {
             return null;
@@ -116,7 +123,7 @@ const MyWorkflow = () => {
                     </div>
                 </div>
                 <div className="mt-16">
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 ml-3">
                         {userWorkflows?.map((workflow) => (
                             <button
                                 key={workflow.id}
@@ -145,12 +152,12 @@ const MyWorkflow = () => {
                                     <h2
                                         className="text-white text-[28px] font-[800] leading-[1.125] mt-6 m-0 p-0 break-words whitespace-normal"
                                     >
-                                        {workflow.name}
+                                        {sliceText(workflow.name, 70)}
                                     </h2>
 
-                                    <div className="bottom-[10px]">
+                                    <div className="absolute bottom-[20px]">
                                         <p
-                                            className="text-white text-[15.7px] mt-[10px] max-w-[100%]"
+                                            className="text-white text-[15.7px] mt-[30px] max-w-[100%]"
                                         >
                                             by{' '}
                                             <span className="font-bold">
@@ -160,7 +167,7 @@ const MyWorkflow = () => {
 
                                         <div
                                             style={{backgroundColor: "white"}}
-                                            className="h-[38px] w-[160px] mt-[10px] rounded-full relative flex items-center justify-between px-1"
+                                            className="h-[38px] w-[160px] mt-[22px] rounded-full relative flex items-center justify-between px-1"
                                         >
                                             {workflow.isactivated ? (
                                                 <p
@@ -184,26 +191,26 @@ const MyWorkflow = () => {
                                                         : "translateX(-120px)",
                                                 }}
                                                 className="h-[33px] w-[33px] rounded-full">
-                                                    </div>
-                                                </div>
-                                                {workflow.isactivated ? (
-                                                    <div className="flex flex-row mt-[10px]">
-                                                        <img
-                                                            className="w-[14px] h-[18px]"
-                                                            src="/user-icon.png"
-                                                            alt="Avatar"
-                                                        />
-                                                        <span
-                                                            className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
-                                                        >
-                                                            1
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="mb-[60px]"></div>
-                                                )}
                                             </div>
                                         </div>
+                                        {workflow.isactivated ? (
+                                            <div className="flex flex-row mt-[22px]">
+                                                <img
+                                                    className="w-[14px] h-[18px]"
+                                                    src="/user-icon.png"
+                                                    alt="Avatar"
+                                                />
+                                                <span
+                                                    className="text-white ml-2 text-[20px] font-bold -translate-y-1.5"
+                                                >
+                                                    1
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-[60px]"></div>
+                                        )}
+                                    </div>
+                                </div>
 
                                     </button>
 
