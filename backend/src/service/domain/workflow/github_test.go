@@ -247,7 +247,7 @@ func TestCheckGithubWebhooksWorkflow(test *testing.T) {
 }
 
 func TestIsGithubRepositoryWebhookPresent(test *testing.T) {
-	test.Run("Fail Execute Request", func(t *testing.T) {
+	test.Run("Fail Execute Request", func(test *testing.T) {
 		mockServiceServiceRepo := new(MockServiceServiceRepository)
 
 		github := &WorkflowService{
@@ -264,7 +264,7 @@ func TestIsGithubRepositoryWebhookPresent(test *testing.T) {
 		require.EqualError(test, err, "Fail Execute API")
 	})
 
-	test.Run("Fail decode", func(t *testing.T) {
+	test.Run("Fail decode", func(test *testing.T) {
 		mockServiceServiceRepo := new(MockServiceServiceRepository)
 
 		github := &WorkflowService{
@@ -283,5 +283,15 @@ func TestIsGithubRepositoryWebhookPresent(test *testing.T) {
 		_, err := github.isGithubRepositoryWebhookPresent("repo", "accessToken")
 
 		require.Error(test, err)
+	})
+}
+
+func TestCheckNewWorkflowGithubWebhook(test *testing.T) {
+	test.Run("Get Action Param Fail", func(test *testing.T) {
+		github := &WorkflowService{}
+
+		err := github.checkNewWorkflowGithubWebhook(entities.Workflow{}, "accessToken")
+
+		require.EqualError(test, err, errorMissingField)
 	})
 }
