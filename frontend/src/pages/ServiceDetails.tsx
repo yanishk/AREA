@@ -159,7 +159,7 @@ const ServiceDetailsPage = () => {
                                     {service?.name != "SMS" && service?.name != "Email" && service?.name != "Time & Date" && (
                                         <div className="ml-[40px]">
                                                 <ActionButton
-                                                    text={`Visit ${serviceName}`}
+                                                    text={`Visit ${service?.name}`}
                                                     textColor="text-white"
                                                     borderColor="border-white"
                                                     bgColor={`bg-[${service?.color}]`}
