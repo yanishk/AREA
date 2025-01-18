@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
 import { useNavigate } from "react-router-dom";
 import getServiceDetails from "../utils/GetServiceDetails";
+import ButtonValidation from "../components/buttons/ButtonValidation";
 
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
     const [userName, setUserName] = useState("You");
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     const getUserWorkflows = async () => {
@@ -25,6 +27,12 @@ const MyWorkflow = () => {
 
             const workflows = result.data.workflows;
 
+            if (!result.data.workflows) {
+                setUserWorkflows([]);
+                setIsLoading(false);
+                return;
+            }
+
             const workflowsDetails = await Promise.all(
                 workflows.map(async (workflow: any) => {
                     const actionDetails = await getServiceDetails(workflow.actionid, "action");
@@ -39,6 +47,7 @@ const MyWorkflow = () => {
                 })
             );
 
+            setIsLoading(false);
             setUserWorkflows(workflowsDetails);
         } catch (err) {
             console.error("Error fetching workflows:", err);
@@ -65,13 +74,40 @@ const MyWorkflow = () => {
         return text;
     }
 
-    return (
-        <>
-            <Navbar />
+    const renderContent = () => {
+        if (isLoading) {
+            return null;
+        }
 
-            <MaxWidthWrapper
-                maxWidth="1120px"
-            >
+        if (userWorkflows.length === 0) {
+            return (
+                <div
+                    className="flex flex-col items-center justify-center min-h-[75vh] text-center"
+                >
+                    <h1
+                        className="text-[#222222] text-[2.96666667rem] font-[900]"
+                    >
+                        Start connecting your world
+                    </h1>
+                    <p
+                        className="text-[#222222] mt-[30px] text-[20px] mb-[50px] font-[500]"
+                    >
+                        Save time and money by making the internet work for you!
+                    </p>
+                    <MaxWidthWrapper
+                        maxWidth="420px"
+                    >
+                        <ButtonValidation
+                            text="Create your workflow"
+                            onClick={() => navigate("/create")}
+                        />
+                    </MaxWidthWrapper>
+                </div>
+            )
+        }
+
+        return (
+            <>
                 <div
                     className="flex items-center justify-center mt-10"
                 >
@@ -151,8 +187,8 @@ const MyWorkflow = () => {
                                                 style={{
                                                     backgroundColor: workflow.actioncolor,
                                                     transform: workflow.isactivated
-                                                    ? "translateX(0)"
-                                                    : "translateX(-120px)",
+                                                        ? "translateX(0)"
+                                                        : "translateX(-120px)",
                                                 }}
                                                 className="h-[33px] w-[33px] rounded-full">
                                             </div>
@@ -176,14 +212,28 @@ const MyWorkflow = () => {
                                     </div>
                                 </div>
 
-                            </button>
+                                    </button>
 
-                        ))}
-                    </div>
-                </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+        )
+    }
+
+    return (
+        <>
+            <Navbar />
+
+            <MaxWidthWrapper
+                maxWidth="1120px"
+            >
+                {
+                    renderContent()
+                }
             </MaxWidthWrapper>
         </>
-    )
+    );
 }
 
 export default MyWorkflow
