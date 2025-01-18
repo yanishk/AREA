@@ -98,14 +98,13 @@ func TestCheckTimeAndDateEveryHourAction(test *testing.T) {
 		timeDate := &WorkflowService{}
 
 		time := entities.TimeResponse{
-			Minute: 1,
+			Minute: 2,
 		}
 
 		workflow := entities.Workflow{
 			ActionParam: map[string]interface{}{
 				"minute": 1.0,
 			},
-			IsActivated: false,
 		}
 
 		err := timeDate.checkTimeAndDateEveryHourAction(time, workflow)
