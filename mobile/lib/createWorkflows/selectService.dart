@@ -23,19 +23,9 @@ class APICall extends StatefulWidget {
 }
 
 class SelectService extends State<APICall> {
-  String title = "Select action service";
+  String title = "Choose a service";
   int serviceIndex = 0;
   List<Widget> services = [];
-
-  Future<void> setActionOrReactionServiceList() async {
-    if (isAnAction == true) {
-      title = "Select action service";
-      return;
-    }
-    setState(() {
-      title = "Select reaction service";
-    });
-  }
 
   Future<void> redirectToSelectActionOrReactionPage(int servicesIndex) async {
     await Navigator.push(
@@ -121,7 +111,6 @@ class SelectService extends State<APICall> {
       CreateData.reactionServiceList = [];
     }
     setState(() {
-      setActionOrReactionServiceList();
       for (int i = 0; i < Globaldata.serviceList.length; i++) {
         if (isAnAction) {
           if (Globaldata.serviceList[i].hasActions) {
