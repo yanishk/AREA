@@ -78,7 +78,7 @@ const MyWorkflow = () => {
                 {userWorkflows.length === 0 ? (
                     <>
                         <div
-                            className="flex flex-col items-center justify-center min-h-screen text-center"
+                            className="flex flex-col items-center justify-center min-h-[75vh] text-center"
                         >
                             <h1
                                 className="text-[#222222] text-[2.96666667rem] font-[900]"
