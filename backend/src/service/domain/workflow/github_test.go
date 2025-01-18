@@ -245,3 +245,43 @@ func TestCheckGithubWebhooksWorkflow(test *testing.T) {
 		require.EqualError(test, err, errorMissingField)
 	})
 }
+
+func TestIsGithubRepositoryWebhookPresent(test *testing.T) {
+	test.Run("Fail Execute Request", func(t *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		getWebhooksUrl := githubBaseUrl + githubRepositoryEndpoint + "repo" + "/hooks"
+
+		mockServiceServiceRepo.On("ExecuteApiRequest", getWebhooksUrl, "GET", bearerType, "accessToken", nil).
+			Return(&http.Response{}, errors.New("Fail Execute API"))
+
+		_, err := github.isGithubRepositoryWebhookPresent("repo", "accessToken")
+
+		require.EqualError(test, err, "Fail Execute API")
+	})
+
+	test.Run("Fail decode", func(t *testing.T) {
+		mockServiceServiceRepo := new(MockServiceServiceRepository)
+
+		github := &WorkflowService{
+			ServiceService: mockServiceServiceRepo,
+		}
+
+		getWebhooksUrl := githubBaseUrl + githubRepositoryEndpoint + "repo" + "/hooks"
+
+		mockResponse := &http.Response{
+			Body: io.NopCloser(strings.NewReader(`{"name": "test"}`)),
+		}
+
+		mockServiceServiceRepo.On("ExecuteApiRequest", getWebhooksUrl, "GET", bearerType, "accessToken", nil).
+			Return(mockResponse, nil)
+
+		_, err := github.isGithubRepositoryWebhookPresent("repo", "accessToken")
+
+		require.Error(test, err)
+	})
+}
