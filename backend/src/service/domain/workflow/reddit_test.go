@@ -1,7 +1,9 @@
 package workflow_service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -102,5 +104,49 @@ func TestCheckRedditReactions(test *testing.T) {
 		err := reddit.checkRedditReactions(workflow)
 
 		require.EqualError(test, err, errorRetrievingReaction)
+	})
+}
+
+func TestIsANewPost(test *testing.T) {
+	test.Run("Fail Update Workflow", func(t *testing.T) {
+		var result entities.RedditPostResponse
+
+		mockWorkflowRepo := new(MockWorkflowRepository)
+
+		reddit := &WorkflowService{
+			WorkflowRepository: mockWorkflowRepo,
+		}
+
+		workflow := entities.Workflow{
+			Id:         "1",
+			ActionData: map[string]interface{}{},
+		}
+
+		redditResponse := `{
+			"data": {
+				"children": [
+					{
+						"data": {
+							"id": "id",
+							"title": "title",
+							"author": "author",
+							"url": "url"
+						}
+					}
+				]
+			}
+		}`
+
+		json.Unmarshal([]byte(redditResponse), &result)
+
+		expectedWorkflow := workflow
+		expectedWorkflow.ActionData = map[string]interface{}{"id": "id"}
+
+		mockWorkflowRepo.On("UpdateWorkflow", expectedWorkflow.Id, expectedWorkflow).
+			Return(fmt.Errorf("update error"))
+
+		err := reddit.isANewPost(workflow, result)
+
+		require.EqualError(t, err, errorUpdatingWorkflow)
 	})
 }
