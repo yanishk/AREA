@@ -77,7 +77,7 @@ func (self *WorkflowService) checkTimeAndDateEveryHourAction(timeRes entities.Ti
 		return err
 	}
 
-	if int(minuteNumber) == timeRes.Minute && workflow.IsActivated {
+	if int(minuteNumber) == timeRes.Minute {
 		self.checkReactions(workflow)
 	}
 	return nil

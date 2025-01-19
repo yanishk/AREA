@@ -79,6 +79,7 @@ func (self *ServiceService) FindServiceByReactionId(id string) (entities.Service
 	}
 	return self.ServiceRepository.FindServiceById(reaction.ServiceId)
 }
+
 func (self *ServiceService) FindAllServices() ([]entities.Service, error) {
 	return self.ServiceRepository.FindAllServices()
 }
@@ -225,8 +226,8 @@ func oauth2Linkedin(callbackType string) string {
 		clientIdParam + url.QueryEscape(os.Getenv("LINKEDIN_CLIENT_ID")) +
 		redirectUriParam + callbackLink +
 		codeResponseType +
-		"&scope=openid email profile w_member_social") +
-		stateParam + os.Getenv("LINKEDIN_STATE")
+		"&scope=openid email profile w_member_social" +
+		stateParam + os.Getenv("LINKEDIN_STATE"))
 }
 
 func oauth2Dropbox(callbackType string) string {
