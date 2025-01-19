@@ -113,7 +113,6 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
                             if (!itemFieldValues[param.name] && options && options.length > 0) {
                                 handleFieldChange(param.name, options[0], type);
                             }
-                    console.log("option ici : ", options);
 
                     return {
                         id: param.name,

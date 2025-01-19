@@ -49,7 +49,6 @@ const getGithubFieldValues = async (route: string): Promise<{ data: { repositori
     try {
         const result = await isServiceConnected("Github")
         if (!result) {
-            console.log("service n'est pas connecté ici status ici : ", result);
             return { data: { repositories: [] } };
         }
         const slicedRoute = route.slice(1);

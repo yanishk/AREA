@@ -422,7 +422,7 @@ const WorkflowBuilder = () => {
 
             return result.data.authenticated;
         } catch (error) {
-            console.error("Error with service authentication status ici:", error);
+            console.error("Error with service authentication status:", error);
             return false;
         }
     };
