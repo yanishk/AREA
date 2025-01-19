@@ -19,6 +19,7 @@ type availableActionsType = {
     name: string;
     description: string;
     id: string;
+    nbparam: number;
     parameters: Parameters[];
 };
 
@@ -26,6 +27,7 @@ type availableReactionsType = {
     name: string;
     description: string;
     id: string;
+    nbparam: number;
     parameters: Parameters[];
 };
 
@@ -152,6 +154,7 @@ const WorkflowBuilder = () => {
                     name: element.name,
                     description: element.description,
                     id: element.id,
+                    nbparam: element.nbparam,
                     parameters: element.parameters,
                 }));
                 setAvailableActions(actions);
@@ -205,6 +208,7 @@ const WorkflowBuilder = () => {
                     name: element.name,
                     description: element.description,
                     id: element.id,
+                    nbparam: element.nbparam,
                     parameters: element.parameters,
                 }));
                 setAvailableReactions(reactions);
@@ -232,17 +236,33 @@ const WorkflowBuilder = () => {
         }
     }, [currentStep]);
 
-    const isRequiredConnection = (
+    const isServiceAlreadyConnected = async (selectedService: any): Promise<boolean> => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}service-authentication-status?service=${selectedService.name}`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            return result.data.authenticated;
+        } catch (error) {
+            console.error("Error with service authentication status:", error);
+            return false;
+        }
+    };
+
+    const isRequiredConnection = async (
         type: "action" | "reaction",
-    ): boolean => {
+    ): Promise<boolean> => {
         if (type === "action") {
-            if (selectedActionService?.isauthneeded === true) {
+            if (selectedActionService?.isauthneeded === true && !(await isServiceAlreadyConnected(selectedActionService))) {
                 return true;
             }
         }
 
         if (type === "reaction") {
-            if (selectedReactionService?.isauthneeded === true) {
+            if (selectedReactionService?.isauthneeded === true && !(await isServiceAlreadyConnected(selectedReactionService))) {
                 return true;
             }
         }
@@ -255,14 +275,20 @@ const WorkflowBuilder = () => {
         goToStep(Steps.SELECT_ACTION);
     };
 
-    const handleSelectAction = (name: string, id: string, parameters: Parameters[]) => {
-        setSelectedAction({ name, id, parameters });
+    const handleSelectAction = async (name: string, id: string, nbparam: number, parameters: Parameters[]) => {
+        setSelectedAction({ name, id, nbparam, parameters });
 
-        if (selectedActionService?.name && isRequiredConnection("action")) {
+        if (selectedActionService?.name && (await isRequiredConnection("action"))) {
             goToStep(Steps.CONNECT_ACTION_SERVICE);
-        } else {
-            goToStep(Steps.TRIGGER_ACTION);
+            return;
         }
+
+        if (nbparam === 0) {
+            goToStep(Steps.HOME);
+            return;
+        }
+
+        goToStep(Steps.TRIGGER_ACTION);
     };
 
     const handleFieldChange = async (id: string, value: string, type: "action" | "reaction") => {
@@ -305,14 +331,20 @@ const WorkflowBuilder = () => {
         goToStep(Steps.SELECT_REACTION);
     };
 
-    const handleSelectReaction = (name: string, id: string, parameters: Parameters[]) => {
-        setSelectedReaction({ name, id, parameters});
+    const handleSelectReaction = async (name: string, id: string, nbparam: number, parameters: Parameters[]) => {
+        setSelectedReaction({ name, id, nbparam, parameters});
 
-        if (selectedReactionService?.name && isRequiredConnection("reaction")) {
+        if (selectedReactionService?.name && await isRequiredConnection("reaction")) {
             goToStep(Steps.CONNECT_REACTION_SERVICE);
-        } else {
-            goToStep(Steps.TRIGGER_REACTION);
+            return;
         }
+
+        if (nbparam === 0) {
+            goToStep(Steps.HOME);
+            return;
+        }
+
+        goToStep(Steps.TRIGGER_REACTION);
     };
 
     const handleConnectService = async (selectedService: any, type: "action" | "reaction") => {
@@ -494,14 +526,14 @@ const WorkflowBuilder = () => {
     useEffect(() => {
         const fetchFieldValues = async () => {
             if (selectedAction?.parameters) {
-                if (isRequiredConnection("action") && !isServiceConnected) {
+                if (await isRequiredConnection("action") && !isServiceConnected) {
                     return;
                 }
                 await updateFieldValues(selectedAction.parameters, setActionFieldValues);
                 setIsServiceConnected(false);
             }
             if (selectedReaction?.parameters) {
-                if (isRequiredConnection("reaction") && !isServiceConnected) {
+                if (await isRequiredConnection("reaction") && !isServiceConnected) {
                     return;
                 }
                 await updateFieldValues(selectedReaction.parameters, setReactionFieldValues);
@@ -642,8 +674,6 @@ const WorkflowBuilder = () => {
             });
         }
 
-        navigate("/my_workflows");
-
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
             {
@@ -657,6 +687,8 @@ const WorkflowBuilder = () => {
                 withCredentials: true,
             }
         );
+
+        navigate("/my_workflows");
 
         sessionStorage.removeItem("state-data");
         setSelectedActionService(null);
