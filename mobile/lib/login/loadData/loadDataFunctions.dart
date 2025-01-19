@@ -25,6 +25,7 @@ class LoadDataFunctions {
     Globaldata.userInfos.createdat = getInfosFromUserDataString(userDataString, "createdat: ");
     Globaldata.userInfos.timezone = getInfosFromUserDataString(userDataString, "timezone: ");
     Globaldata.userInfos.connectiontype = getInfosFromUserDataString(userDataString, "connectiontype: ");
+    Globaldata.userInfos.username = Globaldata.userInfos.email.split("@").first.replaceAll(".", "");
   }
 
   static Future<dynamic> getServiceActionsOrReactions(String route) async {

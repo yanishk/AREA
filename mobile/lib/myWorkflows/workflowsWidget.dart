@@ -130,7 +130,7 @@ class WorkflowsTiles extends StatelessWidget {
             padding: const EdgeInsets.only(left: 0),
             mainAxisAlignment: MainAxisAlignment.start,
             firstChild: Text(
-              "By ",
+              "by ",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,

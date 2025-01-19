@@ -11,10 +11,8 @@ import Steps from "../utils/CreateStepsType";
 import { Parameters } from "../utils/ActionReactionParameters";
 import { ActionType } from "../utils/ActionType";
 import { ReactionType } from "../utils/ReactionType";
-import getFieldValues from "../utils/getFieldValues";
+import getFieldValues from "../utils/GetFieldValues";
 import { setSelectedWorkspace } from "../utils/AsanaUtils";
-import { monthType } from "../utils/monthType";
-import { dayType } from "../utils/dayType";
 import { getDiscordChannels, getServerIdByName, setSelectedServer } from "../utils/DiscordUtils";
 
 type availableActionsType = {
@@ -83,7 +81,7 @@ const WorkflowBuilder = () => {
             handleDeleteAction();
             handleDeleteReaction();
             sessionStorage.removeItem("state-data");
-            navigate("/explore")
+            navigate(-1);
             return;
         }
         if (currentStep == Steps.SELECT_SERVICE_ACTION) {
@@ -325,8 +323,6 @@ const WorkflowBuilder = () => {
                 ...prev,
                 [id]: value,
             }));
-        } else {
-            console.error(`Invalid type parameter: ${type}`);
         }
     };
 
@@ -447,6 +443,23 @@ const WorkflowBuilder = () => {
         window.history.replaceState({}, document.title, url.toString());
     };
 
+    const isServiceConnectedStatus = async (Servicename: string): Promise<boolean> => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}service-authentication-status?service=${Servicename}`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            return result.data.authenticated;
+        } catch (error) {
+            console.error("Error with service authentication status:", error);
+            return false;
+        }
+    };
+
+
     useEffect(() => {
         const getSavedData = async () => {
             const params = new URLSearchParams(window.location.search);
@@ -461,13 +474,6 @@ const WorkflowBuilder = () => {
 
             const jsonState = JSON.parse(state);
 
-            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
-                goToStep(Steps.TRIGGER_ACTION);
-            }
-            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
-                goToStep(Steps.TRIGGER_REACTION);
-            }
-
             const serviceAuth = jsonState.selectedService;
 
             updateStateFromSession(jsonState);
@@ -477,6 +483,23 @@ const WorkflowBuilder = () => {
             }
 
             await handleServiceCallback(codeAuth, serviceAuth.name);
+
+            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedActionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_ACTION);
+                }
+                return;
+            }
+            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedReactionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_REACTION);
+                }
+                return;
+            }
 
             sessionStorage.removeItem("state-data");
 
@@ -518,9 +541,15 @@ const WorkflowBuilder = () => {
             }
         };
 
-        fetchFieldValues();
+        const test = async () => {
+            if (isServiceConnected) {
+                fetchFieldValues();
+            }
+        }
 
-    }, [selectedAction, selectedReaction]);
+        test();
+
+    }, [selectedAction, selectedReaction, isServiceConnected]);
 
     const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
@@ -618,34 +647,20 @@ const WorkflowBuilder = () => {
                 if (param.type != "int" || actionParams === null) {
                     return null;
                 }
-                if (param.name === "month") {
-                    const monthName = actionParams?.[param.name];
-                    actionParams[param.name] = monthType[monthName];
-                    return actionParams[param.name];
-                }
-                if (param.name === "day") {
-                    const dayName = actionParams?.[param.name];
-                    if (dayType[dayName] != null)
-                        actionParams[param.name] = dayType[dayName];
-                    else
-                        actionParams[param.name] = parseInt(actionParams[param.name], 10);
-                    return actionParams[param.name];
-                }
-                if (param.name === "hour") {
-                    const hourParams = actionParams?.[param.name];
-                    const [hour, period] = hourParams.split(" ");
-                    let hourInt = parseInt(hour, 10);
 
-                    if (period === "PM" && hourInt !== 12) {
-                        hourInt += 12;
-                    }
-                    if (period === "AM" && hourInt === 12) {
-                        hourInt = 0;
-                    }
-                    actionParams[param.name] = hourInt;
-                    return actionParams[param.name];
+                const selectedParam = actionParams?.[param.name];
+                let index = param.values.indexOf(selectedParam);
+
+                if (param.values[0] === "0") {
+                    actionParams[param.name] = index;
                 }
-                actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                if (index != -1) {
+                    actionParams[param.name] = index + 1;
+                } else {
+                    actionParams[param.name] = parseInt(actionParams[param.name], 10);
+                }
+
+                return actionParams[param.name]
             });
         }
 
@@ -659,7 +674,7 @@ const WorkflowBuilder = () => {
             });
         }
 
-        navigate("/explore");
+        navigate("/my_workflows");
 
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
