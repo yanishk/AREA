@@ -31,19 +31,24 @@ const AccountPage = () => {
         getUserEmail();
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        goHome();
-    }
-
     const handleDelete = async () => {
         try {
-            await axios.delete(
+            const result = await axios.delete(
                 `${import.meta.env.VITE_API_URL}user`, {
                     withCredentials: true,
                 }
             );
-            handleLogout();
+
+            if (result.data.success) {
+                navigate("/explore", {
+                    state: {
+                        notification: "Account deleted",
+                        notificationTrigger: Date.now()
+                    }
+                });
+            }
+
+            logout();
         } catch (error) {
             console.error("Failed to delete account : ", error);
         }
@@ -51,10 +56,6 @@ const AccountPage = () => {
 
     const goBack = () => {
         navigate(-1);
-    };
-
-    const goHome = () => {
-        navigate("/explore");
     };
 
     const handleShowModal = () => {

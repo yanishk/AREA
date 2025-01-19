@@ -10,8 +10,8 @@ type Parameters = {
 
 interface SelectActionReactionStepProps {
     selectedService: { name: string; color: string; iconPath: string } | null;
-    availableItems: { name: string; description: string; id: string; parameters: Parameters[] } [] | null;
-    handleSelect: (name: string, id: string, parameters: Parameters[]) => void;
+    availableItems: { name: string; description: string; id: string; nbparam: number, parameters: Parameters[] } [] | null;
+    handleSelect: (name: string, id: string, nbparam: number, parameters: Parameters[]) => void;
     goBack: () => void;
     type: "action" | "reaction";
 }
@@ -63,6 +63,7 @@ const SelectActionReactionStep: React.FC<SelectActionReactionStepProps> = ({
                                 onClick={() => handleSelect(
                                     element.name,
                                     element.id,
+                                    element.nbparam,
                                     element.parameters
                                 )
                             }

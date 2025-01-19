@@ -219,7 +219,9 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     };
 
     const renderAsanaFields = () => {
-        if (!selectedItem) return null;
+        if (!selectedItem) {
+            return null;
+        }
 
         return (
             <div className="w-full max-w-[520px] mx-auto">
@@ -313,7 +315,9 @@ const TriggerActionReactionStep: React.FC<TriggerActionReactionProps> = ({
     };
 
     const renderDiscordFields = () => {
-    if (!selectedItem) return null;
+    if (!selectedItem) {
+        return null;
+    }
 
     return (
         <div className="w-full max-w-[520px] mx-auto">
