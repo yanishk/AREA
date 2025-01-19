@@ -46,6 +46,10 @@ func checkEveryMonthOnTheParamValidity(day interface{}, hour interface{}, minute
 	return dayNumber, hourNumber, minuteNumber, nil
 }
 
+func checkEveryWeekAtParamValidity(day interface{}, hour interface{}, minute interface{}) (float64, float64, float64, error) {
+	return checkEveryMonthOnTheParamValidity(day, hour, minute)
+}
+
 func checkEveryYearParamValidity(month interface{}, day interface{}, hour interface{}, minute interface{}) (float64, float64, float64, float64, error) {
 	var monthNumber, dayNumber, hourNumber, minuteNumber float64
 
@@ -111,7 +115,7 @@ func (self *WorkflowService) checkTimeAndDateEveryWeekAtAction(timeRes entities.
 	}
 
 	for _, day := range dayArray {
-		dayNumber, hourNumber, minuteNumber, err := checkEveryMonthOnTheParamValidity(day, hour, minute)
+		dayNumber, hourNumber, minuteNumber, err := checkEveryWeekAtParamValidity(day, hour, minute)
 		if err != nil {
 			return err
 		}
