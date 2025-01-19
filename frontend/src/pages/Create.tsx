@@ -411,6 +411,23 @@ const WorkflowBuilder = () => {
         window.history.replaceState({}, document.title, url.toString());
     };
 
+    const isServiceConnectedStatus = async (Servicename: string): Promise<boolean> => {
+        try {
+            const result = await axios.get(
+                `${import.meta.env.VITE_API_URL}service-authentication-status?service=${Servicename}`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            return result.data.authenticated;
+        } catch (error) {
+            console.error("Error with service authentication status:", error);
+            return false;
+        }
+    };
+
+
     useEffect(() => {
         const getSavedData = async () => {
             const params = new URLSearchParams(window.location.search);
@@ -425,13 +442,6 @@ const WorkflowBuilder = () => {
 
             const jsonState = JSON.parse(state);
 
-            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
-                goToStep(Steps.TRIGGER_ACTION);
-            }
-            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
-                goToStep(Steps.TRIGGER_REACTION);
-            }
-
             const serviceAuth = jsonState.selectedService;
 
             updateStateFromSession(jsonState);
@@ -441,6 +451,23 @@ const WorkflowBuilder = () => {
             }
 
             await handleServiceCallback(codeAuth, serviceAuth.name);
+
+            if (jsonState.type === "action" && jsonState.selectedAction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedActionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_ACTION);
+                }
+                return;
+            }
+            if (jsonState.type === "reaction" && jsonState.selectedReaction?.parameters != null) {
+                const isconnected = await isServiceConnectedStatus(jsonState.selectedReactionService?.name)
+
+                if (isconnected) {
+                    goToStep(Steps.TRIGGER_REACTION);
+                }
+                return;
+            }
 
             sessionStorage.removeItem("state-data");
 
@@ -482,9 +509,15 @@ const WorkflowBuilder = () => {
             }
         };
 
-        fetchFieldValues();
+        const test = async () => {
+            if (isServiceConnected) {
+                fetchFieldValues();
+            }
+        }
 
-    }, [selectedAction, selectedReaction]);
+        test();
+
+    }, [selectedAction, selectedReaction, isServiceConnected]);
 
     const getActionReactionParams = async (
         valuesSelectedByUser: Record<string, string>,
