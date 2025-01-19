@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
-import ErrorMessage from "../components/errors/ErrorMessage"
 import Navbar from "../components/navbar/Navbar"
 import {useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 import MaxWidthWrapper from "../components/MaxWidthWrapper";
+import MessageBox from "../components/notification/MessageBox";
 
 const ExplorePage = () => {
     const location = useLocation();
-    const [error, setError] = useState("");
-    const [errorTrigger, setErrorTrigger] = useState(0);
+    const [notification, setNotification] = useState("");
+    const [notificationTrigger, setNotificationTrigger] = useState(0);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [services, setServices] = useState<any[]>([]);
     const { login } = useAuth();
 
     useEffect(() => {
-        if (location.state?.error) {
-            setError(location.state.error);
+        if (location.state?.notification) {
+            setNotification(location.state.notification);
         }
-        if (location.state?.errorTrigger) {
-            setErrorTrigger(location.state.errorTrigger);
+        if (location.state?.notificationTrigger) {
+            setNotificationTrigger(location.state.notificationTrigger);
         }
     }, [location.state]);
 
@@ -71,15 +71,16 @@ const ExplorePage = () => {
     }, []);
 
     const handleErrorClose = () => {
-        setError("");
-        setErrorTrigger(0);
+        setNotification("");
+        setNotificationTrigger(0);
         navigate(location.pathname, { replace: true, state: {} });
     };
 
     return (
         <>
             <Navbar bgColor="bg-white"/>
-            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose} />
+
+            <MessageBox message={notification} trigger={notificationTrigger} onClose={handleErrorClose} type="validation" timeout={3000} />
 
             <div
                     className="flex items-center justify-center mt-10"

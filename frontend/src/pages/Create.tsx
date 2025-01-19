@@ -674,8 +674,6 @@ const WorkflowBuilder = () => {
             });
         }
 
-        navigate("/my_workflows");
-
         await axios.post(
             `${import.meta.env.VITE_API_URL}workflows`,
             {
@@ -689,6 +687,8 @@ const WorkflowBuilder = () => {
                 withCredentials: true,
             }
         );
+
+        navigate("/my_workflows");
 
         sessionStorage.removeItem("state-data");
         setSelectedActionService(null);

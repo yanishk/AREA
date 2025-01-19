@@ -7,10 +7,10 @@ import InputField from "../components/inputs/InputsField";
 import ButtonValidation from "../components/buttons/ButtonValidation";
 import CallToActionLink from "../components/CallToActionLink";
 import SocialButton from "../components/buttons/SocialButton";
-import ErrorMessage from "../components/errors/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "./AuthContext";
 import { handleOAuthLogin } from "../OAuth";
+import MessageBox from "../components/notification/MessageBox";
 
 const LoginForm = () => {
     const { login } = useAuth();
@@ -70,7 +70,7 @@ const LoginForm = () => {
 
     return (
         <>
-            <ErrorMessage message={error} trigger={errorTrigger} onClose={handleErrorClose}/>
+            <MessageBox message={error} trigger={errorTrigger} onClose={handleErrorClose} type="error" timeout={3000}/>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[#F9FAFB]">
                 <h1
                     className="text-4xl text-[#222222] hover:text-[#333333] font-extrabold mt-10">

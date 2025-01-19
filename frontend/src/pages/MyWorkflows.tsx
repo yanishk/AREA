@@ -3,16 +3,20 @@ import MaxWidthWrapper from "../components/MaxWidthWrapper"
 import Navbar from "../components/navbar/Navbar"
 import { useEffect, useState } from "react";
 import { getUserName } from "../utils/GetUserName";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import getServiceDetails from "../utils/GetServiceDetails";
 import ButtonValidation from "../components/buttons/ButtonValidation";
+import MessageBox from "../components/notification/MessageBox";
 
 const MyWorkflow = () => {
 
     const [userWorkflows, setUserWorkflows] = useState<any[]>([]);
     const [userName, setUserName] = useState("You");
     const [isLoading, setIsLoading] = useState(true);
+    const [notification, setNotification] = useState("");
+    const [notificationTrigger, setNotificationTrigger] = useState(0);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const getUserWorkflows = async () => {
         try {
@@ -47,12 +51,21 @@ const MyWorkflow = () => {
                 })
             );
 
-            setIsLoading(false);
             setUserWorkflows(workflowsDetails);
+            setIsLoading(false);
         } catch (err) {
             console.error("Error fetching workflows:", err);
         }
     };
+
+    useEffect(() => {
+        if (location.state?.notification) {
+            setNotification(location.state.notification);
+        }
+        if (location.state?.notificationTrigger) {
+            setNotificationTrigger(location.state.notificationTrigger);
+        }
+    }, [location.state]);
 
     useEffect(() => {
         const fetchUserName = async () => {
@@ -73,6 +86,12 @@ const MyWorkflow = () => {
         }
         return text;
     }
+
+    const handleNotificationClose = () => {
+        setNotification("");
+        setNotificationTrigger(0);
+        navigate(location.pathname, { replace: true, state: {} });
+    };
 
     const renderContent = () => {
         if (isLoading) {
@@ -207,23 +226,31 @@ const MyWorkflow = () => {
                                                 </span>
                                             </div>
                                         ) : (
-                                            <div className="mb-[60px]"></div>
+                                            <div className="mb-[51px]"></div>
                                         )}
                                     </div>
                                 </div>
-
-                                    </button>
-
-                                ))}
-                            </div>
-                        </div>
-                    </>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </>
         )
     }
 
     return (
         <>
             <Navbar />
+
+            {notification && (
+                <MessageBox
+                    message={notification}
+                    trigger={notificationTrigger}
+                    onClose={handleNotificationClose}
+                    type="notification"
+                    timeout={3000}
+                />
+            )}
 
             <MaxWidthWrapper
                 maxWidth="1120px"
