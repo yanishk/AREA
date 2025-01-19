@@ -8,8 +8,8 @@ import MessageBox from "../components/notification/MessageBox";
 
 const ExplorePage = () => {
     const location = useLocation();
-    const [notification, setError] = useState("");
-    const [errorTrigger, setErrorTrigger] = useState(0);
+    const [notification, setNotification] = useState("");
+    const [notificationTrigger, setNotificationTrigger] = useState(0);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [services, setServices] = useState<any[]>([]);
@@ -17,10 +17,10 @@ const ExplorePage = () => {
 
     useEffect(() => {
         if (location.state?.notification) {
-            setError(location.state.error);
+            setNotification(location.state.notification);
         }
-        if (location.state?.errorTrigger) {
-            setErrorTrigger(location.state.errorTrigger);
+        if (location.state?.notificationTrigger) {
+            setNotificationTrigger(location.state.notificationTrigger);
         }
     }, [location.state]);
 
@@ -71,8 +71,8 @@ const ExplorePage = () => {
     }, []);
 
     const handleErrorClose = () => {
-        setError("");
-        setErrorTrigger(0);
+        setNotification("");
+        setNotificationTrigger(0);
         navigate(location.pathname, { replace: true, state: {} });
     };
 
@@ -80,7 +80,7 @@ const ExplorePage = () => {
         <>
             <Navbar bgColor="bg-white"/>
 
-            <MessageBox message={error} trigger={errorTrigger} onClose={handleErrorClose} type="error" timeout={3000} />
+            <MessageBox message={notification} trigger={notificationTrigger} onClose={handleErrorClose} type="validation" timeout={3000} />
 
             <div
                     className="flex items-center justify-center mt-10"
