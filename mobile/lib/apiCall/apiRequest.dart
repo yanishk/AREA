@@ -18,11 +18,15 @@ HttpClient createHttpClient() {
 class ApiRequest {
   static final ioClient = IOClient(createHttpClient());
 
+  static String removeDoubleSlash(String url) {
+    return "https://" + url.split("https://").last.replaceAll("//", "/");
+  }
+
   static Future<Response> get(String apiRoute) async {
     developer.log('GetApi route : $apiRoute');
     try {
       final response = await ioClient.get(
-        Uri.parse(ApiData.apiUrl + apiRoute),
+        Uri.parse(removeDoubleSlash(ApiData.apiUrl + apiRoute)),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Cookie': Globaldata.JWToken,
@@ -41,7 +45,7 @@ class ApiRequest {
     developer.log('PutApi route : $apiRoute');
     try {
       final response = await ioClient.put(
-        Uri.parse('${ApiData.apiUrl + apiRoute}'),
+        Uri.parse(removeDoubleSlash(ApiData.apiUrl + apiRoute)),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Cookie': Globaldata.JWToken,
@@ -61,7 +65,7 @@ class ApiRequest {
     developer.log('DeleteApi route : $apiRoute');
     try {
       final response = await ioClient.delete(
-        Uri.parse('${ApiData.apiUrl + apiRoute}'),
+        Uri.parse(removeDoubleSlash(ApiData.apiUrl + apiRoute)),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Cookie': Globaldata.JWToken,
@@ -81,7 +85,7 @@ class ApiRequest {
     developer.log("api domaine : ${ApiData.apiUrl}");
     try {
       final response = await ioClient.post(
-        Uri.parse('${ApiData.apiUrl + apiRoute}'),
+        Uri.parse(removeDoubleSlash(ApiData.apiUrl + apiRoute)),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Cookie': Globaldata.JWToken,
