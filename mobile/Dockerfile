@@ -1,4 +1,4 @@
-FROM openjdk:17-slim AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -25,7 +25,7 @@ RUN yes | sdkmanager --licenses
 
 RUN sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-30"
 
-RUN git clone https://github.com/flutter/flutter.git /opt/flutter
+RUN git clone --depth 1 --branch 3.27.1 https://github.com/flutter/flutter.git /opt/flutter
 ENV PATH="/opt/flutter/bin:${PATH}"
 
 RUN flutter doctor --android-licenses
